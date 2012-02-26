@@ -13,8 +13,14 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
   try {
     if(empty($c->idnumber)) throw new moodle_exception('empty idnumber');
 
-    $cr = create_course($c);
-    $tr = array( 'result' => 'ok', 'id' => $cr->id );
+    if($c->isa == 'NEW' ) {
+      $cr = create_course($c);
+      $tr = array( 'result' => 'ok', 'id' => $cr->id, 'idnumber' => $c->idnumber );
+    } else if($c->isa == 'DELETE') {
+      throw new moodle_exception('delete not implemented for courses');
+    } else {
+      throw new moodle_exception('dont understand '.$c->isa);
+    }
   } catch( Exception $e ) {
     $tr = array(
       'result' => 'error',
