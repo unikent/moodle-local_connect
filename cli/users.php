@@ -34,6 +34,9 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         case "teacher":
           $role = "teacher";
           break;
+        case "student":
+          $role = "student";
+          break;
         default:
           throw new moodle_exception('unknown role '.$c->role);
         }
