@@ -8,14 +8,35 @@ require(dirname(dirname(__FILE__)).'/locallib.php');
 
 $res = array();
 
+/*
+ * expects input :
+ * [
+ *  { shortname => "", fullname => "",
+ *    category => 1, visible => 1, idnumber => "",
+ *    startdate => '', isa => "NEW" }
+ *  ...
+ * ]
+ *
+ * sends output :
+ * [
+ *   { 'result' => 'ok' or 'error', 'exception' => if error
+ *     moodle_course_id => 123, 'in' => input }
+ * ]
+ */
+
 foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
   $tr = array();
   try {
     if(empty($c->idnumber)) throw new moodle_exception('empty idnumber');
 
     if($c->isa == 'NEW' ) {
+      global $DB;
+      $r = $DB->get_record('course',array('idnumber'=>$c->idnumber));
+      if($r) {
+        throw new moodle_exception('non unique idnumber');
+      }
       $cr = create_course($c);
-      $tr = array( 'result' => 'ok', 'id' => $cr->id, 'idnumber' => $c->idnumber );
+      $tr = array( 'result' => 'ok', 'moodle_course_id' => $cr->id, 'in' => $c );
     } else if($c->isa == 'DELETE') {
       throw new moodle_exception('delete not implemented for courses');
     } else {
@@ -24,7 +45,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
   } catch( Exception $e ) {
     $tr = array(
       'result' => 'error',
-      'idnumber' => "$c->idnumber",
+      'in' => $c,
       'exception' => $e->getMessage() );
   }
   $res []= $tr;

@@ -9,13 +9,30 @@ require_once(dirname(dirname(__FILE__)).'/locallib.php');
 
 $res = array();
 
+/*
+ * expects input :
+ * [
+ *   { username => "", password => '',
+ *     firstname => "", lastname => "",
+ *     email => "", auth => 'manual', isa => "NEW" 
+ *     role => "convenor|teacher|student", moodle_course_id => "" }
+ *  ...
+ * ]
+ *
+ * sends output :
+ * [
+ *   { 'result' => 'ok' or 'error', 'exception' => if error
+ *     moodle_user_id => 123, 'in' => input }
+ * ]
+ */
+
 foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
   global $DB;
   $tr = array();
   try {
-    if(empty($c->idnumber)) throw new moodle_exception('empty idnumber');
+    if(empty($c->username)) throw new moodle_exception('empty username');
 
-    $uid = $DB->get_record('user',array('idnumber'=>$c->idnumber));
+    $uid = $DB->get_record('user',array('username'=>$c->username));
 
     if($c->isa == 'NEW') {
       if(!$uid) {
@@ -24,7 +41,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         $uid = $uid->id;
       }
 
-      if(!empty($c->course_id) && !empty($c->role)) {
+      if(!empty($c->moodle_course_id) && !empty($c->role)) {
         // we want to enrol
         $role = '';
         switch($c->role) {
@@ -42,7 +59,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         }
 
         $role = $DB->get_record('role', array('shortname'=>$role));
-        $r = enrol_try_internal_enrol($c->course_id, $uid, $role->id);
+        $r = enrol_try_internal_enrol($c->moodle_course_id, $uid, $role->id);
         if(!$r) throw new moodle_exception('enrol_internal gave us false');
       }
     } else if($c->isa == 'DELETE') {
@@ -53,8 +70,8 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         if (!$enrol = enrol_get_plugin('manual')) {
           throw new moodle_exception('manual enrolment plugin not found?');
         }
-        if (!$instances = $DB->get_records('enrol', array('enrol'=>'manual', 'courseid'=>$c->course_id, 'status'=>ENROL_INSTANCE_ENABLED), 'sortorder,id ASC')) {
-          throw new moodle_exception('no course? ' + $c->course_id);
+        if (!$instances = $DB->get_records('enrol', array('enrol'=>'manual', 'courseid'=>$c->moodle_course_id, 'status'=>ENROL_INSTANCE_ENABLED), 'sortorder,id ASC')) {
+          throw new moodle_exception('no course? ' + $c->moodle_course_id);
         }
         $instance = reset($instances);
         $enrol->unenrol_user($instance, $uid->id);
@@ -63,11 +80,11 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       throw new moodle_exception('dont understand ' + $c->isa);
     }
 
-    $tr = array( 'result' => 'ok', 'id' => $uid, 'idnumber' => $c->idnumber );
+    $tr = array( 'result' => 'ok', 'moodle_user_id' => $uid, 'username' => $c->username, 'in' => $c );
   } catch( Exception $e ) {
     $tr = array(
       'result' => 'error',
-      'idnumber' => "$c->idnumber",
+      'in' => $c,
       'exception' => $e->getMessage() );
   }
   $res []= $tr;
