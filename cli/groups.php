@@ -13,7 +13,7 @@ $res = array();
 /*
  * expects input : (needs user fields in here too)
  * [
- *  { 'moodle_user_id' => 123, 'group_desc' => 'something', 'moodle_course_id' => 321
+ *  { 'username' => 'abc', 'group_desc' => 'something', 'moodle_course_id' => 321
  *    'isa' => 'NEW' or 'DELETE'
  *    'moodle_group_id' => 354 or nil }
  *  ...
@@ -31,7 +31,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
   $tr = array();
   $group = (object) array();
   try {
-    $uid = !empty($c->moodle_user_id) ? $DB->get_record('user',array('id'=>$c->moodle_user_id)) : false;
+    $uid = !empty($c->username) ? $DB->get_record('user',array('username'=>$c->username)) : false;
 
     if($c->isa == 'NEW') {
       if(!$uid) {
