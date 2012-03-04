@@ -50,7 +50,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       $r = groups_add_member($group,$uid);
       if(!$r) {
         $reason = '';
-        if( !is_enrolled(get_context_instance(CONTEXT_COURSE,$group->moodle_course_id), $uid) ) {
+        if( !is_enrolled(get_context_instance(CONTEXT_COURSE,$c->moodle_course_id), $uid) ) {
           $reason = 'user isnt enrolled on course '.$group->courseid;
         }
         throw new moodle_exception('group_add_member failed for '.$group->id.' and '.$uid.' '.$reason);
