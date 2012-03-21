@@ -1,12 +1,17 @@
 <?php
 
 $capabilities = array(
-  'local/kent-connect:publish' => array(
-    'riskbitmask' => RISK_CONFIG,
-    'captype' => 'write',
-    'contextlevel' => CONTEXT_SYSTEM,
-    'archetypes' => array(
-      'admin' => CAP_ALLOW
-    )
-  )
+	// Ability to access da pages
+    'local/kent-connect:manage' => array(
+        'riskbitmask' => RISK_MANAGETRUST & RISK_CONFIG,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'guest' => CAP_PREVENT,
+            'student' => CAP_PREVENT,
+            'teacher' => CAP_PREVENT,
+            'editingteacher' => CAP_PREVENT,
+            'manager' => CAP_PREVENT
+        )
+    ),
 );

@@ -1,4 +1,6 @@
 <?php
 
 $string['pluginname'] = 'Kent connect related utils';
-$string['kent-connect:publish'] = 'Publish sds deliveries into moodle';
+$string['connectreport'] = 'Departmental administration';
+$string['kent-connect:manage'] = 'Departmental administrator';
+$string['accessdenied'] = 'You are not permitted to view the Departmental administration page';

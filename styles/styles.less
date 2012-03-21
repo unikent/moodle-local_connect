@@ -1,0 +1,313 @@
+.gradient(@color: #F5F5F5, @start: #EEE, @stop: #FFF) {
+  background: @color;
+  background: -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, @start),
+                               color-stop(1, @stop));
+  background: -ms-linear-gradient(bottom,
+                                  @start,
+                                  @stop);
+  background: -moz-linear-gradient(center bottom,
+                                   @start 0%,
+                                   @stop 100%);
+}
+.bw-gradient(@color: #F5F5F5, @start: 0, @stop: 255) {
+  background: @color;
+  background: -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, rgb(@start,@start,@start)),
+                               color-stop(1, rgb(@stop,@stop,@stop)));
+  background: -ms-linear-gradient(bottom,
+                                  rgb(@start,@start,@start) 0%,
+                                  rgb(@start,@start,@start) 100%);
+  background: -moz-linear-gradient(center bottom,
+                                   rgb(@start,@start,@start) 0%,
+                                   rgb(@stop,@stop,@stop) 100%);
+}
+.drop-shadow(@x-axis: 0, @y-axis: 1px, @blur: 2px, @alpha: 0.1) {
+  -webkit-box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
+  -moz-box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
+  box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
+}
+.rounded(@radius: 2px) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  border-radius: @radius;
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
+}
+.border-radius(@topright: 0, @bottomright: 0, @bottomleft: 0, @topleft: 0) {
+  -webkit-border-top-right-radius: @topright;
+  -webkit-border-bottom-right-radius: @bottomright;
+  -webkit-border-bottom-left-radius: @bottomleft;
+  -webkit-border-top-left-radius: @topleft;
+  -moz-border-radius-topright: @topright;
+  -moz-border-radius-bottomright: @bottomright;
+  -moz-border-radius-bottomleft: @bottomleft;
+  -moz-border-radius-topleft: @topleft;
+  border-top-right-radius: @topright;
+  border-bottom-right-radius: @bottomright;
+  border-bottom-left-radius: @bottomleft;
+  border-top-left-radius: @topleft;
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
+}
+.opacity(@opacity: 0.5) {
+  -moz-opacity: @opacity;
+  -khtml-opacity: @opacity;
+  -webkit-opacity: @opacity;
+  opacity: @opacity;
+}
+.transition-duration(@duration: 0.2s) {
+  -moz-transition-duration: @duration;
+  -webkit-transition-duration: @duration;
+  transition-duration: @duration;
+}
+
+.inner-shadow(@horizontal:0, @vertical:1px, @blur:2px, @alpha: 0.4) {
+  -webkit-box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
+  -moz-box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
+  box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
+}
+.box-shadow(@arguments) {
+  -webkit-box-shadow: @arguments;
+  -moz-box-shadow: @arguments;
+  box-shadow: @arguments;
+}
+
+
+.dataTable {
+	clear: both;
+	width: 100%;
+}
+
+#filter-status {
+	/*display: none;*/
+}
+
+
+
+#dapage_app {
+	border: 1px solid #e3e3e3;
+	.rounded(5px);
+
+	#options_bar {
+		clear: both;
+		padding: 20px;
+		height: 34px;
+		.border-radius(5px, 0, 0, 5px);
+		.gradient(#efefef, #e9e9e9, #efefef);
+		border-color: #fff #fff #e3e3e3 #fff;
+		border-style: solid;
+		border-width: 1px;
+
+		ul#status_toggle {
+			clear: left;
+			margin: 0px;
+			float: left;
+			margin-top: 10px;
+
+			li {
+				list-style: none;
+				float: left;
+				padding-right: 20px;
+				position: relative;
+
+				input {
+					margin: 0px;
+				}
+
+				input[type=checkbox] {
+					position: absolute;
+					left: -999em;
+				}
+
+				input[type=checkbox] + label {
+					display: block;
+					height: 20px;
+					padding: 2px 0 0 40px;
+					background: url(../images/checkbox_empty.png) top left no-repeat;
+					color: #777;
+					text-shadow: 0 1px 1px #fff;
+				}
+
+				input[type=checkbox]:checked + label {
+					background-image: url(../images/checkbox_tick.png);
+				}
+			}
+		}
+
+		#dasearch {
+			float: right;
+			width: 20%;
+
+			input {
+				width: 90%;
+			}
+		}
+	}
+
+	#datable_wrapper {
+
+		.dataTables_filter {
+			display: none;
+		}
+
+		#datable {
+			border-collapse: inherit;
+			margin-bottom: 0px;
+
+			thead {
+
+				tr {
+					background-color: #fafafa;
+					border-color: #fff #fff #e3e3e3 #fff;
+					border-style: solid;
+					border-width: 1px;
+
+					th {
+						color: #333;
+						font-weight: normal;
+						font-size: 14px;
+						text-shadow: 0 1px 1px #fff;
+					}
+				}
+
+				.code {
+					width:6%;
+				}
+
+				.name {
+					width: 20%;
+				}
+
+				.campus {
+					width: 5%;
+				}
+
+				.duration {
+					width: 10%;
+				}
+
+				.students {
+					width: 5%;
+				}
+
+				.summary {
+					width: 25%;
+				}
+
+				.status {
+					width: 5%;
+				}
+			}
+
+			tbody {
+					
+					tr {
+						.gradient(#f5f5f5, #eee, #f5f5f5);
+
+						td {
+							padding: 10px;
+							border-top: 1px solid #fff;
+							border-bottom: 1px solid #e3e3e3;
+							color: #6f6f6f;
+							text-shadow: 0 1px 1px #fff;
+						}
+
+						td:first-child {
+							border-left: 1px solid #fff;
+						}
+
+						td:last-child {
+							border-right: 1px solid #fff;
+						}
+
+						td.status {
+							text-align: center;
+
+							.status_1 {
+
+								text-indent: -9999px;
+								background: url(../images/status_new.png) no-repeat center center;
+							}
+
+							.status_2 {
+
+								text-indent: -9999px;
+								background: url(../images/status_pending.png) no-repeat center center;
+							}
+
+							.status_3 {
+
+								text-indent: -9999px;
+								background: url(../images/status_active.png) no-repeat center center;
+							}
+
+							.status_4 {
+
+								text-indent: -9999px;
+								background: url(../images/status_error.png) no-repeat center center;
+							}
+
+						}
+
+						td.sorting_1 {
+							background: #e9e9e9;
+						}
+					}
+
+					tr.row_selected {
+						.gradient(#B0BBCD, #A7B2C3, #B0BBCD);
+
+						td {
+							.gradient(#B0BBCD, #A7B2C3, #B0BBCD);
+						}
+					}
+
+					tr:last-child {
+
+						td {
+							border-bottom: 1px solid #fff;
+						}
+
+						td:first-child {
+							.border-radius(0, 0,5px, 0);
+						}
+
+						td:last-child {
+							.border-radius(0, 5px, 0, 0);
+						}
+						
+
+					}
+
+					tr:hover {
+						cursor: pointer;
+						.gradient(#efefef, #e9e9e9, #efefef);
+
+						td {
+							.gradient(#efefef, #e9e9e9, #efefef);
+						}
+					}
+
+					tr.row_selected:hover {
+						cursor: pointer;
+						.gradient(#C9D5EA, #C2CEE2, #C9D5EA);
+
+						td {
+							.gradient(#C9D5EA, #C2CEE2, #C9D5EA);
+						}
+					}
+			}
+
+			tfoot {
+				/*display: none;*/
+			}
+		}
+
+		#datable_info {
+			margin: 10px 0 0 10px;
+		}
+	}
+}
