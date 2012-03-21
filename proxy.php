@@ -6,7 +6,7 @@ if( !$CFG->kent_connect ) die(0);
 $sitecontext = get_context_instance(CONTEXT_SYSTEM);
 $site = get_site();
 
-if (!has_capability('local/kent-connect:publish', $sitecontext)) {
+if (!has_capability('local/kent-connect:manage', $sitecontext)) {
   print_error('nopermissions', 'error', '', 'publish connect courses');
   exit(0);
 }

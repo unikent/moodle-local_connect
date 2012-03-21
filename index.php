@@ -2,7 +2,7 @@
 
 require_once('../../config.php');
 
-global $USER, $PAGE;
+global $USER, $PAGE, $CFG;
 
 require_login();
 
@@ -34,13 +34,13 @@ $table = <<< HEREDOC
 	<div id= "dapage_app">
 		<div id="options_bar">
 			<ul id="status_toggle">
-				<li><input type="checkbox" name="new" value="1"  id="new" class="status_checkbox"/><label for="new">new</label></li>
-				<li><input type="checkbox" name="pending" value="2"  id="pending" class="status_checkbox"/><label for="pending">pending</label></li>
-				<li><input type="checkbox" name="active" value="3"  id="active" class="status_checkbox"/><label for="active">active</label></li>
-				<li><input type="checkbox" name="error" value="4"  id="error" class="status_checkbox"/><label for="error">error</label></li>
+				<li><input type="checkbox" name="new" value="1"  id="new" class="status_checkbox"/><label id="label-new" for="new">new</label></li>
+				<li><input type="checkbox" name="pending" value="2"  id="pending" class="status_checkbox"/><label id="label-pending" for="pending">pending</label></li>
+				<li><input type="checkbox" name="active" value="3"  id="active" class="status_checkbox"/><label id="label-active" for="active">active</label></li>
+				<li><input type="checkbox" name="error" value="4"  id="error" class="status_checkbox"/><label id="label-error" for="error">error</label></li>
 			</ul>
 			<div id="dasearch">
-				<input type="text" />
+				<input type="text" id="dasearch-box" name="dasearch-box" />
 			</div>
 		</div>
 		<table id="datable">
@@ -64,6 +64,9 @@ $table = <<< HEREDOC
 			</tbody>
 		</table>
 	</div>
+	<script type="text/javascript">
+		window.dapageUrl = '$CFG->daPageUrl';
+	</script>
 HEREDOC;
 
 echo $table;

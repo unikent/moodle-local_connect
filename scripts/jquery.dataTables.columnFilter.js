@@ -396,29 +396,37 @@
                 checkbox.change(function () {
                         
                         var search = '';
-                        var count = 0;
+                        var vals = new Array();
                         var index = 0;
                         
                         $('input:checkbox[name="'+localLabel+'"]:checked').each(function(index) {
 
                                 //search = search + $(this).val();
-                                count ++;
+                                vals.push($(this).val());
+                                
 
                         });
 
-                        console.log(count);
+                        $('input:checkbox[name="'+localLabel+'"]:checked').each(function(index) {
 
-                        for (var jj = 0; jj < count; jj++) {
-                                        
+                                search = search + $(this).val();
+                                if (search != "" && vals[index + 1] != undefined) {
+                                        search = search + '|';
+                                }
+                        });
+
+                        /*for (var jj = 0; jj < vals.length; jj++) {
+
                             if ($('#status_' + aData[jj]).is(':checked')) {
                                 search = search + $('#status_' + aData[jj]).val();
 
-                                if (search != "" && aData[jj] != "" && count>jj+1) {
+                                console.log(vals.length);
+                                if (search != "" && aData[jj] != "" && vals.length>jj+1) {
                                         search = search + '|';
                                 }
                             }
                         
-                        }
+                        }*/
 
                           
                         /*for (var jj = 0; jj < iLen; jj++) {
@@ -428,7 +436,6 @@
                               $('#' + aData[jj]).addClass("search_init");
                           }
                         }*/
-                          
                     oTable.fnFilter(search, index, true, false);
 
                     

@@ -3,7 +3,7 @@ $(document).ready(function() {
 
 	var oTable = $('#datable').dataTable( {
 		"bProcessing": true,
-		"sAjaxSource": "arrays.txt",
+		"sAjaxSource": window.dapageUrl + 'da-mock.php',
 		"aoColumns": [
 			{'sClass': 'status'},
 			{'sClass': 'code'},
@@ -16,9 +16,23 @@ $(document).ready(function() {
 		},
 		"fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull){
 			$('td:eq(0)', nRow).html('<div class="status_'+aData[0]+'">'+aData[0]+'</div');
+			/*$(nRow).click(function() {
+				if($(this).hasClass('row_selected')) {
+					$(this).removeClass('row_selected');
+				} else {
+					$(this).addClass('row_selected');
+				}
+			});	*/
+		},
+		"fnCreatedRow": function(nRow, aData, iDataIndex) {
+			console.log('bob');
 			$(nRow).click(function() {
-				$(this).toggleClass('row_selected');
-			});	
+				if($(this).hasClass('row_selected')) {
+					$(this).removeClass('row_selected');
+				} else {
+					$(this).addClass('row_selected');
+				}
+			});
 		},
 		"bPaginate" : false,
 
@@ -42,9 +56,10 @@ $(document).ready(function() {
 	$('.status_checkbox').change(function() {
 		if($(this).is(':checked')) {
 			var val = $(this).val();
-			$('#status_' + val).attr('checked','checked').trigger();
+			$('#status_' + val).attr('checked','checked').trigger('change');
 		} else {
-			$('#status_' + val).removeAttr('checked');
+			var val = $(this).val();
+			$('#status_' + val).removeAttr('checked').trigger('change');
 		}
 	});
 });
