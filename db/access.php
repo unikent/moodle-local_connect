@@ -1,8 +1,8 @@
 <?php
 
 $capabilities = array(
-	// Ability to access da pages
-    'local/kent-connect:manage' => array(
+    // Ability to access da pages
+    'local/kentconnect:manage' => array(
         'riskbitmask' => RISK_MANAGETRUST & RISK_CONFIG,
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,

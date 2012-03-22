@@ -9,7 +9,7 @@ require_login();
 $site_context = context_system::instance();
 $PAGE->set_context($site_context);
 
-if (!has_capability('local/kent-connect:manage', $site_context)) {
+if (!has_capability('local/kentconnect:manage', $site_context)) {
     print_error('accessdenied', 'local_connect');
 }
 
