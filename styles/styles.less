@@ -88,8 +88,11 @@
 
 
 #dapage_app {
+	width: 82%;
 	border: 1px solid #e3e3e3;
 	.rounded(5px);
+	float:left;
+	margin-bottom: 20px;
 
 	#options_bar {
 		clear: both;
@@ -106,6 +109,7 @@
 			margin: 0px;
 			float: left;
 			margin-top: 10px;
+			font-size: 12px;
 
 			li {
 				list-style: none;
@@ -125,7 +129,7 @@
 				input[type=checkbox] + label {
 					display: block;
 					height: 20px;
-					padding: 2px 0 0 40px;
+					padding: 3px 0 0 40px;
 					background: url(../images/checkbox_empty.png) top left no-repeat;
 					color: #777;
 					text-shadow: 0 1px 1px #fff;
@@ -148,6 +152,19 @@
 	}
 
 	#datable_wrapper {
+		position: relative;
+
+		#statusbox {
+			width: 500px;
+			cursor: pointer;
+			padding: 5px 10px;
+			margin-top: 25px;
+			text-align: center;
+			background: #f9edbe;
+			border: 1px solid #f0c36d;
+			position: absolute;
+			left: 25%;
+		}
 
 		.dataTables_filter {
 			display: none;
@@ -186,7 +203,7 @@
 				}
 
 				.duration {
-					width: 10%;
+					width: 5%;
 				}
 
 				.students {
@@ -198,7 +215,7 @@
 				}
 
 				.status {
-					width: 5%;
+					width: 10%;
 				}
 			}
 
@@ -224,30 +241,36 @@
 						}
 
 						td.status {
-							text-align: center;
+							text-align: right;
+							padding-right: 20px;
+							font-weight: bold;
 
-							.status_1 {
-
-								text-indent: -9999px;
-								background: url(../images/status_new.png) no-repeat center center;
+							div {
+								background-position: 10px 3px;
+								background-repeat: no-repeat;
+								text-shadow: 0 1px 1px #fff;
 							}
 
-							.status_2 {
-
-								text-indent: -9999px;
-								background: url(../images/status_pending.png) no-repeat center center;
+							.status_unprocessed {
+								color: #689351;
+								background-image: url(../images/status_new.png);
 							}
 
-							.status_3 {
-
-								text-indent: -9999px;
-								background: url(../images/status_active.png) no-repeat center center;
+							.status_scheduled {
+								color: #AA9946;
+								background-image: url(../images/status_pending.png);
 							}
 
-							.status_4 {
+							.status_created_in_moodle {
 
-								text-indent: -9999px;
-								background: url(../images/status_error.png) no-repeat center center;
+								background-image: url(../images/status_active.png);
+								color: #7895C0;
+							}
+
+							.status_failed_in_moodle {
+
+								background-image: url(../images/status_error.png);
+								color: #D38D77;
 							}
 
 						}
@@ -259,9 +282,13 @@
 
 					tr.row_selected {
 						.gradient(#B0BBCD, #A7B2C3, #B0BBCD);
+						color: #fff;
+						text-shadow: none;
 
 						td {
 							.gradient(#B0BBCD, #A7B2C3, #B0BBCD);
+							color: #fff;
+							text-shadow: none;
 						}
 					}
 
@@ -307,7 +334,11 @@
 		}
 
 		#datable_info {
-			margin: 10px 0 0 10px;
+			display: none;
 		}
 	}
+}
+
+#jobs_wrapper {
+	float: right;
 }

@@ -1,5 +1,28 @@
 $(document).ready(function() {
 
+	function statusbox(el, message) {
+		var position = $(el).position();
+		if($('#statusbox').is(':visible') && $('#statusbox').position().top === position.top) {
+			return
+		}
+
+		// kill a statusHide timeout if it exists
+		if (statusHide) clearTimeout(statusHide);
+
+		$('#statusbox').stop(true, true).html(message).css({
+			'top' : position.top,
+		}).click(function() {
+			$(this).hide();
+			clearTimeout(statusHide);
+		}).fadeIn('fast');//.fadeIn('fast').delay(500).fadeOut('fast');
+
+		statusHide = setTimeout(function() {
+			$('#statusbox').fadeOut('fast');
+		}, 5000)
+	}
+
+	var status = [];
+	var statusHide = null;
 
 	var oTable = $('#datable').dataTable( {
 		"bProcessing": true,
@@ -15,51 +38,82 @@ $(document).ready(function() {
 			"sSearch": "Search all columns:"
 		},
 		"fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull){
-			$('td:eq(0)', nRow).html('<div class="status_'+aData[0]+'">'+aData[0]+'</div');
-			/*$(nRow).click(function() {
-				if($(this).hasClass('row_selected')) {
-					$(this).removeClass('row_selected');
-				} else {
-					$(this).addClass('row_selected');
-				}
-			});	*/
+			var name = aData[0].split('_').join(' ');
+			$('td:eq(0)', nRow).html('<div class="status_'+aData[0]+'">'+name+'</div');
+			$('#statusbox').fadeOut('fast');
+
 		},
 		"fnCreatedRow": function(nRow, aData, iDataIndex) {
-			console.log('bob');
+			var name = aData[0].split('_').join(' ');
 			$(nRow).click(function() {
-				if($(this).hasClass('row_selected')) {
-					$(this).removeClass('row_selected');
+				if(aData[0] === 'unprocessed' || aData[0] === 'failed_in_moodle') {
+					if($(this).hasClass('row_selected')) {
+						$(this).removeClass('row_selected');
+					} else {
+						$(this).addClass('row_selected');
+					}
 				} else {
-					$(this).addClass('row_selected');
+					statusbox (nRow, 'Error: you cannot push a delivery with a status of ' + name);
 				}
 			});
 		},
 		"bPaginate" : false,
 
-	}).columnFilter({
-		aoColumns: [
-			{
-				type: 'checkbox',
-				values: ['1', '2', '3', '4']
-			},
-			null,
-			null,
-			null,
-			null,
-		]
-	});
+		fnInitComplete: function(oSettings, json) {
 
-	$('#dasearch input').keyup(function() {
-		oTable.fnFilter($(this).val());
-	});
+			$('#datable tbody tr').click(function() {
 
-	$('.status_checkbox').change(function() {
-		if($(this).is(':checked')) {
-			var val = $(this).val();
-			$('#status_' + val).attr('checked','checked').trigger('change');
-		} else {
-			var val = $(this).val();
-			$('#status_' + val).removeAttr('checked').trigger('change');
+				//console.log(oTable.fnGetNodes());
+				var count = 0;
+				$('#datable tbody tr.row_selected').each(function() {
+					count++;
+				});
+
+				$('#jobs').html(count);
+			});
+			
+
+			$('#datable_wrapper').prepend('<div id="statusbox"></div>');
+			$('#statusbox').hide();
+			status = _.uniq(_.map(json.aaData, function(val) { return val[0]; }));
+
+			oTable.columnFilter({
+				aoColumns: [
+					{
+						type: 'checkbox',
+						values: status
+					},
+					null,
+					null,
+					null,
+					null,
+				]
+			});
+
+			$(status).each(function(val) {
+				var spaces = [];
+				spaces[val] = status[val].split('_').join(' ');
+				$('<li><input type="checkbox" name="'+status[val]+'" value="'+status[val]+'"  id="'+status[val]+'" class="status_checkbox"/><label id="label-'+status[val]+'" for="'+status[val]+'">'+spaces[val]+'</label></li>').appendTo('#status_toggle');
+			});
+			
+			$('#dasearch input').keyup(function() {
+					oTable.fnFilter($(this).val());
+			});
+
+			$('#unprocessed').attr('checked', 'checked');
+			$('#status_unprocessed').attr('checked','checked').trigger('change');
+
+			$('.status_checkbox').change(function() {
+				if($(this).is(':checked')) {
+					var val = $(this).val();
+					$('#status_' + val).attr('checked','checked').trigger('change');
+				} else {
+					var val = $(this).val();
+					$('#status_' + val).removeAttr('checked').trigger('change');
+				}
+			});
 		}
 	});
+
+	
 });
