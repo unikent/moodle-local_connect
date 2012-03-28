@@ -397,7 +397,7 @@
                         
                         var search = '';
                         var vals = new Array();
-                        var index = 0;
+                        var index = 1;
                         
                         $('input:checkbox[name="'+localLabel+'"]:checked').each(function(index) {
 
@@ -409,7 +409,7 @@
 
                         $('input:checkbox[name="'+localLabel+'"]:checked').each(function(index) {
 
-                                search = search + $(this).val();
+                                search = search + $(this).val().split('_').join(' ');
                                 if (search != "" && vals[index + 1] != undefined) {
                                         search = search + '|';
                                 }
@@ -436,6 +436,7 @@
                               $('#' + aData[jj]).addClass("search_init");
                           }
                         }*/
+
                     oTable.fnFilter(search, index, true, false);
 
                     
