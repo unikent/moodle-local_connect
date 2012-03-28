@@ -114,7 +114,7 @@ $(document).ready(function() {
 						$('#statusbox').fadeOut('fast');
 					}, 5000)
 				}
-
+/*
 				// Setting up datatables natural sort asc using the natural sort plugin
 				jQuery.fn.dataTableExt.oSort['natural-asc']  = function(a,b) {
 	    		return naturalSort(a,b);
@@ -124,7 +124,7 @@ $(document).ready(function() {
 				jQuery.fn.dataTableExt.oSort['natural-desc'] = function(a,b) {
 				    return naturalSort(a,b) * -1;
 				};
-
+*/
 				var status = [];
 				var statusHide = null;
 				var selectedDeliveries = [];
@@ -135,12 +135,20 @@ $(document).ready(function() {
 					"bProcessing": true,
 					"aaData": datatable,
 					"aoColumns": [
-						{'sClass': 'id', 'sType': 'natural'},
+/*						{'sClass': 'id', 'sType': 'natural'},
 						{'sClass': 'status', 'sType': 'natural'},
 						{'sClass': 'code', 'sType': 'natural'},
 						{'sClass': 'name', 'sType': 'natural'},
 						{'sClass': 'campus', 'sType': 'natural'},
-						{'sClass': 'duration', 'sType': 'natural'},
+						{'sClass': 'duration', 'sType': 'natural'}, */
+						{'sClass': 'id' },
+						{'sClass': 'status'},
+						{'sClass': 'code'},
+						{'sClass': 'name'},
+						{'sClass': 'campus'},
+						{'sClass': 'duration'}
+
+
 					],
 					"aoColumnDefs": [
 						{ "bSearchable": true, "bVisible": false, "aTargets": [ 0 ] },
@@ -148,7 +156,7 @@ $(document).ready(function() {
 					"oLanguage": {
 						"sSearch": "Search all columns:"
 					},
-					"bPaginate" : false,
+					"bPaginate" : true,
 					"fnCreatedRow": function( nRow, aData, iDataIndex ) {
 						$(nRow).attr('ident', aData[0]);
 					},
@@ -241,7 +249,8 @@ $(document).ready(function() {
 				});
 
 
-				status = _.uniq(_.map(datatable, function(val) { return $(val[1]).html().split(' ').join('_');; }));
+				//status = _.uniq(_.map(datatable, function(val) { return $(val[1]).html().split(' ').join('_');; }));
+        status = [ 'unprocessed', 'created_in_moodle', 'failed_in_moodle', 'scheduled', 'processing' ];
 				oTable.columnFilter({
 					aoColumns: [
 						null,
@@ -291,7 +300,7 @@ $(document).ready(function() {
 				 	$.ajax({
 				 		type: 'POST',
 				 		url: window.dapageUrl + '/courses/schedule/',
-				 		data: selectedDeliveries,
+				 		data: {'ids':selectedDeliveries},
 				 		success: function () {
 							button.stop();
 				 			$('#datable tbody tr').removeClass('row_selected');

@@ -18,6 +18,7 @@ curl_setopt($ch, CURLOPT_HEADER, 1);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $_SERVER["REQUEST_METHOD"]);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents("php://input"));
 
 //get contents
 $response = curl_exec( $ch );
