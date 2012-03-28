@@ -197,7 +197,7 @@ $(document).ready(function() {
 						{'sClass': 'name', 'sType': 'natural'},
 						{'sClass': 'campus', 'sType': 'natural'},
 						{'sClass': 'duration', 'sType': 'natural'}, */
-						{'sClass': 'id' },
+						{'sClass': 'id', "bSearchable": false},
 						{'sClass': 'status'},
 						{'sClass': 'code'},
 						{'sClass': 'name'},
@@ -278,7 +278,11 @@ $(document).ready(function() {
 				});*/
 				
 				$('#dasearch input').keyup(function() {
+					if($(this).val().length > 1) {
 						oTable.fnFilter($(this).val());
+					} else {
+						oTable.fnFilter('')
+					}
 				});
 
 				$('#unprocessed').attr('checked', 'checked');
