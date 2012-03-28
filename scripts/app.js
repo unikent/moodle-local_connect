@@ -130,6 +130,62 @@ $(document).ready(function() {
 				var selectedDeliveries = [];
 				var delivery_list = '';
 				var count = 0;
+				var draws = 0;
+				/*
+				 * Event handler for the clicking of a datatable element 
+				*/
+				function rowClick() {
+
+					$('#datable tbody tr').live('click', function() {
+						//create a nicer display version of the status name
+						var name = $('.status div', this).html().split('_').join(' ');
+
+						//get the row checksum
+						var ident = $(this).attr('ident');
+
+						//application of styling for selected rows and error message handler for those that cannot be selected
+						// also create an array of selected rows storing thier checksums
+						if($('.status div', this).html() === 'unprocessed' || $('.status div', this).html() === 'failed in moodle') {
+							if($(this).hasClass('row_selected')) {
+								$(this).removeClass('row_selected');
+								selectedDeliveries = _.reject(selectedDeliveries, function(num) { return num === ident; });
+							} else {
+								$(this).addClass('row_selected');
+								selectedDeliveries.push($(this).attr('ident'));
+							}
+						} else {
+							statusbox(this, 'Error: you cannot push a delivery with a status of ' + name);
+						}
+
+						//gets the number of selected deliveries and appends it to the dom  
+						count = selectedDeliveries.length;
+						$('#job_number').html(count);
+						
+						//loops through the json data and finds the entries for the selected deliveries. Then grabs the short codes and appends it to a 
+						//string as a list element.
+						delivery_list = '';
+						$(selectedDeliveries).each(function(index) {
+							var	delivery = selectedDeliveries[index];
+							var row = _.find(datatable, function (row) { 
+								if(row[0] === delivery) {
+									return row;
+								}
+							});
+							delivery_list = delivery_list + '<li>' + row[2] + '</li>';
+						});
+
+						if($('#jobs ul').hasClass('visible')) {
+							$('#jobs ul').html(delivery_list);
+						}
+
+						if(selectedDeliveries.length !== 0) {
+							$('#push_deliveries').removeAttr('disabled').html('<span>Push</span> to Moodle').removeClass();
+						} else {
+							$('#push_deliveries').attr('disabled', 'disabled').html('No selection').removeClass();
+						}
+							
+					});
+				};
 
 				var oTable = $('#datable').dataTable( {
 					"bProcessing": true,
@@ -156,12 +212,14 @@ $(document).ready(function() {
 					"oLanguage": {
 						"sSearch": "Search all columns:"
 					},
+					"iDisplayLength": 50,
 					"bPaginate" : true,
 					"fnCreatedRow": function( nRow, aData, iDataIndex ) {
 						$(nRow).attr('ident', aData[0]);
 					},
 					"fnInitComplete": function(oSettings, json) {
 						jQuery.unblockUI();
+						rowClick();	
 					}
 				});
 
@@ -172,59 +230,7 @@ $(document).ready(function() {
 					$('#statusbox').fadeOut('fast');
 				});
 
-				/*
-				 * Event handler for the clicking of a datatable element 
-				*/
-				$('#datable tbody tr').click(function() {
-
-					//create a nicer display version of the status name
-					var name = $('.status div', this).html().split('_').join(' ');
-
-					//get the row checksum
-					var ident = $(this).attr('ident');
-
-					//application of styling for selected rows and error message handler for those that cannot be selected
-					// also create an array of selected rows storing thier checksums
-					if($('.status div', this).html() === 'unprocessed' || $('.status div', this).html() === 'failed in moodle') {
-						if($(this).hasClass('row_selected')) {
-							$(this).removeClass('row_selected');
-							selectedDeliveries = _.reject(selectedDeliveries, function(num) { return num === ident; });
-						} else {
-							$(this).addClass('row_selected');
-							selectedDeliveries.push($(this).attr('ident'));
-						}
-					} else {
-						statusbox(this, 'Error: you cannot push a delivery with a status of ' + name);
-					}
-
-					//gets the number of selected deliveries and appends it to the dom  
-					count = selectedDeliveries.length;
-					$('#job_number').html(count);
-					
-					//loops through the json data and finds the entries for the selected deliveries. Then grabs the short codes and appends it to a 
-					//string as a list element.
-					delivery_list = '';
-					$(selectedDeliveries).each(function(index) {
-						var	delivery = selectedDeliveries[index];
-						var row = _.find(datatable, function (row) { 
-							if(row[0] === delivery) {
-								return row;
-							}
-						});
-						delivery_list = delivery_list + '<li>' + row[2] + '</li>';
-					});
-
-					if($('#jobs ul').hasClass('visible')) {
-						$('#jobs ul').html(delivery_list);
-					}
-
-					if(selectedDeliveries.length !== 0) {
-						$('#push_deliveries').removeAttr('disabled').html('<span>Push</span> to Moodle').removeClass();
-					} else {
-						$('#push_deliveries').attr('disabled', 'disabled').html('No selection').removeClass();
-					}
-						
-				});
+				//rowClick();
 
 
 				/*
