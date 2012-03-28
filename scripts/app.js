@@ -66,7 +66,7 @@ $(document).ready(function() {
     });
 
 	$.ajax({
-		url: /*window.dapageUrl + '/courses/'*/'',
+		url: window.dapageUrl + '/courses/',
 		dataType: 'json',
 		success: function(json) {
 
