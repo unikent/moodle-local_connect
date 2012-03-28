@@ -98,7 +98,6 @@ $(document).ready(function() {
 				 * functions that outputs a message in the status box 
 				 */
 				function statusbox(el, message) {
-					console.log(el)
 					var position = $(el).position();
 					if($('#statusbox').is(':visible') && $('#statusbox').position().top === position.top) {
 						return
@@ -186,7 +185,6 @@ $(document).ready(function() {
 							selectedDeliveries.push($(this).attr('ident'));
 						}
 					} else {
-						console.log('bob')
 						statusbox(this, 'Error: you cannot push a delivery with a status of ' + name);
 					}
 
@@ -318,7 +316,6 @@ $(document).ready(function() {
 							$('#push_deliveries').addClass('success');
 				 		},
 				 		error: function() {
-				 			console.log('bib');
 				 		}
 				 	})
 				});
