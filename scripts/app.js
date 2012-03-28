@@ -53,7 +53,6 @@ $(document).ready(function() {
 	})();
 
 	$.blockUI({ message: '<div class="blockui_loading">Please wait, loading course lists.</div>' });
-
 	$("#dialog_error").dialog({
          autoOpen: false,
          title: 'Connect error',
@@ -76,7 +75,6 @@ $(document).ready(function() {
 	            $("#dialog_error").dialog("open");
 	        } else {
 
-	            jQuery.unblockUI();
 				//taking json and mapping into usable data
 				var datatable = _.map(json, function(val) {
 
@@ -153,6 +151,9 @@ $(document).ready(function() {
 					"bPaginate" : false,
 					"fnCreatedRow": function( nRow, aData, iDataIndex ) {
 						$(nRow).attr('ident', aData[0]);
+					},
+					"fnInitComplete": function(oSettings, json) {
+						jQuery.unblockUI();
 					}
 				});
 
@@ -289,7 +290,7 @@ $(document).ready(function() {
 				 	button.disable($(this));
 				 	$.ajax({
 				 		type: 'POST',
-				 		url: window.dapageUrl,
+				 		url: window.dapageUrl + '/courses/schedule/',
 				 		data: selectedDeliveries,
 				 		success: function () {
 							button.stop();
@@ -314,8 +315,22 @@ $(document).ready(function() {
 							
 							button.updateText('Success');
 							$('#push_deliveries').addClass('success');
+
+							setTimeout(function() {
+								button.updateText('No selection');
+								$('#push_deliveries').removeClass('success').attr('disabled', 'disabled');
+							}, 4000);
 				 		},
 				 		error: function() {
+				 			button.stop();
+				 			$('#push_deliveries').removeClass('loading');
+				 			button.updateText('Error');
+							$('#push_deliveries').addClass('error');
+
+							setTimeout(function() {
+								button.updateText('<span>Push</span> to Moodle');
+								$('#push_deliveries').removeClass('error');
+							}, 4000);
 				 		}
 				 	})
 				});

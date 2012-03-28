@@ -221,6 +221,10 @@
 		#datable_wrapper {
 			position: relative;
 
+			#datable_processing {
+				display: none;
+			}
+
 			#statusbox {
 				width: 500px;
 				cursor: pointer;
@@ -556,6 +560,7 @@
 			}
 
 			#push_deliveries.loading {
+				cursor: poiunt;
 				color: #fff;
 				border: 1px solid #214587;
 				.gradient(#27519f, #214587, #27519f);
@@ -565,9 +570,16 @@
 			#push_deliveries.success {
 				color: #689351;
 				border: 1px solid #C8F9BB;
-				.gradient(#EFF9E2, #C8F9BB, #EFF9E2);
+				.gradient(#EFF9E2, #E1F9D2, #EFF9E2);
 				cursor: default;
-			}	
+			}
+
+			#push_deliveries.error {
+				color: #A12A2A;
+				border: 1px solid #A12A2A;
+				.gradient(#F9E8E8, #F9D1CC, #F9E8E8);
+				cursor: default;
+			} 
 		}
 	}
 }
