@@ -214,6 +214,7 @@ $(document).ready(function() {
 					},
 					"iDisplayLength": 50,
 					"bPaginate" : true,
+					"sPaginationType": "full_numbers",
 					"fnCreatedRow": function( nRow, aData, iDataIndex ) {
 						$(nRow).attr('ident', aData[0]);
 					},

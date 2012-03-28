@@ -157,7 +157,7 @@
 	#dapage_app {
 		width: 82%;
 		border: 1px solid #e3e3e3;
-		.rounded(5px);
+		.border-radius(5px, 0px, 5px, 5px);
 		float:left;
 		margin-bottom: 40px;
 
@@ -230,12 +230,32 @@
 			}
 
 			.dataTables_paginate {
+				border: 1px solid #214587;
+				.gradient(#27519f, #214587, #27519f);
+				padding: 10px;
 				position: absolute;
-				bottom: -30px;
-				right: 10px;
+				bottom: -42px;
+				right: -1px;
+				color: #fff;
+				.border-radius(0px, 5px, 5px, 0px);
 
 				a {
-					margin-left: 40px;
+					margin: 0 10px;
+					padding: 5px 10px;
+					cursor: pointer;
+				}
+
+				a:hover {
+					background-color: #C5D2E8;
+					color: #27519f;
+					.rounded(5px);
+					text-decoration: none;
+				}
+
+				.paginate_active {
+					background-color: #fff;
+					color: #27519f;
+					.rounded(5px);
 				}
 			}
 
@@ -392,7 +412,7 @@
 							}
 
 							td:last-child {
-								.border-radius(0, 5px, 0, 0);
+								/*.border-radius(0, 5px, 0, 0);*/
 							}
 							
 
