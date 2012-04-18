@@ -329,7 +329,7 @@
 					}
 
 					.toolbar {
-						width: 10% !important;
+						width: 15% !important;
 					}
 				}
 
@@ -419,6 +419,19 @@
 								.edit_row:hover {
 									background-image: url(../images/edit-hover.png);
 								}
+
+								.child_expand {
+									background-image: url(../images/switch_plus.png);
+									width: 16px;
+									height: 16px;
+									float: right;
+								} 
+
+								.child_expand:hover {
+									opacity: 0.5;
+									-moz-opacity: 0.5;
+									filter:alpha(opacity=5);
+								} 
 							}
 
 							td.sorting_1 {
@@ -703,9 +716,35 @@
 	}
 }
 
-.ui-button[disabled=disabled] {
+#dialog-form {
+	#shortname {
+		width: 360px;
+	}
+
+	#fullname {
+		width: 447px;
+	}
+
+	#synopsis {
+		padding: 8px;
+		width: 447px;
+		height: 130px;
+	}
+}
+
+.ui-button {
+	padding: 0.4em 1em !important;
+
+	span {
+		padding: 0px !important;
+	}
+}
+
+.ui-button.error {
 	padding: 0.4em 1em;
-	cursor: default !important;
+	background: #f9e8e8 !important;
+	border-color: #a12a2a !important;
+	color: #a12a2a !important;
 }
 
 #edit_notifications {

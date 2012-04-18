@@ -99,9 +99,14 @@ $(document).ready(function() {
 					var state = '<div class="status_'+val.state[0]+'">'+name+'</div>';
 					var toolbar = ' ';
 					if(val.state[0] === 'created_in_moodle') {
+						if(val.children !== null) {
+							toolbar += '<div class="child_expand toolbar_link"></div>'
+						}
 						toolbar += '<div class="edit_row toolbar_link"></div>'
 						toolbar += '<a href=" '+ window.coursepageUrl + '/course/view.php?id='+ val.moodle_id +'" target="_blank" class="created_link toolbar_link"></a>';
+						
 					}
+					
 					return [val.chksum, state, val.module_code, val.module_title, val.campus_desc, duration, val.student_count, val.module_version, toolbar];
 
 				});
@@ -254,6 +259,7 @@ $(document).ready(function() {
 						var date = '(' + Date.parse(row[0].session_code).toString('yyyy');
 						date += '/' + Date.parse(row[0].session_code).next().year().toString('yyyy') + ')';
 						var synopsis = $.trim(row[0].synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
+
 						var shortname = row[0].module_code + ' ' + date;
 						var fullname = row[0].module_title + ' ' + date;
 						
@@ -272,64 +278,160 @@ $(document).ready(function() {
 						var fullname = row[0].module_title;
 					}
 
+					var ui_sub;
 					//Appends the data created to the form
 					$('#shortname').val(shortname);
 					$('#fullname').val(fullname);
 					$('#synopsis').val(synopsis);
-					
 					$( "#dialog-form" ).dialog({ 
-									title: 'Choose details',
-									close: function(event, ui) {
-										if(row_unprocessed ===true) {
-											button.stop();
-											button.updateText('<span>Edit</span> to Moodle');
-											$('#push_deliveries').removeClass();
-										}
-									},
-									buttons: {
-										"Push to moodle": function() {
-											var ui_sub = new ButtonLoader($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'), 'Saving');
-										 	ui_sub.disable($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'));
-										 	ui_sub.start();
+						title: 'Choose details',
+						close: function(event, ui) {
+							if(row_unprocessed ===true) {
+								button.stop();
+								button.updateText('<span>Edit</span> to Moodle');
+								$('#push_deliveries').removeClass().addClass('edit_to_moodle');
+							}
+						},
+						open: function(event, ui) {
+							ui_sub = new ButtonLoader($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'), 'Saving');
+						},
+						buttons: {
+							"Push to moodle": function() {
+								
+							 	ui_sub.disable($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'));
+							 	ui_sub.start();
 
-										 	if($('#shortname_ext').get(0)) {
-										 		if($('#shortname_ext').val() === '') {
-										 			$('#edit_notifications').addClass('error').text('Please provide a three letter identifier');
-										 			$('#shortname_ext').addClass('error');
-										 			ui_sub.stop();
-										 			return;
-										 		}
+							 	if($('#shortname_ext').get(0)) {
+							 		if($('#shortname_ext').val() === '') {
+							 			$('#edit_notifications').addClass('error').text('Please provide a three letter identifier');
+							 			$('#shortname_ext').addClass('error');
+							 			ui_sub.stop();
+							 			return;
+							 		}
+							 		shortname += ' ' + $('#shortname_ext').val();
+							 	}
 
-										 		var short_name_val = short_name + ' ' + $('#shortname_ext').val();
+							 	if(row_unprocessed ===true) {
+							 		synopsis = $('#synopsis').val() + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ row[0].module_code +"'>More</a>"
+							 	}
 
-										 		if(_.find(json, function (row){ return row.module_code === short_name_val}) !== undefined) {
-										 			$('#edit_notifications').addClass('error').text('This combination is already in use please pick another');
-										 			$('#shortname_ext').addClass('error');
-										 			ui_sub.stop();
-										 			return;
-										 		} 
-										 		short_name += ' ' + $('#shortname_ext').val();
-										 	}
+							 	var data = [{
+							 		id: row[0].chksum,
+							 		code: shortname,
+							 		title: $('#fullname').val(),
+							 		synopsis: synopsis,
+							 		category: $('#category').val()
+							 	}];
 
-										 	var data = {
-										 		chksum: pushees[0].chksum,
-										 		code: short_name,
-										 		title: full_name,
-										 		synopsis: synopsis + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mod_code +"'>More</a>",
-										 		category: $('#category').val()
-										 	};
 
-										 	/*TODO: ajax post functionality */
+							 	/*200 OK
 
-										 	clear_ui_form()
-											$( this ).dialog( "close" );									 										 	
-										},
-										Cancel: function() {
-											clear_ui_form()
-											$( this ).dialog( "close" );
-										}
+							 	422 [
+							 		{ 'error_code': 'duplicate', 'id': '48293481928chjefwji23ij' },
+							 		{ 'error_code': 'duplicate', 'id': '48293481928chjefwji23ij' },
+							 	]*/
+
+							 	push_selected(data, ui_sub, true, function() {
+							 		clear_ui_form();
+									$( "#dialog-form" ).dialog( "close" );
+									button.stop();
+									button.updateText('<span>Edit</span> to Moodle');
+									$('#push_deliveries').removeClass().addClass('edit_to_moodle');	 
+							 	});
+						 												 	
+							},
+							Cancel: function() {
+								clear_ui_form()
+								$( this ).dialog( "close" );
+							}
+						}
+					}).dialog("open" );
+				}
+
+				function push_selected(data, button, single, callback) {
+
+					console.log(data);
+
+					$.ajax({
+				 		type: 'POST',
+				 		url: window.dapageUrl + '/courses/schedule/',
+				 		contentType: 'json',
+				 		data: {'courses': data},
+				 		success: function () {
+							button.stop();
+				 			$('#datable tbody tr').removeClass('row_selected');
+				 			$('#push_deliveries').removeClass('loading');
+				 			$(selectedDeliveries).each(function(index) {
+				 				var row = $('#datable tbody tr[ident='+selectedDeliveries[index]+']');
+				 				var aPos = oTable.fnGetPosition(row[0]);
+				 				oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
+				 			})
+
+				 			oTable.fnDraw();
+
+				 			selectedDeliveries = [];
+				 			count = 0;
+				 			$('#job_number').html(count);
+				 			delivery_list = '<li class="empty_deliv">no items have been selected</li>';
+				 			if($('#jobs ul').hasClass('visible')) {
+								$('#jobs ul').html(delivery_list);
+							}
+							
+							
+							button.updateText('Success');
+							$('#push_deliveries').addClass('success');
+
+							setTimeout(function() {
+								button.updateText('No selection');
+								$('#push_deliveries').removeClass('success').attr('disabled', 'disabled');
+							}, 3000);
+
+							callback();
+				 		},
+				 		error: function() {
+
+						 	/*var duplicates = _.chain(pushees).groupBy(function(item) {
+								return item.module_code;
+							}).reject(function(item) {
+								return item.length < 2;
+							}).flatten().map(function(item) {
+								return item;
+							}).value();
+
+							$.each(pushees, function(i){
+								var shortname = pushees[i].module_code + ' ' + date;
+								if(_.find(valid_data, function (row){ 
+									if(row.state[0] === 'processing' || row.state[0] === 'scheduled' || row.state[0] === 'created_in_moodle') {
+										return row.module_code === shortname;
 									}
-								}).dialog("open" );
+									}) !== undefined) {
+										duplicates.push(pushees[i]);
+									}
+								});
+
+							if(duplicates.length !== 0) {
+								$('#dialog_error').html('Duplicates detected! To resolve please merge or push through individually. If you have other selections they will now be pushed through');
+								$("#dialog_error").dialog("open");
+								//statusbox($('#datable tbody tr:first'), 'Duplicates detected! To resolve please merge or push through individually');
+								pushees = _.without(pushees, duplicates);
+
+								
+							}*/
+				 			button.stop();
+				 			$(button.element[0]).removeClass('loading');
+				 			button.updateText('Error');
+							$(button.element[0]).addClass('error');
+
+							setTimeout(function() {
+								if(single === true) {
+									button.updateText('<span class="ui-button-text">Push to Moodle<span>');
+								} else {
+									button.updateText('<span>Push</span> to Moodle');
+								}
+								$(button.element[0]).removeClass('error');
+							}, 3000);
+				 		}
+				 	});
 				}
 
 				$.fn.dataTableExt.oApi.fnGetFilteredNodes = function ( oSettings )
@@ -354,6 +456,13 @@ $(document).ready(function() {
 				 * Event handler for the clicking of a datatable element 
 				*/
 				function rowClick(json) {
+
+					$('.child_expand').live('click', function() {
+						var nTr = $(this).parents('tr')[0];
+						if(oTable.fnIsOpen(nTr)) {
+
+						}
+					});
 
 					$('.edit_row').live('click', function() {
 						chksum = $(this).closest('tr').attr('ident');
@@ -520,34 +629,6 @@ $(document).ready(function() {
 						var date = '(' + Date.parse(pushees[0].session_code).toString('yyyy');
 						date += '/' + Date.parse(pushees[0].session_code).next().year().toString('yyyy') + ')';
 
-						/*var duplicates = _.chain(pushees).groupBy(function(item) {
-							return item.module_code;
-						}).reject(function(item) {
-							return item.length < 2;
-						}).flatten().map(function(item) {
-							return item;
-						}).value();
-
-						$.each(pushees, function(i){
-							var shortname = pushees[i].module_code + ' ' + date;
-							if(_.find(valid_data, function (row){ 
-								if(row.state[0] === 'processing' || row.state[0] === 'scheduled' || row.state[0] === 'created_in_moodle') {
-									return row.module_code === shortname;
-								}
-								}) !== undefined) {
-									duplicates.push(pushees[i]);
-								}
-							});
-
-						if(duplicates.length !== 0) {
-							$('#dialog_error').html('Duplicates detected! To resolve please merge or push through individually. If you have other selections they will now be pushed through');
-							$("#dialog_error").dialog("open");
-							//statusbox($('#datable tbody tr:first'), 'Duplicates detected! To resolve please merge or push through individually');
-							pushees = _.without(pushees, duplicates);
-
-							
-						}*/
-
 						var data = [];
 
 						$.each(pushees, function(i) {
@@ -564,55 +645,9 @@ $(document).ready(function() {
 
 							data.push(obj);
 						});
-						/*TODO: ajax post functionality*/
-						$.ajax({
-					 		type: 'POST',
-					 		url: window.dapageUrl + '/courses/schedule/',
-					 		data: {'ids':selectedDeliveries},
-					 		success: function () {
-								button.stop();
-					 			$('#datable tbody tr').removeClass('row_selected');
-					 			$('#push_deliveries').removeClass('loading');
-					 			$(selectedDeliveries).each(function(index) {
-					 				var row = $('#datable tbody tr[ident='+selectedDeliveries[index]+']');
-					 				var aPos = oTable.fnGetPosition(row[0]);
-					 				oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-					 			})
 
-					 			oTable.fnDraw();
-
-					 			selectedDeliveries = [];
-					 			count = 0;
-					 			$('#job_number').html(count);
-					 			delivery_list = '<li class="empty_deliv">no items have been selected</li>';
-					 			if($('#jobs ul').hasClass('visible')) {
-									$('#jobs ul').html(delivery_list);
-								}
-								
-								
-								button.updateText('Success');
-								$('#push_deliveries').addClass('success');
-
-								setTimeout(function() {
-									button.updateText('No selection');
-									$('#push_deliveries').removeClass('success').attr('disabled', 'disabled');
-								}, 4000);
-					 		},
-					 		error: function() {
-					 			button.stop();
-					 			$('#push_deliveries').removeClass('loading');
-					 			button.updateText('Error');
-								$('#push_deliveries').addClass('error');
-
-								setTimeout(function() {
-									button.updateText('<span>Push</span> to Moodle');
-									$('#push_deliveries').removeClass('error');
-								}, 4000);
-					 		}
-					 	});
-						/*button.stop();
-						button.updateText('<span>Push</span> to Moodle');
-						$('#push_deliveries').removeClass();*/
+						var status = push_selected(data, button, false);
+						
 					}
 				});
 

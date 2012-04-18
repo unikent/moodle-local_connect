@@ -127,16 +127,16 @@ $table = <<< HEREDOC
 		<table>
 			<tr>
 				<td><label for="shortname">Shortname</label></td>
-				<td><input type="text" disabled="disabled" name="shortname" id="shortname" class="text ui-widget-content ui-corner-all" size="49" /></td>
+				<td><input type="text" disabled="disabled" name="shortname" id="shortname" class="text ui-widget-content ui-corner-all" /></td>
 				<td id="shortname_ext_td"></td>
 			</tr>
 			<tr>
 				<td><label for="fullname">Fullname</label></td>
-				<td colspan="2"><input type="text" name="fullname" id="fullname" value="" class="text ui-widget-content ui-corner-all" size="60" /></td>
+				<td colspan="2"><input type="text" name="fullname" id="fullname" value="" class="text ui-widget-content ui-corner-all"/></td>
 			</tr>
 			<tr>
 				<td><label for="synopsis">Synopsis</label></td>
-				<td colspan="2"><textarea maxlength="500" name="synopsis" id="synopsis" class="text ui-widget-content ui-corner-all" rows=7" cols="72"></textarea></td>
+				<td colspan="2"><textarea maxlength="500" name="synopsis" id="synopsis" class="text ui-widget-content ui-corner-all"></textarea></td>
 			</tr>
 			<tr>
 				<td><label for="category">Category</label></td>
