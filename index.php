@@ -43,8 +43,8 @@ $scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/jquery.data
 $scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/jquery.dataTables.columnFilter.js" type="text/javascript"></script>';
 $scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/naturalSort.js" type="text/javascript"></script>';
 $scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/underscore-min.js" type="text/javascript"></script>';
-$scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/js/jquery-ui-1.8.17.custom.min.js" type="text/javascript"></script>';
 $scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/js/jquery.blockUI.js" type="text/javascript"></script>';
+$scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/js/json2.js" type="text/javascript"></script>';
 $scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/date-en-GB.js" type="text/javascript"></script>';
 echo $scripts;
 

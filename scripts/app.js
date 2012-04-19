@@ -356,7 +356,8 @@ $(document).ready(function() {
 				 		type: 'POST',
 				 		url: window.dapageUrl + '/courses/schedule/',
 				 		contentType: 'json',
-				 		data: {'courses': data},
+				 		dataType: 'json',
+				 		data: JSON.stringify({'courses': data }),
 				 		success: function () {
 							button.stop();
 				 			$('#datable tbody tr').removeClass('row_selected');
