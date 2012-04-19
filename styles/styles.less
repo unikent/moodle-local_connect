@@ -78,7 +78,8 @@
 
 .dataTable {
 	clear: both;
-	width: 100%;
+	max-width: 893px !important;
+	min-width: 849px !important;
 }
 
 #filter-status {
@@ -210,7 +211,7 @@
 
 			#dasearch {
 				float: right;
-				width: 20%;
+				max-width: 170px;
 
 				input {
 					width: 90%;
@@ -296,41 +297,37 @@
 						}
 					}
 
-					/*.id {
-						width: 0%;
-					}
-
 					.code {
-						width:12% !important;
+						width: 10% !important;
 					}
 
 					.name {
-						width: 25% !important;
+						width: 22% !important;
 					}
 
 					.campus {
-						width: 10%;
+						width: 10% !important;
 					}
 
 					.duration {
-						width: 12% !important;
+						width: 5% !important;
 					}
 
 					.students {
-						width: 5%;
+						width: 5% !important;
 					}
 
-					.summary {
-						width: 25%;
+					.version {
+						width: 5% !important;
 					}
 
 					.status {
-						width: 20% !important;
+						width: 15% !important;
 					}
 
 					.toolbar {
 						width: 15% !important;
-					}*/
+					}
 				}
 
 				tbody {
@@ -354,13 +351,27 @@
 								border-right: 1px solid #fff;
 							}
 
+							.duration {
+								text-align: center;
+							}
+
+							.students {
+								text-align: center;
+							}
+
+							.version {
+								text-align: center;
+							}
+
 							td.status {
 								text-align: right;
 								padding-right: 20px;
 								font-weight: bold;
 
 								div {
-									background-position: 10px 3px;
+									text-align: left;
+									padding-left: 35px;
+									background-position: 10px center;
 									background-repeat: no-repeat;
 									text-shadow: 0 1px 1px #fff;
 								}
@@ -371,6 +382,11 @@
 								}
 
 								.status_scheduled {
+									color: #AA9946;
+									background-image: url(../images/status_pending.png);
+								}
+
+								.status_processing {
 									color: #AA9946;
 									background-image: url(../images/status_pending.png);
 								}

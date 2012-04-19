@@ -1,5 +1,9 @@
 $(document).ready(function() {
 
+	var push_timeout;
+	var merge_timeout;
+	var ui_timeout;
+
 	var ButtonLoader = (function() {
 
 	  ButtonLoader.prototype.interval = null;
@@ -338,7 +342,8 @@ $(document).ready(function() {
 									button.stop();
 									button.updateText('Success');
 									$('#push_deliveries').addClass('success');
-									setTimeout(function() {
+									clearTimeout(push_timeout);
+									push_timeout = setTimeout(function() {
 										button.updateText('No selection');
 										$('#push_deliveries').removeClass('success').attr('disabled', 'disabled');
 									}, 3000); 
@@ -420,8 +425,8 @@ $(document).ready(function() {
 				 			$(button.element[0]).removeClass('loading');
 				 			button.updateText('Error');
 							$(button.element[0]).addClass('error');
-
-							setTimeout(function() {
+							clearTimeout(ui_timeout);
+							ui_timeout = setTimeout(function() {
 								if(single === true) {
 									button.updateText('<span class="ui-button-text">Push to Moodle<span>');
 								} else {
@@ -548,16 +553,17 @@ $(document).ready(function() {
 				var oTable = $('#datable').dataTable( {
 					"bProcessing": true,
 					"aaData": datatable,
+					"bAutoWidth": false,
 					"aoColumns": [
 						{'sClass': 'id', "bSearchable": false},
-						{'sClass': 'status', "sWidth": "20%"},
-						{'sClass': 'code', "sWidth": "12%"},
-						{'sClass': 'name', "sWidth": "25%"},
-						{'sClass': 'campus', "sWidth": "10%"},
-						{'sClass': 'duration', "sWidth": "12%"},
-						{'sClass': 'students', "sWidth": "5%"},
-						{'sClass': 'version', "sWidth": "5%"},
-						{'sClass': 'toolbar', "sWidth": "20%"}
+						{'sClass': 'status'},
+						{'sClass': 'code'},
+						{'sClass': 'name', "sWidth": "20%"},
+						{'sClass': 'campus', "sWidth": "20%"},
+						{'sClass': 'duration'},
+						{'sClass': 'students'},
+						{'sClass': 'version'},
+						{'sClass': 'toolbar'}
 
 					],
 					"aoColumnDefs": [
@@ -678,8 +684,8 @@ $(document).ready(function() {
 
 							var obj = {
 								id: pushees[i].chksum,
-								module_code: pushees[i].module_code + ' ' + date,
-								module_title: pushees[i].module_title + ' ' + date,
+								code: pushees[i].module_code + ' ' + date,
+								title: pushees[i].module_title + ' ' + date,
 								synopsis: synopsis + '  <a href="http://www.kent.ac.uk/courses/modulecatalogue/modules/'+ pushees[i].module_code +'">More</a>',
 								category: '1'
 							}
@@ -687,7 +693,13 @@ $(document).ready(function() {
 							data.push(obj);
 						});
 
-						var status = push_selected(data, button, false);
+						var status = push_selected(data, button, false, function(){
+							clearTimeout(push_timeout);
+							push_timeout = setTimeout(function() {
+								button.updateText('No selection');
+								$('#push_deliveries').removeClass('success').attr('disabled', 'disabled');
+							}, 3000); 
+						});
 						
 					}
 				});
@@ -824,8 +836,8 @@ $(document).ready(function() {
 										button.stop();
 										button.updateText('Success');
 										$('#merge_deliveries').addClass('success');
-
-										setTimeout(function() {
+										clearTimeout(merge_timeout);
+										merge_timeout = setTimeout(function() {
 											button.updateText('No selection');
 											$('#merge_deliveries').removeClass('success').attr('disabled', 'disabled');
 										}, 4000);
@@ -858,8 +870,8 @@ $(document).ready(function() {
 							 			$('#merge_deliveries').removeClass('loading');
 							 			button.updateText('Error');
 										$('#merge_deliveries').addClass('error');
-
-										setTimeout(function() {
+										clearTimeout(merge_timeout);
+										merge_timeout = setTimeout(function() {
 											button.updateText('<span>Merge</span> to Moodle');
 											$('#merge_deliveries').removeClass('error');
 										}, 4000);
