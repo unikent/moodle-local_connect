@@ -100,7 +100,7 @@ $(document).ready(function() {
 					var toolbar = ' ';
 					if(val.state[0] === 'created_in_moodle') {
 						if(val.children !== null) {
-							toolbar += '<div class="child_expand toolbar_link"></div>'
+							toolbar += '<div class="child_expand open toolbar_link"></div>'
 						}
 						toolbar += '<div class="edit_row toolbar_link"></div>'
 						toolbar += '<a href=" '+ window.coursepageUrl + '/course/view.php?id='+ val.moodle_id +'" target="_blank" class="created_link toolbar_link"></a>';
@@ -332,11 +332,16 @@ $(document).ready(function() {
 							 	]*/
 
 							 	push_selected(data, ui_sub, true, function() {
+
 							 		clear_ui_form();
-									$( "#dialog-form" ).dialog( "close" );
+									$("#dialog-form").dialog( "close" );
 									button.stop();
-									button.updateText('<span>Edit</span> to Moodle');
-									$('#push_deliveries').removeClass().addClass('edit_to_moodle');	 
+									button.updateText('Success');
+									$('#push_deliveries').addClass('success');
+									setTimeout(function() {
+										button.updateText('No selection');
+										$('#push_deliveries').removeClass('success').attr('disabled', 'disabled');
+									}, 3000); 
 							 	});
 						 												 	
 							},
@@ -349,8 +354,6 @@ $(document).ready(function() {
 				}
 
 				function push_selected(data, button, single, callback) {
-
-					console.log(data);
 
 					$.ajax({
 				 		type: 'POST',
@@ -381,11 +384,6 @@ $(document).ready(function() {
 							
 							button.updateText('Success');
 							$('#push_deliveries').addClass('success');
-
-							setTimeout(function() {
-								button.updateText('No selection');
-								$('#push_deliveries').removeClass('success').attr('disabled', 'disabled');
-							}, 3000);
 
 							callback();
 				 		},
@@ -435,6 +433,35 @@ $(document).ready(function() {
 				 	});
 				}
 
+				function fnFormatDetails (row) {
+				    var sOut = '<table>';
+				    	sOut += '<tr">';
+				    	sOut += '<th>Code</th>';
+				    	sOut += '<th>Name</th>';
+				    	sOut += '<th>Campus</th>';
+				    	sOut += '<th>Duration</th>';
+				    	sOut += '<th>Students</th>';
+				    	sOut += '<th>Version</th>';
+				    	sOut += '<th></th>';
+				    	sOut += '</tr">';
+				    $.each(row.children, function(i) {
+				    	var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10);
+						var duration = row.children[i].module_week_beginning + '-' + end;
+				    	sOut += '<tr ident="'+ row.chksum +'">';
+				    	sOut += '<td class="code">'+ row.children[i].module_code +'</td>';
+				    	sOut += '<td class="name">'+ row.children[i].module_title +'</td>';
+				    	sOut += '<td class="campus"> Canterbury</td>';
+				    	sOut += '<td class="duration">'+ duration +'</td>';
+				    	sOut += '<td class="students">10</td>';
+				    	sOut += '<td class="version">1</td>';
+				    	sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';
+				    	sOut += '</tr>';
+				    });
+				    sOut += '</table>';
+				     
+				    return sOut;
+				}
+
 				$.fn.dataTableExt.oApi.fnGetFilteredNodes = function ( oSettings )
 				{
 				    var anRows = [];
@@ -459,19 +486,31 @@ $(document).ready(function() {
 				function rowClick(json) {
 
 					$('.child_expand').live('click', function() {
+						var chksum = $(this).closest('tr').attr('ident');
+
+						var row = _.filter(json, function (r) { 
+							return r.chksum === chksum;
+						});
+
 						var nTr = $(this).parents('tr')[0];
 						if(oTable.fnIsOpen(nTr)) {
-
+							$(this).removeClass('close').addClass('open');
+							oTable.fnClose(nTr);
+						} else {
+							$(this).removeClass('open').addClass('close');
+							oTable.fnOpen( nTr, fnFormatDetails(row[0]), 'merged' );
 						}
 					});
 
+
+
 					$('.edit_row').live('click', function() {
-						chksum = $(this).closest('tr').attr('ident');
+						var chksum = $(this).closest('tr').attr('ident');
 
 						edit_row(chksum, json, null);
 					});
 
-					$('#datable tbody tr').live('click', function() {
+					$('#datable tbody tr.parent').live('click', function() {
 						if(event.target === $('.toolbar a',this)[0] || event.target === $('.toolbar div',this)[0]){
 							return true;
 						}
@@ -511,14 +550,14 @@ $(document).ready(function() {
 					"aaData": datatable,
 					"aoColumns": [
 						{'sClass': 'id', "bSearchable": false},
-						{'sClass': 'status'},
-						{'sClass': 'code'},
-						{'sClass': 'name'},
-						{'sClass': 'campus'},
-						{'sClass': 'duration'},
-						{'sClass': 'students'},
-						{'sClass': 'version'},
-						{'sClass': 'toolbar'}
+						{'sClass': 'status', "sWidth": "20%"},
+						{'sClass': 'code', "sWidth": "12%"},
+						{'sClass': 'name', "sWidth": "25%"},
+						{'sClass': 'campus', "sWidth": "10%"},
+						{'sClass': 'duration', "sWidth": "12%"},
+						{'sClass': 'students', "sWidth": "5%"},
+						{'sClass': 'version', "sWidth": "5%"},
+						{'sClass': 'toolbar', "sWidth": "20%"}
 
 					],
 					"aoColumnDefs": [
@@ -532,6 +571,7 @@ $(document).ready(function() {
 					"sPaginationType": "full_numbers",
 					"fnCreatedRow": function( nRow, aData, iDataIndex ) {
 						$(nRow).attr('ident', aData[0]);
+						$(nRow).addClass('parent')
 					},
 					"fnInitComplete": function(oSettings) {
 						jQuery.unblockUI();
@@ -637,7 +677,7 @@ $(document).ready(function() {
 							var synopsis = $.trim(pushees[i].synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
 
 							var obj = {
-								chksum: pushees[i].chksum,
+								id: pushees[i].chksum,
 								module_code: pushees[i].module_code + ' ' + date,
 								module_title: pushees[i].module_title + ' ' + date,
 								synopsis: synopsis + '  <a href="http://www.kent.ac.uk/courses/modulecatalogue/modules/'+ pushees[i].module_code +'">More</a>',
@@ -716,6 +756,7 @@ $(document).ready(function() {
 					$('#fullname').val(full_name);
 					$('#synopsis').val(synopsis);
 
+					var ui_sub;
 
 					$( "#dialog-form" ).dialog({ 
 						title: 'Choose merge details',
@@ -724,9 +765,11 @@ $(document).ready(function() {
 							button.updateText('<span>Merge</span> to Moodle');
 							$('#merge_deliveries').removeClass();
 						},
+						open: function(event, ui) {
+							ui_sub = new ButtonLoader($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'), 'Saving');
+						},
 						buttons: {
 							"Push to moodle": function() {
-								var ui_sub = new ButtonLoader($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'), 'Saving');
 							 	ui_sub.disable($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'));
 							 	ui_sub.start();
 
@@ -752,7 +795,9 @@ $(document).ready(function() {
 							 	$.ajax({
 							 		type: 'POST',
 							 		url: window.dapageUrl + '/courses/merge/',
-							 		data: data,
+							 		contentType: 'json',
+				 					dataType: 'json',
+							 		data: JSON.stringify(data),
 							 		success: function () {
 							 			ui_sub.stop();
 							 			$('#datable tbody tr').removeClass('row_selected');
@@ -773,6 +818,10 @@ $(document).ready(function() {
 											$('#jobs ul').html(delivery_list);
 										}
 
+										clear_ui_form()
+										$("#dialog-form").dialog("close");
+
+										button.stop();
 										button.updateText('Success');
 										$('#merge_deliveries').addClass('success');
 
