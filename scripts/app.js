@@ -70,7 +70,7 @@ $(document).ready(function() {
 
     $( "#dialog-form" ).dialog({
 		autoOpen: false,
-		height: 490,
+		height: 500,
 		width: 600,
 		modal: true,
 		buttons: {
@@ -225,18 +225,23 @@ $(document).ready(function() {
 						$('#job_number').html(count);
 
 						if(selectedDeliveries.length > 1) {
-							if(complete_selected.length !== 0) {
-								$('#push_deliveries').attr('disabled', 'disabled').html('Cant push').removeClass();
+							if(complete_selected.length > 1) {
+								$('#push_deliveries').attr('disabled', 'disabled').html('Can\'t push').removeClass();
+								$('#merge_deliveries').attr('disabled', 'disabled').html('Can\'t merge').removeClass();
+							}else if(complete_selected.length === 1) {
+								$('#push_deliveries').attr('disabled', 'disabled').html('Can\'t push').removeClass();
+								$('#merge_deliveries').removeAttr('disabled').html('<span>Merge</span> to Moodle').removeClass();
 							} else {
 								$('#push_deliveries').removeAttr('disabled').html('<span>Push</span> to Moodle').removeClass();
+								$('#merge_deliveries').removeAttr('disabled').html('<span>Merge</span> to Moodle').removeClass();
 							}
-							$('#merge_deliveries').removeAttr('disabled').html('<span>Merge</span> to Moodle').removeClass();
 						} else if(selectedDeliveries.length === 1) {
 							if(complete_selected.length !== 0) {
-								$('#push_deliveries').attr('disabled', 'disabled').html('Cant push').removeClass();
+								$('#push_deliveries').attr('disabled', 'disabled').html('Can\'t push').removeClass();
+								$('#merge_deliveries').attr('disabled', 'disabled').html('Can\'t merge').removeClass();
 							} else {
 								$('#push_deliveries').removeAttr('disabled').html('<span>Edit</span> to Moodle').removeClass().addClass('edit_to_moodle');
-								$('#merge_deliveries').attr('disabled', 'disabled').html('No selection').removeClass();
+								$('#merge_deliveries').attr('disabled', 'disabled').html('Can\'t merge').removeClass();
 							}
 						} else {
 							$('#push_deliveries').attr('disabled', 'disabled').html('No selection').removeClass();
@@ -295,6 +300,10 @@ $(document).ready(function() {
 								button.updateText('<span>Edit</span> to Moodle');
 								$('#push_deliveries').removeClass().addClass('edit_to_moodle');
 							}
+
+							$('#shortname_ext_td').html('');
+							$('#edit_notifications').html('');
+							$('#edit_notifications').removeClass();
 						},
 						open: function(event, ui) {
 							ui_sub = new ButtonLoader($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'), 'Saving');
@@ -307,7 +316,7 @@ $(document).ready(function() {
 
 							 	if($('#shortname_ext').get(0)) {
 							 		if($('#shortname_ext').val() === '') {
-							 			$('#edit_notifications').addClass('error').text('Please provide a three letter identifier');
+							 			$('#edit_notifications').removeClass('warn').addClass('error').text('Please provide a three letter identifier');
 							 			$('#shortname_ext').addClass('error');
 							 			ui_sub.stop();
 							 			return;
@@ -327,14 +336,6 @@ $(document).ready(function() {
 							 		category: $('#category').val()
 							 	}];
 
-
-							 	/*200 OK
-
-							 	422 [
-							 		{ 'error_code': 'duplicate', 'id': '48293481928chjefwji23ij' },
-							 		{ 'error_code': 'duplicate', 'id': '48293481928chjefwji23ij' },
-							 	]*/
-
 							 	push_selected(data, ui_sub, true, function() {
 
 							 		clear_ui_form();
@@ -344,9 +345,37 @@ $(document).ready(function() {
 									$('#push_deliveries').addClass('success');
 									clearTimeout(push_timeout);
 									push_timeout = setTimeout(function() {
-										button.updateText('No selection');
-										$('#push_deliveries').removeClass('success').attr('disabled', 'disabled');
-									}, 3000); 
+										$(button.element[0]).removeClass();
+										/*if(single === true) {
+											button.updateText('<span class="ui-button-text">Push to Moodle<span>');
+										} else {
+											button.updateText('<span>Push</span> to Moodle');
+										}*/
+										processRowSelect();
+									}, 3000);
+							 	}, function(xhr) {
+
+							 		var problems = JSON.parse(xhr.responseText);
+
+							 		switch(problems[0].error_code) {
+					 					case 'duplicate':
+					 					case 'could_not_schedule':
+					 						if($('#shortname_ext').get(0)) {
+					 							$('#edit_notifications').addClass('error').text('Please provide a three letter identifier');
+								 				$('#shortname_ext').addClass('error');
+					 						} else {
+					 							$('#shortname_ext_td').html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
+												$('#edit_notifications').removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
+												$('#shortname_ext').addClass('warn');
+											}
+					 					break;
+					 				}
+
+					 				clearTimeout(ui_timeout);
+									ui_timeout = setTimeout(function() {
+									$(ui_sub.element[0]).removeClass('error');
+										ui_sub.updateText('<span class="ui-button-text">Push to Moodle<span>');
+									}, 2000);
 							 	});
 						 												 	
 							},
@@ -358,8 +387,7 @@ $(document).ready(function() {
 					}).dialog("open" );
 				}
 
-				function push_selected(data, button, single, callback) {
-
+				function push_selected(data, button, single, callback, errorcallback) {
 					$.ajax({
 				 		type: 'POST',
 				 		url: window.dapageUrl + '/courses/schedule/',
@@ -389,51 +417,21 @@ $(document).ready(function() {
 							
 							button.updateText('Success');
 							$('#push_deliveries').addClass('success');
+							if(single === false) {
+								$(button.element[0]).removeClass('loading');
+								button.updateText('<span class="ui-button-text">Push to Moodle<span>');
+							}
 
 							callback();
 				 		},
-				 		error: function() {
-
-						 	/*var duplicates = _.chain(pushees).groupBy(function(item) {
-								return item.module_code;
-							}).reject(function(item) {
-								return item.length < 2;
-							}).flatten().map(function(item) {
-								return item;
-							}).value();
-
-							$.each(pushees, function(i){
-								var shortname = pushees[i].module_code + ' ' + date;
-								if(_.find(valid_data, function (row){ 
-									if(row.state[0] === 'processing' || row.state[0] === 'scheduled' || row.state[0] === 'created_in_moodle') {
-										return row.module_code === shortname;
-									}
-									}) !== undefined) {
-										duplicates.push(pushees[i]);
-									}
-								});
-
-							if(duplicates.length !== 0) {
-								$('#dialog_error').html('Duplicates detected! To resolve please merge or push through individually. If you have other selections they will now be pushed through');
-								$("#dialog_error").dialog("open");
-								//statusbox($('#datable tbody tr:first'), 'Duplicates detected! To resolve please merge or push through individually');
-								pushees = _.without(pushees, duplicates);
-
-								
-							}*/
+				 		error: function(xhr, request, settings) {
 				 			button.stop();
 				 			$(button.element[0]).removeClass('loading');
 				 			button.updateText('Error');
 							$(button.element[0]).addClass('error');
-							clearTimeout(ui_timeout);
-							ui_timeout = setTimeout(function() {
-								if(single === true) {
-									button.updateText('<span class="ui-button-text">Push to Moodle<span>');
-								} else {
-									button.updateText('<span>Push</span> to Moodle');
-								}
-								$(button.element[0]).removeClass('error');
-							}, 3000);
+
+				 			errorcallback(xhr);
+
 				 		}
 				 	});
 				}
@@ -516,6 +514,10 @@ $(document).ready(function() {
 					});
 
 					$('#datable tbody tr.parent').live('click', function() {
+
+						clearTimeout(push_timeout);
+						clearTimeout(ui_timeout);
+						clearTimeout(merge_timeout);
 						if(event.target === $('.toolbar a',this)[0] || event.target === $('.toolbar div',this)[0]){
 							return true;
 						}
@@ -533,7 +535,7 @@ $(document).ready(function() {
 				});
 
 				$('#deselect_all').click(function() {
-					var rows = oTable.fnGetFilteredNodes();
+					var rows = oTable.fnGetNodes();
 					rowSelectAll(rows, false);
 					processRowSelect();
 				});
@@ -696,9 +698,84 @@ $(document).ready(function() {
 						var status = push_selected(data, button, false, function(){
 							clearTimeout(push_timeout);
 							push_timeout = setTimeout(function() {
-								button.updateText('No selection');
-								$('#push_deliveries').removeClass('success').attr('disabled', 'disabled');
+								$(button.element[0]).removeClass();
+								/*if(single === true) {
+									button.updateText('<span class="ui-button-text">Push to Moodle<span>');
+								} else {
+									button.updateText('<span>Push</span> to Moodle');
+								}*/
+								processRowSelect();
 							}, 3000); 
+						}, function(xhr) {
+							var problems = JSON.parse(xhr.responseText);
+				 			var error_ids = [];
+				 			var errors = '<div id="push_notifications" class="warn">Note: courses that have not errored have still been scheduled.</div>';
+				 			errors += '<ul id="error_ui">';
+
+				 			$.each(problems, function(i) {
+				 				
+				 				var row = _.filter(data, function (r) { 
+									return r.id === problems[i].id;
+								});
+
+				 				error_ids.push(row[0].id);
+
+				 				switch(problems[i].error_code) {
+				 					case 'duplicate':
+				 						errors += '<li class="warning"><span class="type">WARNING: Duplicate</span> - <span class="cours_dets">';
+				 						errors += row[0].code + ': ' + row[0].title + '</span>. Please merge or push through individually';
+				 						errors += '</li>';
+				 					break;
+				 					case 'could_not_schedule':
+				 						errors += '<li class="error"><span class="type">ERROR: Already scheduled</span> - <span class="cours_dets">';
+				 						errors += row[0].code + ': ' + row[0].title + '</span>. Please merge or push through individually';
+				 						errors += '</li>';
+				 					break;
+				 				}
+				 			});
+
+				 			errors += '</ul>';
+											 			
+							$('#dialog_error').html(errors);
+							$("#dialog_error").dialog({
+								width: 500,
+								height: 400
+							}).dialog("open");
+							//statusbox($('#datable tbody tr:first'), 'Duplicates detected! To resolve please merge or push through individually');
+							selectedDeliveries = _.without(selectedDeliveries, error_ids);
+							$('#datable tbody tr').removeClass('row_selected');
+				 			$(selectedDeliveries).each(function(i) {
+				 				var row = $('#datable tbody tr[ident='+selectedDeliveries[i]+']');
+				 				var aPos = oTable.fnGetPosition(row[0]);
+				 				oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
+				 			});
+
+				 			oTable.fnDraw();
+
+				 			selectedDeliveries = [];
+				 			count = 0;
+				 			$('#job_number').html(count);
+				 			delivery_list = '<li class="empty_deliv">no items have been selected</li>';
+				 			if($('#jobs ul').hasClass('visible')) {
+								$('#jobs ul').html(delivery_list);
+							}
+
+							$(error_ids).each(function(i) {
+				 				var dom_row = $('#datable tbody tr[ident='+error_ids[i]+']')[0];
+				 				rowSelect(dom_row, false);
+
+				 			});
+
+							clearTimeout(push_timeout);
+							push_timeout = setTimeout(function() {
+								$(button.element[0]).removeClass();
+								/*if(single === true) {
+									button.updateText('<span class="ui-button-text">Push to Moodle<span>');
+								} else {
+									button.updateText('<span>Push</span> to Moodle');
+								}*/
+								processRowSelect();
+							}, 2000);
 						});
 						
 					}
@@ -776,6 +853,10 @@ $(document).ready(function() {
 							button.stop();
 							button.updateText('<span>Merge</span> to Moodle');
 							$('#merge_deliveries').removeClass();
+
+							$('#shortname_ext_td').html('');
+							$('#edit_notifications').html('');
+							$('#edit_notifications').removeClass();
 						},
 						open: function(event, ui) {
 							ui_sub = new ButtonLoader($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'), 'Saving');
@@ -787,7 +868,7 @@ $(document).ready(function() {
 
 							 	if($('#shortname_ext').get(0)) {
 							 		if($('#shortname_ext').val() === '') {
-							 			$('#edit_notifications').addClass('error').text('Please provide a three letter identifier');
+							 			$('#edit_notifications').removeClass('warn').addClass('error').text('Please provide a three letter identifier');
 							 			$('#shortname_ext').addClass('error');
 							 			ui_sub.stop();
 							 			return;
@@ -842,9 +923,27 @@ $(document).ready(function() {
 											$('#merge_deliveries').removeClass('success').attr('disabled', 'disabled');
 										}, 4000);
 
-							 		},
-							 		error: function() {
+										processRowSelect();
 
+							 		},
+							 		error: function(xhr, request, settings) {
+
+
+							 			var problems = JSON.parse(xhr.responseText);
+
+								 		switch(problems[0].error_code) {
+						 					case 'duplicate':
+						 					case 'could_not_schedule':
+						 						if($('#shortname_ext').get(0)) {
+						 							$('#edit_notifications').addClass('error').text('Please provide a three letter identifier');
+									 				$('#shortname_ext').addClass('error');
+						 						} else {
+						 							$('#shortname_ext_td').html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
+													$('#edit_notifications').removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
+													$('#shortname_ext').addClass('warn');
+												}
+						 					break;
+						 				}
 							 			/*//Checks to see if the shortname is already an active delivery
 										//If it is then is adds a form element to make it unique
 										if(_.find(json, function (row){ 
@@ -866,13 +965,13 @@ $(document).ready(function() {
 								 			return;
 								 		}*/ 
 
-							 			button.stop();
-							 			$('#merge_deliveries').removeClass('loading');
-							 			button.updateText('Error');
-										$('#merge_deliveries').addClass('error');
+							 			ui.stop();
+							 			$(ui.element[0]).removeClass('loading');
+							 			ui.updateText('Error');
+										$(ui.element[0]).addClass('error');
 										clearTimeout(merge_timeout);
 										merge_timeout = setTimeout(function() {
-											button.updateText('<span>Merge</span> to Moodle');
+											ui_sub.updateText('<span class="ui-button-text">Push to Moodle<span>');
 											$('#merge_deliveries').removeClass('error');
 										}, 4000);
 							 		}

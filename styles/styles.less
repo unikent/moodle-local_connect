@@ -781,7 +781,7 @@
 
 #dialog-form {
 	#shortname {
-		width: 360px;
+		width: 374px;
 	}
 
 	#fullname {
@@ -810,13 +810,13 @@
 	color: #a12a2a !important;
 }
 
-#edit_notifications {
+#edit_notifications, #push_notifications {
 	width: auto;
 	padding: 10px;
 	.rounded(5px);
 }
 
-#edit_notifications.warn {
+#edit_notifications.warn, #push_notifications.warn {
 	background-color: #f9edbe;
 	border: 1px solid #f0c36d;
 	color: #C59A47;
@@ -826,7 +826,7 @@
 	border: 1px solid #f0c36d !important;
 }
 
-#edit_notifications.error {
+#edit_notifications.error, #push_notifications.error {
 	background-color: #f9e8e8;
 	border: 1px solid #CD665E;
 	color: #CD665E;
@@ -836,3 +836,46 @@
 	border: 1px solid #CD665E !important;
 }
 
+#error_ui {
+	margin: 0;
+	margin-top: 5px;
+	padding: 5px;
+	list-style: none;
+
+	li {
+		margin: 0 0 10px 0;
+		border-bottom: 1px solid #ddd;
+		padding-bottom: 10px;
+		padding-left: 30px;
+		font-weight: normal;
+	}
+
+	li.warning {
+		background: url(../images/warning.png) no-repeat 5px 1px;
+		
+
+		.type {
+			color: #c59a47;
+			font-weight: bold;
+		}
+
+		.cours_dets {
+			font-weight: bold;
+		}
+	}
+
+	li.error {
+		background: url(../images/error.png) no-repeat 5px 1px;
+		color:#6f6f6f;
+
+		.type {
+			color: #CD665E;
+			font-weight: bold;
+		}
+
+		.cours_dets {
+			font-weight: bold;
+			color:#6f6f6f;
+		}
+	}
+}
