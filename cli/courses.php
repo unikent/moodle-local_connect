@@ -37,7 +37,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         throw new moodle_exception('non unique idnumber');
       }
       $c->numsections = '10';
-      $c->maxbytes = '2097152';
+      $c->maxbytes = '10485760';
       $cr = create_course($c);
 
       $DB->set_field('course_sections', 'name', $c->fullname, array('course'=>$cr->id, 'section'=>0));
