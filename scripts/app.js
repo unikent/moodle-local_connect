@@ -417,7 +417,7 @@ $(document).ready(function() {
 							
 							button.updateText('Success');
 							$('#push_deliveries').addClass('success');
-							if(single === false) {
+							if(single === true) {
 								$(button.element[0]).removeClass('loading');
 								button.updateText('<span class="ui-button-text">Push to Moodle<span>');
 							}
@@ -825,8 +825,16 @@ $(document).ready(function() {
 
 					//Creates the combined shorts and long names
 					$.each(mergers, function(i, val) {
-						short_name +=val.module_code;
-						full_name += val.module_title;
+						var code = val.module_code.split(' ');
+						if(code.length > 1) {
+							short_name += code[0];
+						} else {
+							short_name += val.module_code;	
+						}
+
+						full_name += val.module_title.replace(/( )(\()(\d+)(\/)(\d+)(\))/i, '');
+					
+						//full_name += val.module_title;
 						if(i !== mergers.length-1) {
 							short_name += '/';
 							full_name += '/';
@@ -991,7 +999,8 @@ $(document).ready(function() {
 
 			}
 		}, // end of ajax success
-		error: function() {
+		error: function(event) {
+			console.log(event);
 			jQuery.unblockUI();
 	        $("#dialog_error").dialog("open");
 		}
