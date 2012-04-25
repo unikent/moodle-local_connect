@@ -9,25 +9,32 @@ require_login();
 $site_context = context_system::instance();
 $PAGE->set_context($site_context);
 
-if (!has_capability('local/kentconnect:manage', $site_context)) {
-    print_error('accessdenied', 'local_connect');
-}
-
 $PAGE->set_url('/local/connect/index.php');
 $PAGE->set_pagelayout('datool');
 
 echo $OUTPUT->header();
 $theCats='';
 $cats = $DB->get_records('course_categories');
+$cat_permissions = array();
 
 foreach($cats as $cat) {
 	$context = get_context_instance(CONTEXT_COURSECAT, $cat->id);
 
 	if(has_capability('moodle/category:manage', $context)) {
-		$theCats .= '<option value="'.$cat->idnumber.'">'.$cat->name.'</option>';
+		array_push($cat_permissions, $cat->id);
+		$theCats .= '<option value="'.$cat->id.'">'.$cat->name.'</option>';
 	}
 }
 
+if(count($cat_permissions) == 0) {
+	print_error('accessdenied', 'local_connect');
+}
+
+if (has_capability('local/kentconnect:manage', $site_context)) {
+	$cat_json = json_encode("");
+} else {
+	$cat_json = json_encode($cat_permissions);
+}
 
 $clareport_text = get_string('connectreport', 'local_connect');
 echo $OUTPUT->heading($clareport_text);
@@ -119,6 +126,7 @@ $table = <<< HEREDOC
 	<script type="text/javascript">
 		window.dapageUrl = '$CFG->daPageUrl';
 		window.coursepageUrl = '$CFG->wwwroot';
+		window.cats = $cat_json;
 	</script>
 <div id="dialog-form" title="Edit details">
 	<div id="edit_notifications"></div>

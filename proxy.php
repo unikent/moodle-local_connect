@@ -1,19 +1,28 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php'); 
 if( !$CFG->kent_connect ) die(0);
 
 $sitecontext = get_context_instance(CONTEXT_SYSTEM);
 $site = get_site();
 
-if (!has_capability('local/kentconnect:manage', $sitecontext)) {
-  print_error('nopermissions', 'error', '', 'publish connect courses');
-  exit(0);
+$cats = $DB->get_records('course_categories');
+$cat_permissions = array();
+
+foreach($cats as $cat) {
+  $context = get_context_instance(CONTEXT_COURSECAT, $cat->id);
+
+  if(has_capability('moodle/category:manage', $context)) {
+    array_push($cat_permissions, $cat->id);
+  }
+}
+
+if(count($cat_permissions) == 0) {
+  print_error('accessdenied', 'local_connect');
 }
 
 //make resource
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $CFG->kent_connect_url . $_SERVER['PATH_INFO']);
+curl_setopt($ch, CURLOPT_URL, $CFG->kent_connect_url . $_SERVER['PATH_INFO'] . '?' . $_SERVER['QUERY_STRING']);
 curl_setopt($ch, CURLOPT_HEADER, 1);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $_SERVER["REQUEST_METHOD"]);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
