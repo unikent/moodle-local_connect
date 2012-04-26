@@ -42,18 +42,9 @@ echo $OUTPUT->heading($clareport_text);
 $scripts = '<link rel="stylesheet" type="text/css" href="styles/demo_table.css">';
 $scripts = '<link rel="stylesheet" type="text/css" href="scripts/css/ui-lightness/jquery-ui-1.8.17.custom.css">';
 $scripts .= '<link rel="stylesheet/less" type"text/css" href="styles/styles.less">';
-
-$scripts .='<script src="' . $CFG->wwwroot . '/lib/less/less-1.2.0.min.js" type="text/javascript"></script>';
-$scripts .='<script src="' . $CFG->wwwroot . '/lib/jquery/jquery-1.7.1.min.js" type="text/javascript"></script>';
-$scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/jquery-ui-1.8.18.custom.min.js" type="text/javascript"></script>';
-$scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/jquery.dataTables.min.js" type="text/javascript"></script>';
-$scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/jquery.dataTables.columnFilter.js" type="text/javascript"></script>';
-$scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/naturalSort.js" type="text/javascript"></script>';
-$scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/underscore-min.js" type="text/javascript"></script>';
-$scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/js/jquery.blockUI.js" type="text/javascript"></script>';
-$scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/js/json2.js" type="text/javascript"></script>';
-$scripts .='<script src="' . $CFG->wwwroot . '/local/connect/scripts/date-en-GB.js" type="text/javascript"></script>';
 echo $scripts;
+
+require_once('includes.php');
 
 $table = <<< HEREDOC
 <div id="da_wrapper">
