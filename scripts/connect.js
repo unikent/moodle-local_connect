@@ -253,22 +253,22 @@ var Connect = (function() {
     	sOut += '<th></th>';
     	sOut += '</tr>';
 	    $.each(row.children, function(i) {
-	    	var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10);
-			var duration = row.children[i].module_week_beginning + '-' + end;
-	    	sOut += '<tr ident="'+ row.children[i].chksum +'">';
-	    	sOut += '<td class="code">'+ row.children[i].module_code +'</td>';
-	    	sOut += '<td class="name">'+ row.children[i].module_title +'</td>';
-	    	sOut += '<td class="campus">' + row.children[i].campus_desc +'</td>';
-	    	sOut += '<td class="duration">'+ duration +'</td>';
-	    	sOut += '<td class="students">'+ row.children[i].student_count +'</td>';
-	    	sOut += '<td class="version">'+ row.children[i].module_version +'</td>';
-	    	if(row.children.length > 1) {
-	    		sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';	
-	    	} else {
-	    		sOut += '<td class="toolbar"></td>';
-	    	}
-	    	
-	    	sOut += '</tr>';
+        var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10);
+        var duration = row.children[i].module_week_beginning + ( isNaN(end) ? '' : '-' + end );
+        sOut += '<tr ident="'+ row.children[i].chksum +'">';
+        sOut += '<td class="code">'+ row.children[i].module_code +'</td>';
+        sOut += '<td class="name">'+ row.children[i].module_title +'</td>';
+        sOut += '<td class="campus">' + row.children[i].campus_desc +'</td>';
+        sOut += '<td class="duration">'+ duration +'</td>';
+        sOut += '<td class="students">'+ row.children[i].student_count +'</td>';
+        sOut += '<td class="version">'+ row.children[i].module_version +'</td>';
+        if(row.children.length > 1) {
+          sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';	
+        } else {
+          sOut += '<td class="toolbar"></td>';
+        }
+
+        sOut += '</tr>';
 	    });
 	    sOut += '</table>';
 	     
