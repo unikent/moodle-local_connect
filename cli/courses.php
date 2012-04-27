@@ -36,13 +36,19 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       if($r) {
         throw new moodle_exception('non unique idnumber');
       }
-      
+
       // create one section for each duration
       $c->numsections = $c->duration != null ? $c->duration : 1;
       $c->maxbytes = '10485760';
       $cr = create_course($c);
 
       $DB->set_field('course_sections', 'name', $c->fullname, array('course'=>$cr->id, 'section'=>0));
+
+      // gives our course a news forum, which means modinfo
+      // can get populated and we dont have to refresh to see courses..
+      require_once($CFG->dirroot .'/mod/forum/lib.php');
+      forum_get_course_forum($cr->id,'news');
+
       $tr = array( 'result' => 'ok', 'moodle_course_id' => $cr->id, 'in' => $c );
     } else if($c->isa == 'DELETE') {
       throw new moodle_exception('delete not implemented for courses');
