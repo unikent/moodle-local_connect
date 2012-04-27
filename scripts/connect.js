@@ -190,7 +190,7 @@ var Connect = (function() {
 		});
 
 		this.buttons.edit.live('click', function() {
-			var chksum = this.buttons.edit.closest('tr').attr('ident');
+			var chksum = $(this).closest('tr').attr('ident');
 
 			_this.edit_row(chksum, _this.json, null);
 		});
