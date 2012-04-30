@@ -36,7 +36,27 @@ if( !$response ) {
   header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
 } else {
 
-  list($response_headers, $response_body) = explode("\r\n\r\n", $response, 2);
+  $lines = explode("\r\n\r\n", $response);
+
+  if (count($lines) > 2) {
+    if (preg_match("/100 Continue/i", $lines[0])) {
+      // we can throw this away, as we don't need it
+      array_shift($lines);
+    } else {
+      // this is a problem and means this reverse proxy isn't
+      // working properly which wouldn't be very surprising because
+      // this is a horrible hack
+      echo "REVERSE PROXY IS BROKEN";
+      die(); 
+    }
+  }
+
+  $response_headers = $lines[0];
+  if ($lines[1]) {
+    $response_body = $lines[1];
+  } else {
+    $response_body = '';
+  }
 
   //send your header
   $ary_headers = explode("\n", $response_headers );
