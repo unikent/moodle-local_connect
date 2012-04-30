@@ -7,6 +7,25 @@ require(dirname(dirname(dirname(dirname(__FILE__)))).'/course/lib.php');
 require(dirname(dirname(dirname(dirname(__FILE__)))).'/course/edit_form.php');
 require(dirname(dirname(__FILE__)).'/locallib.php');
 
+function kent_connect_fetch_or_create_removed_category_id() {
+  global $DB;
+  $category = $DB->get_record('course_categories', array('idnumber' => 'kent_connect_removed'));
+
+  if(!$category) {
+    $category = new stdClass();
+    $category->name = 'Removed';
+    $category->idnumber = 'kent_connect_removed';
+    $category->description_editor = $data->description_editor;
+    $category->parent = 0;
+    $category->description = 'Holding place for removed courses';
+    $category->sortorder = 999;
+    $category->visible = false;
+    $category->id = $DB->insert_record('course_categories', $category);
+  }
+
+  return $category->id;
+}
+
 $res = array();
 
 /*
@@ -51,7 +70,14 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
 
       $tr = array( 'result' => 'ok', 'moodle_course_id' => $cr->id, 'in' => $c );
     } else if($c->isa == 'DELETE') {
-      throw new moodle_exception('delete not implemented for courses');
+      global $DB;
+      $r = $DB->get_record('course',array('idnumber'=>$c->idnumber));
+      if(!$r) {
+        throw new moodle_exception('course doesnt exist');
+      }
+      $r->category = kent_connect_fetch_or_create_removed_category_id();
+      update_course($r);
+      $tr = array( 'result' => 'ok', 'in' => $c );
     } else {
       throw new moodle_exception('dont understand '.$c->isa);
     }
