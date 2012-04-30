@@ -906,9 +906,11 @@ var Connect = (function() {
 			var row = $(el).closest('tr');
 			$(el).removeClass('unlink_row').addClass('ajax_loading');
 			$.ajax({
-		 		type: 'GET',
-		 		url: window.dapageUrl + '/courses/',
+		 		type: 'POST',
+		 		url: window.dapageUrl + '/courses/disengage/',
 				dataType: 'json',
+        contentType: 'json',
+        data: JSON.stringify({ 'courses' : [ chksum ] }),
 		 		success: function () {
 
 		 			if(_this.oTable.fnIsOpen(row[0])) {
@@ -948,11 +950,13 @@ var Connect = (function() {
 
 		$(el).removeClass('unlink_child').addClass('ajax_loading');
 
-		$.ajax({
-	 		type: 'GET',
-	 		url: window.dapageUrl + '/courses/',
-			dataType: 'json',
-	 		success: function () {
+    $.ajax({
+      type: 'POST',
+      url: window.dapageUrl + '/courses/disengage/',
+      dataType: 'json',
+      contentType: 'json',
+      data: JSON.stringify({ 'courses' : [ chksum ] }),
+      success: function () {
 
  				var data = [
 	 				chksum,
