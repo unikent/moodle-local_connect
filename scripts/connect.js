@@ -952,7 +952,7 @@ var Connect = (function() {
 
     $.ajax({
       type: 'POST',
-      url: window.dapageUrl + '/courses/disengage/',
+      url: window.dapageUrl + '/courses/unlink/',
       dataType: 'json',
       contentType: 'json',
       data: JSON.stringify({ 'courses' : [ chksum ] }),
