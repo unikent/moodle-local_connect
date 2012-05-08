@@ -40,13 +40,24 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         $uid = $uid->id;
       }
 
+      $grouping = null;
       if(empty($c->moodle_group_id)) {
         $data = (object) array( 'name' => $c->group_desc, 'courseid' => $c->moodle_course_id );
         $group = groups_create_group($data);
         $c->moodle_group_id = $group;
+        if(! ($grouping = $DB->get_record('groupings',array('name'=>'Seminar groups','courseid'=>$c->moodle_course_id))) ) {
+          $data->name = "Seminar groups";
+          $grouping = groups_create_grouping($data);
+        } else {
+          $grouping = $grouping->id;
+        }
+      }
+      if(!($g = $DB->get_record('groupings_groups',array('groupid'=>(int)$group,'groupingid'=>$grouping))) ) {
+        groups_assign_grouping($grouping, $group);
       }
 
       $group = $DB->get_record('groups',array('id'=>$c->moodle_group_id));
+
       $r = groups_add_member($group,$uid);
       if(!$r) {
         $reason = '';

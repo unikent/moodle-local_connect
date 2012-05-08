@@ -66,7 +66,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         }
 
         $role = $DB->get_record('role', array('shortname'=>$shortname));
-        
+
         if(empty($role)) {
           unset($_POST['name']);
           unset($_POST['shortname']);
