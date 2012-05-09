@@ -5,6 +5,7 @@ define('CLI_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/user/lib.php');
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/lib/enrollib.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/group/lib.php');
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/admin/roles/lib.php');
 require_once(dirname(dirname(__FILE__)).'/locallib.php');
 
@@ -26,6 +27,24 @@ $res = array();
  *     moodle_user_id => 123, 'in' => input }
  * ]
  */
+
+// add delivery groups and people to them
+function delivery_groups_plx($c,$uid) {
+  global $DB;
+  if(!empty($c->deliveries)) {
+    if(! ($grouping = $DB->get_record('groupings',array('name'=>'Delivery groups','courseid'=>$c->moodle_course_id))) ) {
+      $data = (object) array( 'name' => 'Delivery groups', 'courseid' => $c->moodle_course_id );
+      $grouping = groups_create_grouping($data);
+    }
+    foreach( $c->deliveries as $d ) {
+      if(! $group = $DB->get_record('groups',array( 'name' => $d, 'courseid' => $c->moodle_course_id )) ) {
+        $group = groups_create_group((object)array('name'=>$d,'courseid'=>$c->moodle_course_id));
+        groups_assign_grouping($grouping, $group);
+      }
+      groups_add_member($group,$uid);
+    }
+  }
+}
 
 foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
   global $DB;
@@ -86,6 +105,8 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
 
         $r = enrol_try_internal_enrol($c->moodle_course_id, $uid, $role->id);
         if(!$r) throw new moodle_exception('enrol_internal gave us false');
+
+        delivery_groups_plx($c, $uid);
       }
     } else if($c->isa == 'DELETE') {
       if($uid) { // if the user doesnt exist, their enrolments should have been wiped already
