@@ -28,10 +28,11 @@ var Connect = (function() {
 			var end = parseInt(val.module_week_beginning, 10) + parseInt(val.module_length, 10);
 			var duration = val.module_week_beginning + '-' + end;
 			var name = val.state[0].split('_').join(' ');
-			var state = '<div class="status_'+val.state[0]+'">'+name+'</div>';
+      var sink_deleted = val.sink_deleted;
 			var toolbar = ' ';
 			if(val.state[0] === 'created_in_moodle') {
 				if(val.children !== null) {
+          sink_deleted = sink_deleted || _.any(val.children, function(i) {return i.sink_deleted;})
 					toolbar += '<div class="child_expand open toolbar_link"></div>'
 				}
 				toolbar += '<div class="unlink_row toolbar_link"></div>'
@@ -39,6 +40,7 @@ var Connect = (function() {
 				toolbar += '<a href=" '+ window.coursepageUrl + '/course/view.php?id='+ val.moodle_id +'" target="_blank" class="created_link toolbar_link"></a>';
 				
 			}
+			var state = '<div class="status_'+val.state[0]+' '+(sink_deleted?'sink_deleted':'')+'">'+name+'</div>';
 			
 			return [val.chksum, state, val.module_code, val.module_title, val.campus_desc, 
 					duration, val.student_count, val.module_version, toolbar];
@@ -256,14 +258,17 @@ var Connect = (function() {
         var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10);
         var duration = row.children[i].module_week_beginning + ( isNaN(end) ? '' : '-' + end );
         sOut += '<tr ident="'+ row.children[i].chksum +'">';
-        sOut += '<td class="code">'+ row.children[i].module_code +'</td>';
+        sOut += '<td class="code"><div class="'
+                  + (row.children[i].sink_deleted ? 'sink_deleted' : '' )
+                  + '">' + row.children[i].module_code
+                  + '</div></td>';
         sOut += '<td class="name">'+ row.children[i].module_title +'</td>';
         sOut += '<td class="campus">' + row.children[i].campus_desc +'</td>';
         sOut += '<td class="duration">'+ duration +'</td>';
         sOut += '<td class="students">'+ row.children[i].student_count +'</td>';
         sOut += '<td class="version">'+ row.children[i].module_version +'</td>';
         if(row.children.length > 1) {
-          sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';	
+          sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';
         } else {
           sOut += '<td class="toolbar"></td>';
         }

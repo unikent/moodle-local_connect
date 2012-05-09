@@ -509,6 +509,19 @@
 					.toolbar {
 						width: 20% !important;
 					}
+
+          .sorting_asc {
+            background: url('../images/sort_asc.png') no-repeat center right;
+          }
+
+          .sorting_desc {
+            background: url('../images/sort_desc.png') no-repeat center right;
+          }
+
+          .sorting {
+            background: url('../images/sort_both.png') no-repeat center right;
+          }
+
 				}
 
 				/*====== BODY
@@ -589,6 +602,13 @@
 									background-image: url(../images/status_error.png);
 									color: #D38D77;
 								}
+
+								.sink_deleted {
+
+									background-image: url(../images/warning.png);
+									color: #D38D77;
+								}
+
 
 							}
 
@@ -744,19 +764,31 @@
 								border: none;
 								padding: 0px;
 
+
 								table {
-									margin-bottom: 0px;
+									margin-bottom: 1em;
+                  margin-left: 2em;
 									width: 100%;
 
 									td {
 										border: none;
 										padding: 0.5em;
 
+
+                    div {
+                      padding-left: 25px;
+                    }
+                    div.sink_deleted {
+                      background-image: url(../images/warning.png);
+                      background-repeat: no-repeat;
+                    }
+
 										.unlink_child {
 											background-image: url(../images/unlink.png);
 											width: 16px;
 											height: 16px;
 											cursor: pointer;
+                      background-repeat: no-repeat;
 										}
 
 										.unlink_child:hover {
@@ -764,6 +796,7 @@
 											opacity: 0.5;
 											-moz-opacity: 0.5;
 											filter:alpha(opacity=5);
+                      background-repeat: no-repeat;
 										}
 
 										.ajax_loading {
@@ -771,7 +804,9 @@
 											width: 16px;
 											height: 11px;
 											margin-top: 3px;
+                      background-repeat: no-repeat;
 										}
+
 									}
 
 									.duration, .students, .version {
