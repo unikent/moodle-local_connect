@@ -36,7 +36,7 @@ var Connect = (function() {
 					toolbar += '<div class="child_expand open toolbar_link"></div>'
 				}
 				toolbar += '<div class="unlink_row toolbar_link"></div>'
-				toolbar += '<div class="edit_row toolbar_link"></div>'
+				//toolbar += '<div class="edit_row toolbar_link"></div>'
 				toolbar += '<a href=" '+ window.coursepageUrl + '/course/view.php?id='+ val.moodle_id +'" target="_blank" class="created_link toolbar_link"></a>';
 				
 			}
@@ -819,8 +819,8 @@ var Connect = (function() {
 				 	var data = {
 				 		link_courses: _this.selectedDeliveries,
 				 		code: short_name,
-				 		title: full_name,
-				 		synopsis: synopsis + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mod_code +"'>More</a>",
+				 		title: _this.formEl.fullName.val(),
+				 		synopsis: _this.formEl.synopsis.val() + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mod_code +"'>More</a>",
 				 		category: _this.formEl.cat.val()
 				 	};
 
