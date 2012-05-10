@@ -265,7 +265,7 @@ var Connect = (function() {
         sOut += '<td class="name">'+ row.children[i].module_title +'</td>';
         sOut += '<td class="campus">' + row.children[i].campus_desc +'</td>';
         sOut += '<td class="duration">'+ duration +'</td>';
-        sOut += '<td class="students">'+ row.children[i].student_count +'</td>';
+        sOut += '<td class="students">'+ (row.children[i].student_count==null?'-':row.children[i].student_count) +'</td>';
         sOut += '<td class="version">'+ row.children[i].module_version +'</td>';
         if(row.children.length > 1) {
           sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';
