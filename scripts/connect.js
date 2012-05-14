@@ -364,13 +364,16 @@ var Connect = (function() {
 		//string as a list element.
 		this.delivery_list = '';
 		var _this = this;
+		
 		$(this.selectedDeliveries).each(function(index) {
 			var	delivery = _this.selectedDeliveries[index];
-			var row = _.find(_this.tabledata, function (row) { 
+			
+			var row = _.find(_this.tabledata, function (row) {
 				if(row[0] === delivery) {
 					return row;
 				}
 			});
+			
 			_this.delivery_list = _this.delivery_list + '<li>' + row[2] + '</li>';
 		});
 
@@ -459,12 +462,12 @@ var Connect = (function() {
 					$(button.element[0]).removeClass();
 					_this.processRowSelect();
 				}, 3000); 
-			}, function(xhr) {
+			}, function(xhr) { // error callback
 				var problems = JSON.parse(xhr.responseText);
 				var error_ids = [];
 				var errors = '<div id="push_notifications" class="warn">Note: courses that have not errored have still been scheduled.</div>';
 				errors += '<ul id="error_ui">';
-
+				
 				$.each(problems, function(i) {
 					
 					var row = _.filter(data, function (r) { 
@@ -499,11 +502,11 @@ var Connect = (function() {
 					width: 500,
 					height: 400
 				}).dialog("open");
-
+				
 				_this.selectedDeliveries = _.without(_this.selectedDeliveries, error_ids);
 				_this.buttons.rowsEl.removeClass('row_selected');
 				$(_this.selectedDeliveries).each(function(i) {
-					var row = $('#datable tbody tr[ident='+selectedDeliveries[i]+']');
+					var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[i]+']');
 					var aPos = _this.oTable.fnGetPosition(row[0]);
 					_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
 				});
