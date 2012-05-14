@@ -145,6 +145,12 @@ $table = <<< HEREDOC
 	</fieldset>
 	</form>
 </div>
+<div id="dialog-confirm" title="Confirm">
+	<p>
+		<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+		These deliveries will be pushed as-is. If you want to edit a course's information, please push it separately.
+	</p>
+</div>
 
 HEREDOC;
 

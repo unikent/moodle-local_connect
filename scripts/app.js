@@ -10,6 +10,13 @@ $("#dialog_error").dialog({
      }
 });
 
+$('#dialog-confirm').dialog({
+	autoOpen: false,
+	height: 185,
+	width: 375,
+	modal: true
+});
+
 $( "#dialog-form" ).dialog({
 	autoOpen: false,
 	height: 500,

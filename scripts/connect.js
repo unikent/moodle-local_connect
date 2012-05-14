@@ -419,120 +419,145 @@ var Connect = (function() {
 		
 		var _this = this;
 
-		var button = new ButtonLoader(this.buttons.pushBtn, 'Saving');
-		this.buttons.pushBtn.attr('disabled', 'disabled').addClass('loading');
-		button.start();
-		button.disable(this.buttons.pushBtn);
-
 		if(this.buttons.pushBtn.hasClass('edit_to_moodle')) {
+
+			var button = new ButtonLoader(this.buttons.pushBtn, 'Saving');
+			this.buttons.pushBtn.attr('disabled', 'disabled').addClass('loading');
+			button.start();
+			button.disable(this.buttons.pushBtn);
 
 			this.edit_row(this.selectedDeliveries[0], button);
 
 		} else {
 
-			var pushees = _.filter(this.json, function (row) { 
-				if(_.indexOf(_this.selectedDeliveries, row.chksum) !== -1){
-					return row;
-				}
-			});
+			// callback for actually doing the push stuff
+			var doPush = function() {
 
-			var date = '(' + Date.parse(pushees[0].session_code).toString('yyyy');
-			date += '/' + Date.parse(pushees[0].session_code).next().year().toString('yyyy') + ')';
+				// hide dialog immediately as we're not using it to feedback
+				$("#dialog-confirm").dialog("close");
 
-			var data = [];
+				var button = new ButtonLoader(_this.buttons.pushBtn, 'Saving');
+				_this.buttons.pushBtn.attr('disabled', 'disabled').addClass('loading');
+				button.start();
+				button.disable(_this.buttons.pushBtn);
 
-			$.each(pushees, function(i) {
-
-				var synopsis = $.trim(pushees[i].synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
-
-				var obj = {
-					id: pushees[i].chksum,
-					code: pushees[i].module_code + ' ' + date,
-					title: pushees[i].module_title + ' ' + date,
-					synopsis: synopsis + '  <a href="http://www.kent.ac.uk/courses/modulecatalogue/modules/'+ pushees[i].module_code +'">More</a>',
-					category: '1'
-				}
-
-				data.push(obj);
-			});
-
-			var status = this.push_selected(data, button, false, function(){
-				clearTimeout(_this.push_timeout);
-				_this.push_timeout = setTimeout(function() {
-					$(button.element[0]).removeClass();
-					_this.processRowSelect();
-				}, 3000); 
-			}, function(xhr) { // error callback
-				var problems = JSON.parse(xhr.responseText);
-				var error_ids = [];
-				var errors = '<div id="push_notifications" class="warn">Note: courses that have not errored have still been scheduled.</div>';
-				errors += '<ul id="error_ui">';
-				
-				$.each(problems, function(i) {
-					
-					var row = _.filter(data, function (r) { 
-						return r.id === problems[i].id;
-					});
-
-					error_ids.push(row[0].id);
-
-					switch(problems[i].error_code) {
-						case 'duplicate':
-							errors += '<li class="warning"><span class="type">WARNING: Duplicate</span> - <span class="cours_dets">';
-							errors += row[0].code + ': ' + row[0].title + '</span>. Please merge or push through individually';
-							errors += '</li>';
-						break;
-						case 'could_not_schedule':
-							errors += '<li class="error"><span class="type">ERROR: Already scheduled</span> - <span class="cours_dets">';
-							errors += row[0].code + ': ' + row[0].title + '</span>. Please merge or push through individually';
-							errors += '</li>';
-						break;
-						case 'category_is_zero':
-							errors += '<li class="error"><span class="type">ERROR: Category not found</span> - <span class="cours_dets">';
-							errors += row[0].code + ': ' + row[0].title + '</span>. Push through individually to choose a relevant category';
-							errors += '</li>';
-						break;
+				var pushees = _.filter(_this.json, function (row) { 
+					if(_.indexOf(_this.selectedDeliveries, row.chksum) !== -1){
+						return row;
 					}
 				});
 
-				errors += '</ul>';
-											
-				$('#dialog_error').html(errors);
-				$("#dialog_error").dialog({
-					width: 500,
-					height: 400
-				}).dialog("open");
-				
-				_this.selectedDeliveries = _.without(_this.selectedDeliveries, error_ids);
-				_this.buttons.rowsEl.removeClass('row_selected');
-				$(_this.selectedDeliveries).each(function(i) {
-					var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[i]+']');
-					var aPos = _this.oTable.fnGetPosition(row[0]);
-					_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
+				var date = '(' + Date.parse(pushees[0].session_code).toString('yyyy');
+				date += '/' + Date.parse(pushees[0].session_code).next().year().toString('yyyy') + ')';
+
+				var data = [];
+
+				$.each(pushees, function(i) {
+
+					var synopsis = $.trim(pushees[i].synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
+
+					var obj = {
+						id: pushees[i].chksum,
+						code: pushees[i].module_code + ' ' + date,
+						title: pushees[i].module_title + ' ' + date,
+						synopsis: synopsis + '  <a href="http://www.kent.ac.uk/courses/modulecatalogue/modules/'+ pushees[i].module_code +'">More</a>',
+						category: '1'
+					}
+
+					data.push(obj);
 				});
 
-				_this.oTable.fnDraw();
+				var status = _this.push_selected(data, button, false, function(){
+					clearTimeout(_this.push_timeout);
+					_this.push_timeout = setTimeout(function() {
+						$(button.element[0]).removeClass();
+						_this.processRowSelect();
+					}, 3000); 
+				}, function(xhr) { // error callback
+					var problems = JSON.parse(xhr.responseText);
+					var error_ids = [];
+					var errors = '<div id="push_notifications" class="warn">Note: courses that have not errored have still been scheduled.</div>';
+					errors += '<ul id="error_ui">';
+					
+					$.each(problems, function(i) {
+						
+						var row = _.filter(data, function (r) { 
+							return r.id === problems[i].id;
+						});
 
-				_this.selectedDeliveries = [];
-				_this.count = 0;
-				$('#job_number').html(_this.count);
-				_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
-				if($('#jobs ul').hasClass('visible')) {
-					$('#jobs ul').html(_this.delivery_list);
+						error_ids.push(row[0].id);
+
+						switch(problems[i].error_code) {
+							case 'duplicate':
+								errors += '<li class="warning"><span class="type">WARNING: Duplicate</span> - <span class="cours_dets">';
+								errors += row[0].code + ': ' + row[0].title + '</span>. Please merge or push through individually';
+								errors += '</li>';
+							break;
+							case 'could_not_schedule':
+								errors += '<li class="error"><span class="type">ERROR: Already scheduled</span> - <span class="cours_dets">';
+								errors += row[0].code + ': ' + row[0].title + '</span>. Please merge or push through individually';
+								errors += '</li>';
+							break;
+							case 'category_is_zero':
+								errors += '<li class="error"><span class="type">ERROR: Category not found</span> - <span class="cours_dets">';
+								errors += row[0].code + ': ' + row[0].title + '</span>. Push through individually to choose a relevant category';
+								errors += '</li>';
+							break;
+						}
+					});
+
+					errors += '</ul>';
+												
+					$('#dialog_error').html(errors);
+					$("#dialog_error").dialog({
+						width: 500,
+						height: 400
+					}).dialog("open");
+					
+					_this.selectedDeliveries = _.without(_this.selectedDeliveries, error_ids);
+					_this.buttons.rowsEl.removeClass('row_selected');
+					$(_this.selectedDeliveries).each(function(i) {
+						var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[i]+']');
+						var aPos = _this.oTable.fnGetPosition(row[0]);
+						_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
+					});
+
+					_this.oTable.fnDraw();
+
+					_this.selectedDeliveries = [];
+					_this.count = 0;
+					$('#job_number').html(_this.count);
+					_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
+					if($('#jobs ul').hasClass('visible')) {
+						$('#jobs ul').html(_this.delivery_list);
+					}
+
+					$(error_ids).each(function(i) {
+						var dom_row = $('#datable tbody tr[ident='+error_ids[i]+']')[0];
+						_this.rowSelect(dom_row, false);
+
+					});
+
+					clearTimeout(_this.push_timeout);
+					_this.push_timeout = setTimeout(function() {
+						$(button.element[0]).removeClass();
+						_this.processRowSelect();
+					}, 2000);
+				});
+			}
+
+			// show confirmation
+			$('#dialog-confirm').dialog({
+				title: 'Confirm push',
+				buttons: {
+					"OK": function() {
+						doPush();
+					},
+					"Cancel": function() {
+						$(this).dialog('close');
+					}
 				}
-
-				$(error_ids).each(function(i) {
-					var dom_row = $('#datable tbody tr[ident='+error_ids[i]+']')[0];
-					_this.rowSelect(dom_row, false);
-
-				});
-
-				clearTimeout(_this.push_timeout);
-				_this.push_timeout = setTimeout(function() {
-					$(button.element[0]).removeClass();
-					_this.processRowSelect();
-				}, 2000);
-			});
+			}).dialog('open');
 		}
 	};
 
