@@ -81,7 +81,20 @@ $.ajax({
 			jQuery.unblockUI();
 	        $("#dialog_error").dialog("open");
 		}
-}); 
+});
+
+ $('#key_button').click(function() {
+ 	if($(this).hasClass('show_key')) {
+ 		$(this).removeClass().addClass('hide_key');
+ 		$('#key_button_wrap', this).html('Hide key')
+ 		$('#key').stop(true, true).slideDown();
+ 	} else {
+ 		$('#key_button_wrap', this).html('Show key');
+ 		$('#key').stop(true, true).slideUp('fast', function() {
+ 			$('#key_button').removeClass().addClass('show_key');
+ 		});
+ 	}
+ });
 
 var $scrolldiv = $('#jobs_wrapper');
 

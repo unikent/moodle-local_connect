@@ -36,15 +36,32 @@ if (has_capability('local/kentconnect:manage', $site_context)) {
 	$cat_json = json_encode($cat_permissions);
 }
 
-$clareport_text = get_string('connectreport', 'local_connect');
-echo $OUTPUT->heading($clareport_text);
-
 $scripts = '<link rel="stylesheet" type="text/css" href="styles/demo_table.css">';
 $scripts = '<link rel="stylesheet" type="text/css" href="scripts/css/ui-lightness/jquery-ui-1.8.17.custom.css">';
 $scripts .= '<link rel="stylesheet/less" type"text/css" href="styles/styles.less">';
 echo $scripts;
 
 require_once('includes.php');
+
+$clareport_text = get_string('connectreport', 'local_connect');
+echo $OUTPUT->heading($clareport_text);
+
+echo '<div id="key_button" class="show_key"><div id="key_button_wrap">Show key</div></div>';
+
+echo <<< HEREDOC
+<div id="key">
+	<div id="key_wrap">
+		<ul>
+			<li class="status_key key_item">= Status indicator (normaly coloured)</li>
+			<li class="warning_key key_item">= Delivery is no longer in sds</li>
+			<li class="link_key key_item">= Link to active moodle delivery</li>
+			<li class="delete_key key_item">= Removed delivery from moodle</li>
+			<li class="unlink_key key_item">= Unlink child delivery from parent</li>
+		</ul>
+	</div>
+</div>
+<div id="key_margin"></div>
+HEREDOC;
 
 $table = <<< HEREDOC
 <div id="da_wrapper">
