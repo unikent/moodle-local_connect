@@ -35,10 +35,16 @@ function delivery_groups_plx($c,$uid) {
     if(! ($grouping = $DB->get_record('groupings',array('name'=>'Delivery groups','courseid'=>$c->moodle_course_id))) ) {
       $data = (object) array( 'name' => 'Delivery groups', 'courseid' => $c->moodle_course_id );
       $grouping = groups_create_grouping($data);
+    } else {
+      $grouping = $grouping->id;
     }
     foreach( $c->deliveries as $d ) {
       if(! $group = $DB->get_record('groups',array( 'name' => $d, 'courseid' => $c->moodle_course_id )) ) {
         $group = groups_create_group((object)array('name'=>$d,'courseid'=>$c->moodle_course_id));
+      } else {
+        $group = $group->id;
+      }
+      if(!($g = $DB->get_record('groupings_groups',array('groupid'=>$group,'groupingid'=>$grouping))) ) {
         groups_assign_grouping($grouping, $group);
       }
       groups_add_member($group,$uid);

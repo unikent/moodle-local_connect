@@ -51,9 +51,9 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         } else {
           $grouping = $grouping->id;
         }
-      }
-      if(!($g = $DB->get_record('groupings_groups',array('groupid'=>(int)$group,'groupingid'=>$grouping))) ) {
-        groups_assign_grouping($grouping, $group);
+        if(!($g = $DB->get_record('groupings_groups',array('groupid'=>$group,'groupingid'=>$grouping))) ) {
+          groups_assign_grouping($grouping, $group);
+        }
       }
 
       $group = $DB->get_record('groups',array('id'=>$c->moodle_group_id));
