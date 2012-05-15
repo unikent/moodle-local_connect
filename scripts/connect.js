@@ -155,11 +155,11 @@ var Connect = (function() {
 		var _this = this;
 
 		//Setting the click event for table rows
-		this.buttons.rowsEl.live('click', function() {
+		this.buttons.rowsEl.live('click', function(e) {
 			clearTimeout(this.push_timeout);
 			clearTimeout(this.ui_timeout);
 			clearTimeout(this.merge_timeout);
-			if(event.target === $('.toolbar a',this)[0] || event.target === $('.toolbar div',this)[0]){
+			if(e.target === $('.toolbar a',this)[0] || e.target === $('.toolbar div',this)[0]){
 				return true;
 			}
 			_this.rowSelect(this);
