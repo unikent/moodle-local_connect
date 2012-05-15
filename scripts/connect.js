@@ -34,6 +34,7 @@ var Connect = (function() {
 				if(val.children !== null) {
 					sink_deleted = sink_deleted || _.any(val.children, function(i) {return i.sink_deleted;})
 					toolbar += '<div class="child_expand open toolbar_link"></div>'
+          val.student_count = _.reduce( val.children, function(memo,child) { return memo + child.student_count; }, 0 );
 				}
 				toolbar += '<div class="unlink_row toolbar_link"></div>'
 				//toolbar += '<div class="edit_row toolbar_link"></div>'
