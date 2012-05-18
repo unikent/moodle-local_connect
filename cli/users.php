@@ -122,6 +122,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         delivery_groups_plx($c, $uid);
       }
     } else if($c->isa == 'DELETE') {
+      $result = 'ok';
       if($uid) { // if the user doesnt exist, their enrolments should have been wiped already
         if (!enrol_is_enabled('manual')) {
           throw new moodle_exception('manual enrolment not enabled?');
