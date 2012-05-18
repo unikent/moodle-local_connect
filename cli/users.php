@@ -109,7 +109,6 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
 
         }
 
-
         if( false === enrol_get_enrolment_end($c->moodle_course_id, $uid) ) {
           // $ep = enrol_get_plugin('manual')
           // $ep->enrol_user

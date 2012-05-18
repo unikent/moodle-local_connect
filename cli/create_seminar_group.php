@@ -55,7 +55,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       throw new moodle_exception('dont understand ' + $c->isa);
     }
 
-    $tr = array( 'result' => 'ok', 'moodle_group_id' => $group->id, 'in' => $c );
+    $tr = array( 'result' => 'ok', 'moodle_group_id' => $c->moodle_group_id, 'in' => $c );
   } catch( Exception $e ) {
     $tr = array(
       'result' => 'error',
