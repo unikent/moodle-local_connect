@@ -61,6 +61,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
     $uid = $DB->get_record('user',array('username'=>$c->username));
 
     if($c->isa == 'NEW') {
+      $result = 'ok';
       if(!$uid) {
         $uid = user_create_user($c);
       } else {
@@ -109,8 +110,14 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         }
 
 
-        $r = enrol_try_internal_enrol($c->moodle_course_id, $uid, $role->id);
-        if(!$r) throw new moodle_exception('enrol_internal gave us false');
+        if( false === enrol_get_enrolment_end($c->moodle_course_id, $uid) ) {
+          // $ep = enrol_get_plugin('manual')
+          // $ep->enrol_user
+          $r = enrol_try_internal_enrol($c->moodle_course_id, $uid, $role->id);
+          if(!$r) throw new moodle_exception('enrol_internal gave us false');
+        } else {
+          $result = 'duplicate';
+        }
 
         delivery_groups_plx($c, $uid);
       }
@@ -132,7 +139,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       throw new moodle_exception('dont understand ' + $c->isa);
     }
 
-    $tr = array( 'result' => 'ok', 'moodle_user_id' => $uid, 'username' => $c->username, 'in' => $c );
+    $tr = array( 'result' => $result, 'moodle_user_id' => $uid, 'username' => $c->username, 'in' => $c );
   } catch( Exception $e ) {
     $tr = array(
       'result' => 'error',
