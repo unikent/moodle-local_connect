@@ -422,12 +422,12 @@ var Connect = (function() {
 
 		if(this.buttons.pushBtn.hasClass('edit_to_moodle')) {
 
-			var button = new ButtonLoader(this.buttons.pushBtn, 'Saving');
-			this.buttons.pushBtn.attr('disabled', 'disabled').addClass('loading');
-			button.start();
-			button.disable(this.buttons.pushBtn);
+			//var button = new ButtonLoader(this.buttons.pushBtn, 'Saving');
+			//this.buttons.pushBtn.attr('disabled', 'disabled').addClass('loading');
+			//button.start();
+			//button.disable(this.buttons.pushBtn);
 
-			this.edit_row(this.selectedDeliveries[0], button);
+			this.edit_row(this.selectedDeliveries[0]);
 
 		} else {
 
@@ -562,7 +562,7 @@ var Connect = (function() {
 		}
 	};
 
-	Connect.prototype.edit_row = function(chksum, button) {
+	Connect.prototype.edit_row = function(chksum) {
 		
 		var _this = this;
 
@@ -603,9 +603,9 @@ var Connect = (function() {
 			title: 'Choose details',
 			close: function(event, ui) {
 				if(row_unprocessed ===true) {
-					button.stop();
-					button.updateText('<span>Edit</span> to Moodle');
-					$('#push_deliveries').removeClass().addClass('edit_to_moodle');
+					//button.stop();
+					//button.updateText('<span>Edit</span> to Moodle');
+					//$('#push_deliveries').removeClass().addClass('edit_to_moodle');
 				}
 
 				_this.formEl.shrtNmExtTd.html('');
