@@ -51,6 +51,12 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       if( !groups_delete_group($c->moodle_group_id) ) {
         throw new moodle_exception('groups_delete_group failed');
       }
+    } else if($c->isa == 'UPDATE') {
+      if(! $g = $DB->get_record('groups',array('id'=>$c->moodle_group_id)) ) {
+        throw new moodle_exception('group didnt exist');
+      }
+      $g->name = $c->group_desc;
+      groups_update_group($g);
     } else {
       throw new moodle_exception('dont understand ' + $c->isa);
     }
