@@ -29,6 +29,9 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents("php://input"));
 
+// just force set the content type to json since all this stuff is json anyway
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
 //get contents
 $response = curl_exec( $ch );
 
@@ -60,10 +63,14 @@ if( !$response ) {
 
   //send your header
   $ary_headers = explode("\n", $response_headers );
-
+  
   foreach($ary_headers as $hdr) {
-    header($hdr);
+    if (!preg_match("/Transfer-Encoding/i", $hdr)) {
+      header($hdr);
+    }
   }
+  //header("Content-Type: application/json;charset=utf-8");
+  //header("Content-Length: " . strlen($response_body));
   echo $response_body;
 }
 exit(0);

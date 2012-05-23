@@ -647,12 +647,12 @@ var Connect = (function() {
 
 						_this.clear_ui_form();
 						$("#dialog-form").dialog( "close" );
-						button.stop();
-						button.updateText('Success');
-						_this.buttons.pushBtn.addClass('success');
+						//button.stop();
+						//button.updateText('Success');
+						_this.buttons.pushBtn.text('Success').addClass('success');
 						clearTimeout(_this.push_timeout);
 						_this.push_timeout = setTimeout(function() {
-							$(button.element[0]).removeClass();
+							//$(button.element[0]).removeClass();
 							_this.processRowSelect();
 						}, 3000);
 					}, function(xhr) {
@@ -696,7 +696,7 @@ var Connect = (function() {
 		$.ajax({
 			type: 'POST',
 			url: window.dapageUrl + '/courses/schedule/',
-			contentType: 'json',
+			contentType: 'application/json',
 			dataType: 'json',
 			data: JSON.stringify({'courses': data }),
 			success: function () {
