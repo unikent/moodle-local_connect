@@ -31,7 +31,7 @@ var Connect = (function() {
 			var sink_deleted = val.sink_deleted;
 			var toolbar = ' ';
 			if(val.state[0] === 'created_in_moodle') {
-				if(val.children !== null) {
+				if(val.children !== undefined) {
 					sink_deleted = sink_deleted || _.any(val.children, function(i) {return i.sink_deleted;})
 					toolbar += '<div class="child_expand open toolbar_link"></div>'
           val.student_count = _.reduce( val.children, function(memo,child) { return memo + child.student_count; }, 0 );
@@ -255,6 +255,7 @@ var Connect = (function() {
 			sOut += '<th>Version</th>';
 			sOut += '<th></th>';
 			sOut += '</tr>';
+			
 			$.each(row.children, function(i) {
 				var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10);
 				var duration = row.children[i].module_week_beginning + ( isNaN(end) ? '' : '-' + end );
@@ -900,7 +901,7 @@ var Connect = (function() {
 							var problems = xhr.responseText.length == 0 ? null : JSON.parse(xhr.responseText);
 
 							if (problems) {
-								switch(problems[0].error_code) {
+								switch(problems.error_code) {
 									case 'duplicate':
 									case 'could_not_schedule':
 										if($('#shortname_ext').get(0)) {
@@ -1019,7 +1020,7 @@ var Connect = (function() {
 			},
 			error: function() {
 				$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_child');
-				statusbox(row, 'Error: we were unable to process your request at this time. Please try later');
+				_this.statusbox(row, 'Error: we were unable to process your request at this time. Please try later');
 			}
 		});
 	};
