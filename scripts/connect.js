@@ -25,12 +25,13 @@ var Connect = (function() {
 
 				//taking json and mapping into usable data
 		this.tabledata = _.map(this.json, function(val) {
+      var state_zero = (val.state && _.first(val.state)) || '';
 			var end = parseInt(val.module_week_beginning, 10) + parseInt(val.module_length, 10);
 			var duration = val.module_week_beginning + '-' + end;
-			var name = val.state[0].split('_').join(' ');
+			var name = state_zero.split('_').join(' ');
 			var sink_deleted = val.sink_deleted;
 			var toolbar = ' ';
-			if(val.state[0] === 'created_in_moodle') {
+			if( state_zero === 'created_in_moodle') {
 				if(val.children !== undefined) {
 					sink_deleted = sink_deleted || _.any(val.children, function(i) {return i.sink_deleted;})
 					toolbar += '<div class="child_expand open toolbar_link"></div>'
@@ -41,7 +42,7 @@ var Connect = (function() {
 				toolbar += '<a href=" '+ window.coursepageUrl + '/course/view.php?id='+ val.moodle_id +'" target="_blank" class="created_link toolbar_link"></a>';
 				
 			}
-			var state = '<div class="status_'+val.state[0]+' '+(sink_deleted?'sink_deleted':'')+'">'+name+'</div>';
+			var state = '<div class="status_'+state_zero+' '+(sink_deleted?'sink_deleted':'')+'">'+name+'</div>';
 			
 			return [val.chksum, state, val.module_code, val.module_title, val.campus_desc, 
 					duration, val.student_count, val.module_version, toolbar];
@@ -576,8 +577,8 @@ var Connect = (function() {
 			date += '/' + Date.parse(row[0].session_code).next().year().toString('yyyy') + ')';
 			var synopsis = $.trim(row[0].synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
 
-			var shortname = row[0].module_code + ' ' + date;
-			var fullname = row[0].module_title + ' ' + date;
+			var shortname = row[0].module_code + (row[0].module_code.indexOf(date) > 0 ? '' : ' ' + date);
+			var fullname = row[0].module_title + (row[0].module_code.indexOf(date) > 0 ? '' : ' ' + date);
 			
 			if(_.find(_this.json, function (r){ 
 				if(r.state[0] === 'processing' || r.state[0] === 'scheduled' || r.state[0] === 'created_in_moodle') {
@@ -632,8 +633,9 @@ var Connect = (function() {
 						shortname += ' ' + $('#shortname_ext').val();
 					}
 
-					if(row_unprocessed ===true) {
-						synopsis = $('#synopsis').val() + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ row[0].module_code +"'>More</a>"
+					if(row_unprocessed === true) {
+            mc = row[0].module_code.replace(/ (.*)/, '');
+						synopsis = $('#synopsis').val() + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mc +"'>More</a>"
 					}
 
 					var data = [{
