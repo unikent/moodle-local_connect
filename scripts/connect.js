@@ -450,8 +450,8 @@ var Connect = (function() {
 					}
 				});
 
-				var date = '(' + Date.parse(pushees[0].session_code).toString('yyyy');
-				date += '/' + Date.parse(pushees[0].session_code).next().year().toString('yyyy') + ')';
+				var date = '(' + Date.parse(pushees[0].session_code).previous().year().toString('yyyy');
+				date += '/' + Date.parse(pushees[0].session_code).toString('yyyy') + ')';
 
 				var data = [];
 
@@ -573,8 +573,8 @@ var Connect = (function() {
 		});
 		if(row[0].state[0] === 'unprocessed') {
 			var row_unprocessed = true;
-			var date = '(' + Date.parse(row[0].session_code).toString('yyyy');
-			date += '/' + Date.parse(row[0].session_code).next().year().toString('yyyy') + ')';
+			var date = '(' + Date.parse(row[0].session_code).previous().year().toString('yyyy');
+			date += '/' + Date.parse(row[0].session_code).toString('yyyy') + ')';
 			var synopsis = $.trim(row[0].synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
 
 			var shortname = row[0].module_code + (row[0].module_code.indexOf(date) > 0 ? '' : ' ' + date);
@@ -804,8 +804,8 @@ var Connect = (function() {
 
 		//Gets the year from the first delivery and creates the date string from this.
 		//Then appends this to the short and full name
-		var date = '(' + Date.parse(mergers[0].session_code).toString('yyyy');
-		date += '/' + Date.parse(mergers[0].session_code).next().year().toString('yyyy') + ')';
+		var date = '(' + Date.parse(mergers[0].session_code).previous().year().toString('yyyy');
+		date += '/' + Date.parse(mergers[0].session_code).toString('yyyy') + ')';
 		short_name += ' ' + date;
 		full_name += ' ' + date;
 
