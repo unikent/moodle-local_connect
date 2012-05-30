@@ -79,6 +79,40 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       forum_get_course_forum($cr->id,'news');
 
       $tr = array( 'result' => 'ok', 'moodle_course_id' => $cr->id, 'in' => $c );
+    } else if($c->isa == 'UPDATE') {
+      global $DB;
+      $r = $DB->get_record('course',array('id'=>$c->moodle_id));
+      if(!$r) {
+        throw new moodle_exception('course doesnt exist');
+      }
+
+      // update course extra details too
+      $connect_data = $DB->get_record('connect_course_dets',array('course'=>$r->id));
+      if(!$connect_data) {
+        $connect_data = new stdClass;
+        $connect_data->course = $r->id;
+        $connect_data->campus = isset($c->campus_desc) ? $c->campus_desc : '';
+        $connect_data->startdate = isset($c->startdate) ? $c->startdate : '';
+        $connect_data->enddate = isset($c->module_length) ? strtotime('+'. $c->module_length .' weeks', $c->startdate) : $CFG->default_course_end_date;
+        $connect_data->weeks = isset($c->module_length) ? $c->module_length : 0;
+        $DB->insert_record('connect_course_dets', $connect_data);
+        $c->visible = $r->visible;
+        $uc = (object)array_merge((array)$r,(array)$c );
+        update_course( $uc );
+      } else if(!$connect_data->unlocked) {
+        $connect_data->campus = isset($c->campus_desc) ? $c->campus_desc : '';
+        $connect_data->startdate = isset($c->startdate) ? $c->startdate : '';
+        $connect_data->enddate = isset($c->module_length) ? strtotime('+'. $c->module_length .' weeks', $c->startdate) : $CFG->default_course_end_date;
+        $connect_data->weeks = isset($c->module_length) ? $c->module_length : 0;
+        $DB->update_record('connect_course_dets', $connect_data);
+        $c->visible = $r->visible;
+        $uc = (object)array_merge((array)$r,(array)$c );
+        update_course( $uc );
+      } else {
+        // locked
+      }
+
+      $tr = array( 'result' => 'ok', 'in' => $c );
     } else if($c->isa == 'DELETE') {
       global $DB;
       $r = $DB->get_record('course',array('idnumber'=>$c->idnumber));
