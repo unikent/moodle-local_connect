@@ -23,6 +23,15 @@ var Connect = (function() {
 				return
 		}
 
+    var existing_courses = _.map(
+        _.filter( this.json,
+          function(e) {
+            return e.state[0] == "created_in_moodle";
+          } ),
+        function(e) {
+          return e.module_code.replace(/(.*)\s.*/,'$1');
+        });
+
 				//taking json and mapping into usable data
 		this.tabledata = _.map(this.json, function(val) {
       var state_zero = (val.state && _.first(val.state)) || '';
@@ -31,6 +40,7 @@ var Connect = (function() {
 			var name = state_zero.split('_').join(' ');
 			var sink_deleted = val.sink_deleted;
 			var toolbar = ' ';
+      var same_module_code_created = false;
 			if( state_zero === 'created_in_moodle') {
 				if(val.children !== undefined) {
 					sink_deleted = sink_deleted || _.any(val.children, function(i) {return i.sink_deleted;})
@@ -41,8 +51,10 @@ var Connect = (function() {
 				//toolbar += '<div class="edit_row toolbar_link"></div>'
 				toolbar += '<a href=" '+ window.coursepageUrl + '/course/view.php?id='+ val.moodle_id +'" target="_blank" class="created_link toolbar_link"></a>';
 				
-			}
-			var state = '<div class="status_'+state_zero+' '+(sink_deleted?'sink_deleted':'')+'">'+name+'</div>';
+			} else {
+        same_module_code_created = _.find( existing_courses, function(e) { return e == val.module_code; } ) != undefined;
+      }
+			var state = '<div class="status_'+state_zero+' '+(sink_deleted?'sink_deleted':'')+' '+(same_module_code_created?'same_module_code_created':'')+'">'+name+'</div>';
 			
 			return [val.chksum, state, val.module_code, val.module_title, val.campus_desc, 
 					duration, val.student_count, val.module_version, toolbar];
@@ -790,15 +802,15 @@ var Connect = (function() {
 			if(code.length > 1) {
 				short_name += code[0];
 			} else {
-				short_name += val.module_code;	
+				short_name += val.module_code;
 			}
 
 			full_name += val.module_title.replace(/( )(\()(\d+)(\/)(\d+)(\))/i, '');
-		
+
 			//full_name += val.module_title;
 			if(i !== mergers.length-1) {
-				short_name += '/';
 				full_name += '/';
+				short_name += '/';
 			}
 		});
 

@@ -57,6 +57,7 @@ echo <<< HEREDOC
 			<li class="link_key key_item">= Link to active moodle delivery</li>
 			<li class="delete_key key_item">= Removed delivery from moodle</li>
 			<li class="unlink_key key_item">= Unlink child delivery from parent</li>
+			<li class="flag_key key_item">= Delivery shares its module code with an already created course</li>
 		</ul>
 	</div>
 </div>
