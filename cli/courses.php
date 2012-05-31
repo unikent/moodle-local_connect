@@ -57,7 +57,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       }
 
       // create one section for each duration
-      $c->numsections = $c->duration != null ? $c->duration : 1;
+      $c->numsections = $c->module_length != null ? $c->module_length : 1;
       $c->maxbytes = '10485760';
       $cr = create_course($c);
 
