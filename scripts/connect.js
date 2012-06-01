@@ -797,22 +797,27 @@ var Connect = (function() {
 		synopsis = $.trim(synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
 
 		//Creates the combined shorts and long names
+    var fname = [];
+    var sname = [];
 		$.each(mergers, function(i, val) {
 			var code = val.module_code.split(' ');
 			if(code.length > 1) {
-				short_name += code[0];
+				code = code[0];
 			} else {
-				short_name += val.module_code;
+				code = val.module_code;
 			}
+      if( !_.contains(sname,code) ) {
+        sname.push(code);
+      }
 
-			full_name += val.module_title.replace(/( )(\()(\d+)(\/)(\d+)(\))/i, '');
+			var tmp_full_name = val.module_title.replace(/( )(\()(\d+)(\/)(\d+)(\))/i, '');
+      if( !_.contains(fname,tmp_full_name) ) {
+        fname.push(tmp_full_name);
+      }
 
-			//full_name += val.module_title;
-			if(i !== mergers.length-1) {
-				full_name += '/';
-				short_name += '/';
-			}
 		});
+    short_name += sname.join('/');
+    full_name += fname.join('/');
 
 		//Gets the year from the first delivery and creates the date string from this.
 		//Then appends this to the short and full name
