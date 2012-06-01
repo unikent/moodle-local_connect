@@ -865,6 +865,10 @@ var Connect = (function() {
 						short_name += ' ' + $('#shortname_ext').val();
 					}
 
+          if(!_.isEmpty($('#shortname_ext').val())) {
+						short_name += ' ' + $('#shortname_ext').val();
+          }
+
 					var data = {
 						link_courses: _this.selectedDeliveries,
 						code: short_name,
