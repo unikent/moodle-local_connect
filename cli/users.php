@@ -63,6 +63,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
     if($c->isa == 'NEW') {
       $result = 'ok';
       if(!$uid) {
+        $c->mnethostid = $CFG->mnet_localhost_id;
         $uid = user_create_user($c);
       } else {
         $uid = $uid->id;
