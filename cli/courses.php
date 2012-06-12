@@ -78,6 +78,21 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       require_once($CFG->dirroot .'/mod/forum/lib.php');
       forum_get_course_forum($cr->id,'news');
 
+      // enable guest access for this course
+      $enrol = $DB->get_record('enrol', array('enrol' => 'guest', 'courseid' => $cr->id));
+
+      if ($enrol) {
+        // set status to 0.. no, I don't know why '0' means guest is enabled, and '1'
+        // means it's disabled... it starts off as 1 - what the fuck
+        $edata = new stdClass;
+        $edata->id = $enrol->id;
+        $edata->status = 0;
+        $DB->update_record('enrol', $edata);
+      } else {
+        // enrol doesn't exist... not sure this should happen but if it does we
+        // can probably insert a new guest enrol set to 0?
+      }
+
       $tr = array( 'result' => 'ok', 'moodle_course_id' => $cr->id, 'in' => $c );
     } else if($c->isa == 'UPDATE') {
       global $DB;
