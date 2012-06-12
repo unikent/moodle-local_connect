@@ -869,6 +869,13 @@ var Connect = (function() {
 						short_name += ' ' + $('#shortname_ext').val();
           }
 
+          // get full name and check it's ok (pretty lame check)
+          full_name = _this.formEl.fullName.val();
+
+          if (_.isEmpty(full_name)) {
+          	return alert('Please enter a full name');
+          }
+
 					var data = {
 						link_courses: _this.selectedDeliveries,
 						code: short_name,
