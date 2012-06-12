@@ -55,9 +55,9 @@ var Connect = (function() {
         same_module_code_created = _.find( existing_courses, function(e) { return e == val.module_code; } ) != undefined;
       }
 			var state = '<div class="status_'+state_zero+' '+(sink_deleted?'sink_deleted':'')+' '+(same_module_code_created?'same_module_code_created':'')+'">'+name+'</div>';
-			
+
 			return [val.chksum, state, val.module_code, val.module_title, val.campus_desc, 
-					duration, val.student_count, val.module_version, toolbar];
+					duration, val.student_count, val.module_version, val.delivery_department, toolbar];
 
 
 			// prepending status box to the dom and hiding it ready for use
@@ -89,6 +89,7 @@ var Connect = (function() {
 				{'sClass': 'duration'},
 				{'sClass': 'students'},
 				{'sClass': 'version'},
+				{'sClass': 'department'},
 				{'sClass': 'toolbar'}
 
 			],
@@ -135,6 +136,7 @@ var Connect = (function() {
 				null,
 				null,
 				null,
+				null
 			]
 		});
 

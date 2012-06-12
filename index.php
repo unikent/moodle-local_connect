@@ -84,18 +84,20 @@ $table = <<< HEREDOC
 				<tr>
 					<th>Id</th>
 					<th>Status</th>
-					<th >Code</th>
+					<th>Code</th>
 					<th>Name</th>
 					<th>Campus</th>
 					<th>Duration</th>
 					<th>Students</th>
 					<th>Version</th>
+					<th>Department</th>
 					<th></th>
 				</tr>
 			</thead>
 			<tfoot>
 					<th></th>
 					<th id="filter-status"></th>
+					<th></th>
 					<th></th>
 					<th></th>
 					<th></th>
