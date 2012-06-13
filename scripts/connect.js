@@ -268,6 +268,7 @@ var Connect = (function() {
 			sOut += '<th>Duration</th>';
 			sOut += '<th>Students</th>';
 			sOut += '<th>Version</th>';
+			sOut += '<th>Department</th>';
 			sOut += '<th></th>';
 			sOut += '</tr>';
 			
@@ -284,6 +285,7 @@ var Connect = (function() {
 				sOut += '<td class="duration">'+ duration +'</td>';
 				sOut += '<td class="students">'+ row.children[i].student_count +'</td>';
 				sOut += '<td class="version">'+ row.children[i].module_version +'</td>';
+				sOut += '<td class="department">'+ row.children[i].delivery_department +'</td>';
 				if(row.children.length > 1) {
 					sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';
 				} else {
