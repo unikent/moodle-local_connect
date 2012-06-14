@@ -473,13 +473,14 @@ var Connect = (function() {
 
 				$.each(pushees, function(i) {
 
-					var synopsis = $.trim(pushees[i].synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
+					//var synopsis = $.trim(pushees[i].synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
+					var synopsis = $.trim(pushees[i].synopsis);
 
 					var obj = {
 						id: pushees[i].chksum,
 						code: pushees[i].module_code + ' ' + date,
 						title: pushees[i].module_title + ' ' + date,
-						synopsis: synopsis + '  <a href="http://www.kent.ac.uk/courses/modulecatalogue/modules/'+ pushees[i].module_code +'">More</a>',
+						synopsis: synopsis,// + '  <a href="http://www.kent.ac.uk/courses/modulecatalogue/modules/'+ pushees[i].module_code +'">More</a>',
 						category: '1'
 					}
 
@@ -591,7 +592,7 @@ var Connect = (function() {
 			var row_unprocessed = true;
 			var date = '(' + Date.parse(row[0].session_code).previous().year().toString('yyyy');
 			date += '/' + Date.parse(row[0].session_code).toString('yyyy') + ')';
-			var synopsis = $.trim(row[0].synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
+			var synopsis = $.trim(row[0].synopsis);//.substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
 
 			var shortname = row[0].module_code + (row[0].module_code.indexOf(date) > 0 ? '' : ' ' + date);
 			var fullname = row[0].module_title + (row[0].module_code.indexOf(date) > 0 ? '' : ' ' + date);
@@ -651,7 +652,7 @@ var Connect = (function() {
 
 					if(row_unprocessed === true) {
             mc = row[0].module_code.replace(/ (.*)/, '');
-						synopsis = $('#synopsis').val() + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mc +"'>More</a>"
+						synopsis = $('#synopsis').val();// + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mc +"'>More</a>"
 					}
 
 					var data = [{
@@ -798,7 +799,8 @@ var Connect = (function() {
 		}
 
 		//Limits the synop length and adds a ... on the end
-		synopsis = $.trim(synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
+		//synopsis = $.trim(synopsis).substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
+		synopsis = $.trim(synopsis);
 
 		//Creates the combined shorts and long names
     var fname = [];
@@ -884,7 +886,7 @@ var Connect = (function() {
 						link_courses: _this.selectedDeliveries,
 						code: short_name,
 						title: full_name,
-						synopsis: synopsis + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mod_code +"'>More</a>",
+						synopsis: synopsis,// + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mod_code +"'>More</a>",
 						category: _this.formEl.cat.val()
 					};
 
