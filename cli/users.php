@@ -64,6 +64,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       $result = 'ok';
       if(!$uid) {
         $c->mnethostid = $CFG->mnet_localhost_id;
+        $c->confirmed = 1;
         $uid = user_create_user($c);
       } else {
         $uid = $uid->id;
