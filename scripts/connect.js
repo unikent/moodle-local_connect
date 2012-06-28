@@ -640,8 +640,8 @@ var Connect = (function() {
 					ui_sub.disable($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'));
 					ui_sub.start();
 
-					if(_this.formEl.shortNameExt.get(0)) {
-						if(_this.formEl.shortNameExt.val() === '') {
+          if(!_.isEmpty($('#shortname_ext_td').children()) && $('#shortname_ext_td').children().length > 0) {
+						if(_.isEmpty($('#shortname_ext').val())) {
 							_this.formEl.notes.removeClass('warn').addClass('error').text('Please provide a three letter identifier');
 							_this.formEl.shortNameExt.addClass('error');
 							ui_sub.stop();
