@@ -1044,6 +1044,7 @@ var Connect = (function() {
 					$(children).find('tr[ident='+chksum+'] .duration').text(),
 					$(children).find('tr[ident='+chksum+'] .students').text(),
 					$(children).find('tr[ident='+chksum+'] .version').text(),
+					$(children).find('tr[ident='+chksum+'] .department').text(),
 					' '
 				];
 				_this.oTable.fnAddData(data);
