@@ -94,7 +94,7 @@ var Connect = (function() {
 
 			],
 			"aoColumnDefs": [
-				{ "bSearchable": true, "bVisible": false, "aTargets": [ 0 ] },
+				{ "bSearchable": true, "bVisible": false, "aTargets": [ 0 ] }
 			],
 			"oLanguage": {
 				"sSearch": "Search all columns:"
