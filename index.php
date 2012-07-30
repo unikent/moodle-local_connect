@@ -110,27 +110,29 @@ $table = <<< HEREDOC
 			</tbody>
 		</table>
 	</div>
-
-	<div id="jobs_wrapper">
-		<div id="select_buttons">
-			<div class="sel_btn" id="select_all"> Select all</div>
-			<div class="sel_btn" id="deselect_all"> Deselect all</div>
-		</div>
-		<div id="jobs">
-			<div class="job_number_text">you currently have</div>
-			<div id="job_number">0</div>
-			<div class="job_number_text">deliveries selected</div>
-			<div id="display_list_toggle">
-				<button>show deliveries</button>
-				<div class="arrow_border"></div>
-				<div class="arrow_light"></div>
+	<div id="right_bar_wrap">
+		<div class="data_refresh">Refresh deliveries</div>
+		<div id="jobs_wrapper">
+			<div id="select_buttons">
+				<div class="sel_btn" id="select_all"> Select all</div>
+				<div class="sel_btn" id="deselect_all"> Deselect all</div>
 			</div>
-			<ul>
-			</ul>
-		</div>
-		<div id="process_jobs">
-			<button id="push_deliveries" disabled="disabled">No selection</button>
-			<button id="merge_deliveries" disabled="disabled">No selection</button>
+			<div id="jobs">
+				<div class="job_number_text">you currently have</div>
+				<div id="job_number">0</div>
+				<div class="job_number_text">deliveries selected</div>
+				<div id="display_list_toggle">
+					<button>show deliveries</button>
+					<div class="arrow_border"></div>
+					<div class="arrow_light"></div>
+				</div>
+				<ul>
+				</ul>
+			</div>
+			<div id="process_jobs">
+				<button id="push_deliveries" disabled="disabled">No selection</button>
+				<button id="merge_deliveries" disabled="disabled">No selection</button>
+			</div>
 		</div>
 	</div>
 </div>

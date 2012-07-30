@@ -27,11 +27,13 @@
 									ROW HOVER/SELECT
 									CHILDREN TABLE 
 								FOOTER
-						JOBS CART
-							SHOW/HIDE ALL BUTTONS
-							JOBS QUEUE
-								JOBS LIST
-							PUSH/MERGE BUTTONS
+						RIGHT BAR WRAPPER
+							PAGE REFRESH
+							JOBS CART
+								SHOW/HIDE ALL BUTTONS
+								JOBS QUEUE
+									JOBS LIST
+								PUSH/MERGE BUTTONS
 
 
 ==================================================================*/
@@ -973,236 +975,366 @@ h2.main {
 		}
 	}
 
-	/*==== JOBS CART
+	/*==== RIGHT BAR WRAPPER
 	==================================================*/
-
-	#jobs_wrapper {
+	#right_bar_wrap {
 		float: right;
-		border: 1px solid #e3e3e3;
-		.rounded(5px);
 		width: 15%;
 
-		/*===== SHOW/HIDE ALL BUTTONS
+		/*===== PAGE REFRESH
 		==================================================*/
 
-		#select_buttons {
-			.border-radius(5px, 0, 0, 5px);	
-			border-bottom: 1px solid #E3E3E3;
+		.data_refresh {
+			/*.gradient(#F5F5F5, #ddd, #f5f5f5);*/
+			background: #F5F5F5;
+  			background: url(../images/reload.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #ddd),
+                               color-stop(1, #f5f5f5));
+ 			background: url(../images/reload.png), -ms-linear-gradient(bottom,
+                                  #ddd,
+                                  #f5f5f5);
+  			background: url(../images/reload.png), -moz-linear-gradient(center bottom,
+                                   #ddd 0%,
+                                   #f5f5f5 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+			.rounded(5px);
 			padding: 10px;
-			clear: both;
-			height: 25px;
-
-			.sel_btn {
-				width: 47%;
-				text-align: center;
-				font-size: 12px;
-				color: #999;
-				border: 1px solid #E3E3E3;
-				.gradient(#F5F5F5, #ddd, #f5f5f5);
-				height: 20px;
-				padding-top: 5px;
-				padding-left: 2px;
-				cursor: pointer;
-			}
-
-			.sel_btn:hover {
-				color: #fff;
-				border: 1px solid #214587;
-				.gradient(#27519f, #214587, #27519f);
-			}
-
-			.sel_btn:active {
-				color: #fff;
-				border: 1px solid #1C3B74;
-				.gradient(#1E3E7A, #1C3B74, #1E3E7A);
-			}
-
-			#select_all {
-				margin: 0px;
-				float: left;
-				.border-radius(0, 0, 3px, 3px);
-				border-right: none;
-			}
-
-			#deselect_all {
-				.border-radius(3px, 3px, 0, 0);
-				float: left;
-			}
+			margin-bottom: 10px;
+			font-size: 12px;
+			color: #999;
+			border: 1px solid #E3E3E3;
+			cursor: pointer;
 		}
 
-		/*===== JOBS QUEUE
+		.data_refresh:hover {
+			color: #fff;
+			border: 1px solid #214587;
+			background: #27519f;
+  			background: url(../images/reload-hover.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #214587),
+                               color-stop(1, #27519f));
+ 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
+                                  #214587,
+                                  #27519f);
+  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
+                                   #214587 0%,
+                                   #27519f 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+		}
+
+		.data_refresh:active {
+			color: #fff;
+			border: 1px solid #1C3B74;
+			background: #1E3E7A;
+			background: url(../images/reload-hover.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #1C3B74),
+                               color-stop(1, #1E3E7A));
+ 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
+                                  #1C3B74,
+                                  #1E3E7A);
+  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
+                                   #1C3B74 0%,
+                                   #1E3E7A 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+		}
+
+		.data_refresh.highlight {
+			color: #fff;
+			padding: 10px 30px 10px 10px;
+			border: 1px solid #214587;
+			background: #27519f;
+  			background: url(../images/reload-hover.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #214587),
+                               color-stop(1, #27519f));
+ 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
+                                  #214587,
+                                  #27519f);
+  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
+                                   #214587 0%,
+                                   #27519f 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+		}
+
+		.data_refresh.highlight:hover {
+			color: #fff;
+			border: 1px solid #1C3B74;
+			background: #1E3E7A;
+			background: url(../images/reload-hover.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #1C3B74),
+                               color-stop(1, #1E3E7A));
+ 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
+                                  #1C3B74,
+                                  #1E3E7A);
+  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
+                                   #1C3B74 0%,
+                                   #1E3E7A 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+		}
+		
+		.data_refresh.highlight:active {
+			color: #fff;
+			border: 1px solid #1C3B74;
+			background: #193467;
+			background: url(../images/reload-hover.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #183262),
+                               color-stop(1, #1A3568));
+ 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
+                                  #183262,
+                                  #1A3568);
+  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
+                                   #183262 0%,
+                                   #1A3568 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+		}
+
+		/*===== JOBS CART
 		==================================================*/
 
-		#jobs {
-			text-align: center;
-			.gradient(#efefef, #e9e9e9, #efefef);
-			border-color: #fff #fff #e3e3e3 #fff;
-			border-style: solid;
-			border-width: 1px;
-			padding: 10px;
+		#jobs_wrapper {
+			/*float: right;*/
+			border: 1px solid #e3e3e3;
+			.rounded(5px);
 
-			.job_number_text {
-				color: #6f6f6f;
-				text-shadow: 1px 1px 0px #fff;
-			}
-
-			#job_number {
-				font-size: 45px;
-				font-weight: bold;
-				color: #27519F;
-				text-shadow: rgba(0,0,0,0.5) -1px 0, rgba(0,0,0,0.3) 0 -1px, rgba(255,255,255,0.5) 0 1px, rgba(0,0,0,0.3) -1px 0px;
-			}
-
-			/*====== JOBS LIST
+			/*====== SHOW/HIDE ALL BUTTONS
 			==================================================*/
 
-			#display_list_toggle {
-				border-bottom: 1px solid #dbdbdb;
-				cursor: pointer;
-				width: 80%;
-				margin: 0 auto;
-				margin-top: 10px;
-				margin-bottom: 5px;
-				position: relative;
+			#select_buttons {
+				.border-radius(5px, 0, 0, 5px);	
+				border-bottom: 1px solid #E3E3E3;
+				padding: 10px;
+				clear: both;
+				height: 25px;
 
-				button {
-					color: #6f6f6f;
-					font-size: 12px;
-					margin: 0px;
-					background: transparent;
-					border: none;
-				}
-
-				.arrow_border {
-					border-color: #DBDBDB transparent transparent transparent;
-					border-color: #DBDBDB rgba(255,255,255,0) rgba(255,255,255,0) rgba(255,255,255,0);
-					border-style: solid;
-					border-width: 10px;
-					width: 0px;
-					height: 0px;
-					position: absolute;
-					left: 42%;
-					top: 19px;
-				}
-
-				.arrow_light {
-					border-color: #e9e9e9 transparent transparent transparent;
-					border-color: #e9e9e9 rgba(255,255,255,0) rgba(255,255,255,0) rgba(255,255,255,0);
-					border-style: solid;
-					border-width: 10px;
-					width: 0px;
-					height: 0px;
-					position: absolute;
-					left: 42%;
-					top: 17px;
-				}
-			}
-
-			#display_list_toggle:hover {
-				border-bottom: 1px solid #d4d4d4;
-
-				p {
-					color: #333;
-				}
-
-				.arrow_border {
-					border-color: #d4d4d4 transparent transparent transparent;
-					border-color: #d4d4d4 rgba(255,255,255,0) rgba(255,255,255,0) rgba(255,255,255,0);
-				}
-			}
-
-			ul {
-				display: none;
-				margin: 0px;
-				li {
-					list-style: none;
-					text-align: left;
-					color: #6f6f6f;
-					font-weight: bold;
-					padding: 5px 10px;
-				}
-
-				.empty_deliv {
+				.sel_btn {
+					width: 47%;
 					text-align: center;
 					font-size: 12px;
-					font-weight: normal;
-					padding: 10px;
+					color: #999;
+					border: 1px solid #E3E3E3;
+					.gradient(#F5F5F5, #ddd, #f5f5f5);
+					height: 20px;
+					padding-top: 5px;
+					padding-left: 2px;
+					cursor: pointer;
+				}
+
+				.sel_btn:hover {
+					color: #fff;
+					border: 1px solid #214587;
+					.gradient(#27519f, #214587, #27519f);
+				}
+
+				.sel_btn:active {
+					color: #fff;
+					border: 1px solid #1C3B74;
+					.gradient(#1E3E7A, #1C3B74, #1E3E7A);
+				}
+
+				#select_all {
+					margin: 0px;
+					float: left;
+					.border-radius(0, 0, 3px, 3px);
+					border-right: none;
+				}
+
+				#deselect_all {
+					.border-radius(3px, 3px, 0, 0);
+					float: left;
 				}
 			}
-		}
 
-		/*===== PUSH/MERGE BUTTONS
-		==================================================*/
+			/*====== JOBS QUEUE
+			==================================================*/
 
-		#process_jobs {
-			padding: 10px;
-
-			#submit_message {
-				border-width: 1px;
-				border-style: solid;
+			#jobs {
 				text-align: center;
-				font-size: 12px;
-				margin-bottom: 5px;
-				display: none;
-			}
+				.gradient(#efefef, #e9e9e9, #efefef);
+				border-color: #fff #fff #e3e3e3 #fff;
+				border-style: solid;
+				border-width: 1px;
+				padding: 10px;
 
-			#submit_message.error {
-				background-color: #f9e8e8;
-				border-color: #a12a2a;
-				color: #a12a2a;
-			}
+				.job_number_text {
+					color: #6f6f6f;
+					text-shadow: 1px 1px 0px #fff;
+				}
 
-			#push_deliveries, #merge_deliveries {
-				width: 48%;
-				font-size: 12px;
-				color: #fff;
-				cursor: pointer;
-				border: 1px solid #214587;
-				.gradient(#27519f, #214587, #27519f);
-				.rounded(3px);
-				height: 46px;
-                                line-height: 14px;
-
-				span {
-					width: 100%;
-					font-size: 13px;
+				#job_number {
+					font-size: 45px;
 					font-weight: bold;
-					display: block;
+					color: #27519F;
+					text-shadow: rgba(0,0,0,0.5) -1px 0, rgba(0,0,0,0.3) 0 -1px, rgba(255,255,255,0.5) 0 1px, rgba(0,0,0,0.3) -1px 0px;
+				}
+
+				/*======= JOBS LIST
+				==================================================*/
+
+				#display_list_toggle {
+					border-bottom: 1px solid #dbdbdb;
+					cursor: pointer;
+					width: 80%;
+					margin: 0 auto;
+					margin-top: 10px;
+					margin-bottom: 5px;
+					position: relative;
+
+					button {
+						color: #6f6f6f;
+						font-size: 12px;
+						margin: 0px;
+						background: transparent;
+						border: none;
+					}
+
+					.arrow_border {
+						border-color: #DBDBDB transparent transparent transparent;
+						border-color: #DBDBDB rgba(255,255,255,0) rgba(255,255,255,0) rgba(255,255,255,0);
+						border-style: solid;
+						border-width: 10px;
+						width: 0px;
+						height: 0px;
+						position: absolute;
+						left: 42%;
+						top: 19px;
+					}
+
+					.arrow_light {
+						border-color: #e9e9e9 transparent transparent transparent;
+						border-color: #e9e9e9 rgba(255,255,255,0) rgba(255,255,255,0) rgba(255,255,255,0);
+						border-style: solid;
+						border-width: 10px;
+						width: 0px;
+						height: 0px;
+						position: absolute;
+						left: 42%;
+						top: 17px;
+					}
+				}
+
+				#display_list_toggle:hover {
+					border-bottom: 1px solid #d4d4d4;
+
+					p {
+						color: #333;
+					}
+
+					.arrow_border {
+						border-color: #d4d4d4 transparent transparent transparent;
+						border-color: #d4d4d4 rgba(255,255,255,0) rgba(255,255,255,0) rgba(255,255,255,0);
+					}
+				}
+
+				ul {
+					display: none;
+					margin: 0px;
+					li {
+						list-style: none;
+						text-align: left;
+						color: #6f6f6f;
+						font-weight: bold;
+						padding: 5px 10px;
+					}
+
+					.empty_deliv {
+						text-align: center;
+						font-size: 12px;
+						font-weight: normal;
+						padding: 10px;
+					}
 				}
 			}
 
-			#merge_deliveries {
-				float: right;
-			}
+			/*====== PUSH/MERGE BUTTONS
+			==================================================*/
 
-			#push_deliveries[disabled=disabled], #merge_deliveries[disabled=disabled] {
-				cursor: default;
-				color: #999;
-				border: 1px solid #E3E3E3;
-				.gradient(#F5F5F5, #ddd, #f5f5f5);
-			}
+			#process_jobs {
+				padding: 10px;
 
-			#push_deliveries.loading, #merge_deliveries.loading {
-				cursor: pointer;
-				color: #fff;
-				border: 1px solid #214587;
-				.gradient(#27519f, #214587, #27519f);
-				cursor: default;
-			}
+				#submit_message {
+					border-width: 1px;
+					border-style: solid;
+					text-align: center;
+					font-size: 12px;
+					margin-bottom: 5px;
+					display: none;
+				}
 
-			#push_deliveries.success, #merge_deliveries.success {
-				color: #689351;
-				border: 1px solid #C8F9BB;
-				.gradient(#EFF9E2, #E1F9D2, #EFF9E2);
-				cursor: default;
-			}
+				#submit_message.error {
+					background-color: #f9e8e8;
+					border-color: #a12a2a;
+					color: #a12a2a;
+				}
 
-			#push_deliveries.error, #merge_deliveries.error {
-				color: #A12A2A;
-				border: 1px solid #A12A2A;
-				.gradient(#F9E8E8, #F9D1CC, #F9E8E8);
-				cursor: default;
-			} 
+				#push_deliveries, #merge_deliveries {
+					width: 48%;
+					font-size: 12px;
+					color: #fff;
+					cursor: pointer;
+					border: 1px solid #214587;
+					.gradient(#27519f, #214587, #27519f);
+					.rounded(3px);
+					height: 46px;
+	                                line-height: 14px;
+
+					span {
+						width: 100%;
+						font-size: 13px;
+						font-weight: bold;
+						display: block;
+					}
+				}
+
+				#merge_deliveries {
+					float: right;
+				}
+
+				#push_deliveries[disabled=disabled], #merge_deliveries[disabled=disabled] {
+					cursor: default;
+					color: #999;
+					border: 1px solid #E3E3E3;
+					.gradient(#F5F5F5, #ddd, #f5f5f5);
+				}
+
+				#push_deliveries.loading, #merge_deliveries.loading {
+					cursor: pointer;
+					color: #fff;
+					border: 1px solid #214587;
+					.gradient(#27519f, #214587, #27519f);
+					cursor: default;
+				}
+
+				#push_deliveries.success, #merge_deliveries.success {
+					color: #689351;
+					border: 1px solid #C8F9BB;
+					.gradient(#EFF9E2, #E1F9D2, #EFF9E2);
+					cursor: default;
+				}
+
+				#push_deliveries.error, #merge_deliveries.error {
+					color: #A12A2A;
+					border: 1px solid #A12A2A;
+					.gradient(#F9E8E8, #F9D1CC, #F9E8E8);
+					cursor: default;
+				} 
+			}
 		}
 	}
 }

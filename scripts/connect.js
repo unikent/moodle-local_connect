@@ -136,7 +136,7 @@ var Connect = (function() {
 				null,
 				null,
 				null,
-				null
+				null,
 			]
 		});
 
@@ -223,11 +223,11 @@ var Connect = (function() {
 			var nTr = $(this).parents('tr')[0];
 
 			if(_this.oTable.fnIsOpen(nTr)) {
-				_this.buttons.child.removeClass('close').addClass('open');
+				$(this).removeClass('close').addClass('open');
 				_this.oTable.fnClose(nTr);
 			} else {
-				_this.buttons.child.removeClass('open').addClass('close');
-				_this.oTable.fnOpen(nTr, _this.fnFormatDetails(row[0]), 'merged' );
+				$(this).removeClass('open').addClass('close');
+				_this.oTable.fnOpen(nTr, _this.fnFormatDetails(row[0], chksum), 'merged' );
 				_this.buttons.unlinkChild = $(_this.buttons.unlinkChildSel);
 			}
 		});
@@ -259,8 +259,8 @@ var Connect = (function() {
 		});
 	};
 
-	Connect.prototype.fnFormatDetails = function(row) {
-		var sOut = '<table>';
+	Connect.prototype.fnFormatDetails = function(row, par_chksm) {
+		var sOut = '<table par_ident="'+ par_chksm +'">';
 			sOut += '<tr>';
 			sOut += '<th>Code</th>';
 			sOut += '<th>Name</th>';
@@ -746,7 +746,8 @@ var Connect = (function() {
 					$(button.element[0]).removeClass('loading');
 					button.updateText('<span class="ui-button-text">Push to Moodle<span>');
 				}
-
+				_this.buttons.pageRefresh.addClass('highlight');
+				// _this.buttons.pageRefresh.text('The table data has changed. Click here to reload table');
 				callback();
 			},
 			error: function(xhr, request, settings) {
@@ -916,6 +917,8 @@ var Connect = (function() {
 								$('#jobs ul').html(delivery_list);
 							}
 
+							_this.buttons.pageRefresh.addClass('highlight');
+
 							_this.clear_ui_form()
 							$("#dialog-form").dialog("close");
 
@@ -1009,6 +1012,8 @@ var Connect = (function() {
 					if($('#jobs ul').hasClass('visible')) {
 						$('#jobs ul').html(_this.delivery_list);
 					}
+
+					_this.buttons.pageRefresh.addClass('highlight');
 				},
 				error: function() {
 					$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_row');
@@ -1020,8 +1025,19 @@ var Connect = (function() {
 	Connect.prototype.unlink_child = function(el) {
 		
 		var _this = this;
-
 		var chksum = $(el).closest('tr').attr('ident');
+		var par_chksm = $(el).closest('table').attr('par_ident');
+		var row_data = _.filter(_this.json, function (r) {
+			return r.chksum === par_chksm;
+		});
+
+		$.each(row_data[0].children, function(i, c) {
+			if(c.chksum === chksum) {
+				row_data[0].children.splice(i,1);
+				return false;
+			}
+		})
+
 		var row = $(el).closest('tr');
 		var children =$(row).closest('.merged tbody');
 
@@ -1054,6 +1070,9 @@ var Connect = (function() {
 				if(count === 2) {
 					$(children).find('.unlink_child').remove();
 				}
+
+				_this.buttons.pageRefresh.addClass('highlight');
+
 			},
 			error: function() {
 				$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_child');

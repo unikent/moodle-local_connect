@@ -64,7 +64,8 @@ $.ajax({
 					selAll: $('#select_all'),
 					deSelAll: $('#deselect_all'),
 					edit: $('.edit_row'),
-					listToggle: $('#display_list_toggle')
+					listToggle: $('#display_list_toggle'),
+					pageRefresh: $('.data_refresh')
 				},
 				formEl: {
 					notes: $('#edit_notifications'),
@@ -96,7 +97,11 @@ $.ajax({
  	}
  });
 
-var $scrolldiv = $('#jobs_wrapper');
+ $('.data_refresh').click(function() {
+ 	location.reload(true);
+ });
+
+var $scrolldiv = $('#right_bar_wrap');
 
 $(window).scroll(function() {
 	$scrolldiv.stop().css({
