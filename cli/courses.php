@@ -137,7 +137,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       $r->category = kent_connect_fetch_or_create_removed_category_id();
 
       //Update the shortcode before moving into the removed category
-      $r->shortname = date("dmY") . "-" . $r->shortname;
+      $r->shortname = date("dmY-His") . "-" . $r->shortname;
 
       update_course($r);
       $tr = array( 'result' => 'ok', 'in' => $c );
