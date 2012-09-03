@@ -138,7 +138,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
 
       //Update the shortcode before moving into the removed category
       $r->shortname = date("dmY-His") . "-" . $r->shortname;
-      $r->idnumber = date()"dmY-His" . "-" . $r->idnumber;
+      $r->idnumber = date("dmY-His") . "-" . $r->idnumber;
       update_course($r);
       $tr = array( 'result' => 'ok', 'in' => $c );
     } else {
