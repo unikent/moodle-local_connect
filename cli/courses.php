@@ -180,8 +180,6 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       throw new moodle_exception('dont understand '.$c->isa);
     }
   } catch( Exception $e ) {
-
-    var_dump($e);
     $tr = array(
       'result' => 'error',
       'in' => $c,
