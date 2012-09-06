@@ -5,6 +5,7 @@ define('CLI_SCRIPT', true);
 require(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require(dirname(dirname(dirname(dirname(__FILE__)))).'/course/lib.php');
 require(dirname(dirname(dirname(dirname(__FILE__)))).'/course/edit_form.php');
+require(dirname(dirname(dirname(dirname(__FILE__)))).'/mod/aspirelists/lib.php');
 require(dirname(dirname(__FILE__)).'/locallib.php');
 
 function kent_connect_fetch_or_create_removed_category_id() {
@@ -73,6 +74,40 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
 
       $DB->insert_record('connect_course_dets', $connect_data);
 
+      //Add the reading list module to our course if it is based in Canterbury
+      if($connect_data->campus === 'Canterbury') {
+
+        $module = $DB->get_record('modules', array('name'=>'aspirelists'));
+
+        $rl = new stdClass();
+        $rl->course     = $cr->id;
+        $rl->name       = 'Reading list';
+        $rl->intro      = '';
+        $rl->introformat  = 1;
+        $rl->category     = 'all';
+        $rl->timemodified = time();
+
+        $instance = aspirelists_add_instance($rl, new stdClass());
+
+        $sql = "SELECT id, sequence FROM {$CFG->prefix}course_sections 
+                WHERE course = {$cr->id} 
+                  AND section = 0";
+
+        $section = $DB->get_record_sql($sql);
+
+        $cm = new stdClass();
+        $cm->course     = $cr->id;
+        $cm->module     = $module->id;
+        $cm->instance     = $instance;
+        $cm->section    = $section->id;
+        $cm->visible    = 1;
+
+        $cm->coursemodule = add_course_module($cm);
+
+        $sequence = "$cm->coursemodule,$section->sequence";
+
+        $DB->set_field('course_sections', 'sequence', $sequence, array('id'=>$section->id));
+      }
       // gives our module a news forum, which means modinfo
       // can get populated and we dont have to refresh to see modules..
       require_once($CFG->dirroot .'/mod/forum/lib.php');
@@ -145,6 +180,8 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       throw new moodle_exception('dont understand '.$c->isa);
     }
   } catch( Exception $e ) {
+
+    var_dump($e);
     $tr = array(
       'result' => 'error',
       'in' => $c,
