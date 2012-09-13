@@ -111,7 +111,8 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
 
         }
 
-        if( false === enrol_get_enrolment_end($c->moodle_course_id, $uid) ) {
+        //FG30 - Now we check if user is enrolled with a particular role already
+        if( false === kent_is_user_enrolled_as_role($c->moodle_course_id, $uid, $role->id) ) {
           // $ep = enrol_get_plugin('manual')
           // $ep->enrol_user
           $r = enrol_try_internal_enrol($c->moodle_course_id, $uid, $role->id);
