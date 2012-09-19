@@ -162,7 +162,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         // locked
       }
 
-      $tr = array( 'result' => 'ok', 'in' => $c );
+      $tr = array( 'result' => 'ok', 'moodle_course_id' => $c->moodle_id, 'unlocked' => $connect_data->unlocked, 'in' => $c );
     } else if($c->isa == 'DELETE') {
       global $DB;
       $r = $DB->get_record('course',array('idnumber'=>$c->idnumber));
