@@ -49,6 +49,15 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
   $tr = array();
   try {
     if(empty($c->idnumber)) throw new moodle_exception('empty idnumber');
+
+    // force 2012/2013 on shortnames and titles for everything
+    if(false === strstr($c->shortname, '(2012/2013)')) {
+      $c->shortname .= ' (2012/2013)';
+    }
+    if(false === strstr($c->fullname, '(2012/2013)')) {
+      $c->fullname .= ' (2012/2013)';
+    }
+
     $c->visible = 0;
     if($c->isa == 'NEW' ) {
       global $DB;
