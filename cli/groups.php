@@ -33,12 +33,10 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
   try {
     $uid = !empty($c->username) ? $DB->get_record('user',array('username'=>$c->username)) : false;
 
+    if(!$uid) throw new moodle_exception('user not created yet?');
+
     if($c->isa == 'NEW') {
-      if(!$uid) {
-        $uid = user_create_user($c);
-      } else {
-        $uid = $uid->id;
-      }
+      $uid = $uid->id;
 
       $grouping = null;
       if(empty($c->moodle_group_id)) {
