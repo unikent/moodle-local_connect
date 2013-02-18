@@ -8,7 +8,7 @@ require(dirname(dirname(dirname(dirname(__FILE__)))).'/course/edit_form.php');
 require(dirname(dirname(__FILE__)).'/locallib.php');
 
 function kent_connect_fetch_or_create_removed_category_id() {
-  global $DB;
+  global $DB, $CFG;
   $category = $DB->get_record('course_categories', array('idnumber' => 'kent_connect_removed'));
 
   if(!$category) {
@@ -62,6 +62,16 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       $cr = create_course($c);
 
       $DB->set_field('course_sections', 'name', $c->fullname, array('course'=>$cr->id, 'section'=>0));
+
+      // Add course extra details to the connect_course_dets table
+      $connect_data = new stdClass;
+      $connect_data->course = $cr->id;
+      $connect_data->campus = isset($c->campus_desc) ? $c->campus_desc : '';
+      $connect_data->startdate = isset($c->startdate) ? $c->startdate : '';
+      $connect_data->enddate = isset($c->module_length) ? strtotime('+'. $c->module_length .' weeks', $c->startdate) : $CFG->default_course_end_date;
+      $connect_data->weeks = isset($c->module_length) ? $c->module_length : 0;
+
+      $DB->insert_record('connect_course_dets', $connect_data);
 
       // gives our course a news forum, which means modinfo
       // can get populated and we dont have to refresh to see courses..
