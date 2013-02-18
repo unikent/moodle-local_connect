@@ -16,23 +16,23 @@ var Connect = (function() {
 		this.formEl = options.formEl;
 
 		//First check if we have courses and error if not.
-        if (this.json.length === 0){
-            jQuery.unblockUI();
-            $('#dialog_error').html('You do not have access to any deliveries at this time.');
-            $("#dialog_error").dialog("open");
-            return
-        }
+		if (this.json.length === 0){
+				jQuery.unblockUI();
+				$('#dialog_error').html('You do not have access to any deliveries at this time.');
+				$("#dialog_error").dialog("open");
+				return
+		}
 
-        //taking json and mapping into usable data
+				//taking json and mapping into usable data
 		this.tabledata = _.map(this.json, function(val) {
 			var end = parseInt(val.module_week_beginning, 10) + parseInt(val.module_length, 10);
 			var duration = val.module_week_beginning + '-' + end;
 			var name = val.state[0].split('_').join(' ');
-      var sink_deleted = val.sink_deleted;
+			var sink_deleted = val.sink_deleted;
 			var toolbar = ' ';
 			if(val.state[0] === 'created_in_moodle') {
 				if(val.children !== null) {
-          sink_deleted = sink_deleted || _.any(val.children, function(i) {return i.sink_deleted;})
+					sink_deleted = sink_deleted || _.any(val.children, function(i) {return i.sink_deleted;})
 					toolbar += '<div class="child_expand open toolbar_link"></div>'
 				}
 				toolbar += '<div class="unlink_row toolbar_link"></div>'
@@ -245,39 +245,39 @@ var Connect = (function() {
 
 	Connect.prototype.fnFormatDetails = function(row) {
 		var sOut = '<table>';
-    	sOut += '<tr>';
-    	sOut += '<th>Code</th>';
-    	sOut += '<th>Name</th>';
-    	sOut += '<th>Campus</th>';
-    	sOut += '<th>Duration</th>';
-    	sOut += '<th>Students</th>';
-    	sOut += '<th>Version</th>';
-    	sOut += '<th></th>';
-    	sOut += '</tr>';
-	    $.each(row.children, function(i) {
-        var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10);
-        var duration = row.children[i].module_week_beginning + ( isNaN(end) ? '' : '-' + end );
-        sOut += '<tr ident="'+ row.children[i].chksum +'">';
-        sOut += '<td class="code"><div class="'
-                  + (row.children[i].sink_deleted ? 'sink_deleted' : '' )
-                  + '">' + row.children[i].module_code
-                  + '</div></td>';
-        sOut += '<td class="name">'+ row.children[i].module_title +'</td>';
-        sOut += '<td class="campus">' + row.children[i].campus_desc +'</td>';
-        sOut += '<td class="duration">'+ duration +'</td>';
-        sOut += '<td class="students">'+ (row.children[i].student_count==null?'-':row.children[i].student_count) +'</td>';
-        sOut += '<td class="version">'+ row.children[i].module_version +'</td>';
-        if(row.children.length > 1) {
-          sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';
-        } else {
-          sOut += '<td class="toolbar"></td>';
-        }
+			sOut += '<tr>';
+			sOut += '<th>Code</th>';
+			sOut += '<th>Name</th>';
+			sOut += '<th>Campus</th>';
+			sOut += '<th>Duration</th>';
+			sOut += '<th>Students</th>';
+			sOut += '<th>Version</th>';
+			sOut += '<th></th>';
+			sOut += '</tr>';
+			$.each(row.children, function(i) {
+				var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10);
+				var duration = row.children[i].module_week_beginning + ( isNaN(end) ? '' : '-' + end );
+				sOut += '<tr ident="'+ row.children[i].chksum +'">';
+				sOut += '<td class="code"><div class="'
+									+ (row.children[i].sink_deleted ? 'sink_deleted' : '' )
+									+ '">' + row.children[i].module_code
+									+ '</div></td>';
+				sOut += '<td class="name">'+ row.children[i].module_title +'</td>';
+				sOut += '<td class="campus">' + row.children[i].campus_desc +'</td>';
+				sOut += '<td class="duration">'+ duration +'</td>';
+				sOut += '<td class="students">'+ row.children[i].student_count +'</td>';
+				sOut += '<td class="version">'+ row.children[i].module_version +'</td>';
+				if(row.children.length > 1) {
+					sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';
+				} else {
+					sOut += '<td class="toolbar"></td>';
+				}
 
-        sOut += '</tr>';
-	    });
-	    sOut += '</table>';
-	     
-	    return sOut;
+				sOut += '</tr>';
+			});
+			sOut += '</table>';
+			 
+			return sOut;
 	}
 
 	Connect.prototype.statusbox = function(el, message) {
@@ -417,11 +417,11 @@ var Connect = (function() {
 		var _this = this;
 
 		var button = new ButtonLoader(this.buttons.pushBtn, 'Saving');
-	 	this.buttons.pushBtn.attr('disabled', 'disabled').addClass('loading');
-	 	button.start();
-	 	button.disable(this.buttons.pushBtn);
+		this.buttons.pushBtn.attr('disabled', 'disabled').addClass('loading');
+		button.start();
+		button.disable(this.buttons.pushBtn);
 
-	 	if(this.buttons.pushBtn.hasClass('edit_to_moodle')) {
+		if(this.buttons.pushBtn.hasClass('edit_to_moodle')) {
 
 			this.edit_row(this.selectedDeliveries[0], button);
 
@@ -461,39 +461,39 @@ var Connect = (function() {
 				}, 3000); 
 			}, function(xhr) {
 				var problems = JSON.parse(xhr.responseText);
-	 			var error_ids = [];
-	 			var errors = '<div id="push_notifications" class="warn">Note: courses that have not errored have still been scheduled.</div>';
-	 			errors += '<ul id="error_ui">';
+				var error_ids = [];
+				var errors = '<div id="push_notifications" class="warn">Note: courses that have not errored have still been scheduled.</div>';
+				errors += '<ul id="error_ui">';
 
-	 			$.each(problems, function(i) {
-	 				
-	 				var row = _.filter(data, function (r) { 
+				$.each(problems, function(i) {
+					
+					var row = _.filter(data, function (r) { 
 						return r.id === problems[i].id;
 					});
 
-	 				error_ids.push(row[0].id);
+					error_ids.push(row[0].id);
 
-	 				switch(problems[i].error_code) {
-	 					case 'duplicate':
-	 						errors += '<li class="warning"><span class="type">WARNING: Duplicate</span> - <span class="cours_dets">';
-	 						errors += row[0].code + ': ' + row[0].title + '</span>. Please merge or push through individually';
-	 						errors += '</li>';
-	 					break;
-	 					case 'could_not_schedule':
-	 						errors += '<li class="error"><span class="type">ERROR: Already scheduled</span> - <span class="cours_dets">';
-	 						errors += row[0].code + ': ' + row[0].title + '</span>. Please merge or push through individually';
-	 						errors += '</li>';
-	 					break;
-	 					case 'category_is_zero':
-	 						errors += '<li class="error"><span class="type">ERROR: Category not found</span> - <span class="cours_dets">';
-	 						errors += row[0].code + ': ' + row[0].title + '</span>. Push through individually to choose a relevant category';
-	 						errors += '</li>';
-	 					break;
-	 				}
-	 			});
+					switch(problems[i].error_code) {
+						case 'duplicate':
+							errors += '<li class="warning"><span class="type">WARNING: Duplicate</span> - <span class="cours_dets">';
+							errors += row[0].code + ': ' + row[0].title + '</span>. Please merge or push through individually';
+							errors += '</li>';
+						break;
+						case 'could_not_schedule':
+							errors += '<li class="error"><span class="type">ERROR: Already scheduled</span> - <span class="cours_dets">';
+							errors += row[0].code + ': ' + row[0].title + '</span>. Please merge or push through individually';
+							errors += '</li>';
+						break;
+						case 'category_is_zero':
+							errors += '<li class="error"><span class="type">ERROR: Category not found</span> - <span class="cours_dets">';
+							errors += row[0].code + ': ' + row[0].title + '</span>. Push through individually to choose a relevant category';
+							errors += '</li>';
+						break;
+					}
+				});
 
-	 			errors += '</ul>';
-								 			
+				errors += '</ul>';
+											
 				$('#dialog_error').html(errors);
 				$("#dialog_error").dialog({
 					width: 500,
@@ -502,27 +502,27 @@ var Connect = (function() {
 
 				_this.selectedDeliveries = _.without(_this.selectedDeliveries, error_ids);
 				_this.buttons.rowsEl.removeClass('row_selected');
-	 			$(_this.selectedDeliveries).each(function(i) {
-	 				var row = $('#datable tbody tr[ident='+selectedDeliveries[i]+']');
-	 				var aPos = _this.oTable.fnGetPosition(row[0]);
-	 				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-	 			});
+				$(_this.selectedDeliveries).each(function(i) {
+					var row = $('#datable tbody tr[ident='+selectedDeliveries[i]+']');
+					var aPos = _this.oTable.fnGetPosition(row[0]);
+					_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
+				});
 
-	 			_this.oTable.fnDraw();
+				_this.oTable.fnDraw();
 
-	 			_this.selectedDeliveries = [];
-	 			_this.count = 0;
-	 			$('#job_number').html(_this.count);
-	 			_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
-	 			if($('#jobs ul').hasClass('visible')) {
+				_this.selectedDeliveries = [];
+				_this.count = 0;
+				$('#job_number').html(_this.count);
+				_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
+				if($('#jobs ul').hasClass('visible')) {
 					$('#jobs ul').html(_this.delivery_list);
 				}
 
 				$(error_ids).each(function(i) {
-	 				var dom_row = $('#datable tbody tr[ident='+error_ids[i]+']')[0];
-	 				_this.rowSelect(dom_row, false);
+					var dom_row = $('#datable tbody tr[ident='+error_ids[i]+']')[0];
+					_this.rowSelect(dom_row, false);
 
-	 			});
+				});
 
 				clearTimeout(_this.push_timeout);
 				_this.push_timeout = setTimeout(function() {
@@ -589,34 +589,34 @@ var Connect = (function() {
 			buttons: {
 				"Push to moodle": function() {
 					
-				 	ui_sub.disable($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'));
-				 	ui_sub.start();
+					ui_sub.disable($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'));
+					ui_sub.start();
 
-				 	if(_this.formEl.shortNameExt.get(0)) {
-				 		if(_this.formEl.shortNameExt.val() === '') {
-				 			_this.formEl.notes.removeClass('warn').addClass('error').text('Please provide a three letter identifier');
-				 			_this.formEl.shortNameExt.addClass('error');
-				 			ui_sub.stop();
-				 			return;
-				 		}
-				 		shortname += ' ' + $('#shortname_ext').val();
-				 	}
+					if(_this.formEl.shortNameExt.get(0)) {
+						if(_this.formEl.shortNameExt.val() === '') {
+							_this.formEl.notes.removeClass('warn').addClass('error').text('Please provide a three letter identifier');
+							_this.formEl.shortNameExt.addClass('error');
+							ui_sub.stop();
+							return;
+						}
+						shortname += ' ' + $('#shortname_ext').val();
+					}
 
-				 	if(row_unprocessed ===true) {
-				 		synopsis = $('#synopsis').val() + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ row[0].module_code +"'>More</a>"
-				 	}
+					if(row_unprocessed ===true) {
+						synopsis = $('#synopsis').val() + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ row[0].module_code +"'>More</a>"
+					}
 
-				 	var data = [{
-				 		id: row[0].chksum,
-				 		code: shortname,
-				 		title: _this.formEl.fullName.val(),
-				 		synopsis: synopsis,
-				 		category: _this.formEl.cat.val()
-				 	}];
+					var data = [{
+						id: row[0].chksum,
+						code: shortname,
+						title: _this.formEl.fullName.val(),
+						synopsis: synopsis,
+						category: _this.formEl.cat.val()
+					}];
 
-				 	_this.push_selected(data, ui_sub, true, function() {
+					_this.push_selected(data, ui_sub, true, function() {
 
-				 		_this.clear_ui_form();
+						_this.clear_ui_form();
 						$("#dialog-form").dialog( "close" );
 						button.stop();
 						button.updateText('Success');
@@ -626,31 +626,31 @@ var Connect = (function() {
 							$(button.element[0]).removeClass();
 							_this.processRowSelect();
 						}, 3000);
-				 	}, function(xhr) {
+					}, function(xhr) {
 
-				 		var problems = JSON.parse(xhr.responseText);
+						var problems = JSON.parse(xhr.responseText);
 
-				 		switch(problems[0].error_code) {
-		 					case 'duplicate':
-		 					case 'could_not_schedule':
-		 						if(_this.formEl.shortNameExt.get(0)) {
-		 							_this.formEl.notes.addClass('error').text('Please provide a three letter identifier');
-					 				_this.formEl.shortNameExt.addClass('error');
-		 						} else {
-		 							_this.formEl.shrtNmExtTd.html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
+						switch(problems[0].error_code) {
+							case 'duplicate':
+							case 'could_not_schedule':
+								if(_this.formEl.shortNameExt.get(0)) {
+									_this.formEl.notes.addClass('error').text('Please provide a three letter identifier');
+									_this.formEl.shortNameExt.addClass('error');
+								} else {
+									_this.formEl.shrtNmExtTd.html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
 									_this.formEl.notes.removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
 									_this.formEl.shortNameExt.addClass('warn');
 								}
-		 					break;
-		 				}
+							break;
+						}
 
-		 				clearTimeout(_this.ui_timeout);
+						clearTimeout(_this.ui_timeout);
 						_this.ui_timeout = setTimeout(function() {
 						$(ui_sub.element[0]).removeClass('error');
 							ui_sub.updateText('<span class="ui-button-text">Push to Moodle<span>');
 						}, 2000);
-				 	});
-			 												 	
+					});
+																
 				},
 				Cancel: function() {
 					_this.clear_ui_form()
@@ -665,28 +665,28 @@ var Connect = (function() {
 		var _this = this;
 
 		$.ajax({
-	 		type: 'POST',
-	 		url: window.dapageUrl + '/courses/schedule/',
-	 		contentType: 'json',
-	 		dataType: 'json',
-	 		data: JSON.stringify({'courses': data }),
-	 		success: function () {
+			type: 'POST',
+			url: window.dapageUrl + '/courses/schedule/',
+			contentType: 'json',
+			dataType: 'json',
+			data: JSON.stringify({'courses': data }),
+			success: function () {
 				button.stop();
-	 			_this.buttons.rowsEl.removeClass('row_selected');
-	 			_this.buttons.pushBtn.removeClass('loading');
-	 			$(_this.selectedDeliveries).each(function(index) {
-	 				var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[index]+']');
-	 				var aPos = _this.oTable.fnGetPosition(row[0]);
-	 				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-	 			})
+				_this.buttons.rowsEl.removeClass('row_selected');
+				_this.buttons.pushBtn.removeClass('loading');
+				$(_this.selectedDeliveries).each(function(index) {
+					var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[index]+']');
+					var aPos = _this.oTable.fnGetPosition(row[0]);
+					_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
+				})
 
-	 			_this.oTable.fnDraw();
+				_this.oTable.fnDraw();
 
-	 			_this.selectedDeliveries = [];
-	 			_this.count = 0;
-	 			$('#job_number').html(_this.count);
-	 			_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
-	 			if($('#jobs ul').hasClass('visible')) {
+				_this.selectedDeliveries = [];
+				_this.count = 0;
+				$('#job_number').html(_this.count);
+				_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
+				if($('#jobs ul').hasClass('visible')) {
 					$('#jobs ul').html(_this.delivery_list);
 				}
 				
@@ -699,17 +699,17 @@ var Connect = (function() {
 				}
 
 				callback();
-	 		},
-	 		error: function(xhr, request, settings) {
-	 			button.stop();
-	 			$(button.element[0]).removeClass('loading');
-	 			button.updateText('Error');
+			},
+			error: function(xhr, request, settings) {
+				button.stop();
+				$(button.element[0]).removeClass('loading');
+				button.updateText('Error');
 				$(button.element[0]).addClass('error');
 
-	 			errorcallback(xhr);
+				errorcallback(xhr);
 
-	 		}
-	 	});
+			}
+		});
 	};
 
 	Connect.prototype.mergeDeliveries = function() {
@@ -717,12 +717,12 @@ var Connect = (function() {
 		var _this = this;
 
 		// Set the button appearence and functionality
-		var button = new ButtonLoader(this.buttons.mergeBtn, 'Saving');
-	 	this.buttons.mergeBtn.attr('disabled', 'disabled').addClass('loading');
-	 	button.start();
-	 	button.disable(this.buttons.mergeBtn);
+		//var button = new ButtonLoader(this.buttons.mergeBtn, 'Saving');
+		//this.buttons.mergeBtn.attr('disabled', 'disabled').addClass('loading');
+		//button.start();
+		//button.disable(this.buttons.mergeBtn);
 
-	 	//Gets the data objects for all of the selected rows
+		//Gets the data objects for all of the selected rows
 		var mergers = _.chain(this.json).filter(function (row) { 
 			if(_.indexOf(_this.selectedDeliveries, row.chksum) !== -1){
 				return row;
@@ -789,111 +789,117 @@ var Connect = (function() {
 		$( "#dialog-form" ).dialog({ 
 			title: 'Choose merge details',
 			close: function(event, ui) {
-				button.stop();
-				button.updateText('<span>Merge</span> to Moodle');
-				_this.buttons.mergeBtn.removeClass();
+				//button.stop();
+				//button.updateText('<span>Merge</span> to Moodle');
+				//_this.buttons.mergeBtn.removeClass();
 
 				_this.formEl.shrtNmExtTd.html('');
 				_this.formEl.notes.html('');
 				_this.formEl.notes.removeClass();
 			},
 			open: function(event, ui) {
-				ui_sub = new ButtonLoader($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'), 'Saving');
+				ui_sub = new ButtonLoader($('.ui-dialog-buttonpane').find('button:contains("Merge to moodle")'), 'Saving');
 			},
 			buttons: {
-				"Push to moodle": function() {
-				 	ui_sub.disable($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'));
-				 	ui_sub.start();
+				"Merge to moodle": function() {
+					ui_sub.disable($('.ui-dialog-buttonpane').find('button:contains("Merge to moodle")'));
+					ui_sub.start();
 
-				 	if(_this.formEl.shortNameExt.get(0)) {
-				 		if(_this.formEl.shortNameExt.val() === '') {
-				 			_this.formEl.notes.removeClass('warn').addClass('error').text('Please provide a three letter identifier');
-				 			_this.formEl.shortNameExt.addClass('error');
-				 			ui_sub.stop();
-				 			return;
-				 		}
+					if(_this.formEl.shortNameExt.get(0)) {
+						if(_this.formEl.shortNameExt.val() === '') {
+							_this.formEl.notes.removeClass('warn').addClass('error').text('Please provide a three letter identifier');
+							_this.formEl.shortNameExt.addClass('error');
+							ui_sub.stop();
+							return;
+						}
 
-				 		short_name += ' ' + $('#shortname_ext').val();
-				 	}
+						short_name += ' ' + $('#shortname_ext').val();
+					}
 
-				 	var data = {
-				 		link_courses: _this.selectedDeliveries,
-				 		code: short_name,
-				 		title: _this.formEl.fullName.val(),
-				 		synopsis: _this.formEl.synopsis.val() + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mod_code +"'>More</a>",
-				 		category: _this.formEl.cat.val()
-				 	};
+					var data = {
+						link_courses: _this.selectedDeliveries,
+						code: short_name,
+						title: full_name,
+						synopsis: synopsis + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mod_code +"'>More</a>",
+						category: _this.formEl.cat.val()
+					};
 
-				 	$.ajax({
-				 		type: 'POST',
-				 		url: window.dapageUrl + '/courses/merge/',
-				 		contentType: 'json',
-	 					dataType: 'json',
-				 		data: JSON.stringify(data),
-				 		success: function () {
-				 			ui_sub.stop();
-				 			_this.buttons.rowsEl.removeClass('row_selected');
-				 			_this.buttons.mergeBtn.removeClass('loading');
-				 			$(_this.selectedDeliveries).each(function(index) {
-				 				var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[index]+']');
-				 				var aPos = _this.oTable.fnGetPosition(row[0]);
-				 				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
-				 			})
+					$.ajax({
+						type: 'POST',
+						url: window.dapageUrl + '/courses/merge/',
+						contentType: 'json',
+						dataType: 'json',
+						data: JSON.stringify(data),
+						success: function () {
+							ui_sub.stop();
+							_this.buttons.rowsEl.removeClass('row_selected');
+							_this.buttons.mergeBtn.removeClass('loading');
+							$(_this.selectedDeliveries).each(function(index) {
+								var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[index]+']');
+								var aPos = _this.oTable.fnGetPosition(row[0]);
+								_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
+							})
 
-				 			_this.oTable.fnDraw();
+							_this.oTable.fnDraw();
 
-				 			_this.selectedDeliveries = [];
-				 			_this.count = 0;
-				 			$('#job_number').html(_this.count);
-				 			_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
-				 			if($('#jobs ul').hasClass('visible')) {
+							_this.selectedDeliveries = [];
+							_this.count = 0;
+							$('#job_number').html(_this.count);
+							_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
+							if($('#jobs ul').hasClass('visible')) {
 								$('#jobs ul').html(delivery_list);
 							}
 
 							_this.clear_ui_form()
 							$("#dialog-form").dialog("close");
 
-							button.stop();
-							button.updateText('Success');
-							_this.buttons.mergeBtn.addClass('success');
-							clearTimeout(_this.merge_timeout);
-							_this.merge_timeout = setTimeout(function() {
-								_this.buttons.mergeBtn.removeClass('success').attr('disabled', 'disabled');
-								_this.processRowSelect();
-							}, 4000);
+							//button.stop();
+							//button.updateText('Success');
+							//_this.buttons.mergeBtn.addClass('success');
+							//clearTimeout(_this.merge_timeout);
+							//_this.merge_timeout = setTimeout(function() {
+							//	_this.buttons.mergeBtn.removeClass('success').attr('disabled', 'disabled');
+							//	_this.processRowSelect();
+							//}, 4000);
 
 
-				 		},
-				 		error: function(xhr, request, settings) {
+						},
+						error: function(xhr, request, settings) {
 
+							console.log(xhr);
 
-				 			var problems = JSON.parse(xhr.responseText);
+							var problems = xhr.responseText.length == 0 ? null : JSON.parse(xhr.responseText);
 
-					 		switch(problems[0].error_code) {
-			 					case 'duplicate':
-			 					case 'could_not_schedule':
-			 						if($('#shortname_ext').get(0)) {
-			 							$('#edit_notifications').addClass('error').text('Please provide a three letter identifier');
-						 				$('#shortname_ext').addClass('error');
-			 						} else {
-			 							$('#shortname_ext_td').html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
-										$('#edit_notifications').removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
-										$('#shortname_ext').addClass('warn');
-									}
-			 					break;
-			 				} 
+							if (problems) {
+								switch(problems[0].error_code) {
+									case 'duplicate':
+									case 'could_not_schedule':
+										if($('#shortname_ext').get(0)) {
+											$('#edit_notifications').addClass('error').text('Please provide a three letter identifier');
+											$('#shortname_ext').addClass('error');
+										} else {
+											$('#shortname_ext_td').html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
+											$('#edit_notifications').removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
+											$('#shortname_ext').addClass('warn');
+										}
+									break;
+								}
+							} else {
+								$('#edit_notifications').addClass('error').text('A server error occured :( ... please contact an administrator');
+								$('#shortname_ext').addClass('error');
+							}
 
-				 			ui.stop();
-				 			$(ui.element[0]).removeClass('loading');
-				 			ui.updateText('Error');
-							$(ui.element[0]).addClass('error');
-							clearTimeout(_this.merge_timeout);
-							_this.merge_timeout = setTimeout(function() {
-								ui_sub.updateText('<span class="ui-button-text">Push to Moodle<span>');
-								$('#merge_deliveries').removeClass('error');
-							}, 4000);
-				 		}
-				 	});								 										 	
+							ui_sub.stop();
+							// $(ui.element[0]).removeClass('loading');
+							// ui.updateText('Error');
+							// $(ui.element[0]).addClass('error');
+							// clearTimeout(_this.merge_timeout);
+							// _this.merge_timeout = setTimeout(function() {
+							// 	ui_sub.updateText('<span class="ui-button-text">Push to Moodle<span>');
+							// 	$('#merge_deliveries').removeClass('error');
+							// }, 4000);
+						}
+					});								 										 	
 				},
 				Cancel: function() {
 					_this.clear_ui_form()
@@ -911,38 +917,38 @@ var Connect = (function() {
 			var row = $(el).closest('tr');
 			$(el).removeClass('unlink_row').addClass('ajax_loading');
 			$.ajax({
-		 		type: 'POST',
-		 		url: window.dapageUrl + '/courses/disengage/',
+				type: 'POST',
+				url: window.dapageUrl + '/courses/disengage/',
 				dataType: 'json',
-        contentType: 'json',
-        data: JSON.stringify({ 'courses' : [ chksum ] }),
-		 		success: function () {
+				contentType: 'json',
+				data: JSON.stringify({ 'courses' : [ chksum ] }),
+				success: function () {
 
-		 			if(_this.oTable.fnIsOpen(row[0])) {
+					if(_this.oTable.fnIsOpen(row[0])) {
 						row.removeClass('close').addClass('open');
 						_this.oTable.fnClose(row[0]);
 					}
 
-		 			row.removeClass('row_selected');
-		 			var aPos = _this.oTable.fnGetPosition(row[0]);
-	 				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-	 				_this.oTable.fnUpdate('', row[0], 8, false)
+					row.removeClass('row_selected');
+					var aPos = _this.oTable.fnGetPosition(row[0]);
+					_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
+					_this.oTable.fnUpdate('', row[0], 8, false)
 
-		 			_this.oTable.fnDraw();
+					_this.oTable.fnDraw();
 
-		 			_this.selectedDeliveries = [];
-		 			_this.count = 0;
-		 			$('#job_number').html(_this.count);
-		 			_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
-		 			if($('#jobs ul').hasClass('visible')) {
+					_this.selectedDeliveries = [];
+					_this.count = 0;
+					$('#job_number').html(_this.count);
+					_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
+					if($('#jobs ul').hasClass('visible')) {
 						$('#jobs ul').html(_this.delivery_list);
 					}
-		 		},
-		 		error: function() {
-		 			$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_row');
-		 			_this.statusbox(row, 'Error: we were unable to process your request at this time. Please try later');
-		 		}
-		 	});
+				},
+				error: function() {
+					$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_row');
+					_this.statusbox(row, 'Error: we were unable to process your request at this time. Please try later');
+				}
+			});
 	};
 
 	Connect.prototype.unlink_child = function(el) {
@@ -955,38 +961,38 @@ var Connect = (function() {
 
 		$(el).removeClass('unlink_child').addClass('ajax_loading');
 
-    $.ajax({
-      type: 'POST',
-      url: window.dapageUrl + '/courses/unlink/',
-      dataType: 'json',
-      contentType: 'json',
-      data: JSON.stringify({ 'courses' : [ chksum ] }),
-      success: function () {
+		$.ajax({
+			type: 'POST',
+			url: window.dapageUrl + '/courses/unlink/',
+			dataType: 'json',
+			contentType: 'json',
+			data: JSON.stringify({ 'courses' : [ chksum ] }),
+			success: function () {
 
- 				var data = [
-	 				chksum,
-	 				'<div class="status_scheduled">scheduled</div>',
-	 				$(children).find('tr[ident='+chksum+'] .code').text(),
-	 				$(children).find('tr[ident='+chksum+'] .name').text(),
-	 				$(children).find('tr[ident='+chksum+'] .campus').text(),
-	 				$(children).find('tr[ident='+chksum+'] .duration').text(),
-	 				$(children).find('tr[ident='+chksum+'] .students').text(),
-	 				$(children).find('tr[ident='+chksum+'] .version').text(),
-	 				' '
-	 			];
- 				_this.oTable.fnAddData(data);
- 				$(children).find('tr[ident='+chksum+']').remove();
- 				var count = $('tr', children).length;
+				var data = [
+					chksum,
+					'<div class="status_scheduled">scheduled</div>',
+					$(children).find('tr[ident='+chksum+'] .code').text(),
+					$(children).find('tr[ident='+chksum+'] .name').text(),
+					$(children).find('tr[ident='+chksum+'] .campus').text(),
+					$(children).find('tr[ident='+chksum+'] .duration').text(),
+					$(children).find('tr[ident='+chksum+'] .students').text(),
+					$(children).find('tr[ident='+chksum+'] .version').text(),
+					' '
+				];
+				_this.oTable.fnAddData(data);
+				$(children).find('tr[ident='+chksum+']').remove();
+				var count = $('tr', children).length;
 
- 				if(count === 2) {
- 					$(children).find('.unlink_child').remove();
- 				}
-	 		},
-	 		error: function() {
-	 			$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_child');
-	 			statusbox(row, 'Error: we were unable to process your request at this time. Please try later');
-	 		}
-	 	});
+				if(count === 2) {
+					$(children).find('.unlink_child').remove();
+				}
+			},
+			error: function() {
+				$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_child');
+				statusbox(row, 'Error: we were unable to process your request at this time. Please try later');
+			}
+		});
 	};
 
 	Connect.prototype.clear_ui_form = function() {
@@ -1001,13 +1007,13 @@ var Connect = (function() {
 
 	$.fn.dataTableExt.oApi.fnGetFilteredNodes = function ( oSettings )
 	{
-	    var anRows = [];
-	    for ( var i=0, iLen=oSettings.aiDisplay.length ; i<iLen ; i++ )
-	    {
-	        var nRow = oSettings.aoData[ oSettings.aiDisplay[i] ].nTr;
-	        anRows.push( nRow );
-	    }
-	    return anRows;
+		var anRows = [];
+		for ( var i=0, iLen=oSettings.aiDisplay.length ; i<iLen ; i++ )
+		{
+				var nRow = oSettings.aoData[ oSettings.aiDisplay[i] ].nTr;
+				anRows.push( nRow );
+		}
+		return anRows;
 	};
 
 	return Connect;
