@@ -57,7 +57,7 @@ echo <<< HEREDOC
 			<li class="link_key key_item">= Link to active moodle delivery</li>
 			<li class="delete_key key_item">= Removed delivery from moodle</li>
 			<li class="unlink_key key_item">= Unlink child delivery from parent</li>
-			<li class="flag_key key_item">= Delivery shares its module code with an already created course</li>
+			<li class="flag_key key_item">= Delivery shares its module code with an already created module</li>
 		</ul>
 	</div>
 </div>
@@ -166,7 +166,7 @@ $table = <<< HEREDOC
 <div id="dialog-confirm" title="Confirm">
 	<p>
 		<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-		These deliveries will be pushed as-is. If you want to edit a course's information, please push it separately.
+		These deliveries will be pushed as-is. If you want to edit a module's information, please push it separately.
 	</p>
 </div>
 

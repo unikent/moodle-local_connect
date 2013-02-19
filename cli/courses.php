@@ -17,7 +17,7 @@ function kent_connect_fetch_or_create_removed_category_id() {
     $category->idnumber = 'kent_connect_removed';
     $category->description_editor = $data->description_editor;
     $category->parent = 0;
-    $category->description = 'Holding place for removed courses';
+    $category->description = 'Holding place for removed modules';
     $category->sortorder = 999;
     $category->visible = false;
     $category->id = $DB->insert_record('course_categories', $category);
@@ -63,7 +63,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
 
       $DB->set_field('course_sections', 'name', $c->fullname, array('course'=>$cr->id, 'section'=>0));
 
-      // Add course extra details to the connect_course_dets table
+      // Add module extra details to the connect_course_dets table
       $connect_data = new stdClass;
       $connect_data->course = $cr->id;
       $connect_data->campus = isset($c->campus_desc) ? $c->campus_desc : '';
@@ -73,8 +73,8 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
 
       $DB->insert_record('connect_course_dets', $connect_data);
 
-      // gives our course a news forum, which means modinfo
-      // can get populated and we dont have to refresh to see courses..
+      // gives our module a news forum, which means modinfo
+      // can get populated and we dont have to refresh to see modules..
       require_once($CFG->dirroot .'/mod/forum/lib.php');
       forum_get_course_forum($cr->id,'news');
 
@@ -83,10 +83,10 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       global $DB;
       $r = $DB->get_record('course',array('id'=>$c->moodle_id));
       if(!$r) {
-        throw new moodle_exception('course doesnt exist');
+        throw new moodle_exception('module doesnt exist');
       }
 
-      // update course extra details too
+      // update module extra details too
       $connect_data = $DB->get_record('connect_course_dets',array('course'=>$r->id));
       if(!$connect_data) {
         $connect_data = new stdClass;
@@ -117,7 +117,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       global $DB;
       $r = $DB->get_record('course',array('idnumber'=>$c->idnumber));
       if(!$r) {
-        throw new moodle_exception('course doesnt exist');
+        throw new moodle_exception('module doesnt exist');
       }
       $r->category = kent_connect_fetch_or_create_removed_category_id();
       update_course($r);

@@ -491,7 +491,7 @@ var Connect = (function() {
 				}, function(xhr) { // error callback
 					var problems = JSON.parse(xhr.responseText);
 					var error_ids = [];
-					var errors = '<div id="push_notifications" class="warn">Note: courses that have not errored have still been scheduled.</div>';
+					var errors = '<div id="push_notifications" class="warn">Note: modules that have not errored have still been scheduled.</div>';
 					errors += '<ul id="error_ui">';
 					
 					$.each(problems, function(i) {

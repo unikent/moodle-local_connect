@@ -1,4 +1,4 @@
-$.blockUI({ message: '<div class="blockui_loading">Please wait, loading course lists.</div>' });
+$.blockUI({ message: '<div class="blockui_loading">Please wait, loading module lists.</div>' });
 $("#dialog_error").dialog({
      autoOpen: false,
      title: 'Connect error',
