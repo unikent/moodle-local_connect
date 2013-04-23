@@ -52,6 +52,33 @@ function delivery_groups_plx($c,$uid) {
   }
 }
 
+function generate_user_password($length = 8) {
+  $chars = "abcdefghijklmnopqrstuvwxyz";
+  $caps = strtoupper($chars);
+  $nums = "0123456789";
+  $syms = "!@#$%^&*()-+?";
+  $out = '';
+
+  for($i=0; $i < $length; $i++) {
+    $out .= substr($chars, mt_rand(0, strlen($chars) -1), 1);
+  }
+
+  $tmp1 = str_split($out);
+  $tmp2 = array();
+
+  array_push($tmp2, substr($caps, mt_rand(0, strlen($caps) - 1), 1));
+  array_push($tmp2, substr($nums, mt_rand(0, strlen($nums) - 1), 1));
+  array_push($tmp2, substr($syms, mt_rand(0, strlen($syms) - 1), 1));
+
+  $tmp1 = array_slice($tmp1, 0, $length - 3);
+  $tmp1 = array_merge($tmp1, $tmp2);
+
+  shuffle($tmp1);
+  $out = implode('', $tmp1);
+
+  return $out;
+}
+
 foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
   global $DB;
   $tr = array();
@@ -65,6 +92,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       if(!$uid) {
         $c->mnethostid = $CFG->mnet_localhost_id;
         $c->confirmed = 1;
+        $c->password = generate_user_password(8);
         $uid = user_create_user($c);
       } else {
         $uid = $uid->id;
