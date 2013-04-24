@@ -51,11 +51,12 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
     if(empty($c->idnumber)) throw new moodle_exception('empty idnumber');
 
     // force 2012/2013 on shortnames and titles for everything
-    if(false === strstr($c->shortname, '(2012/2013)')) {
-      $c->shortname .= ' (2012/2013)';
+    $prev_year = date('Y', strtotime('1-1-' . $c->session_code . ' -1 year'));
+    if(preg_match('/\(\d+\/\d+\)/is', $c->shortname) === 0) {
+      $c->shortname .= " ($prev_year/$c->session_code)";
     }
-    if(false === strstr($c->fullname, '(2012/2013)')) {
-      $c->fullname .= ' (2012/2013)';
+    if(preg_match('/\(\d+\/\d+\)/is', $c->fullname) === 0) {
+      $c->fullname .= " ($prev_year/$c->session_code)";
     }
 
     $c->visible = 0;
