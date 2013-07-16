@@ -596,10 +596,12 @@ var Connect = (function() {
 
 			var shortname = row[0].module_code + (row[0].module_code.indexOf(date) > 0 ? '' : ' ' + date);
 			var fullname = row[0].module_title + (row[0].module_code.indexOf(date) > 0 ? '' : ' ' + date);
-			
+			var tempshortname = "";
+
 			if(_.find(_this.json, function (r){ 
 				if(r.state[0] === 'processing' || r.state[0] === 'scheduled' || r.state[0] === 'created_in_moodle') {
-					return r.module_code === shortname;
+					tempshortname = r.module_code + (r.module_code.indexOf(date) > 0 ? '' : ' ' + date);
+					return tempshortname === shortname;
 				}
 			}) !== undefined) {
 				_this.formEl.shrtNmExtTd.html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
