@@ -35,7 +35,7 @@ var Connect = (function() {
 				//taking json and mapping into usable data
 		this.tabledata = _.map(this.json, function(val) {
       var state_zero = (val.state && _.first(val.state)) || '';
-			var end = parseInt(val.module_week_beginning, 10) + parseInt(val.module_length, 10);
+			var end = parseInt(val.module_week_beginning, 10) + parseInt(val.module_length, 10) - 1;
 			var duration = val.module_week_beginning + '-' + end;
 			var name = state_zero.split('_').join(' ');
 			var sink_deleted = val.sink_deleted;
@@ -273,7 +273,7 @@ var Connect = (function() {
 			sOut += '</tr>';
 			
 			$.each(row.children, function(i) {
-				var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10);
+				var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10) - 1;
 				var duration = row.children[i].module_week_beginning + ( isNaN(end) ? '' : '-' + end );
 				sOut += '<tr ident="'+ row.children[i].chksum +'">';
 				sOut += '<td class="code"><div class="'
