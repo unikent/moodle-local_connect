@@ -5,8 +5,6 @@
 	global $CFG;
 	
 	$scripts = array(
-		'less-1.2.0.min.js',
-		'jquery-1.7.1.min.js',
 		'jquery-ui-1.8.18.custom.min.js',
 		'jquery.blockUI.js',
 		'jquery.dataTables.min.js',
@@ -20,6 +18,8 @@
 
 	$includes = '';
 
+	$includes .= '<script src="' . $CFG->wwwroot . '/lib/less/less-1.4.2.min.js" type="text/javascript"></script>';
+	$includes .= '<script src="' . $CFG->wwwroot . '/lib/jquery/jquery-1.7.1.min.js" type="text/javascript"></script>';
 	foreach($scripts as $script) {
 		$includes .= '<script src="' . $CFG->wwwroot . '/local/connect/scripts/' . $script . '" type="text/javascript"></script>';
 	}
