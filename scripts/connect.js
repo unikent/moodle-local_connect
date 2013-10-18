@@ -846,12 +846,12 @@ var Connect = (function() {
 		this.formEl.synopsis.val(synopsis);
 		this.formEl.cat.val(mergers[0].category_id);
 		this.formEl.primary_child.val(primary_child);
-/*
-		this.formEl.shortName.change(function() {this.formEl.primary_child.val(''); });
-		this.formEl.fullName.change(function() {this.formEl.primary_child.val(''); });
-		this.formEl.synopsis.change(function() {this.formEl.primary_child.val(''); });
-		this.formEl.cat.change(function() {this.formEl.primary_child.val(''); });
-*/
+
+		this.formEl.shortName.change(function() { $('#primary_child').val(''); });
+		this.formEl.fullName.change(function() { $('#primary_child').val(''); });
+		this.formEl.synopsis.change(function() { $('#primary_child').val(''); });
+		this.formEl.cat.change(function() { $('#primary_child').val(''); });
+
 		var ui_sub;
 
 		$( "#dialog-form" ).dialog({ 
@@ -901,7 +901,7 @@ var Connect = (function() {
 						title: full_name,
 						synopsis: synopsis,// + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mod_code +"'>More</a>",
 						category: _this.formEl.cat.val(),
-						primary_child: primary_child
+						primary_child: _this.formEl.primary_child.val()
 					};
 
 					$.ajax({
