@@ -164,6 +164,7 @@ $table = <<< HEREDOC
 				<td colspan="2"><select name="category" id="category">$theCats</select></td>
 			</tr>
 		</table>
+		<input type="text" name="primary_child" id="primary_child" value="" />
 	</fieldset>
 	</form>
 </div>

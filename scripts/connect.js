@@ -788,6 +788,7 @@ var Connect = (function() {
 		var mod_code = '';
 		var full_name = '';
 		var synopsis = '';
+		var primary_child = '';
 		var mergers_count = 0;
 
 		//Finds the first synopsis in the selected deliveries and uses this
@@ -797,6 +798,7 @@ var Connect = (function() {
 			} else {
 				synopsis = mergers[mergers_count].synopsis;
 				var mod_code = mergers[mergers_count].module_code;
+				primary_child = mergers[mergers_count].chksum;
 				mergers_count ++;
 			}
 		}
@@ -815,14 +817,16 @@ var Connect = (function() {
 			} else {
 				code = val.module_code;
 			}
-      if( !_.contains(sname,code) ) {
-        sname.push(code);
-      }
 
-			var tmp_full_name = val.module_title.replace(/( )(\()(\d+)(\/)(\d+)(\))/i, '');
-      if( !_.contains(fname,tmp_full_name) ) {
-        fname.push(tmp_full_name);
-      }
+			var tmp_code = code.replace(/\s+\(\d+\/\d+\)/i, '');
+			if( !_.contains(sname,tmp_code) ) {
+				sname.push(code);
+			}
+
+			var tmp_full_name = val.module_title.replace(/\s+\(\d+\/\d+\)/i, '');
+			if( !_.contains(fname,tmp_full_name) ) {
+				fname.push(tmp_full_name);
+			}
 
 		});
     short_name += sname.join('/');
@@ -841,7 +845,13 @@ var Connect = (function() {
 		this.formEl.fullName.val(full_name);
 		this.formEl.synopsis.val(synopsis);
 		this.formEl.cat.val(mergers[0].category_id);
-
+		this.formEl.primary_child.val(primary_child);
+/*
+		this.formEl.shortName.change(function() {this.formEl.primary_child.val(''); });
+		this.formEl.fullName.change(function() {this.formEl.primary_child.val(''); });
+		this.formEl.synopsis.change(function() {this.formEl.primary_child.val(''); });
+		this.formEl.cat.change(function() {this.formEl.primary_child.val(''); });
+*/
 		var ui_sub;
 
 		$( "#dialog-form" ).dialog({ 
@@ -890,7 +900,8 @@ var Connect = (function() {
 						code: short_name,
 						title: full_name,
 						synopsis: synopsis,// + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mod_code +"'>More</a>",
-						category: _this.formEl.cat.val()
+						category: _this.formEl.cat.val(),
+						primary_child: primary_child
 					};
 
 					$.ajax({
@@ -1087,12 +1098,17 @@ var Connect = (function() {
 		this.formEl.shortName.val('');
 		this.formEl.fullName.val('');
 		this.formEl.synopsis.val('');
+		this.formEl.primary_child.val('');
 
 		if(this.formEl.shortNameExt.get(0)) {
 			this.formEl.shortNameExt.val('');
 		}
 	};
-
+/*
+	Connect.prototype.clear_primary_child = function() {
+		this.formEl.primary_child.val('');
+	};
+*/
 	$.fn.dataTableExt.oApi.fnGetFilteredNodes = function ( oSettings )
 	{
 		var anRows = [];

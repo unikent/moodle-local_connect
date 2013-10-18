@@ -72,6 +72,7 @@ $.ajax({
 					shortName: $('#shortname'),
 					fullName: $('#fullname'),
 					synopsis: $('#synopsis'),
+					primary_child: $('#primary_child'),
 					cat: $('#category'),
 					shrtNmExtTd: $('#shortname_ext_td'),
 					shortNameExt: $('#shortname_ext')

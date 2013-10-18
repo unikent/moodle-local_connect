@@ -1,5 +1,8 @@
 <?php
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php'); 
+
+ob_start("ob_gzhandler");
+
 if( !$CFG->kent_connect ) die(0);
 
 $sitecontext = get_context_instance(CONTEXT_SYSTEM);
