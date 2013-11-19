@@ -5,7 +5,7 @@ ob_start("ob_gzhandler");
 
 if( !$CFG->kent_connect ) die(0);
 
-$sitecontext = get_context_instance(CONTEXT_SYSTEM);
+$sitecontext = context_system::instance();
 $site = get_site();
 
 $cats = $DB->get_records('course_categories');

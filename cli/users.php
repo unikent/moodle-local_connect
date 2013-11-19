@@ -126,7 +126,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         if(empty($role)) {
           unset($_POST['name']);
           unset($_POST['shortname']);
-          $systemcontext = get_context_instance(CONTEXT_SYSTEM);
+          $systemcontext = context_system::instance();
           $definitiontable = new define_role_table_basic($systemcontext, $parent_id);
           $definitiontable->read_submitted_permissions();
           $definitiontable->make_copy();
