@@ -12,7 +12,7 @@ $cats = $DB->get_records('course_categories');
 $cat_permissions = array();
 
 foreach($cats as $cat) {
-  $context = get_context_instance(CONTEXT_COURSECAT, $cat->id);
+  $context = context_coursecat::instance($cat->id);
 
   if(has_capability('moodle/category:manage', $context)) {
     array_push($cat_permissions, $cat->id);
