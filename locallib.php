@@ -6,7 +6,7 @@
 function kent_is_user_enrolled_as_role($courseid, $userid, $roleid) {
     global $DB;
 
-    $context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
+    $context = context_course::instance($courseid, MUST_EXIST);
 
     $sql = "SELECT ue.*
               FROM {user_enrolments} ue
