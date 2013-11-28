@@ -2,6 +2,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2012052913;
-$plugin->requires  = 2011120500;
+$plugin->version   = 2013112800;
+$plugin->requires  = 2013110500;
 $plugin->cron      = 0;
