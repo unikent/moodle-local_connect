@@ -1,4 +1,22 @@
 <?php
+/**
+ * Returns a JSON list of courses we can manage
+ */
+function kent_get_connect_course_categories() {
+    global $DB;
+
+    $cat_permissions = array();
+    
+    $cats = $DB->get_records('course_categories');
+    foreach ($cats as $cat) {
+        $context = context_coursecat::instance($cat->id);
+        if (has_capability('moodle/category:manage', $context)) {
+            array_push($cat_permissions, array($cat->id, $cat->name));
+        }
+    }
+
+    return $cat_permissions;
+}
 
 /**
  * This function has been copied from /lib/enrollib.php from enrol_get_enrolment_end and added in role.

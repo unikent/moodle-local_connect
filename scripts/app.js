@@ -34,57 +34,58 @@ $( "#dialog-form" ).dialog({
 	}
 });
 
-
-if(window.cats === '') {
+function connect_load(yui, cats) {
+	if (cats === '') {
 		data = {};
-
 	} else {
 		data = {
-			category_restrictions:window.cats
+			category_restrictions: cats
 		};
-}
+	}
+	console.log(data);
 
-$.ajax({
-		url: window.dapageUrl + '/courses/',
-		type: 'GET',
-		data: data,
-		dataType: 'json',
-		success: function(json) {
-			kenConnect = new Connect({
-				tabledata: json,
-				tableEl: $('#datable'),
-				statusEl: $('.status_checkbox'),
-				searchEl: $('#dasearch input'),
-				buttons: {
-					rowsSel: '.parent',
-					childSel: '.child_expand',
-					unlinkRowSel: '.unlink_row',
-					unlinkChildSel: '.unlink_child',
-					pushBtn: $('#push_deliveries'),
-					mergeBtn: $('#merge_deliveries'),
-					selAll: $('#select_all'),
-					deSelAll: $('#deselect_all'),
-					edit: $('.edit_row'),
-					listToggle: $('#display_list_toggle'),
-					pageRefresh: $('.data_refresh')
-				},
-				formEl: {
-					notes: $('#edit_notifications'),
-					shortName: $('#shortname'),
-					fullName: $('#fullname'),
-					synopsis: $('#synopsis'),
-					primary_child: $('#primary_child'),
-					cat: $('#category'),
-					shrtNmExtTd: $('#shortname_ext_td'),
-					shortNameExt: $('#shortname_ext')
-				}
-			});
-		},
-		error: function(event) {
-			jQuery.unblockUI();
-	        $("#dialog_error").dialog("open");
-		}
-});
+	$.ajax({
+			url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/',
+			type: 'GET',
+			data: data,
+			dataType: 'json',
+			success: function(json) {
+				kenConnect = new Connect({
+					tabledata: json,
+					tableEl: $('#datable'),
+					statusEl: $('.status_checkbox'),
+					searchEl: $('#dasearch input'),
+					buttons: {
+						rowsSel: '.parent',
+						childSel: '.child_expand',
+						unlinkRowSel: '.unlink_row',
+						unlinkChildSel: '.unlink_child',
+						pushBtn: $('#push_deliveries'),
+						mergeBtn: $('#merge_deliveries'),
+						selAll: $('#select_all'),
+						deSelAll: $('#deselect_all'),
+						edit: $('.edit_row'),
+						listToggle: $('#display_list_toggle'),
+						pageRefresh: $('.data_refresh')
+					},
+					formEl: {
+						notes: $('#edit_notifications'),
+						shortName: $('#shortname'),
+						fullName: $('#fullname'),
+						synopsis: $('#synopsis'),
+						primary_child: $('#primary_child'),
+						cat: $('#category'),
+						shrtNmExtTd: $('#shortname_ext_td'),
+						shortNameExt: $('#shortname_ext')
+					}
+				});
+			},
+			error: function(event) {
+				jQuery.unblockUI();
+		        $("#dialog_error").dialog("open");
+			}
+	});
+}
 
  $('#key_button').click(function() {
  	if($(this).hasClass('show_key')) {
@@ -102,12 +103,3 @@ $.ajax({
  $('.data_refresh').click(function() {
  	location.reload(true);
  });
-
-var $scrolldiv = $('#right_bar_wrap');
-
-$(window).scroll(function() {
-	$scrolldiv.stop().css({
-		'marginTop': ($(window).scrollTop()) + 'px'
-
-	}, 'fast');
-})

@@ -1,47 +1,58 @@
 <?php
 
 require_once('../../config.php');
+require_once('locallib.php');
 
 global $USER, $PAGE, $CFG;
 
 require_login();
 
+// Are we allowed here?
+$cat_permissions = kent_get_connect_course_categories();
+if (count($cat_permissions) == 0) {
+    print_error('accessdenied', 'local_connect');
+}
+
+/**
+ * Page setup
+ */
 $site_context = context_system::instance();
 $PAGE->set_context($site_context);
-
 $PAGE->set_url('/local/connect/index.php');
 $PAGE->set_pagelayout('datool');
 
+/**
+ * jQuery
+ */
+$PAGE->requires->jquery();
+$PAGE->requires->jquery_plugin('migrate');
+$PAGE->requires->jquery_plugin('ui');
+$PAGE->requires->jquery_plugin('ui-css');
+$PAGE->requires->jquery_plugin('blockui', 'theme_kent');
+$PAGE->requires->jquery_plugin('dataTables', 'theme_kent');
+
+/**
+ * Our JS
+ */
+$PAGE->requires->js('/local/connect/scripts/underscore-min.js');
+$PAGE->requires->js('/local/connect/scripts/date-en-GB.js');
+$PAGE->requires->js('/local/connect/scripts/button-loader.js');
+$PAGE->requires->js('/local/connect/scripts/connect.js');
+$PAGE->requires->js('/local/connect/scripts/app.js');
+$cats = has_capability('local/kentconnect:manage', $site_context) ? json_encode("") : json_encode($cat_permissions);
+$PAGE->requires->js_init_call('connect_load', array(
+	$cats
+));
+
+/**
+ * Our CSS
+ */
+$PAGE->requires->css('/local/connect/styles/demo_table.css');
+$PAGE->requires->css('/local/connect/styles/styles.min.css');
+
+// And the page itself
+
 echo $OUTPUT->header();
-$theCats='';
-$cats = $DB->get_records('course_categories');
-$cat_permissions = array();
-
-foreach($cats as $cat) {
-	$context = context_coursecat::instance($cat->id);
-
-	if(has_capability('moodle/category:manage', $context)) {
-		array_push($cat_permissions, $cat->id);
-		$theCats .= '<option value="'.$cat->id.'">'.$cat->name.'</option>';
-	}
-}
-
-if(count($cat_permissions) == 0) {
-	print_error('accessdenied', 'local_connect');
-}
-
-if (has_capability('local/kentconnect:manage', $site_context)) {
-	$cat_json = json_encode("");
-} else {
-	$cat_json = json_encode($cat_permissions);
-}
-
-$scripts = '<link rel="stylesheet" type="text/css" href="styles/demo_table.css">';
-$scripts = '<link rel="stylesheet" type="text/css" href="scripts/css/ui-lightness/jquery-ui-1.8.17.custom.css">';
-$scripts .= '<link rel="stylesheet/less" type"text/css" href="styles/styles.less">';
-echo $scripts;
-
-require_once('includes.php');
 
 $clareport_text = get_string('connectreport', 'local_connect');
 echo $OUTPUT->heading($clareport_text);
@@ -63,6 +74,12 @@ echo <<< HEREDOC
 </div>
 <div id="key_margin"></div>
 HEREDOC;
+
+$catOptions = '';
+foreach ($cat_permissions as $perm) {
+	list($id, $name) = $perm;
+	$catOptions .= '<option value="'.$id.'">'.$name.'</option>';
+}
 
 $table = <<< HEREDOC
 <div id="da_wrapper">
@@ -136,11 +153,6 @@ $table = <<< HEREDOC
 		</div>
 	</div>
 </div>
-	<script type="text/javascript">
-		window.dapageUrl = '$CFG->daPageUrl';
-		window.coursepageUrl = '$CFG->wwwroot';
-		window.cats = $cat_json;
-	</script>
 <div id="dialog-form" title="Edit details">
 	<div id="edit_notifications"></div>
 	<form>
@@ -161,7 +173,7 @@ $table = <<< HEREDOC
 			</tr>
 			<tr>
 				<td><label for="category">Category</label></td>
-				<td colspan="2"><select name="category" id="category">$theCats</select></td>
+				<td colspan="2"><select name="category" id="category">$catOptions</select></td>
 			</tr>
 		</table>
 		<input type="hidden" name="primary_child" id="primary_child" value="" />
@@ -180,9 +192,5 @@ HEREDOC;
 echo $table;
 
 echo '<div id="dialog_error">'.get_string('connect_error', 'local_connect').'</div>';
-
-$scripts = '<script src="' . $CFG->wwwroot . '/local/connect/scripts/app.js" type="text/javascript"></script>';
-
-echo $scripts;
 
 echo $OUTPUT->footer();

@@ -54,7 +54,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2012052912, 'local', 'connect');
 	}
 
-	if($oldversion < 2012052913) {
+	if ($oldversion < 2012052913) {
 
 		$table = new xmldb_table('connect_course_dets');
 		$field = new xmldb_field('unlocked', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'weeks');
@@ -70,4 +70,6 @@ function xmldb_local_connect_upgrade($oldversion) {
 
 		upgrade_plugin_savepoint(true, 2012052913, 'local', 'connect');
 	}
+
+    return true;
 }
