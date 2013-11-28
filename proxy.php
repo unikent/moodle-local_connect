@@ -14,6 +14,9 @@ if (count(kent_get_connect_course_categories()) == 0) {
   die(json_encode(array("error" => "You do not have access to view this")));
 }
 
+// MUC Cache
+$cache = cache::make('local_connect', 'kent_connect');
+
 /**
  * We now have two choices:
  *   1) We can use the fancy new stuff
@@ -34,6 +37,15 @@ if (count(kent_get_connect_course_categories()) == 0) {
 //
 // Old Stuff
 //
+
+// We may have cached this one!
+if ($_SERVER['PATH_INFO'] == '/courses/') {
+  $cache_content = $cache->get('/courses/');
+  if ($cache_content !== false) {
+    echo $cache_content;
+    exit(0);
+  }
+}
 
 //make resource
 $ch = curl_init();
@@ -83,6 +95,11 @@ if( !$response ) {
     if (!preg_match("/Transfer-Encoding/i", $hdr)) {
       header($hdr);
     }
+  }
+
+  // We may have cached this one!
+  if ($_SERVER['PATH_INFO'] == '/courses/') {
+    $cache->set('/courses/', $response_body);
   }
 
   echo $response_body;

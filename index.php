@@ -50,16 +50,23 @@ $PAGE->requires->js_init_call('connect_load', array(
 $PAGE->requires->css('/local/connect/styles/demo_table.css');
 $PAGE->requires->css('/local/connect/styles/styles.min.css');
 
+/**
+ * Our categories
+ */
+$catOptions = '';
+foreach ($cat_permissions as $perm) {
+	list($id, $name) = $perm;
+	$catOptions .= '<option value="'.$id.'">'.$name.'</option>';
+}
+
 // And the page itself
 
 echo $OUTPUT->header();
 
-$clareport_text = get_string('connectreport', 'local_connect');
-echo $OUTPUT->heading($clareport_text);
-
-echo '<div id="key_button" class="show_key"><div id="key_button_wrap">Show key</div></div>';
+echo $OUTPUT->heading(get_string('connectreport', 'local_connect'));
 
 echo <<< HEREDOC
+<div id="key_button" class="show_key"><div id="key_button_wrap">Show key</div></div>
 <div id="key">
 	<div id="key_wrap">
 		<ul>
@@ -73,15 +80,6 @@ echo <<< HEREDOC
 	</div>
 </div>
 <div id="key_margin"></div>
-HEREDOC;
-
-$catOptions = '';
-foreach ($cat_permissions as $perm) {
-	list($id, $name) = $perm;
-	$catOptions .= '<option value="'.$id.'">'.$name.'</option>';
-}
-
-$table = <<< HEREDOC
 <div id="da_wrapper">
 	<div id= "dapage_app">
 		<div id="options_bar">
@@ -188,8 +186,6 @@ $table = <<< HEREDOC
 </div>
 
 HEREDOC;
-
-echo $table;
 
 echo '<div id="dialog_error">'.get_string('connect_error', 'local_connect').'</div>';
 
