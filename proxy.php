@@ -3,25 +3,37 @@
 define('AJAX_SCRIPT', true);
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/locallib.php');
+require_once(dirname(__FILE__) . '/proxylib.php');
 
 if ($CFG->kent->distribution != "2013") {
-  die(0);
+  die(json_encode(array("error" => "Connect has been disabled")));
 }
 
-$cats = $DB->get_records('course_categories');
-$cat_permissions = array();
+if (count(kent_get_connect_course_categories()) == 0) {
+  die(json_encode(array("error" => "You do not have access to view this")));
+}
 
-foreach($cats as $cat) {
-  $context = context_coursecat::instance($cat->id);
+/**
+ * We now have two choices:
+ *   1) We can use the fancy new stuff
+ *   2) The fancy new stuff does not do what we want yet, so we use the old stuff.
+ */
 
-  if(has_capability('moodle/category:manage', $context)) {
-    array_push($cat_permissions, $cat->id);
+// New stuff waiting on new Connect box
+/*if ($_SERVER['PATH_INFO'] == '/courses/') {
+  if (!lcproxy_canGetCourses()) {
+    print_error('accessdenied', 'local_connect');
   }
-}
 
-if(count($cat_permissions) == 0) {
-  print_error('accessdenied', 'local_connect');
-}
+  lcproxy_printCourses();
+  exit(0);
+}*/
+
+
+//
+// Old Stuff
+//
 
 //make resource
 $ch = curl_init();
