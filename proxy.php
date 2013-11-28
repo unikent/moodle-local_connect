@@ -1,12 +1,12 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php'); 
 
-ob_start("ob_gzhandler");
+define('AJAX_SCRIPT', true);
 
-if( !$CFG->kent_connect ) die(0);
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
-$sitecontext = context_system::instance();
-$site = get_site();
+if ($CFG->kent->distribution != "2013") {
+  die(0);
+}
 
 $cats = $DB->get_records('course_categories');
 $cat_permissions = array();
@@ -72,8 +72,6 @@ if( !$response ) {
       header($hdr);
     }
   }
-  //header("Content-Type: application/json;charset=utf-8");
-  //header("Content-Length: " . strlen($response_body));
+
   echo $response_body;
 }
-exit(0);

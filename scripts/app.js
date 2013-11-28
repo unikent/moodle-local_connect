@@ -48,6 +48,7 @@ $.ajax({
 		url: window.dapageUrl + '/courses/',
 		type: 'GET',
 		data: data,
+		dataType: 'json',
 		success: function(json) {
 			kenConnect = new Connect({
 				tabledata: json,
