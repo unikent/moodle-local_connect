@@ -49,7 +49,7 @@ if ($_SERVER['PATH_INFO'] == '/courses/') {
 
 //make resource
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $CFG->kent_connect_url . $_SERVER['PATH_INFO'] . '?' . $_SERVER['QUERY_STRING']);
+curl_setopt($ch, CURLOPT_URL, $CFG->kent->paths['connect'] . $_SERVER['PATH_INFO'] . '?' . $_SERVER['QUERY_STRING']);
 curl_setopt($ch, CURLOPT_HEADER, 1);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $_SERVER["REQUEST_METHOD"]);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
