@@ -39,7 +39,7 @@ $PAGE->requires->js('/local/connect/scripts/date-en-GB.js');
 $PAGE->requires->js('/local/connect/scripts/button-loader.js');
 $PAGE->requires->js('/local/connect/scripts/connect.js');
 $PAGE->requires->js('/local/connect/scripts/app.js');
-$cats = has_capability('local/kentconnect:manage', $site_context) ? json_encode("") : json_encode($cat_permissions);
+$cats = has_capability('local/kentconnect:manage', $site_context) ? "" : json_encode($cat_permissions);
 $PAGE->requires->js_init_call('connect_load', array(
 	$cats
 ));
@@ -188,5 +188,12 @@ echo <<< HEREDOC
 HEREDOC;
 
 echo '<div id="dialog_error">'.get_string('connect_error', 'local_connect').'</div>';
+
+echo <<<HERE
+       <script type="text/javascript">
+               window.dapageUrl = '$CFG->daPageUrl';
+               window.coursepageUrl = '$CFG->wwwroot';
+       </script>
+HERE;
 
 echo $OUTPUT->footer();
