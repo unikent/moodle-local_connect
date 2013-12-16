@@ -42,7 +42,6 @@ function connect_load(yui, cats) {
 			category_restrictions: cats
 		};
 	}
-	console.log(data);
 
 	$.ajax({
 			url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/',
