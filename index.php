@@ -191,7 +191,7 @@ echo '<div id="dialog_error">'.get_string('connect_error', 'local_connect').'</d
 
 echo <<<HERE
        <script type="text/javascript">
-               window.dapageUrl = '$CFG->daPageUrl';
+               window.dapageUrl = '$CFG->wwwroot/local/connect/proxy.php';
                window.coursepageUrl = '$CFG->wwwroot';
        </script>
 HERE;
