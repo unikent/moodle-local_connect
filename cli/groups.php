@@ -81,7 +81,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         }
       }
     } else {
-      throw new moodle_exception('dont understand ' + $c->isa);
+      throw new moodle_exception('dont understand ' . $c->isa);
     }
 
     $tr = array( 'result' => 'ok', 'moodle_group_id' => $group->id, 'moodle_user_id' => $uid, 'in' => $c );
