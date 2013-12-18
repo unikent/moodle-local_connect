@@ -22,8 +22,6 @@ $sql = 'SELECT mg.id, g.chksum, g.group_desc, g.moodle_id, c.moodle_id as course
 		WHERE c.moodle_id is not null
 		GROUP BY g.id_chksum
 		HAVING mg.id IS NULL;';
-
-
 $objs = $DB->get_recordset_sql($sql);
 
 // For each of these...
@@ -72,3 +70,5 @@ foreach ($objs as $obj) {
 		print $e->getMessage();
 	}
 }
+
+print "Finished!\n";
