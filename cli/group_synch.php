@@ -1,6 +1,6 @@
 <?php
 /**
- * This synchs all groups between Connect and SDS
+ * This synchs all groups between Connect and Moodle
  */
 
 define('CLI_SCRIPT', true);
