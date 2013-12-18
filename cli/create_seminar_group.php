@@ -32,6 +32,13 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
   $group = (object) array();
   try {
 
+    // Check the ISA is valid: if we are updating, does this group exist?
+    if ($c->isa == 'UPDATE') {
+      if (!$DB->get_record('groups',array('id'=>$c->moodle_group_id))) {
+        $c->isa = 'NEW';
+      }
+    }
+
     if($c->isa == 'NEW') {
 
       $data = (object) array( 'name' => $c->group_desc, 'courseid' => $c->moodle_course_id );
