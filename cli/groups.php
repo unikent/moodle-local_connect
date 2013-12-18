@@ -57,7 +57,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       $group = $DB->get_record('groups',array('id'=>$c->moodle_group_id));
 
       if ($group === false) {
-        throw new moodle_exception('Group does not exist '.$c->moodle_group_id);
+        throw new moodle_exception('Group does not exist');
       }
 
       $r = groups_add_member($group,$uid);
