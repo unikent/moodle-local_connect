@@ -124,19 +124,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
         $role = $DB->get_record('role', array('shortname'=>$shortname));
 
         if(empty($role)) {
-          unset($_POST['name']);
-          unset($_POST['shortname']);
-          $systemcontext = context_system::instance();
-          $definitiontable = new define_role_table_basic($systemcontext, $parent_id);
-          $definitiontable->read_submitted_permissions();
-          $definitiontable->make_copy();
-          $_POST['name'] = $name;
-          $_POST['shortname'] = $shortname;
-          $definitiontable->read_submitted_permissions();
-          $definitiontable->save_changes();
-
-          $role = $DB->get_record('role', array('shortname'=>$shortname));
-
+          throw new moodle_exception("empty role: you need to populate your $shortname role");
         }
 
         //FG30 - Now we check if user is enrolled with a particular role already
