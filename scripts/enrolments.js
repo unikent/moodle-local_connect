@@ -17,23 +17,22 @@ M.local_enrolment = {
                         data = Y.JSON.parse(o.responseText);
                     }
                     catch (e) {
-                        // TODO - fail
+                        infobox.setHTML("An error occurred, please contact helpdesk. (Code: ejs10012)");
                         return;
                     }
 
                     if (data.result == "error") {
-                        // TODO - fail
+                        infobox.setHTML("An error occurred, please contact helpdesk. (Code: ejs10013)");
                     } else {
-                        // TODO - succeed!
-                        // infobox.setHTML("Panopto seems to be a bit busy right now! Try again later.");
+                        infobox.setHTML(data.result);
                     }
                 },
 
                 failure : function (x,o) {
                     if (o.statusText == "timeout") {
-                        // TODO - fail
+                        infobox.setHTML("An error occurred, please contact helpdesk. (Code: ejs10014)");
                     } else {
-                        // TODO - fail
+                        infobox.setHTML("An error occurred, please contact helpdesk. (Code: ejs10015)");
                     }
                 }
             }

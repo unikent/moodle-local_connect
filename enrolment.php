@@ -27,9 +27,8 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading("Fixing your enrolments");
 
-echo '<p>Please wait whilst we check your enrolments...</p>';
-
 echo $OUTPUT->box_start('enrolmentbox');
+	echo '<p>Please wait whilst we check your enrolments...</p>';
 	echo $OUTPUT->pix_icon('i/loading_small', "Fixing your enrolments...");
 echo $OUTPUT->box_end();
 
