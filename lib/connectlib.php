@@ -26,6 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 function connect_db() {
+	global $CFG;
+	
 	static $db;
 	if (!isset($db)) {
 		$db = new PDO($CFG->connect->db['dsn'] . ";dbname=" . $CFG->connect->db['name'], $CFG->connect->db['user'], $CFG->connect->db['password']);
