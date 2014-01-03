@@ -1,15 +1,10 @@
 <?php
 require_once(dirname(dirname(dirname(__FILE__))) . '/lib/stomp/Stomp.php');
+require_once(dirname(__FILE__) . '/lib/connectlib.php');
 
 /**
  * Proxy functions
  */
-
-function lcproxy_getDBConnection() {
-	global $CFG;
-	$db = new PDO($CFG->connect->db['dsn'], $CFG->connect->db['user'], $CFG->connect->db['password']);
-	return $db;
-}
 
 function lcproxy_publish($queue, $message) {
 	global $CFG;
@@ -53,7 +48,7 @@ function lcproxy_canGetCourses() {
  */
 function lcproxy_printCourses() {
 
-	$pdo = lcproxy_getDBConnection();
+	$pdo = connect_db();
 
 	$data = array();
 
@@ -173,7 +168,7 @@ function lcproxy_scheduleCourses() {
 		die("Invalid number of courses");
 	}
 
-	$pdo = lcproxy_getDBConnection();
+	$pdo = connect_db();
 
 	$result = array();
 	foreach ($courses as $in_course) {
