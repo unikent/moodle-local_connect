@@ -11,7 +11,6 @@ require_once(dirname(__FILE__) . '/lib/connectlib.php');
 /**
  * Proxy functions
  */
-
 function lcproxy_publish($queue, $message) {
 	global $CFG;
 	$stomp = new \FuseSource\Stomp\Stomp($CFG->connect->stomp);

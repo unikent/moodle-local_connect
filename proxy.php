@@ -6,7 +6,7 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once(dirname(__FILE__) . '/proxylib.php');
 
-if ($CFG->kent->distribution != "2013") {
+if (!($CFG->kent->environment === "dev" || ($CFG->kent->environment === "live" && $CFG->kent->distribution === LIVE_MOODLE))) {
   die(json_encode(array("error" => "Connect has been disabled")));
 }
 
