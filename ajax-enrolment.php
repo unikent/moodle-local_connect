@@ -5,7 +5,8 @@
 
 define('AJAX_SCRIPT', true);
 
-require(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require(dirname(__FILE__) . '/../../config.php');
+require_once(dirname(__FILE__) . '/lib/connectlib.php');
 
 global $PAGE, $OUTPUT;
 

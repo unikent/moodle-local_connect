@@ -34,3 +34,28 @@ function connect_db() {
 	}
 	return $db;
 }
+
+/**
+ * Returns a list of a user's courses
+ */
+function connect_get_user_courses($username) {
+	$data = array();
+	$pdo = connect_db();
+
+	// Select all our courses
+	$sql = "SELECT e.moodle_id enrolmentid, c.moodle_id courseid FROM `enrollments` e
+				LEFT JOIN `courses` c
+				ON c.module_delivery_key = e.module_delivery_key
+			WHERE e.login=:username";
+	$stmt = $pdo->prepare($sql);
+	$stmt->execute(array("username" => $username));
+
+	return $stmt->fetchAll();
+}
+
+/**
+ * Returns a list of this user's courses
+ */
+function connect_get_my_courses() {
+	return connect_get_user_courses($USER->username);
+}
