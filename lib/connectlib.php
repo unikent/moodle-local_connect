@@ -43,9 +43,9 @@ function connect_get_user_courses($username) {
 	$pdo = connect_db();
 
 	// Select all our courses
-	$sql = "SELECT e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role FROM `enrollments` e
+	$sql = "SELECT e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
 				LEFT JOIN `courses` c
-				ON c.module_delivery_key = e.module_delivery_key
+					ON c.module_delivery_key = e.module_delivery_key
 			WHERE e.login=:username";
 	$stmt = $pdo->prepare($sql);
 	$stmt->execute(array(
@@ -82,10 +82,12 @@ function connect_translate_enrolment($enrolment) {
 }
 
 /**
- * Check if this enrolment is valid
+ * Check if this enrolment is valid.
+ * In order for a course to be valid it must:
+ *   - Have a valid course id in Moodle
  */
 function connect_filter_enrolment($enrolment) {
-	return !empty($enrolment['enrolmentid']) && !empty($enrolment['courseid']);
+	return !empty($enrolment['courseid']) && !empty($enrolment['roleid']) && !empty($enrolment['userid']);
 }
 
 /**
@@ -119,12 +121,11 @@ function connect_role_translate($role) {
 /**
  * Check to see if a user is enrolled on a given module in Moodle
  */
-function connect_check_enrolment($user, $enrolment) {
+function connect_check_enrolment($enrolment) {
     global $DB;
 
     // Course context
     $context = context_course::instance($enrolment['courseid'], MUST_EXIST);
-
 
     $sql = "SELECT ue.*
               FROM {user_enrolments} ue
@@ -137,10 +138,9 @@ function connect_check_enrolment($user, $enrolment) {
     	'active' => ENROL_USER_ACTIVE,
     	'userid' => $enrolment['userid'],
     	'courseid' => $enrolment['courseid'],
-    	'roleid' => $roleid,
+    	'roleid' => $enrolment['roleid'],
     	'contextid' => $context->id
     );
-
 
     return (!$enrolments = $DB->get_records_sql($sql, $params));
 }
@@ -148,10 +148,9 @@ function connect_check_enrolment($user, $enrolment) {
 /**
  * Send a Connect enrolment to Moodle
  */
-function connect_send_enrolment($user, $enrolment) {
-	try {
-		$role = connect_role_translate($courses);
-	} catch (moodle_exception $e) {
-		return array("error" => $e->getMessage());
+function connect_send_enrolment($enrolment) {
+	if (!enrol_try_internal_enrol($enrolment['courseid'], $enrolment['userid'], $enrolment['roleid'])) {
+		return false;
 	}
+	return true;
 }

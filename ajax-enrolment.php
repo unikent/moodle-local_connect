@@ -15,19 +15,26 @@ $PAGE->set_url('/local/util/ajax-enrolment.php');
 
 require_login();
 
-$response = array("result" => "Not Implemented");
+$response = array(
+	"result" => ""
+);
 
 $courses = connect_get_user_courses($USER->username);
-$courses = array_filter("connect_filter_enrolment", $courses);
 $courses = array_map("connect_translate_enrolment", $courses);
-print_r($courses);
+$courses = array_filter($courses, "connect_filter_enrolment");
+$courses = array_filter($courses, "connect_check_enrolment");
 
-foreach ($courses as $course) {
-	if (!connect_check_enrolment($USER->username, $course)) {
-		connect_send_enrolment($USER->username, $course);
-	}
+if (empty($courses)) {
+	$response["result"] = "Please contact helpdesk.";
 }
 
+foreach ($courses as $course) {
+	if (connect_send_enrolment($course)) {
+		$response["result"] .= "Enrolled on course " . $course['module_title'] . ".\n";
+	} else {
+		$response["result"] .= "Failed to enrol on course " . $course['module_title'] . ". Please contact helpdesk to gain access to this module.\n";
+	}
+}
 
 header('Content-Type: application/json; charset: utf-8');
 echo json_encode($response);
