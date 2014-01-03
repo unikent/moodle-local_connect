@@ -8,7 +8,7 @@ define('AJAX_SCRIPT', true);
 require(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/lib/connectlib.php');
 
-global $PAGE, $OUTPUT;
+global $PAGE, $OUTPUT, $USER;
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/util/ajax-enrolment.php');
@@ -16,6 +16,18 @@ $PAGE->set_url('/local/util/ajax-enrolment.php');
 require_login();
 
 $response = array("result" => "Not Implemented");
+
+$courses = connect_get_user_courses($USER->username);
+$courses = array_filter("connect_filter_enrolment", $courses);
+$courses = array_map("connect_translate_enrolment", $courses);
+print_r($courses);
+
+foreach ($courses as $course) {
+	if (!connect_check_enrolment($USER->username, $course)) {
+		connect_send_enrolment($USER->username, $course);
+	}
+}
+
 
 header('Content-Type: application/json; charset: utf-8');
 echo json_encode($response);
