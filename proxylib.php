@@ -6,12 +6,14 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/lib/stomp/Stomp.php');
  */
 
 function lcproxy_getDBConnection() {
-	$db = new PDO("mysql:host=localhost;port=3306;dbname=connect_development", "root", "");
+	global $CFG;
+	$db = new PDO($CFG->connect->db['dsn'], $CFG->connect->db['user'], $CFG->connect->db['password']);
 	return $db;
 }
 
 function lcproxy_publish($queue, $message) {
-	$stomp = new \FuseSource\Stomp\Stomp("tcp://localhost:61613");
+	global $CFG;
+	$stomp = new \FuseSource\Stomp\Stomp($CFG->connect->stomp);
 	try {
 	    $stomp->connect();
 	} catch (\FuseSource\Stomp\Exception\StompException $e) {
