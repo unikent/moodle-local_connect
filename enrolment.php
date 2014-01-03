@@ -4,7 +4,8 @@
  * fix their enrolments.
  */
 
-require(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require(dirname(__FILE__) . '/../../config.php');
+require_once('locallib.php');
 
 global $PAGE, $OUTPUT;
 
@@ -14,8 +15,22 @@ $PAGE->set_url('/local/util/enrolment.php');
 $PAGE->set_title("Enrolment");
 $PAGE->set_heading("Enrolment");
 
+$PAGE->requires->js_init_call('M.local_enrolment.init', array(), false, array(
+    'name' => 'local_enrolment',
+    'fullpath' => '/local/connect/scripts/enrolments.js',
+    'requires' => array("node", "io", "dump", "json-parse")
+));
+
 require_login();
 
 echo $OUTPUT->header();
+
+echo $OUTPUT->heading("Fixing your enrolments");
+
+echo '<p>Please wait whilst we check your enrolments...</p>';
+
+echo $OUTPUT->box_start('enrolmentbox');
+	echo $OUTPUT->pix_icon('i/loading_small', "Fixing your enrolments...");
+echo $OUTPUT->box_end();
 
 echo $OUTPUT->footer();
