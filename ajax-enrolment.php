@@ -25,14 +25,14 @@ $courses = array_filter($courses, "connect_filter_enrolment");
 $courses = array_filter($courses, "connect_check_enrolment");
 
 if (empty($courses)) {
-	$response["result"] = "Please contact helpdesk.";
+	$response["result"] = "No missing enrolments found!<br />Please contact helpdesk if you are missing any modules.";
 }
 
 foreach ($courses as $course) {
 	if (connect_send_enrolment($course)) {
-		$response["result"] .= "Enrolled on course " . $course['module_title'] . ".\n";
+		$response["result"] .= "Enrolled on course " . $course['module_title'] . ".<br/>";
 	} else {
-		$response["result"] .= "Failed to enrol on course " . $course['module_title'] . ". Please contact helpdesk to gain access to this module.\n";
+		$response["result"] .= "Failed to enrol on course " . $course['module_title'] . ". Please contact helpdesk to gain access to this module.<br/>";
 	}
 }
 
