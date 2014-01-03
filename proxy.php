@@ -34,8 +34,8 @@ if ($_SERVER['PATH_INFO'] == '/courses/') {
   // We may have cached this one!
   $cache_content = $cache->get('/courses/');
   if ($cache_content !== false) {
-    echo $cache_content;
-    exit(0);
+    //echo $cache_content;
+    //exit(0);
   }
 
   // Grab fresh data

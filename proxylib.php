@@ -46,7 +46,7 @@ function lcproxy_canGetCourses() {
 /**
  * Prints a JSON list of all courses
  */
-function lcproxy_printCourses() {
+function lcproxy_getCourses() {
 
 	$pdo = connect_db();
 
@@ -126,7 +126,7 @@ SQL;
 	  $data[] = $obj;
 	}
 
-	echo json_encode($data);
+	return $data;
 }
 
 /**
