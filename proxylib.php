@@ -52,10 +52,16 @@ function lcproxy_canGetCourses() {
  * Prints a JSON list of all courses
  */
 function lcproxy_getCourses() {
-
+	// Set up our various variables
+	$cache = cache::make('local_connect', 'kent_connect');
 	$pdo = connect_db();
-
 	$data = array();
+
+	// Cache in MUC
+	$cache_content = $cache->get('lcproxy_getCourses');
+	if ($cache_content !== false) {
+		return $cache_content;
+	}
 
 	// Blame Patrick for this, ignore what the git blame says. - Sky
 	$query = <<<SQL
@@ -130,6 +136,8 @@ SQL;
 	  }
 	  $data[] = $obj;
 	}
+
+	$cache->set('lcproxy_getCourses', $data);
 
 	return $data;
 }

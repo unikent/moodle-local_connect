@@ -14,9 +14,6 @@ if (count(kent_get_connect_course_categories()) == 0) {
   die(json_encode(array("error" => "You do not have access to view this")));
 }
 
-// MUC Cache
-$cache = cache::make('local_connect', 'kent_connect');
-
 /**
  * We now have two choices:
  *   1) We can use the fancy new stuff
@@ -31,18 +28,8 @@ if ($_SERVER['PATH_INFO'] == '/courses/') {
     print_error('accessdenied', 'local_connect');
   }
 
-  // We may have cached this one!
-  $cache_content = $cache->get('/courses/');
-  if ($cache_content !== false) {
-    //echo $cache_content;
-    //exit(0);
-  }
-
-  // Grab fresh data
-  $response = json_encode(lcproxy_getCourses());
-  $cache->set('/courses/', $response);
-  echo $response;
-
+  // Grab data and print it
+  echo json_encode(lcproxy_getCourses());
   exit(0);
 }
 
@@ -99,11 +86,6 @@ if( !$response ) {
     if (!preg_match("/Transfer-Encoding/i", $hdr)) {
       header($hdr);
     }
-  }
-
-  // We may have cached this one!
-  if ($_SERVER['PATH_INFO'] == '/courses/') {
-    $cache->set('/courses/', $response_body);
   }
 
   echo $response_body;
