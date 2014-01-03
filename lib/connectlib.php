@@ -26,59 +26,63 @@
 defined('MOODLE_INTERNAL') || die();
 
 function connect_db() {
-	global $CFG;
-	
-	static $db;
-	if (!isset($db)) {
-		$db = new PDO($CFG->connect->db['dsn'] . ";dbname=" . $CFG->connect->db['name'], $CFG->connect->db['user'], $CFG->connect->db['password']);
-	}
-	return $db;
+    global $CFG;
+
+    static $db;
+    if (!isset($db)) {
+        $db = new PDO(
+            $CFG->connect->db['dsn'] . ";dbname=" . $CFG->connect->db['name'],
+            $CFG->connect->db['user'],
+            $CFG->connect->db['password']
+        );
+    }
+    return $db;
 }
 
 /**
  * Returns a list of a user's courses
  */
 function connect_get_user_courses($username) {
-	$data = array();
-	$pdo = connect_db();
+    $data = array();
+    $pdo = connect_db();
 
-	// Select all our courses
-	$sql = "SELECT e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
-				LEFT JOIN `courses` c
-					ON c.module_delivery_key = e.module_delivery_key
-			WHERE e.login=:username";
-	$stmt = $pdo->prepare($sql);
-	$stmt->execute(array(
-		"username" => $username
-	));
+    // Select all our courses.
+    $sql = "SELECT e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
+                LEFT JOIN `courses` c
+                    ON c.module_delivery_key = e.module_delivery_key
+            WHERE e.login=:username";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(array(
+        "username" => $username
+    ));
 
-	return $stmt->fetchAll();
+    return $stmt->fetchAll();
 }
 
 /**
  * Returns a list of this user's courses
  */
 function connect_get_my_courses() {
-	return connect_get_user_courses($USER->username);
+    return connect_get_user_courses($USER->username);
 }
 
 /**
  * Moodle-ify an enrolment grabbed from Connect
  */
 function connect_translate_enrolment($enrolment) {
-	global $DB;
+    global $DB;
 
-    // Get role
+    // Get role.
     $roledata = connect_role_translate($enrolment['role']);
     $shortname = $roledata['shortname'];
     $role = $DB->get_record('role', array('shortname' => $shortname));
-	$enrolment['roleid'] = $role->id;
+    $enrolment['roleid'] = $role->id;
 
-    // Get user
+    // Get user.
     $user = $DB->get_record('user', array('username' => $enrolment['username']));
-	$enrolment['userid'] = $user->id;
+    $enrolment['userid'] = $user->id;
 
-	return $enrolment;
+    return $enrolment;
 }
 
 /**
@@ -87,7 +91,7 @@ function connect_translate_enrolment($enrolment) {
  *   - Have a valid course id in Moodle
  */
 function connect_filter_enrolment($enrolment) {
-	return !empty($enrolment['courseid']) && !empty($enrolment['roleid']) && !empty($enrolment['userid']);
+    return !empty($enrolment['courseid']) && !empty($enrolment['roleid']) && !empty($enrolment['userid']);
 }
 
 /**
@@ -95,26 +99,26 @@ function connect_filter_enrolment($enrolment) {
  */
 function connect_role_translate($role) {
     switch ($role) {
-	    case "convenor":
-	    	return array(
-	    		"shortname" => "convenor",
-	    		"name" => "Convenor",
-	    		"parent_id" => 3
-	    	);
-	    case "teacher":
-	    	return array(
-	    		"shortname" => "sds_teacher",
-	    		"name" => "Teacher (sds)",
-	    		"parent_id" => 3
-	    	);
-	    case "student":
-	    	return array(
-	    		"shortname" => "sds_student",
-	    		"name" => "Student (sds)",
-	    		"parent_id" => 5
-	    	);
-	    default:
-	      throw new moodle_exception("Unknown role: $role!");
+        case "convenor":
+            return array(
+                "shortname" => "convenor",
+                "name" => "Convenor",
+                "parent_id" => 3
+            );
+        case "teacher":
+            return array(
+                "shortname" => "sds_teacher",
+                "name" => "Teacher (sds)",
+                "parent_id" => 3
+            );
+        case "student":
+            return array(
+                "shortname" => "sds_student",
+                "name" => "Student (sds)",
+                "parent_id" => 5
+            );
+        default:
+          throw new moodle_exception("Unknown role: $role!");
     }
 }
 
@@ -124,7 +128,7 @@ function connect_role_translate($role) {
 function connect_check_enrolment($enrolment) {
     global $DB;
 
-    // Course context
+    // Course context.
     $context = context_course::instance($enrolment['courseid'], MUST_EXIST);
 
     $sql = "SELECT ue.*
@@ -134,12 +138,12 @@ function connect_check_enrolment($enrolment) {
               JOIN {role_assignments} ra ON ra.userid = u.id AND contextid = :contextid
              WHERE ue.userid = :userid AND ue.status = :active AND e.status = :enabled AND u.deleted = 0 AND ra.roleid = :roleid";
     $params = array(
-    	'enabled' => ENROL_INSTANCE_ENABLED,
-    	'active' => ENROL_USER_ACTIVE,
-    	'userid' => $enrolment['userid'],
-    	'courseid' => $enrolment['courseid'],
-    	'roleid' => $enrolment['roleid'],
-    	'contextid' => $context->id
+        'enabled' => ENROL_INSTANCE_ENABLED,
+        'active' => ENROL_USER_ACTIVE,
+        'userid' => $enrolment['userid'],
+        'courseid' => $enrolment['courseid'],
+        'roleid' => $enrolment['roleid'],
+        'contextid' => $context->id
     );
 
     return (!$enrolments = $DB->get_records_sql($sql, $params));
@@ -149,8 +153,8 @@ function connect_check_enrolment($enrolment) {
  * Send a Connect enrolment to Moodle
  */
 function connect_send_enrolment($enrolment) {
-	if (!enrol_try_internal_enrol($enrolment['courseid'], $enrolment['userid'], $enrolment['roleid'])) {
-		return false;
-	}
-	return true;
+    if (!enrol_try_internal_enrol($enrolment['courseid'], $enrolment['userid'], $enrolment['roleid'])) {
+        return false;
+    }
+    return true;
 }
