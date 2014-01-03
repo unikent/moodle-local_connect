@@ -24,32 +24,36 @@ $cache = cache::make('local_connect', 'kent_connect');
  */
 
 // New stuff waiting on new Connect box
-/*if ($_SERVER['PATH_INFO'] == '/courses/') {
+if ($_SERVER['PATH_INFO'] == '/courses/') {
+
+  // Are we allowed to do this?
   if (!lcproxy_canGetCourses()) {
     print_error('accessdenied', 'local_connect');
   }
 
-  lcproxy_printCourses();
+  // We may have cached this one!
+  $cache_content = $cache->get('/courses/');
+  if ($cache_content !== false) {
+    echo $cache_content;
+    exit(0);
+  }
+
+  // Grab fresh data
+  $response = json_encode(lcproxy_getCourses());
+  $cache->set('/courses/', $response);
+  echo $response;
+
   exit(0);
-}*/
+}
 
 
 //
 // Old Stuff
 //
 
-// We may have cached this one!
-if ($_SERVER['PATH_INFO'] == '/courses/') {
-  $cache_content = $cache->get('/courses/');
-  if ($cache_content !== false) {
-    echo $cache_content;
-    exit(0);
-  }
-}
-
 //make resource
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $CFG->kent->paths['connect'] . $_SERVER['PATH_INFO'] . '?' . $_SERVER['QUERY_STRING']);
+curl_setopt($ch, CURLOPT_URL, $CFG->kent_connect_url . $_SERVER['PATH_INFO'] . '?' . $_SERVER['QUERY_STRING']);
 curl_setopt($ch, CURLOPT_HEADER, 1);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $_SERVER["REQUEST_METHOD"]);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
