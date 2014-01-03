@@ -20,17 +20,21 @@ if (count(kent_get_connect_course_categories()) == 0) {
  *   2) The fancy new stuff does not do what we want yet, so we use the old stuff.
  */
 
-// New stuff waiting on new Connect box
-if ($_SERVER['PATH_INFO'] == '/courses/') {
+// 
+// New stuff
+// 
 
-  // Are we allowed to do this?
-  if (!lcproxy_canGetCourses()) {
-    print_error('accessdenied', 'local_connect');
-  }
+switch ($_SERVER['PATH_INFO']) {
+  case '/courses':
+  case '/courses/':
+    // Are we allowed to do this?
+    if (!lcproxy_canGetCourses()) {
+      print_error('accessdenied', 'local_connect');
+    }
 
-  // Grab data and print it
-  echo json_encode(lcproxy_getCourses());
-  exit(0);
+    // Grab data and print it
+    echo json_encode(lcproxy_getCourses());
+    exit(0);
 }
 
 
