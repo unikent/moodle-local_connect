@@ -43,7 +43,6 @@ function connect_db() {
  * Returns a list of a user's courses
  */
 function connect_get_user_courses($username) {
-    $data = array();
     $pdo = connect_db();
 
     // Select all our courses.
@@ -63,6 +62,7 @@ function connect_get_user_courses($username) {
  * Returns a list of this user's courses
  */
 function connect_get_my_courses() {
+    global $USER;
     return connect_get_user_courses($USER->username);
 }
 
