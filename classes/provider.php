@@ -42,12 +42,12 @@ class provider {
     private static function setup_connect_database() {
         global $CFG, $CONNECTDB;
 
-        if (isset($CONNECTDB)) {
+        if (isset($CONNECTDB) && get_class($CONNECTDB) !== "local_connect\\provider") {
             return;
         }
 
-        if (!$CONNECTDB = moodle_database::get_driver_instance($CFG->connect->db['driver'], $CFG->connect->db['library'])) {
-            throw new dml_exception('dbdriverproblem', "Unknown driver for connect");
+        if (!$CONNECTDB = \moodle_database::get_driver_instance($CFG->connect->db['driver'], $CFG->connect->db['library'])) {
+            throw new \dml_exception('dbdriverproblem', "Unknown driver for connect");
         }
 
         $CONNECTDB->connect(
@@ -73,7 +73,7 @@ class provider {
         self::setup_connect_database();
 
         // Reflect in this instance, subsequent calls should be routed straight to the DML provider
-        $reflectionMethod = new ReflectionMethod($CONNECTDB, $name);
+        $reflectionMethod = new \ReflectionMethod($CONNECTDB, $name);
         return $reflectionMethod->invokeArgs($CONNECTDB, $arguments);
     }
 }
