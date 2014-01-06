@@ -35,7 +35,7 @@ switch ($_SERVER['PATH_INFO']) {
 
 
 //
-// Old Stuff
+// Old Stuff - Ship it off to Connect
 //
 
 //make resource
