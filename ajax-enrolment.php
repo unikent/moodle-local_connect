@@ -6,7 +6,6 @@
 define('AJAX_SCRIPT', true);
 
 require(dirname(__FILE__) . '/../../config.php');
-require_once(dirname(__FILE__) . '/lib/connectlib.php');
 
 global $PAGE, $OUTPUT, $USER;
 
@@ -19,21 +18,19 @@ $response = array(
 	"result" => ""
 );
 
-$courses = connect_get_user_courses($USER->username);
-$courses = array_map("connect_translate_enrolment", $courses);
-$courses = array_filter($courses, "connect_filter_enrolment");
-$courses = array_filter($courses, "connect_check_enrolment");
-
-if (empty($courses)) {
-	$response["result"] = "No missing enrolments found!<br />Please contact helpdesk if you are missing any modules.";
+$enrolments = \local_connect\enrolment::get_courses($USER->username);
+foreach ($enrolments as $enrolment) {
+	if (!$enrolment->is_in_moodle()) {
+		if ($enrolment->create_in_moodle()) {
+			$response["result"] .= "Enrolled on course $enrolment.<br/>";
+		} else {
+			$response["result"] .= "Failed to enrol on course $enrolment. Please contact <a href=\"mailto:helpdesk@kent.ac.uk\">helpdesk</a> to gain access to this module.<br/>";
+		}
+	}
 }
 
-foreach ($courses as $course) {
-	if (connect_send_enrolment($course)) {
-		$response["result"] .= "Enrolled on course " . $course['module_title'] . ".<br/>";
-	} else {
-		$response["result"] .= "Failed to enrol on course " . $course['module_title'] . ". Please contact <a href=\"mailto:helpdesk@kent.ac.uk\">helpdesk</a> to gain access to this module.<br/>";
-	}
+if (empty($response["result"])) {
+	$response["result"] = "No missing enrolments found!<br />Please contact <a href=\"mailto:helpdesk@kent.ac.uk\">helpdesk</a> if you are missing any modules.";
 }
 
 header('Content-Type: application/json; charset: utf-8');

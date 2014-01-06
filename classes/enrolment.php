@@ -22,12 +22,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_connect;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Connect enrolment container
  */
-class connect_enrolment {
+class enrolment {
 
     /** The Moodle ID of the user this relates to */
     private $userid;
@@ -65,23 +67,24 @@ class connect_enrolment {
         global $DB;
 
         // Get course context.
-        $context = context_course::instance($this->courseid, MUST_EXIST);
+        $context = \context_course::instance($this->courseid, MUST_EXIST);
 
-        $sql = "SELECT ue.*
+        $sql = "SELECT COUNT(ue.id)
                   FROM {user_enrolments} ue
                   JOIN {enrol} e ON (e.id=ue.enrolid AND e.courseid=:courseid)
                   JOIN {user} u ON u.id=ue.userid
                   JOIN {role_assignments} ra ON ra.userid=u.id AND contextid=:contextid
                 WHERE ue.userid=:userid AND ue.status=:active AND e.status=:enabled AND u.deleted=0 AND ra.roleid=:roleid";
-
-        return (!$enrolments = $DB->get_records_sql($sql, array(
+        $params = array(
             'enabled' => ENROL_INSTANCE_ENABLED,
             'active' => ENROL_USER_ACTIVE,
             'userid' => $this->userid,
             'courseid' => $this->courseid,
             'roleid' => $this->roleid,
             'contextid' => $context->id
-        )));
+        );
+
+        return $DB->count_records_sql($sql, $params) > 0;
     }
 
     /**
@@ -111,32 +114,30 @@ class connect_enrolment {
         $user = $DB->get_record('user', array('username' => $username));
 
         // Select all our courses.
-        $sql = "SELECT e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
                     LEFT JOIN `courses` c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE e.login=:username";
-        $stmt = $CONNECTDB->prepare($sql);
-        $stmt->execute(array(
+        $data = $CONNECTDB->get_records_sql($sql, array(
             "username" => $username
         ));
-        $data = $stmt->fetchAll();
 
         // Translate each enrolment datum.
         foreach ($data as &$enrolment) {
             // Update the role.
-            $shortname = self::translate_role($enrolment['role']);
+            $shortname = self::translate_role($enrolment->role);
             $role = self::get_role($shortname);
-            $enrolment['roleid'] = $role->id;
+            $enrolment->roleid = $role->id;
 
             // Update the user.
-            $enrolment['userid'] = $user->id;
+            $enrolment->userid = $user->id;
 
             // Create an object for this enrolment.
-            $enrolment = new core_connect_enrolment(
-                $enrolment['userid'],
-                $enrolment['courseid'],
-                $enrolment['roleid'],
-                $enrolment['module_title']
+            $enrolment = new static(
+                $enrolment->userid,
+                $enrolment->courseid,
+                $enrolment->roleid,
+                $enrolment->module_title
             );
         }
 
@@ -182,6 +183,7 @@ class connect_enrolment {
      * @param string $shortname A shortname for a role
      */
     private static function get_role($shortname) {
+        global $DB;
         static $cache;
 
         // Initialize cache.
