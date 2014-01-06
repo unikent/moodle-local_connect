@@ -51,6 +51,68 @@ class course {
     /** Our state */
     private $state;
 
+    /**
+     * Accessor method
+     */
+    public function get_module_code() {
+        return $this->module_code;
+    }
+
+    /**
+     * Accessor method
+     */
+    public function set_module_code($value) {
+        $this->module_code = $value;
+    }
+
+    /**
+     * Accessor method
+     */
+    public function get_module_title() {
+        return $this->module_title;
+    }
+
+    /**
+     * Accessor method
+     */
+    public function set_module_title($value) {
+        $this->module_title = $value;
+    }
+
+    /**
+     * Accessor method
+     */
+    public function get_synopsis() {
+        return $this->synopsis;
+    }
+
+    /**
+     * Accessor method
+     */
+    public function set_synopsis($value) {
+        $this->synopsis = $value;
+    }
+
+    /**
+     * Accessor method
+     */
+    public function get_category_id() {
+        return $this->category_id;
+    }
+
+    /**
+     * Accessor method
+     */
+    public function set_category_id($value) {
+        $this->category_id = $value;
+    }
+
+    /**
+     * Accessor method
+     */
+    public function get_chksum() {
+        return $this->chksum;
+    }
 
     /**
      * Update this course
@@ -100,6 +162,13 @@ class course {
     }
 
     /**
+     * Has this course been schedules for rollover?
+     */
+    public function is_scheduled() {
+        return in_array($this->state, array(2, 4, 6, 8, 10, 12));
+    }
+
+    /**
      * Get a course by chksum
      */
     public static function get_course($chksum) {
@@ -133,8 +202,10 @@ class course {
      * @param array category_restrictions A list of categories we dont want
      */
     public static function get_courses($category_restrictions = array()) {
+        global $CONNECTDB;
+
         // Set up our various variables.
-        $cache = cache::make('local_connect', 'kent_connect');
+        $cache = \cache::make('local_connect', 'kent_connect');
         $data = array();
 
         // Cache in MUC.
@@ -213,6 +284,7 @@ class course {
             if (!empty($obj->state)) {
                 $obj->state = json_decode($obj->state);
             }
+            return $obj;
         }, $result);
 
         // Set the MUC cache.

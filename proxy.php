@@ -28,12 +28,14 @@ switch ($_SERVER['PATH_INFO']) {
   case '/courses':
   case '/courses/':
     // Are we allowed to do this?
-    if (!lcproxy_canGetCourses()) {
+    if (!\local_connect\course::has_access()) {
       print_error('accessdenied', 'local_connect');
     }
 
+    $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
+
     // Grab data and print it
-    echo json_encode(lcproxy_getCourses());
+    echo json_encode(\local_connect\course::get_courses($category_restrictions));
     exit(0);
 }
 

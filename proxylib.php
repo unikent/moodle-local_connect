@@ -25,27 +25,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/lib/stomp/Stomp.php');
-
-/**
- * Proxy functions
- */
-function lcproxy_publish($queue, $message) {
-    global $CFG;
-    $stomp = new \FuseSource\Stomp\Stomp($CFG->connect->stomp);
-    try {
-        $stomp->connect();
-    } catch (\FuseSource\Stomp\Exception\StompException $e) {
-        die("Couldnt connect to STOMP! " . $e);
-    }
-    $stomp->send($queue, $message);
-    $stomp->disconnect();
-}
-
 /**
  * Schedule courses
  */
 function lcproxy_scheduleCourses() {
+    global $STOMP;
+
     $json = json_decode(file_get_contents("php://input"));
     $courses = $json->courses;
 
@@ -54,38 +39,36 @@ function lcproxy_scheduleCourses() {
         die("Invalid number of courses");
     }
 
-    $pdo = connect_db();
-
     $result = array();
     foreach ($courses as $in_course) {
-        $course = lcproxy_getCourse($pdo, $in_course->id);
+        $course = \local_connect\course::get_course($in_course->id);
 
         // Are we scheduled?
-        if (in_array($course->state, array(2, 4, 6, 8, 10, 12))) {
+        if ($course->is_scheduled()) {
             // Cannot continue with this one
             continue;
         }
 
-        $course->module_code = $in_course->code;
-        $course->module_title = $in_course->title;
-        $course->synopsis = $in_course->synopsis;
-        $course->category_id = $in_course->category;
+        $course->set_module_code($in_course->code);
+        $course->set_module_title($in_course->title);
+        $course->set_synopsis($in_course->synopsis);
+        $course->set_category_id($in_course->category);
 
-        if ($course->category_id == 0) {
+        if ($course->get_category_id() == 0) {
             // Cannot continue with this one
-            $result[] = array("error_code" => "category_is_zero", "id" => $course->chksum);
+            $result[] = array("error_code" => "category_is_zero", "id" => $course->get_chksum());
             continue;
         }
 
-        if (!lcproxy_isCourseUnique($pdo, $course->session_code, $course->module_code, $course->chksum)) {
+        if (!$course->is_unique()) {
             // Cannot continue with this one
-            $result[] = array("error_code" => "duplicate", "id" => $course->chksum);
+            $result[] = array("error_code" => "duplicate", "id" => $course->get_chksum());
             continue;
         }
 
-        lcproxy_updateForSchedule($pdo, $course->chksum, $course->module_code, $course->module_title, $course->synopsis, $course->category_id);
+        $course->update();
 
-        lcproxy_publish('/queue/connect.job.create_course', $course->chksum);
+        $STOMP->send('/queue/connect.job.create_course', $course->get_chksum());
     }
 
     if (count($result) > 0) {
