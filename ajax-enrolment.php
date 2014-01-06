@@ -24,13 +24,13 @@ foreach ($enrolments as $enrolment) {
 		if ($enrolment->create_in_moodle()) {
 			$response["result"] .= "Enrolled on course $enrolment.<br/>";
 		} else {
-			$response["result"] .= "Failed to enrol on course $enrolment. Please contact helpdesk to gain access to this module.<br/>";
+			$response["result"] .= "Failed to enrol on course $enrolment. Please contact <a href=\"mailto:helpdesk@kent.ac.uk\">helpdesk</a> to gain access to this module.<br/>";
 		}
 	}
 }
 
 if (empty($response["result"])) {
-	$response["result"] = "No missing enrolments found!<br />Please contact helpdesk if you are missing any modules.";
+	$response["result"] = "No missing enrolments found!<br />Please contact <a href=\"mailto:helpdesk@kent.ac.uk\">helpdesk</a> if you are missing any modules.";
 }
 
 header('Content-Type: application/json; charset: utf-8');
