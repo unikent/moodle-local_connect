@@ -117,28 +117,26 @@ class enrolment {
                     LEFT JOIN `courses` c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE e.login=:username";
-        $stmt = $CONNECTDB->prepare($sql);
-        $stmt->execute(array(
+        $data = $CONNECTDB->get_records_sql($sql, array(
             "username" => $username
         ));
-        $data = $stmt->fetchAll();
 
         // Translate each enrolment datum.
         foreach ($data as &$enrolment) {
             // Update the role.
-            $shortname = self::translate_role($enrolment['role']);
+            $shortname = self::translate_role($enrolment->role);
             $role = self::get_role($shortname);
-            $enrolment['roleid'] = $role->id;
+            $enrolment->roleid = $role->id;
 
             // Update the user.
-            $enrolment['userid'] = $user->id;
+            $enrolment->userid = $user->id;
 
             // Create an object for this enrolment.
-            $enrolment = new core_connect_enrolment(
-                $enrolment['userid'],
-                $enrolment['courseid'],
-                $enrolment['roleid'],
-                $enrolment['module_title']
+            $enrolment = new static(
+                $enrolment->userid,
+                $enrolment->courseid,
+                $enrolment->roleid,
+                $enrolment->module_title
             );
         }
 
@@ -184,6 +182,7 @@ class enrolment {
      * @param string $shortname A shortname for a role
      */
     private static function get_role($shortname) {
+        global $DB;
         static $cache;
 
         // Initialize cache.
