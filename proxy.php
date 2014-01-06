@@ -10,7 +10,7 @@ if (!($CFG->kent->environment === "dev" || ($CFG->kent->environment === "live" &
   die(json_encode(array("error" => "Connect has been disabled")));
 }
 
-if (count(kent_get_connect_course_categories()) == 0) {
+if (!\local_connect\course::has_access()) {
   die(json_encode(array("error" => "You do not have access to view this")));
 }
 
@@ -27,15 +27,9 @@ if (count(kent_get_connect_course_categories()) == 0) {
 switch ($_SERVER['PATH_INFO']) {
   case '/courses':
   case '/courses/':
-    // Are we allowed to do this?
-    if (!\local_connect\course::has_access()) {
-      print_error('accessdenied', 'local_connect');
-    }
-
     $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
-
-    // Grab data and print it
-    echo json_encode(\local_connect\course::get_courses($category_restrictions));
+    $courses = \local_connect\course::get_courses($category_restrictions);
+    echo json_encode($courses);
     exit(0);
 }
 
