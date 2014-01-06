@@ -14,8 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-global $CONNECTDB;
+global $CONNECTDB, $STOMP;
 
-require_once(dirname(__FILE__) . "/classes/provider.php");
+require_once(dirname(__FILE__) . "/classes/dbprovider.php");
+$CONNECTDB = new \local_connect\dbprovider();
 
-$CONNECTDB = new \local_connect\provider();
+require_once(dirname(__FILE__) . "/classes/stompprovider.php");
+$STOMP = new \local_connect\stompprovider();

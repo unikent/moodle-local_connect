@@ -28,9 +28,9 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Connect Provider for Moodle - Provides
- * a simple interface to Connect
+ * a simple interface to Connect DB
  */
-class provider {
+class dbprovider {
 
     /**
      * Sets up global $CONNECTDB moodle_database instance
@@ -42,7 +42,7 @@ class provider {
     private static function setup_connect_database() {
         global $CFG, $CONNECTDB;
 
-        if (isset($CONNECTDB) && get_class($CONNECTDB) !== "local_connect\\provider") {
+        if (isset($CONNECTDB) && get_class($CONNECTDB) !== get_class(new static())) {
             return;
         }
 
