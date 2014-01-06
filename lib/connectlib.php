@@ -25,37 +25,21 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-function connect_db() {
-    global $CFG;
-
-    static $db;
-    if (!isset($db)) {
-        $db = new PDO(
-            $CFG->connect->db['dsn'] . ";dbname=" . $CFG->connect->db['name'],
-            $CFG->connect->db['user'],
-            $CFG->connect->db['password']
-        );
-    }
-    return $db;
-}
-
 /**
  * Returns a list of a user's courses
  */
 function connect_get_user_courses($username) {
-    $pdo = connect_db();
+    global $CONNECTDB;
 
     // Select all our courses.
     $sql = "SELECT e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
                 LEFT JOIN `courses` c
                     ON c.module_delivery_key = e.module_delivery_key
             WHERE e.login=:username";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(array(
+
+    return $CONNECTDB->get_records_sql($sql, array(
         "username" => $username
     ));
-
-    return $stmt->fetchAll();
 }
 
 /**
