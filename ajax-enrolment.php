@@ -32,7 +32,7 @@ foreach ($courses as $course) {
 	if (connect_send_enrolment($course)) {
 		$response["result"] .= "Enrolled on course " . $course['module_title'] . ".<br/>";
 	} else {
-		$response["result"] .= "Failed to enrol on course " . $course['module_title'] . ". Please contact helpdesk to gain access to this module.<br/>";
+		$response["result"] .= "Failed to enrol on course " . $course['module_title'] . ". Please contact <a href=\"mailto:helpdesk@kent.ac.uk\">helpdesk</a> to gain access to this module.<br/>";
 	}
 }
 
