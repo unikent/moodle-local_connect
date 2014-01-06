@@ -129,94 +129,94 @@ class course {
 
     /**
      * Returns an array of all courses in Connect
+     *
+     * @param array category_restrictions A list of categories we dont want
      */
-    public static function get_courses() {
-        // Set up our various variables
+    public static function get_courses($category_restrictions = array()) {
+        // Set up our various variables.
         $cache = cache::make('local_connect', 'kent_connect');
-        $pdo = connect_db();
         $data = array();
 
-        // Cache in MUC
-        $cache_content = $cache->get('lcproxy_getCourses');
+        // Cache in MUC.
+        $cache_key = "local_connect_course::get_courses." . implode('.', $category_restrictions);
+        $cache_content = $cache->get($cache_key);
         if ($cache_content !== false) {
             return $cache_content;
         }
 
-        // Blame Patrick for this, ignore what the git blame says. - Sky
-        $query = <<<SQL
-          SELECT 
-            c1.chksum,
-            CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('"',statecode.state,'"')),''),']') state,
-            c1.module_code,
-            c1.module_title,
-            c1.module_version,
-            c1.campus,
-            c1.campus_desc,
-            c1.synopsis,
-            c1.module_week_beginning,
-            c1.module_length,
-            c1.moodle_id,
-            c1.sink_deleted,
-            c1.student_count,
-            c1.teacher_count,
-            c1.convenor_count,
-            c1.parent_id,
-            c1.session_code,
-            c1.category_id,
-            c1.delivery_department,
-            CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('"',c2.chksum,'"')),''),']') children
-          FROM
-            courses c1
-              LEFT OUTER JOIN
-            courses c2 ON c1.module_delivery_key = c2.parent_id
-          LEFT OUTER JOIN (SELECT 'unprocessed' state, 1 code
-          UNION
-          SELECT 'scheduled' state, 2 code
-          UNION
-          SELECT 'processing' state, 4 code
-          UNION
-          SELECT 'created_in_moodle' state, 8 code
-          UNION
-          SELECT 'failed_in_moodle' state, 16 code
-          UNION
-          SELECT 'disengage' state, 32 code
-          UNION
-          SELECT 'disengaged_from_moodle' state, 64 code) statecode
-          ON (c1.state & statecode.code) > 0
-    SQL;
-        // End Patrick blame (unless he has left, then it's all his fault)
+        $sql = "SELECT 
+                    c1.chksum,
+                    CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('\"',statecode.state,'\"')),''),']') state,
+                    c1.module_code,
+                    c1.module_title,
+                    c1.module_version,
+                    c1.campus,
+                    c1.campus_desc,
+                    c1.synopsis,
+                    c1.module_week_beginning,
+                    c1.module_length,
+                    c1.moodle_id,
+                    c1.sink_deleted,
+                    c1.student_count,
+                    c1.teacher_count,
+                    c1.convenor_count,
+                    c1.parent_id,
+                    c1.session_code,
+                    c1.category_id,
+                    c1.delivery_department,
+                    CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('\"',c2.chksum,'\"')),''),']') children
+                  FROM courses c1
+                    LEFT OUTER JOIN courses c2
+                        ON c1.module_delivery_key = c2.parent_id
+                    LEFT OUTER JOIN (
+                                        SELECT 'unprocessed' state, 1 code
+                                      UNION
+                                        SELECT 'scheduled' state, 2 code
+                                      UNION
+                                        SELECT 'processing' state, 4 code
+                                      UNION
+                                        SELECT 'created_in_moodle' state, 8 code
+                                      UNION
+                                        SELECT 'failed_in_moodle' state, 16 code
+                                      UNION
+                                        SELECT 'disengage' state, 32 code
+                                      UNION
+                                        SELECT 'disengaged_from_moodle' state, 64 code
+                                    ) statecode
+                        ON (c1.state & statecode.code) > 0";
 
-        // Add the category restrictions if there are any
-        if (isset($_GET['category_restrictions'])) {
-          $inQuery = implode(',', array_fill(0, count($_GET['category_restrictions']), '?'));
-          $query .= " WHERE c1.category_id IN ({$inQuery})";
+        // Add the category restrictions if there are any.
+        if (!empty($category_restrictions)) {
+          $inQuery = implode(',', array_fill(0, count($category_restrictions), ':cat_'));
+          $sql .= " WHERE c1.category_id IN ({$inQuery})";
         }
 
-        $query .= ' GROUP BY c1.chksum';
+        // Also a group by.
+        $sql .= ' GROUP BY c1.chksum';
 
-        $q = $pdo->prepare($query);
+        // Create the parameters.
+        $params = array();
 
-        if (isset($_GET['category_restrictions'])) {
-          foreach ($_GET['category_restrictions'] as $k => $id) {
-            $q->bindValue(($k+1), $id);
-          }
-        }
-        // Done!
-
-        $q->execute();
-
-        $result = $q->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($result as $obj) {
-          if (!empty($obj['children'])) {
-            $obj['children'] = json_decode($obj['children']);
-          }
-          if (!empty($obj['state'])) {
-            $obj['state'] = json_decode($obj['state']);
-          }
-          $data[] = $obj;
+        // Add all the restrictions in.
+        foreach ($category_restrictions as $k => $id) {
+            $params["cat_" . ($k + 1)] = $id;
         }
 
-        $cache->set('lcproxy_getCourses', $data);
+        // Run this massive query.
+        $result = $CONNECTDB->get_records_sql($sql, $params);
+
+        // Decode various elements.
+        $data = array_map(function($obj) {
+            if (!empty($obj->children)) {
+                $obj->children = json_decode($obj->children);
+            }
+            if (!empty($obj->state)) {
+                $obj->state = json_decode($obj->state);
+            }
+        }, $result);
+
+        // Set the MUC cache.
+        $cache->set($cache_key, $data);
 
         return $data;
     }
