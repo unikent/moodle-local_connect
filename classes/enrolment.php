@@ -67,23 +67,24 @@ class enrolment {
         global $DB;
 
         // Get course context.
-        $context = context_course::instance($this->courseid, MUST_EXIST);
+        $context = \context_course::instance($this->courseid, MUST_EXIST);
 
-        $sql = "SELECT ue.*
+        $sql = "SELECT COUNT(ue.id)
                   FROM {user_enrolments} ue
                   JOIN {enrol} e ON (e.id=ue.enrolid AND e.courseid=:courseid)
                   JOIN {user} u ON u.id=ue.userid
                   JOIN {role_assignments} ra ON ra.userid=u.id AND contextid=:contextid
                 WHERE ue.userid=:userid AND ue.status=:active AND e.status=:enabled AND u.deleted=0 AND ra.roleid=:roleid";
-
-        return (!$enrolments = $DB->get_records_sql($sql, array(
+        $params = array(
             'enabled' => ENROL_INSTANCE_ENABLED,
             'active' => ENROL_USER_ACTIVE,
             'userid' => $this->userid,
             'courseid' => $this->courseid,
             'roleid' => $this->roleid,
             'contextid' => $context->id
-        )));
+        );
+
+        return $DB->count_records_sql($sql, $params) > 0;
     }
 
     /**
@@ -113,7 +114,7 @@ class enrolment {
         $user = $DB->get_record('user', array('username' => $username));
 
         // Select all our courses.
-        $sql = "SELECT e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
                     LEFT JOIN `courses` c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE e.login=:username";
