@@ -43,31 +43,6 @@ function lcproxy_publish($queue, $message) {
 }
 
 /**
- * Is this user allowed to grab a list of courses?
- */
-function lcproxy_canGetCourses() {
-    global $DB;
-
-    $sitecontext = get_context_instance(CONTEXT_SYSTEM);
-    $site = get_site();
-
-    $cats = $DB->get_records('course_categories');
-
-    // Check permissions
-    $cat_permissions = array();
-    foreach ($cats as $cat) {
-      $context = get_context_instance(CONTEXT_COURSECAT, $cat->id);
-
-      if(has_capability('moodle/category:manage', $context)) {
-        array_push($cat_permissions, $cat->id);
-        break;
-      }
-    }
-
-    return count($cat_permissions) > 0;
-}
-
-/**
  * Prints a JSON list of all courses
  */
 function lcproxy_getCourses() {
@@ -159,33 +134,6 @@ SQL;
     $cache->set('lcproxy_getCourses', $data);
 
     return $data;
-}
-
-/**
- * Get a course
- */
-function lcproxy_getCourse($pdo, $courseid) {
-    $stmt = $pdo->prepare("SELECT * FROM courses WHERE chksum=?");
-    $stmt->execute(array($courseid));
-    return $stmt->fetchObject();
-}
-
-/**
- * Is a given ID unique?
- */
-function lcproxy_isCourseUnique($pdo, $session_code, $module_code, $chksum) {
-    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM courses WHERE session_code = ? AND module_code = ? AND chksum != ? AND state IN (2, 4, 6, 8, 10, 12)");
-    $stmt->execute(array($session_code, $module_code, $chksum));
-    $obj = $stmt->fetchObject();
-    return $obj->count == 0;
-}
-
-/**
- * Update a course
- */
-function lcproxy_updateForSchedule($pdo, $chksum, $mcode, $mtitle, $synopsis, $catid) {
-    $stmt = $pdo->prepare("UPDATE courses SET chksum = ?, module_code = ?, module_title = ?, synopsis = ?, category_id = ?, state = 2 WHERE chksum = ?");
-    $stmt->execute(array($chksum, $mcode, $mtitle, $synopsis, $catid, $chksum));
 }
 
 /**
