@@ -229,7 +229,7 @@ class course {
             }
         }
 
-        return false
+        return false;
     }
 
     /**
@@ -240,9 +240,15 @@ class course {
     public function create_moodle() {
         global $DB;
 
-        // Give ourselves a category.
+        // Check we have a category.
         if (!isset($this->category)) {
             print "No category for $this->chksum\n";
+            return false;
+        }
+
+        // Does this shortname exist?
+        if ($DB->record_exists('course', array('shortname' => $this->shortname))) {
+            // TODO - Link
             return false;
         }
 
@@ -496,11 +502,12 @@ class course {
 
         // Add all the restrictions in.
         foreach ($category_restrictions as $k => $id) {
-            $params["cat_" . ($k 1)] = $id;
+            $params["cat_" . ($k + 1)] = $id;
         }
 
         // Run this massive query.
         $result = $CONNECTDB->get_records_sql($sql, $params);
+
 
         // Decode various elements.
         $data = array_map(function($obj) use ($obj_form) {
