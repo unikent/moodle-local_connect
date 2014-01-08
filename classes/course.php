@@ -120,6 +120,20 @@ class course {
         $this->children = $obj->children;
         $this->numsections = $this->module_length != null ? $this->module_length : 1;
         $this->maxbytes = '67108864';
+
+        // Set some required vars
+        $this->shortname = $this->module_code;
+        $this->fullname = $this->module_title;
+        $this->visible = 0;
+        
+        // Force 2012/2013 on shortnames and titles for everything.
+        $prev_year = date('Y', strtotime('1-1-' . $this->session_code . ' -1 year'));
+        if (preg_match('/\(\d+\/\d+\)/is', $this->shortname) === 0) {
+            $this->shortname .= " ($prev_year/$this->session_code)";
+        }
+        if (preg_match('/\(\d+\/\d+\)/is', $this->fullname) === 0) {
+            $this->fullname .= " ($prev_year/$this->session_code)";
+        }
     }
 
     /**
@@ -184,33 +198,6 @@ class course {
     }
 
     /**
-     * Has this course changed at all?
-     */
-    public function has_changed() {
-        global $DB;
-
-        // Cant do this if the course doesnt exist.
-        if (!$this->is_created()) {
-            return false;
-        }
-
-        // Grab the course
-        $course = $DB->get_record('course', array('id' => $this->moodle_id));
-        if (!$course) {
-            return false;
-        }
-
-        // Compare Moodle data with Connect data (this).
-        foreach ($course as $key => $val) {
-            if (isset($this->$key) && $this->$key !== $val) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Create this course in Moodle
      *
      * @todo - Fire event off for an enrolment observer
@@ -223,10 +210,6 @@ class course {
             print "No category for $this->chksum\n";
             return false;
         }
-
-        // Set some required vars
-        $this->shortname = $this->module_code;
-        $this->fullname = $this->module_title;
 
         // Create the course.
         try {
@@ -266,16 +249,15 @@ class course {
     }
 
     /**
-     * Add Connect extra details for this course
+     * Returns connect_course_dets data.
      */
-    private function create_connect_extras() {
+    private function get_dets_data() {
         global $CFG, $DB;
 
         // Try to find an existing set of data.
-        $obj = $DB->get_record('connect_course_dets', array(
+        $connect_data = $DB->get_record('connect_course_dets', array(
             'course' => $this->moodle_id
         ));
-        $connect_data = $obj;
 
         // Create a data container.
         if (!$connect_data) {
@@ -289,7 +271,18 @@ class course {
         $connect_data->enddate = isset($this->module_length) ? strtotime('+'. $this->module_length .' weeks', $connect_data->startdate) : $CFG->default_course_end_date;
         $connect_data->weeks = isset($this->module_length) ? $this->module_length : 0;
 
-        if (!$obj) {
+        return $connect_data;
+    }
+
+    /**
+     * Add Connect extra details for this course
+     */
+    private function create_connect_extras() {
+        global $DB;
+
+        $connect_data = $this->get_dets_data();
+
+        if (!isset($connect_data->id)) {
             $DB->insert_record('connect_course_dets', $connect_data);
         } else {
             $DB->update_record('connect_course_dets', $connect_data);
