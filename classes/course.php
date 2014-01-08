@@ -248,6 +248,14 @@ class course {
     }
 
     /**
+     * Update this course in Moodle
+     * @todo
+     */
+    public function update() {
+
+    }
+
+    /**
      * To String override
      */
     public function __toString() {
