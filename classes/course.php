@@ -33,8 +33,8 @@ class course {
     /** Our chksum */
     private $chksum;
 
-    /** Our session code */
-    private $session_code;
+    /** Our state */
+    private $state;
 
     /** Our module code */
     private $module_code;
@@ -42,14 +42,79 @@ class course {
     /** Our module title */
     private $module_title;
 
-    /** Our category id */
-    private $category_id;
+    /** Our module version */
+    private $module_version;
+
+    /** Our campus */
+    private $campus;
+
+    /** Our campus desc */
+    private $campus_desc;
 
     /** Our synopsis */
     private $synopsis;
 
-    /** Our state */
-    private $state;
+    /** Our module week beginning */
+    private $module_week_beginning;
+
+    /** Our module length */
+    private $module_length;
+
+    /** Our moodle id */
+    private $moodle_id;
+
+    /** Our sink deleted */
+    private $sink_deleted;
+
+    /** Our student count */
+    private $student_count;
+
+    /** Our teacher count */
+    private $teacher_count;
+
+    /** Our convenor_count */
+    private $convenor_count;
+
+    /** Our parent id */
+    private $parent_id;
+
+    /** Our session code */
+    private $session_code;
+
+    /** Our category id */
+    private $category_id;
+
+    /** Our delivery department */
+    private $delivery_department;
+
+    /** Our children */
+    private $children;
+
+    /**
+     * Constructor to build from a database object
+     */
+    public function __construct($obj) {
+        $this->chksum = $obj->chksum;
+        $this->state = $obj->state;
+        $this->module_code = $obj->module_code;
+        $this->module_title = $obj->module_title;
+        $this->module_version = $obj->module_version;
+        $this->campus = $obj->campus;
+        $this->campus_desc = $obj->campus_desc;
+        $this->synopsis = $obj->synopsis;
+        $this->module_week_beginning = $obj->module_week_beginning;
+        $this->module_length = $obj->module_length;
+        $this->moodle_id = $obj->moodle_id;
+        $this->sink_deleted = $obj->sink_deleted;
+        $this->student_count = $obj->student_count;
+        $this->teacher_count = $obj->teacher_count;
+        $this->convenor_count = $obj->convenor_count;
+        $this->parent_id = $obj->parent_id;
+        $this->session_code = $obj->session_code;
+        $this->category_id = $obj->category_id;
+        $this->delivery_department = $obj->delivery_department;
+        $this->children = $obj->children;
+    }
 
     /**
      * Accessor method
@@ -162,10 +227,31 @@ class course {
     }
 
     /**
-     * Has this course been schedules for rollover?
+     * Has this course been scheduled for rollover?
      */
     public function is_scheduled() {
         return in_array($this->state, array(2, 4, 6, 8, 10, 12));
+    }
+
+    /**
+     * Has this course been created in Moodle?
+     */
+    public function is_created() {
+        return $this->moodle_id != 0;
+    }
+
+    /**
+     * Create this course in Moodle
+     */
+    public function create() {
+
+    }
+
+    /**
+     * To String override
+     */
+    public function __toString() {
+        return $this->module_title;
     }
 
     /**
@@ -200,8 +286,9 @@ class course {
      * Returns an array of all courses in Connect
      *
      * @param array category_restrictions A list of categories we dont want
+     * @param boolean obj_form Should all objects be of this class type?
      */
-    public static function get_courses($category_restrictions = array()) {
+    public static function get_courses($category_restrictions = array(), $obj_form = false) {
         global $CONNECTDB;
 
         // Set up our various variables.
@@ -209,7 +296,7 @@ class course {
         $data = array();
 
         // Cache in MUC.
-        $cache_key = "local_connect_course::get_courses." . implode('.', $category_restrictions);
+        $cache_key = "local_connect_course::get_courses." . implode('.', $category_restrictions) . ($obj_form ? ".obj" : ".std");
         $cache_content = $cache->get($cache_key);
         if ($cache_content !== false) {
             return $cache_content;
@@ -277,13 +364,19 @@ class course {
         $result = $CONNECTDB->get_records_sql($sql, $params);
 
         // Decode various elements.
-        $data = array_map(function($obj) {
+        $data = array_map(function($obj) use ($obj_form) {
             if (!empty($obj->children)) {
                 $obj->children = json_decode($obj->children);
             }
+
             if (!empty($obj->state)) {
                 $obj->state = json_decode($obj->state);
             }
+
+            if ($obj_form) {
+                $obj = new course($obj);
+            }
+
             return $obj;
         }, $result);
 
