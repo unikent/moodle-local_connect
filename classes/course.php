@@ -120,6 +120,7 @@ class course {
         $this->children = $obj->children;
         $this->numsections = $this->module_length != null ? $this->module_length : 1;
         $this->link = isset($obj->link) ? $obj->link : 0;
+        $this->similar_count = isset($obj->similar_count) ? $obj->similar_count : 0;
         $this->maxbytes = '67108864';
 
         // Set some required vars
@@ -196,6 +197,13 @@ class course {
      */
     public function is_created() {
         return !empty($this->moodle_id);
+    }
+
+    /**
+     * Does this course have a unique shortname?
+     */
+    public function has_unique_shortname() {
+        return $this->similar_count === 0;
     }
 
     /**
@@ -571,9 +579,10 @@ class course {
         // Run this massive query.
         $result = $CONNECTDB->get_records_sql($sql, $params);
 
-
         // Decode various elements.
         $data = array_map(function($obj) use ($obj_form) {
+            global $CONNECTDB;
+
             if (!empty($obj->children)) {
                 $obj->children = json_decode($obj->children);
             }
@@ -581,6 +590,11 @@ class course {
             if (!empty($obj->state)) {
                 $obj->state = json_decode($obj->state);
             }
+
+            // Count the number of similar modules
+            $obj->similar_count = $CONNECTDB->count_records_sql("SELECT COUNT(*) as count FROM courses WHERE module_code=?", array (
+                $obj->module_code
+            ));
 
             if ($obj_form) {
                 $obj = new course($obj);

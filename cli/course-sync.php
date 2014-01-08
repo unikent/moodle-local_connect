@@ -31,7 +31,7 @@ $courses = \local_connect\course::get_courses(array(), true);
 foreach ($courses as $course) {
 	try {
 		
-		if (!$course->is_created()) {
+		if (!$course->is_created() && $course->has_unique_shortname()) {
 			print "Creating $course...\n";
 			$course->create_moodle();
 			continue;
