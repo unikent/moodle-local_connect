@@ -198,6 +198,41 @@ class course {
     }
 
     /**
+     * Has this course changed at all?
+     */
+    public function has_changed() {
+        global $DB;
+
+        // Cant do this if the course doesnt exist.
+        if (!$this->is_created()) {
+            return false;
+        }
+
+        // Grab the course
+        $course = $DB->get_record('course', array('id' => $this->moodle_id));
+        if (!$course) {
+            return false;
+        }
+
+        $watch_list = array(
+            "shortname",
+            "fullname",
+            "category",
+            "summary",
+            "startdate"
+        );
+
+        // Compare Moodle data with Connect data (this).
+        foreach ($watch_list as $key) {
+            if (isset($this->$key) && isset($course->$key) && $this->$key !== $course->$key) {
+                return true;
+            }
+        }
+
+        return false
+    }
+
+    /**
      * Create this course in Moodle
      *
      * @todo - Fire event off for an enrolment observer
@@ -461,7 +496,7 @@ class course {
 
         // Add all the restrictions in.
         foreach ($category_restrictions as $k => $id) {
-            $params["cat_" . ($k + 1)] = $id;
+            $params["cat_" . ($k 1)] = $id;
         }
 
         // Run this massive query.

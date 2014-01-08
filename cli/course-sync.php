@@ -37,6 +37,12 @@ foreach ($courses as $course) {
 			continue;
 		}
 
+		if ($course->has_changed()) {
+			print "Updating $course...\n";
+			$course->update_moodle();
+			continue;
+		}
+
 	} catch (Excepton $e) {
 		$msg = $e->getMessage();
 		print "Error: $msg\n";
