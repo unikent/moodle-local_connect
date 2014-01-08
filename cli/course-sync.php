@@ -29,11 +29,21 @@ require(dirname(__FILE__) . '/../../../config.php');
 $courses = \local_connect\course::get_courses(array(), true);
 
 foreach ($courses as $course) {
-	if (!$course->is_created()) {
-		print "Creating $course...\n";
-		$course->create_moodle();
-	} else {
-		print "Updating $course...\n";
-		$course->update_moodle();
+	try {
+		
+		if (!$course->is_created()) {
+			print "Creating $course...\n";
+			$course->create_moodle();
+			continue;
+		}
+
+		if ($course->has_changed()) {
+			print "Updating $course...\n";
+			$course->update_moodle();
+		}
+
+	} catch (Excepton $e) {
+		$msg = $e->getMessage();
+		print "Error: $msg\n";
 	}
 }

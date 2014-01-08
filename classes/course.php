@@ -86,7 +86,7 @@ class course {
     public $session_code;
 
     /** Our category id */
-    public $category_id;
+    public $category;
 
     /** Our delivery department */
     public $delivery_department;
@@ -115,7 +115,6 @@ class course {
         $this->convenor_count = $obj->convenor_count;
         $this->parent_id = $obj->parent_id;
         $this->session_code = $obj->session_code;
-        $this->category_id = $obj->category_id;
         $this->category = $obj->category_id;
         $this->delivery_department = $obj->delivery_department;
         $this->children = $obj->children;
@@ -143,7 +142,7 @@ class course {
             $this->module_code,
             $this->module_title,
             $this->synopsis,
-            $this->category_id,
+            $this->category,
             $this->state,
             $this->chksum
         ));
@@ -181,7 +180,34 @@ class course {
      * Has this course been created in Moodle?
      */
     public function is_created() {
-        return $this->moodle_id != 0;
+        return !empty($this->moodle_id);
+    }
+
+    /**
+     * Has this course changed at all?
+     */
+    public function has_changed() {
+        global $DB;
+
+        // Cant do this if the course doesnt exist.
+        if (!$this->is_created()) {
+            return false;
+        }
+
+        // Grab the course
+        $course = $DB->get_record('course', array('id' => $this->moodle_id));
+        if (!$course) {
+            return false;
+        }
+
+        // Compare Moodle data with Connect data (this).
+        foreach ($course as $key => $val) {
+            if (isset($this->$key) && $this->$key !== $val) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -194,12 +220,23 @@ class course {
 
         // Give ourselves a category.
         if (!isset($this->category)) {
+            print "No category for $this->chksum\n";
             return false;
         }
 
+        // Set some required vars
+        $this->shortname = $this->module_code;
+        $this->fullname = $this->module_title;
+
         // Create the course.
-        $course = create_course($this);
-        if (!$course) {
+        try {
+            $course = create_course($this);
+            if (!$course) {
+                return false;
+            }
+        } catch (\moodle_exception $e) {
+            $msg = $e->getMessage();
+            print "Error processing $this->chksum: $msg\n";
             return false;
         }
 
@@ -234,22 +271,36 @@ class course {
     private function create_connect_extras() {
         global $CFG, $DB;
 
+        // Try to find an existing set of data.
+        $obj = $DB->get_record('connect_course_dets', array(
+            'course' => $this->moodle_id
+        ));
+        $connect_data = $obj;
+
         // Create a data container.
-        $connect_data = new \stdClass();
+        if (!$connect_data) {
+            $connect_data = new \stdClass();
+        }
+
+        // Update the container's data.
         $connect_data->course = $this->moodle_id;
         $connect_data->campus = isset($this->campus_desc) ? $this->campus_desc : '';
         $connect_data->startdate = isset($this->startdate) ? $this->startdate : $CFG->default_course_start_date;
         $connect_data->enddate = isset($this->module_length) ? strtotime('+'. $this->module_length .' weeks', $connect_data->startdate) : $CFG->default_course_end_date;
         $connect_data->weeks = isset($this->module_length) ? $this->module_length : 0;
 
-        $DB->insert_record('connect_course_dets', $connect_data);
+        if (!$obj) {
+            $DB->insert_record('connect_course_dets', $connect_data);
+        } else {
+            $DB->update_record('connect_course_dets', $connect_data);
+        }
     }
 
     /**
      * Add reading list module to this course
      */
     private function create_reading_list() {
-        global $CFG, $DB;
+        global $DB;
 
         $module = $DB->get_record('modules', array('name' => 'aspirelists'));
 
@@ -299,7 +350,23 @@ class course {
      * @todo
      */
     public function update_moodle() {
+        global $DB;
 
+        $course = $DB->get_record('course', array(
+            'id' => $this->moodle_id
+        ));
+
+        $connect_data = $DB->get_record('connect_course_dets', array(
+            'course' => $this->moodle_id
+        ));
+
+        // Update connect_course_dets.
+        $this->create_connect_extras();
+
+        // Update this course in Moodle.
+        $this->visible = $course->visible;
+        $uc = (object)array_merge((array)$course, (array)$this);
+        update_course($uc);
     }
 
     /**
@@ -345,17 +412,6 @@ class course {
      */
     public static function get_courses($category_restrictions = array(), $obj_form = false) {
         global $CONNECTDB;
-
-        // Set up our various variables.
-        $cache = \cache::make('local_connect', 'kent_connect');
-        $data = array();
-
-        // Cache in MUC.
-        $cache_key = "local_connect_course::get_courses." . implode('.', $category_restrictions) . ($obj_form ? ".obj" : ".std");
-        $cache_content = $cache->get($cache_key);
-        if ($cache_content !== false) {
-            return $cache_content;
-        }
 
         $sql = "SELECT 
                     c1.chksum,
@@ -434,9 +490,6 @@ class course {
 
             return $obj;
         }, $result);
-
-        // Set the MUC cache.
-        $cache->set($cache_key, $data);
 
         return $data;
     }
