@@ -26,69 +26,73 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once (dirname(__FILE__) . '/../../../course/lib.php');
+require_once (dirname(__FILE__) . '/../../../mod/aspirelists/lib.php');
+require_once (dirname(__FILE__) . '/../../../mod/forum/lib.php');
+
 /**
  * Connect courses container
  */
 class course {
     /** Our chksum */
-    private $chksum;
+    public $chksum;
 
     /** Our state */
-    private $state;
+    public $state;
 
     /** Our module code */
-    private $module_code;
+    public $module_code;
 
     /** Our module title */
-    private $module_title;
+    public $module_title;
 
     /** Our module version */
-    private $module_version;
+    public $module_version;
 
     /** Our campus */
-    private $campus;
+    public $campus;
 
     /** Our campus desc */
-    private $campus_desc;
+    public $campus_desc;
 
     /** Our synopsis */
-    private $synopsis;
+    public $synopsis;
 
     /** Our module week beginning */
-    private $module_week_beginning;
+    public $module_week_beginning;
 
     /** Our module length */
-    private $module_length;
+    public $module_length;
 
     /** Our moodle id */
-    private $moodle_id;
+    public $moodle_id;
 
     /** Our sink deleted */
-    private $sink_deleted;
+    public $sink_deleted;
 
     /** Our student count */
-    private $student_count;
+    public $student_count;
 
     /** Our teacher count */
-    private $teacher_count;
+    public $teacher_count;
 
     /** Our convenor_count */
-    private $convenor_count;
+    public $convenor_count;
 
     /** Our parent id */
-    private $parent_id;
+    public $parent_id;
 
     /** Our session code */
-    private $session_code;
+    public $session_code;
 
     /** Our category id */
-    private $category_id;
+    public $category_id;
 
     /** Our delivery department */
-    private $delivery_department;
+    public $delivery_department;
 
     /** Our children */
-    private $children;
+    public $children;
 
     /**
      * Constructor to build from a database object
@@ -114,69 +118,8 @@ class course {
         $this->category_id = $obj->category_id;
         $this->delivery_department = $obj->delivery_department;
         $this->children = $obj->children;
-    }
-
-    /**
-     * Accessor method
-     */
-    public function get_module_code() {
-        return $this->module_code;
-    }
-
-    /**
-     * Accessor method
-     */
-    public function set_module_code($value) {
-        $this->module_code = $value;
-    }
-
-    /**
-     * Accessor method
-     */
-    public function get_module_title() {
-        return $this->module_title;
-    }
-
-    /**
-     * Accessor method
-     */
-    public function set_module_title($value) {
-        $this->module_title = $value;
-    }
-
-    /**
-     * Accessor method
-     */
-    public function get_synopsis() {
-        return $this->synopsis;
-    }
-
-    /**
-     * Accessor method
-     */
-    public function set_synopsis($value) {
-        $this->synopsis = $value;
-    }
-
-    /**
-     * Accessor method
-     */
-    public function get_category_id() {
-        return $this->category_id;
-    }
-
-    /**
-     * Accessor method
-     */
-    public function set_category_id($value) {
-        $this->category_id = $value;
-    }
-
-    /**
-     * Accessor method
-     */
-    public function get_chksum() {
-        return $this->chksum;
+        $this->numsections = $this->module_length != null ? $this->module_length : 1;
+        $this->maxbytes = '67108864';
     }
 
     /**
@@ -186,6 +129,7 @@ class course {
         global $CONNECTDB;
 
         $sql = "UPDATE courses SET
+                    moodle_id = :moodle_id,
                     module_code = :module_code,
                     module_title = :module_title,
                     synopsis = :synopsis,
@@ -194,6 +138,7 @@ class course {
                 WHERE chksum = :chksum";
 
         $params = array(
+            "moodle_id" => $this->moodle_id,
             "module_code" => $this->module_code,
             "module_title" => $this->module_title,
             "synopsis" => $this->synopsis,
@@ -242,16 +187,108 @@ class course {
 
     /**
      * Create this course in Moodle
+     *
+     * @todo - Fire event off for an enrolment observer
      */
-    public function create() {
+    public function create_moodle() {
+        global $DB;
 
+        // Create the course.
+        $course = create_course($this);
+        $this->moodle_id = $course->id;
+
+        // Tell Connect about the new course.
+        $this->update();
+
+        // Add in sections.
+        $DB->set_field('course_sections', 'name', $this->fullname, array (
+            'course' => $course->id,
+            'section' => 0
+        ));
+
+        // Add module extra details to the connect_course_dets table.
+        $this->create_connect_extras();
+
+        // Add the reading list module to our course if it is based in Canterbury.
+        if ($this->campus_desc === 'Canterbury') {
+            $this->create_reading_list();
+        }
+
+        // Add a news forum to the course.
+        $this->create_forum();
+    }
+
+    /**
+     * Add Connect extra details for this course
+     */
+    private function create_connect_extras() {
+        global $CFG, $DB;
+
+        // Create a data container.
+        $connect_data = new \stdClass();
+        $connect_data->course = $this->moodle_id;
+        $connect_data->campus = isset($this->campus_desc) ? $this->campus_desc : '';
+        $connect_data->startdate = isset($this->startdate) ? $this->startdate : '';
+        $connect_data->enddate = isset($this->module_length) ? strtotime('+'. $this->module_length .' weeks', $this->startdate) : $CFG->default_course_end_date;
+        $connect_data->weeks = isset($this->module_length) ? $this->module_length : 0;
+
+        $DB->insert_record('connect_course_dets', $connect_data);
+    }
+
+    /**
+     * Add reading list module to this course
+     */
+    private function create_reading_list() {
+        global $CFG, $DB;
+
+        $module = $DB->get_record('modules', array('name' => 'aspirelists'));
+
+        // Create a data container.
+        $rl = new \stdClass();
+        $rl->course     = $this->moodle_id;
+        $rl->name       = 'Reading list';
+        $rl->intro      = '';
+        $rl->introformat  = 1;
+        $rl->category     = 'all';
+        $rl->timemodified = time();
+
+        // Create the instance.
+        $instance = aspirelists_add_instance($rl, new \stdClass());
+
+        // Find the first course section.
+        $section = $DB->get_record_sql("SELECT id, sequence FROM {course_sections} WHERE course=:cid AND section=0", array (
+            "cid" => $this->moodle_id
+        ));
+
+        // Create a module container.
+        $cm = new \stdClass();
+        $cm->course     = $this->moodle_id;
+        $cm->module     = $module->id;
+        $cm->instance   = $instance;
+        $cm->section    = $section->id;
+        $cm->visible    = 1;
+
+        // Create the module.
+        $coursemodule = add_course_module($cm);
+
+        // Add it to the section.
+        $DB->set_field('course_sections', 'sequence', "$coursemodule,$section->sequence", array (
+            'id' => $section->id
+        ));
+    }
+
+    /**
+     * Add a forum module to this course
+     */
+    private function create_forum() {
+        forum_get_course_forum($this->moodle_id, 'news');
     }
 
     /**
      * Update this course in Moodle
      * @todo
      */
-    public function update() {
+    public function update_moodle() {
 
     }
 

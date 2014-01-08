@@ -31,9 +31,9 @@ $courses = \local_connect\course::get_courses(array(), true);
 foreach ($courses as $course) {
 	if (!$course->is_created()) {
 		print "Creating $course...\n";
-		$course->create();
+		$course->create_moodle();
 	} else {
 		print "Updating $course...\n";
-		$course->update();
+		$course->update_moodle();
 	}
 }

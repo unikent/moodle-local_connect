@@ -49,26 +49,26 @@ function lcproxy_scheduleCourses() {
             continue;
         }
 
-        $course->set_module_code($in_course->code);
-        $course->set_module_title($in_course->title);
-        $course->set_synopsis($in_course->synopsis);
-        $course->set_category_id($in_course->category);
+        $course->module_code = $in_course->code;
+        $course->module_title = $in_course->title;
+        $course->synopsis = $in_course->synopsis;
+        $course->category_id = $in_course->category;
 
-        if ($course->get_category_id() == 0) {
+        if ($course->category_id == 0) {
             // Cannot continue with this one
-            $result[] = array("error_code" => "category_is_zero", "id" => $course->get_chksum());
+            $result[] = array("error_code" => "category_is_zero", "id" => $course->chksum);
             continue;
         }
 
         if (!$course->is_unique()) {
             // Cannot continue with this one
-            $result[] = array("error_code" => "duplicate", "id" => $course->get_chksum());
+            $result[] = array("error_code" => "duplicate", "id" => $course->chksum);
             continue;
         }
 
         $course->update();
 
-        $STOMP->send('/queue/connect.job.create_course', $course->get_chksum());
+        $STOMP->send('/queue/connect.job.create_course', $course->chksum);
     }
 
     if (count($result) > 0) {
