@@ -119,6 +119,7 @@ class course {
         $this->delivery_department = $obj->delivery_department;
         $this->children = $obj->children;
         $this->numsections = $this->module_length != null ? $this->module_length : 1;
+        $this->link = isset($obj->link) ? $obj->link : 0;
         $this->maxbytes = '67108864';
 
         // Set some required vars
@@ -208,14 +209,18 @@ class course {
             return false;
         }
 
-        // Grab the course
+        // Grab the course.
         $course = $DB->get_record('course', array('id' => $this->moodle_id));
         if (!$course) {
             return false;
         }
 
+        // Check the shortnames match.
+        if ($this->shortname != $course->shortname) {
+            return false;
+        }
+
         $watch_list = array(
-            "shortname",
             "fullname",
             "category",
             "summary",
@@ -247,8 +252,16 @@ class course {
         }
 
         // Does this shortname exist?
-        if ($DB->record_exists('course', array('shortname' => $this->shortname))) {
-            // TODO - Link
+        $course = $DB->get_record('course', array('shortname' => $this->shortname));
+        if ($course) {
+            if ($this->link === 0) {
+                // Yes! Link them together.
+                $link_course = static::get_course($course->id);
+                if ($link_course) {
+                    $link_course->add_child($this);
+                }
+            }
+            $this->moodle_id = $course->id;
             return false;
         }
 
@@ -287,6 +300,49 @@ class course {
 
         // Add a news forum to the course.
         $this->create_forum();
+    }
+
+    /**
+     * Link a course to this course
+     */
+    private function create_link($target) {
+        // Create a linked course
+        $data = clone($this);
+        $data->primary_child = $this->chksum;
+        $data->shortname = "$this->shortname/$target->shortname";
+        $data->chksum = $data->id_chksum = uniqid("link-");
+        $data->link = 1;
+        $link = new course($data);
+        $link->create_moodle();
+
+        // Add children
+        $link->add_child($this);
+        $link->add_child($target);
+    }
+
+    /**
+     * Link a course to this course
+     */
+    private function add_child($target) {
+        global $CONNECTDB, $DB;
+
+        print "Linking $this->moodle_id with $target->chksum.\n";
+
+        // Is this a link course?
+        if ($this->link === 0) {
+            return $this->create_link($target);
+        }
+
+        // Link them up
+        $CONNECTDB->set_field('courses', 'parent_id', $this->chksum, array (
+            'chksum' => $target->chksum
+        ));
+        $CONNECTDB->set_field('courses', 'moodle_id', $this->moodle_id, array (
+            'chksum' => $target->chksum
+        ));
+        $CONNECTDB->set_field('courses', 'state', '8', array (
+            'chksum' => $target->chksum
+        ));
     }
 
     /**
@@ -397,9 +453,12 @@ class course {
         // Update connect_course_dets.
         $this->create_connect_extras();
 
-        // Update this course in Moodle.
+        // Set some special vars.
         $this->visible = $course->visible;
         $uc = (object)array_merge((array)$course, (array)$this);
+        $uc->shortname = $course->shortname;
+
+        // Update this course in Moodle.
         update_course($uc);
     }
 
@@ -411,11 +470,15 @@ class course {
     }
 
     /**
-     * Get a course by chksum
+     * Get a Connect Course by Moodle ID
      */
-    public static function get_course($chksum) {
+    public static function get_course($id) {
         global $CONNECTDB;
-        return $CONNECTDB->get_record('courses', array('chksum' => $courseid));
+        $data = $CONNECTDB->get_record('courses', array('moodle_id' => $id), "*", IGNORE_MULTIPLE);
+        if (!$data) {
+            return false;
+        }
+        return new course($data);
     }
 
     /**
