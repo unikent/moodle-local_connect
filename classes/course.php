@@ -116,6 +116,7 @@ class course {
         $this->parent_id = $obj->parent_id;
         $this->session_code = $obj->session_code;
         $this->category_id = $obj->category_id;
+        $this->category = $obj->category_id;
         $this->delivery_department = $obj->delivery_department;
         $this->children = $obj->children;
         $this->numsections = $this->module_length != null ? $this->module_length : 1;
@@ -129,25 +130,23 @@ class course {
         global $CONNECTDB;
 
         $sql = "UPDATE courses SET
-                    moodle_id = :moodle_id,
-                    module_code = :module_code,
-                    module_title = :module_title,
-                    synopsis = :synopsis,
-                    category_id = :category_id,
-                    state = :state,
-                WHERE chksum = :chksum";
+                    moodle_id=?,
+                    module_code=?,
+                    module_title=?,
+                    synopsis=?,
+                    category_id=?,
+                    state=?
+                WHERE chksum=?";
 
-        $params = array(
-            "moodle_id" => $this->moodle_id,
-            "module_code" => $this->module_code,
-            "module_title" => $this->module_title,
-            "synopsis" => $this->synopsis,
-            "category_id" => $this->category_id,
-            "state" => $this->state,
-            "chksum" => $this->chksum
-        );
-
-        return $CONNECTDB->execute($sql, $params);
+        return $CONNECTDB->execute($sql, array(
+            $this->moodle_id,
+            $this->module_code,
+            $this->module_title,
+            $this->synopsis,
+            $this->category_id,
+            $this->state,
+            $this->chksum
+        ));
     }
 
     /**
@@ -157,9 +156,9 @@ class course {
         global $CONNECTDB;
 
         $sql = "SELECT COUNT(*) as count FROM courses
-                  WHERE session_code = ?
-                    AND module_code = ?
-                    AND chksum != ?
+                  WHERE session_code=?
+                    AND module_code=?
+                    AND chksum!=?
                     AND state IN (2, 4, 6, 8, 10, 12)";
 
         $params = array(
@@ -193,15 +192,26 @@ class course {
     public function create_moodle() {
         global $DB;
 
+        // Give ourselves a category.
+        if (!isset($this->category)) {
+            return false;
+        }
+
         // Create the course.
         $course = create_course($this);
+        if (!$course) {
+            return false;
+        }
+
+        // Update connect's reference.
         $this->moodle_id = $course->id;
+        $this->state = 8;
 
         // Tell Connect about the new course.
         $this->update();
 
         // Add in sections.
-        $DB->set_field('course_sections', 'name', $this->fullname, array (
+        $DB->set_field('course_sections', 'name', $this->module_title, array (
             'course' => $course->id,
             'section' => 0
         ));
@@ -228,8 +238,8 @@ class course {
         $connect_data = new \stdClass();
         $connect_data->course = $this->moodle_id;
         $connect_data->campus = isset($this->campus_desc) ? $this->campus_desc : '';
-        $connect_data->startdate = isset($this->startdate) ? $this->startdate : '';
-        $connect_data->enddate = isset($this->module_length) ? strtotime('+'. $this->module_length .' weeks', $this->startdate) : $CFG->default_course_end_date;
+        $connect_data->startdate = isset($this->startdate) ? $this->startdate : $CFG->default_course_start_date;
+        $connect_data->enddate = isset($this->module_length) ? strtotime('+'. $this->module_length .' weeks', $connect_data->startdate) : $CFG->default_course_end_date;
         $connect_data->weeks = isset($this->module_length) ? $this->module_length : 0;
 
         $DB->insert_record('connect_course_dets', $connect_data);
@@ -296,7 +306,7 @@ class course {
      * To String override
      */
     public function __toString() {
-        return $this->module_title;
+        return is_string($this->module_title) ? $this->module_title : "$this->chksum";
     }
 
     /**
