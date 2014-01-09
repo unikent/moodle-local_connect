@@ -127,7 +127,6 @@ class course {
         $this->children = $obj->children;
         $this->numsections = $this->module_length != null ? $this->module_length : 1;
         $this->link = isset($obj->link) ? $obj->link : 0;
-        $this->similar_count = isset($obj->similar_count) ? $obj->similar_count : 0;
         $this->maxbytes = '67108864';
 
         // Get our UID
@@ -213,7 +212,9 @@ class course {
      * Does this course have a unique shortname?
      */
     public function has_unique_shortname() {
-        return $this->similar_count === 0;
+        global $CONNECTDB;
+        $sql = "SELECT COUNT(*) as count FROM courses WHERE module_code=?";
+        return $CONNECTDB->count_records_sql($sql, array($this->module_code)) == 1;
     }
 
     /**
@@ -602,11 +603,6 @@ class course {
             if (!empty($obj->state)) {
                 $obj->state = json_decode($obj->state);
             }
-
-            // Count the number of similar modules
-            $obj->similar_count = $CONNECTDB->count_records_sql("SELECT COUNT(*) as count FROM courses WHERE module_code=?", array (
-                $obj->module_code
-            ));
 
             if ($obj_form) {
                 $obj = new course($obj);

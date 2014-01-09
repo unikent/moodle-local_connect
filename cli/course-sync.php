@@ -27,21 +27,20 @@ define('CLI_SCRIPT', true);
 require(dirname(__FILE__) . '/../../../config.php');
 
 $courses = \local_connect\course::get_courses(array(), true);
-
 foreach ($courses as $course) {
 	try {
-		
+
 		if (!$course->is_created() && $course->has_unique_shortname()) {
 			print "Creating $course...\n";
 			$course->create_moodle();
 			continue;
 		}
 
-		if ($course->has_changed()) {
+		/*if ($course->has_changed()) {
 			print "Updating $course...\n";
 			$course->update_moodle();
 			continue;
-		}
+		}*/
 
 	} catch (Excepton $e) {
 		$msg = $e->getMessage();
