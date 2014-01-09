@@ -38,7 +38,7 @@ foreach ($courses as $course) {
 
 		if ($course->has_changed()) {
 			print "Updating $course...\n";
-			//$course->update_moodle();
+			$course->update_moodle();
 			continue;
 		}
 

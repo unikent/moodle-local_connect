@@ -148,7 +148,7 @@ class course {
     }
 
     /**
-     * Update this course
+     * Update this course in Connect
      */
     public function update() {
         global $CONNECTDB;
@@ -443,7 +443,6 @@ class course {
 
     /**
      * Update this course in Moodle
-     * @todo
      */
     public function update_moodle() {
         global $DB;
@@ -466,6 +465,11 @@ class course {
 
         // Update this course in Moodle.
         update_course($uc);
+
+        // Update chksum tracker.
+        $DB->set_field('connect_course_chksum', 'chksum', $this->chksum, array (
+            'courseid' => $this->id
+        ));
     }
 
     /**
