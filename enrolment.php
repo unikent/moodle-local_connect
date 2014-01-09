@@ -23,7 +23,7 @@ $PAGE->requires->js_init_call('M.local_enrolment.init', array(), false, array(
 
 require_login();
 
-if (true || !\local_connect\utils::is_enabled()) {
+if (!\local_connect\utils::is_enabled()) {
 	print_error('connect_disabled', 'local_connect');
 }
 
