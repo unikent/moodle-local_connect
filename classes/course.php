@@ -228,32 +228,18 @@ class course {
             return false;
         }
 
-        // Grab the course.
-        $course = $DB->get_record('course', array('id' => $this->moodle_id));
-        if (!$course) {
+        // Check our chksum against the value stored in the DB
+        $chksum = $DB->get_record('connect_course_chksum', array (
+            'courseid' => $this->moodle_id,
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
+        if (!$chksum) {
+            // TODO - what happened here?
             return false;
         }
 
-        // Check the shortnames match.
-        if ($this->shortname != $course->shortname) {
-            return false;
-        }
-
-        $watch_list = array(
-            "fullname",
-            "category",
-            "summary",
-            "startdate"
-        );
-
-        // Compare Moodle data with Connect data (this).
-        foreach ($watch_list as $key) {
-            if (isset($this->$key) && isset($course->$key) && $this->$key !== $course->$key) {
-                return true;
-            }
-        }
-
-        return false;
+        return $chksum->chksum == $this->chksum;
     }
 
     /**
