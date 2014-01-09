@@ -4,7 +4,6 @@ define('AJAX_SCRIPT', true);
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
-require_once(dirname(__FILE__) . '/proxylib.php');
 
 if (!\local_connect\utils::is_enabled()) {
   die(json_encode(array("error" => "Connect has been disabled")));
@@ -28,7 +27,7 @@ switch ($_SERVER['PATH_INFO']) {
   case '/courses':
   case '/courses/':
     $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
-    $courses = \local_connect\course::get_courses($category_restrictions);
+    $courses = \local_connect\course::get_courses($category_restrictions, false);
     echo json_encode($courses);
     exit(0);
 }
