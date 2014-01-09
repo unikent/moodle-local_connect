@@ -15,15 +15,47 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This synchronises Connect Courses with Moodle Courses
+ * Local stuff for Moodle Connect
  *
- * @package    local_connect
+ * @package    core_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('CLI_SCRIPT', true);
+namespace local_connect;
 
-require(dirname(__FILE__) . '/../../../config.php');
+defined('MOODLE_INTERNAL') || die();
 
-\local_connect\cli::course_sync();
+/**
+ * Connect CLI helpers
+ */
+class cli {
+
+	/**
+	 * Run the course sync cron
+	 */
+	public static function course_sync() {
+		$courses = \local_connect\course::get_courses(array(), true);
+		foreach ($courses as $course) {
+			try {
+
+				if (!$course->is_created() && $course->has_unique_shortname()) {
+					print "Creating $course...\n";
+					$course->create_moodle();
+					continue;
+				}
+
+				if ($course->has_changed()) {
+					print "Updating $course...\n";
+					$course->update_moodle();
+					continue;
+				}
+
+			} catch (Excepton $e) {
+				$msg = $e->getMessage();
+				print "Error: $msg\n";
+			}
+		}
+	}
+
+}

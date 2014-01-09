@@ -15,15 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This synchronises Connect Courses with Moodle Courses
+ * Connect Crons
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('CLI_SCRIPT', true);
+global $CFG;
 
-require(dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->libdir . "/clilib.php");
 
-\local_connect\cli::course_sync();
+// Only enable this for 2014.
+if (\local_connect\utils::is_enabled() && $CFG->kent->distribution === "2014") {
+	mtrace('');
+
+	// Sync courses
+	mtrace('  Synchronizing courses...');
+	\local_connect\cli::course_sync();
+	mtrace('  done.');
+}

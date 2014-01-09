@@ -37,7 +37,7 @@ class utils {
 	public static function is_enabled() {
 		global $CFG;
 
-		$valid_installations = array("2013", "2012", "archive");
+		$valid_installations = array("2014", "2013", "2012", "archive");
 
 		return $CFG->kent->environment === "dev" || (
 			$CFG->kent->environment === "live" && in_array($CFG->kent->distribution, $valid_installations)
