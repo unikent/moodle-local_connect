@@ -239,7 +239,7 @@ class course {
             return false;
         }
 
-        return $chksum->chksum == $this->chksum;
+        return $chksum->chksum != $this->chksum;
     }
 
     /**
