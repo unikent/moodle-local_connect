@@ -3,7 +3,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 function xmldb_local_connect_upgrade($oldversion) {
-	global $CFG, $DB;
+	global $CFG, $DB, $CONNECTDB;
 
 	$dbman = $DB->get_manager();
 
@@ -95,6 +95,21 @@ function xmldb_local_connect_upgrade($oldversion) {
 
         // Connect savepoint reached.
         upgrade_plugin_savepoint(true, 2014010901, 'local', 'connect');
+    }
+
+    if ($oldversion < 2014010903) {
+    	// Go through and populate connect_course_chksum
+    	$records = $CONNECTDB->get_records("courses", null, '', 'id, moodle_id, chksum, module_delivery_key, session_code');
+    	foreach ($records as $record) {
+    		if (!empty($record->moodle_id)) {
+    			$DB->insert_record_raw("connect_course_chksum", array(
+    				"courseid" => $record->moodle_id,
+    				"module_delivery_key" => $record->module_delivery_key,
+    				"session_code" => $record->session_code,
+    				"chksum" => $record->chksum
+    			));
+    		}
+    	}
     }
 
     return true;
