@@ -34,6 +34,9 @@ require_once (dirname(__FILE__) . '/../../../mod/forum/lib.php');
  * Connect courses container
  */
 class course {
+    /** Our UID */
+    public $uid;
+
     /** Our chksum */
     public $chksum;
 
@@ -57,6 +60,9 @@ class course {
 
     /** Our synopsis */
     public $synopsis;
+
+    /** Our module delivery key */
+    public $module_delivery_key;
 
     /** Our module week beginning */
     public $module_week_beginning;
@@ -103,6 +109,7 @@ class course {
         $this->module_code = $obj->module_code;
         $this->module_title = $obj->module_title;
         $this->module_version = $obj->module_version;
+        $this->module_delivery_key = $obj->module_delivery_key;
         $this->campus = $obj->campus;
         $this->campus_desc = $obj->campus_desc;
         $this->synopsis = $obj->synopsis;
@@ -122,6 +129,9 @@ class course {
         $this->link = isset($obj->link) ? $obj->link : 0;
         $this->similar_count = isset($obj->similar_count) ? $obj->similar_count : 0;
         $this->maxbytes = '67108864';
+
+        // Get our UID
+        $this->uid = $obj->module_delivery_key . "-" . $obj->session_code;
 
         // Set some required vars
         $this->shortname = $this->module_code;
@@ -316,6 +326,7 @@ class course {
     private function create_link($target) {
         // Create a linked course
         $data = clone($this);
+        $data->module_delivery_key = $this->chksum;
         $data->primary_child = $this->chksum;
         $data->shortname = "$this->shortname/$target->shortname";
         $data->chksum = $data->id_chksum = uniqid("link-");
@@ -527,6 +538,7 @@ class course {
                     c1.campus,
                     c1.campus_desc,
                     c1.synopsis,
+                    c1.module_delivery_key,
                     c1.module_week_beginning,
                     c1.module_length,
                     c1.moodle_id,
