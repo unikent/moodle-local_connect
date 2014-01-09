@@ -123,34 +123,34 @@ var Connect = (function() {
 
 	Connect.prototype.filtersInit = function(statusel, searchel) {
 
-		var status = [ 'unprocessed', 'created_in_moodle', 'failed_in_moodle', 'scheduled', 'processing' ];
-		
 		this.oTable.columnFilter({
 			aoColumns: [
-				null,
+				{},
 				{
 					type: 'checkbox',
-					values: status
+					values: [ 'unprocessed', 'created_in_moodle', 'failed_in_moodle', 'scheduled', 'processing' ]
 				},
-				null,
-				null,
-				null,
-				null,
-				null,
+				{},
+				{},
+				{},
+				{},
+				{},
+				{},
+				{}
 			]
 		});
 
-		$('#unprocessed').attr('checked', 'checked');
-		$('#status_unprocessed').attr('checked','checked').trigger('change');
+		$('#unprocessed').prop("checked", true);
+		$('#status_unprocessed').prop("checked", true).trigger('change');
 
 		statusel.change(function() {
 			$('#statusbox').hide();
 			if($(this).is(':checked')) {
 				var val = $(this).val();
-				$('#status_' + val).attr('checked','checked').trigger('change');
+				$('#status_' + val).prop("checked", true).trigger('change');
 			} else {
 				var val = $(this).val();
-				$('#status_' + val).removeAttr('checked').trigger('change');
+				$('#status_' + val).prop("checked", false).trigger('change');
 			}
 		});
 
@@ -411,26 +411,26 @@ var Connect = (function() {
 
 		if(this.selectedDeliveries.length > 1) {
 			if(this.complete_selected.length > 1) {
-				this.buttons.pushBtn.attr('disabled', 'disabled').html('Can\'t push').removeClass();
-				this.buttons.mergeBtn.attr('disabled', 'disabled').html('Can\'t merge').removeClass();
+				this.buttons.pushBtn.prop('disabled', true).html('Can\'t push').removeClass();
+				this.buttons.mergeBtn.prop('disabled', true).html('Can\'t merge').removeClass();
 			}else if(this.complete_selected.length === 1) {
-				this.buttons.pushBtn.attr('disabled', 'disabled').html('Can\'t push').removeClass();
-				this.buttons.mergeBtn.removeAttr('disabled').html('<span>Merge</span> to Moodle').removeClass();
+				this.buttons.pushBtn.prop('disabled', true).html('Can\'t push').removeClass();
+				this.buttons.mergeBtn.prop('disabled', false).html('<span>Merge</span> to Moodle').removeClass();
 			} else {
-				this.buttons.pushBtn.removeAttr('disabled').html('<span>Push</span> to Moodle').removeClass();
-				this.buttons.mergeBtn.removeAttr('disabled').html('<span>Merge</span> to Moodle').removeClass();
+				this.buttons.pushBtn.prop('disabled', false).html('<span>Push</span> to Moodle').removeClass();
+				this.buttons.mergeBtn.prop('disabled', false).html('<span>Merge</span> to Moodle').removeClass();
 			}
 		} else if(this.selectedDeliveries.length === 1) {
 			if(this.complete_selected.length !== 0) {
-				this.buttons.pushBtn.attr('disabled', 'disabled').html('Can\'t push').removeClass();
-				this.buttons.mergeBtn.attr('disabled', 'disabled').html('Can\'t merge').removeClass();
+				this.buttons.pushBtn.prop('disabled', true).html('Can\'t push').removeClass();
+				this.buttons.mergeBtn.prop('disabled', true).html('Can\'t merge').removeClass();
 			} else {
-				this.buttons.pushBtn.removeAttr('disabled').html('<span>Edit</span> to Moodle').removeClass().addClass('edit_to_moodle');
-				this.buttons.mergeBtn.attr('disabled', 'disabled').html('Can\'t merge').removeClass();
+				this.buttons.pushBtn.prop('disabled', false).html('<span>Edit</span> to Moodle').removeClass().addClass('edit_to_moodle');
+				this.buttons.mergeBtn.prop('disabled', true).html('Can\'t merge').removeClass();
 			}
 		} else {
-			this.buttons.pushBtn.attr('disabled', 'disabled').html('No selection').removeClass();
-			this.buttons.mergeBtn.attr('disabled', 'disabled').html('No selection').removeClass();
+			this.buttons.pushBtn.prop('disabled', true).html('No selection').removeClass();
+			this.buttons.mergeBtn.prop('disabled', true).html('No selection').removeClass();
 		}	
 	};
 
@@ -441,7 +441,7 @@ var Connect = (function() {
 		if(this.buttons.pushBtn.hasClass('edit_to_moodle')) {
 
 			//var button = new ButtonLoader(this.buttons.pushBtn, 'Saving');
-			//this.buttons.pushBtn.attr('disabled', 'disabled').addClass('loading');
+			//this.buttons.pushBtn.prop('disabled', true).addClass('loading');
 			//button.start();
 			//button.disable(this.buttons.pushBtn);
 
@@ -456,7 +456,7 @@ var Connect = (function() {
 				$("#dialog-confirm").dialog("close");
 
 				var button = new ButtonLoader(_this.buttons.pushBtn, 'Saving');
-				_this.buttons.pushBtn.attr('disabled', 'disabled').addClass('loading');
+				_this.buttons.pushBtn.prop('disabled', true).addClass('loading');
 				button.start();
 				button.disable(_this.buttons.pushBtn);
 
@@ -770,7 +770,7 @@ var Connect = (function() {
 
 		// Set the button appearence and functionality
 		//var button = new ButtonLoader(this.buttons.mergeBtn, 'Saving');
-		//this.buttons.mergeBtn.attr('disabled', 'disabled').addClass('loading');
+		//this.buttons.mergeBtn.prop('disabled', true).addClass('loading');
 		//button.start();
 		//button.disable(this.buttons.mergeBtn);
 
@@ -940,7 +940,7 @@ var Connect = (function() {
 							//_this.buttons.mergeBtn.addClass('success');
 							//clearTimeout(_this.merge_timeout);
 							//_this.merge_timeout = setTimeout(function() {
-							//	_this.buttons.mergeBtn.removeClass('success').attr('disabled', 'disabled');
+							//	_this.buttons.mergeBtn.removeClass('success').prop('disabled', true);
 							//	_this.processRowSelect();
 							//}, 4000);
 

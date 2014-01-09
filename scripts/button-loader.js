@@ -15,7 +15,7 @@ var ButtonLoader = (function() {
 	ButtonLoader.prototype.disable = function(element) {
 		this.disabledElement = element;
 		if (this.disabledElement.is('input') || this.disabledElement.is('button')) {
-		  return this.disabledElement.attr('disabled', 'disabled');
+		  return this.disabledElement.prop('disabled', true);
 		}
 	};
 
@@ -35,7 +35,7 @@ var ButtonLoader = (function() {
 	ButtonLoader.prototype.stop = function() {
 		clearInterval(this.interval);
 		this.updateText(this.originalText);
-		if (this.disabledElement) return this.disabledElement.removeAttr('disabled');
+		if (this.disabledElement) return this.disabledElement.prop('disabled', false);
 	};
 
 	ButtonLoader.prototype.updateText = function(text) {
