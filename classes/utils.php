@@ -36,7 +36,12 @@ class utils {
 	 */
 	public static function is_enabled() {
 		global $CFG;
-		return $CFG->kent->environment === "dev" || ($CFG->kent->environment === "live" && $CFG->kent->distribution === LIVE_MOODLE);
+
+		$valid_installations = array("2013", "2012", "archive");
+
+		return $CFG->kent->environment === "dev" || (
+			$CFG->kent->environment === "live" && in_array($CFG->kent->distribution, $valid_installations)
+		);
 	}
 
 }
