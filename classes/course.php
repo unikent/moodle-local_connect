@@ -244,8 +244,6 @@ class course {
 
     /**
      * Create this course in Moodle
-     *
-     * @todo - Fire event off for an enrolment observer
      */
     public function create_moodle() {
         global $DB;
@@ -305,6 +303,14 @@ class course {
 
         // Add a news forum to the course.
         $this->create_forum();
+
+        // Add to tracking table.
+        $DB->insert_record_raw("connect_course_chksum", array(
+            "courseid" => $this->moodle_id,
+            "module_delivery_key" => $this->module_delivery_key,
+            "session_code" => $this->session_code,
+            "chksum" => $this->chksum
+        ));
     }
 
     /**
