@@ -23,7 +23,7 @@
         <INDEX NAME="course" UNIQUE="true" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="course_chksum" COMMENT="Checksums for Moodle to SDS course sync">
+    <TABLE NAME="connect_course_chksum" COMMENT="Checksums for Moodle to SDS course sync">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle Course ID"/>

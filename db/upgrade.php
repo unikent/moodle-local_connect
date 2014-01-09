@@ -73,22 +73,22 @@ function xmldb_local_connect_upgrade($oldversion) {
 
     if ($oldversion < 2014010901) {
 
-        // Define table course_chksum to be created.
-        $table = new xmldb_table('course_chksum');
+        // Define table connect_course_chksum to be created.
+        $table = new xmldb_table('connect_course_chksum');
 
-        // Adding fields to table course_chksum.
+        // Adding fields to table connect_course_chksum.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('module_delivery_key', XMLDB_TYPE_CHAR, '36', null, XMLDB_NOTNULL, null, null);
         $table->add_field('session_code', XMLDB_TYPE_CHAR, '4', null, XMLDB_NOTNULL, null, null);
         $table->add_field('chksum', XMLDB_TYPE_CHAR, '36', null, null, null, null);
 
-        // Adding keys to table course_chksum.
+        // Adding keys to table connect_course_chksum.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_key('course_unique', XMLDB_KEY_UNIQUE, array('courseid'));
         $table->add_key('sdsuid_unique', XMLDB_KEY_UNIQUE, array('module_delivery_key', 'session_code'));
 
-        // Conditionally launch create table for course_chksum.
+        // Conditionally launch create table for connect_course_chksum.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
