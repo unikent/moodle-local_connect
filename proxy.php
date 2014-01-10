@@ -26,9 +26,32 @@ if (!\local_connect\course::has_access()) {
 switch ($_SERVER['PATH_INFO']) {
   case '/courses':
   case '/courses/':
+    header('Content-type: application/json');
     $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
     $courses = \local_connect\course::get_courses($category_restrictions, false);
     echo json_encode($courses);
+    exit(0);
+  case '/courses/schedule':
+  case '/courses/schedule/':
+    header('Content-type: application/json');
+    $input = json_decode(file_get_contents('php://input'));
+    if (null == $input) {
+      header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
+    } else {
+      $result = \local_connect\course::schedule_all($input);
+      echo json_encode($result);
+    }
+    exit(0);
+  case '/courses/disengage':
+  case '/courses/disengage/':
+    header('Content-type: application/json');
+    $input = json_decode(file_get_contents('php://input'));
+    if (null == $input) {
+      header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
+    } else {
+      $result = \local_connect\course::disengage_all($input);
+      echo json_encode($result);
+    }
     exit(0);
 }
 

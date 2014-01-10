@@ -100,6 +100,15 @@ class course {
     /** Our children */
     public $children;
 
+    public static $states = array(
+      'unprocessed' => 1,
+      'scheduled' => 2,
+      'processing' => 4,
+      'created_in_moodle' => 8,
+      'failed_in_moodle' => 16,
+      'disengage' => 32,
+      'disengaged_from_moodle' => 64);
+
     /**
      * Constructor to build from a database object
      */
@@ -124,7 +133,7 @@ class course {
         $this->session_code = $obj->session_code;
         $this->category = $obj->category_id;
         $this->delivery_department = $obj->delivery_department;
-        $this->children = $obj->children;
+        $this->children = isset($obj->children) ? $obj->children : null;
         $this->numsections = $this->module_length != null ? $this->module_length : 1;
         $this->link = isset($obj->link) ? $obj->link : 0;
         $this->maxbytes = '67108864';
@@ -183,15 +192,18 @@ class course {
                   WHERE session_code=?
                     AND module_code=?
                     AND chksum!=?
-                    AND state IN (2, 4, 6, 8, 10, 12)";
+                    AND (state & ?) <> 0";
 
         $params = array(
             $this->session_code,
             $this->module_code,
-            $this->chksum
+            $this->chksum,
+            course::$states['scheduled'] |
+            course::$states['processing'] |
+            course::$states['created_in_moodle']
         );
 
-        return $CONNECTDB->count_records_sql($sql, $params) > 0;
+        return $CONNECTDB->count_records_sql($sql, $params) === 0;
     }
 
     /**
@@ -608,5 +620,51 @@ class course {
         }, $result);
 
         return $data;
+    }
+
+    public static function disengage_all($in_courses) {
+      global $CONNECTDB, $STOMP;
+      $r = array();
+
+      foreach ($in_courses as $c) {
+        if ($course = $CONNECTDB->get_record('courses',array('chksum'=>$c))) {
+          if (($course->state & course::$states['created_in_moodle']) <> 0) {
+            $STOMP->send('connect.job.disengage_course',$c);
+          } else {
+            $r []= array('error_code'=>'not_created_in_moodle','id'=>$c);
+          }
+        } else {
+          $r []= array('error_code'=>'does_not_exist','id'=>$c);
+        }
+      }
+
+      return $r;
+    }
+
+    public static function schedule_all($in_courses) {
+      global $CONNECTDB, $STOMP;
+      $r = array();
+
+      foreach ($in_courses as $c) {
+        if ($course = $CONNECTDB->get_record('courses',array('chksum'=>$c['id']))) {
+          $uc = new course($course);
+          $uc->module_code = $c['code'];
+          $uc->module_title = $c['title'];
+          $uc->synopsis = $c['synopsis'];
+          $uc->category = $c['category'];
+          $uc->state = course::$states['scheduled'];
+
+          if ($uc->is_unique()) {
+            $uc->update();
+            $STOMP->send('connect.job.create_course',$uc->chksum);
+          } else {
+            $r []= array('error_code'=>'duplicate','id'=>$c['id']);
+          }
+        } else {
+          $r []= array('error_code'=>'does_not_exist','id'=>$c['id']);
+        }
+      }
+
+      return $r;
     }
 }
