@@ -3,7 +3,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 function xmldb_local_connect_upgrade($oldversion) {
-	global $CFG, $DB, $CONNECTDB;
+	global $CFG, $DB, $CONNECTDB, $SHAREDB;
 
 	$dbman = $DB->get_manager();
 
@@ -115,6 +115,27 @@ function xmldb_local_connect_upgrade($oldversion) {
 
         // Connect savepoint reached.
         upgrade_plugin_savepoint(true, 2014010904, 'local', 'connect');
+    }
+
+    if ($oldversion < 2014011300) {
+        if (\local_connect\utils::is_enabled()) {
+            // Go through and populate mdl_course
+            $records = $CONNECTDB->get_records('courses', null, '', 'chksum, moodle_id, module_delivery_key, session_code');
+            foreach ($records as $record) {
+                if (!empty($record->moodle_id)) {
+                    $obj = new \stdClass();
+                    $obj->session_code = $record->session_code;
+                    $obj->module_delivery_key = $record->module_delivery_key;
+                    $obj->moodle_id = $record->moodle_id;
+                    $obj->moodle_key = $CFG->kent->moodlekey;
+
+                    $SHAREDB->insert_record("shared_course", $obj);
+                }
+            }
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014011300, 'local', 'connect');
     }
 
     return true;

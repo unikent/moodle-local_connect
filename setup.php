@@ -19,5 +19,8 @@ global $CONNECTDB, $STOMP;
 require_once(dirname(__FILE__) . "/classes/dbprovider.php");
 $CONNECTDB = new \local_connect\dbprovider();
 
+require_once(dirname(__FILE__) . "/classes/sharedbprovider.php");
+$SHAREDB = new \local_connect\sharedbprovider();
+
 require_once(dirname(__FILE__) . "/classes/stompprovider.php");
 $STOMP = new \local_connect\stompprovider();
