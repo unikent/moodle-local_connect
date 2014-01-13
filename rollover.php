@@ -29,8 +29,9 @@ echo '<div class="settingsform clearfix">';
 echo html_writer::input_hidden_params($PAGE->url);
 echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
 
-echo '<div class="c2 fld sourceid"><label for="rollover_source">Rollover from: </label>';
+echo '<div class="c2 fld sourceid"><label for="rollover_source">Rollover source: </label>';
 echo '<select name="rollover_source" id="rollover_source">';
+echo '<option value="release">Moodle RD</option>';
 echo '<option value="2013">Moodle 2013</option>';
 echo '<option value="2012">Moodle 2012</option>';
 echo '<option value="archive">Moodle Archive</option>';
@@ -40,10 +41,10 @@ echo '</div>';
 echo '<div class="c1 fld targetid"><label for="rollover_target">Rollover into: </label>';
 echo '<input type="text" name="target_id" id="rollover_target" /></div>';
 
-echo '<div class="c2 fld sourceid"><label for="source_id">Rollover course: </label>';
+echo '<div class="c2 fld sourceid"><label for="source_id">Rollover from: </label>';
 echo '<input type="text" name="source_id" id="source_id" /></div>';
 
-echo '<div class="form-buttons"><input class="form-submit" type="submit" value="'.get_string('savechanges','admin').'" /></div>';
+echo '<div class="form-buttons"><input class="form-submit" type="submit" value="Rollover" /></div>';
 
 echo '</div>';
 echo '</form>';
