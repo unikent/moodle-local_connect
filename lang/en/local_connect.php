@@ -8,4 +8,6 @@ $string['accessdenied'] = 'You are not permitted to view the Departmental admini
 $string['connect_error'] = 'Unable to display deliveries';
 $string['connect_disabled'] = 'Connect has been disabled on your system.';
 
+$string['rollover_heading'] = 'Rollover Pages (BETA)';
+
 $string['cachedef_kent_connect'] = 'Connect Caching';

@@ -10,7 +10,7 @@ require(dirname(__FILE__) . '/../../../config.php');
 global $PAGE, $OUTPUT, $USER;
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/util/ajax/rollover_sources.php');
+$PAGE->set_url('/local/connect/ajax/rollover_sources.php');
 
 if (!isloggedin()) {
 	throw new moodleexception("You must be logged in.");

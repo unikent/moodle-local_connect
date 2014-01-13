@@ -30,19 +30,29 @@ defined('MOODLE_INTERNAL') || die();
  * Connect rollover container
  */
 class rollover {
+
 	/**
-	 * Returns a list of targets for rollover
+	 * Returns a list of sources for rollover
 	 * 
 	 * @return array
 	 */
-	public static function get_target_list() {
+	public static function get_course_list($dist = '', $shortname = '') {
 		global $CFG, $SHAREDB;
 
-		$sql = 'SELECT * FROM {course_list} WHERE moodle_env = :current_env AND moodle_dist = :current_dist';
-        return $SHAREDB->get_records_sql($sql, array(
+		$sql = 'SELECT * FROM {course_list} WHERE moodle_env = :current_env';
+		$sql .= empty($dist) ? ' AND moodle_dist != :current_dist' : ' AND moodle_dist = :current_dist';
+
+		$params = array(
             'current_env' => $CFG->kent->environment,
-            'current_dist' => $CFG->kent->distribution
-        ));
+            'current_dist' => empty($dist) ? $CFG->kent->distribution : $dist
+        );
+
+		if (!empty($shortname)) {
+			$sql .= ' AND shortname LIKE :coursename';
+			$params['coursename'] = $shortname;
+		}
+
+        return $SHAREDB->get_records_sql($sql, $params);
 	}
 
 	/**
@@ -50,13 +60,18 @@ class rollover {
 	 * 
 	 * @return array
 	 */
-	public static function get_source_list() {
-		global $CFG, $SHAREDB;
-
-		$sql = 'SELECT * FROM {course_list} WHERE moodle_env = :current_env AND moodle_dist != :current_dist';
-        return $SHAREDB->get_records_sql($sql, array(
-            'current_env' => $CFG->kent->environment,
-            'current_dist' => $CFG->kent->distribution
-        ));
+	public static function get_source_list($dist = '') {
+		return static::get_course_list('');
 	}
+
+	/**
+	 * Returns a list of targets for rollover
+	 * 
+	 * @return array
+	 */
+	public static function get_target_list() {
+		global $CFG;
+		return static::get_course_list($CFG->kent->distribution);
+	}
+
 }
