@@ -117,19 +117,23 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014010904, 'local', 'connect');
     }
 
-    if ($oldversion < 2014011301) {
+    if ($oldversion < 2014011302) {
         if (\local_connect\utils::is_enabled()) {
             // Go through and populate SHAREDB::course_list
             $records = $DB->get_records('course', null, '', 'id, shortname, fullname, summary');
             foreach ($records as $record) {
+                if ($record->id == 1) {
+                    continue;
+                }
                 $record->moodle_id = $record->id;
-                $record->moodle_key = $CFG->kent->moodlekey;
+                $record->moodle_env = $CFG->kent->environment;
+                $record->moodle_dist = $CFG->kent->distribution;
                 $SHAREDB->insert_record("course_list", $record);
             }
         }
 
         // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2014011301, 'local', 'connect');
+        upgrade_plugin_savepoint(true, 2014011302, 'local', 'connect');
     }
 
     return true;
