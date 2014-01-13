@@ -48,8 +48,9 @@ class rollover {
         );
 
 		if (!empty($shortname)) {
-			$sql .= ' AND shortname LIKE :coursename';
-			$params['coursename'] = $shortname;
+			$shortname = "%" . $shortname . "%";
+			$sql .= ' AND ' . $SHAREDB->sql_like('shortname', ':shortname', false);
+			$params['shortname'] = $shortname;
 		}
 
         return $SHAREDB->get_records_sql($sql, $params);
