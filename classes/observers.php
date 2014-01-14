@@ -63,6 +63,12 @@ class observers {
         $record->moodle_dist = $CFG->kent->distribution;
         $SHAREDB->insert_record("course_list", $record);
 
+        // Sync Enrollments
+        $connect_course = \local_connect\course::get_course($record->moodle_id);
+        if ($connect_course !== false) {
+            $connect_course->sync_enrolments();
+        }
+
         return true;
     }
 

@@ -479,6 +479,13 @@ class course {
     }
 
     /**
+     * Syncs enrollments for this Course
+     */
+    public function sync_enrolments() {
+        // TODO
+    }
+
+    /**
      * To String override
      */
     public function __toString() {
