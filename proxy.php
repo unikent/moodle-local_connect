@@ -9,7 +9,7 @@ if (!\local_connect\utils::is_enabled()) {
   die(json_encode(array("error" => "Connect has been disabled")));
 }
 
-if (!\local_connect\course::has_access()) {
+if (!\local_connect\course::can_manage()) {
   die(json_encode(array("error" => "You do not have access to view this")));
 }
 

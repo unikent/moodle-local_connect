@@ -532,7 +532,7 @@ class course {
     /**
      * Is this user allowed to manage courses?
      */
-    public static function has_access() {
+    public static function can_manage() {
         global $DB;
 
         if (has_capability('moodle/site:config', \context_system::instance())) {
