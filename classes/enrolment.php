@@ -108,6 +108,9 @@ class enrolment {
      */
     private static function filter_sql_query_set($data) {
 
+        // Store of UIDs
+        $uid_store = array();
+
         // Translate each enrolment datum.
         foreach ($data as &$enrolment) {
             // Update the role.
@@ -115,8 +118,17 @@ class enrolment {
             $role = self::get_role($shortname);
             $enrolment->roleid = $role->id;
 
-            // Update the user.
-            $enrolment->userid = $user->id;
+            if (!isset($enrolment->userid)) {
+                if (isset($uid_store['username'])) {
+                    $enrolment->userid = $uid_store['username'];
+                } else {
+                    $user = $DB->get_record('user', array('username' => $enrolment->username));
+                    $uid_store['username'] = null;
+                    if ($user) {
+                        $enrolment->userid = $uid_store['username'] = $user->id;
+                    }
+                }
+            }
 
             // Create an object for this enrolment.
             $enrolment = new static(
@@ -155,6 +167,11 @@ class enrolment {
         $data = $CONNECTDB->get_records_sql($sql, array(
             "username" => $username
         ));
+
+        foreach ($data as &$enrolment) {
+            // Update the user.
+            $enrolment->userid = $user->id;
+        }
 
         return self::filter_sql_query_set($data);
     }
