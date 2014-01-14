@@ -49,12 +49,7 @@ class utils {
 	 */
 	public static function enable_new_features() {
 		global $CFG;
-
-		$valid_installations = array("2014", "2013");
-
-		return $CFG->kent->environment === "dev" || (
-			$CFG->kent->environment === "live" && in_array($CFG->kent->distribution, $valid_installations)
-		);
+		return $CFG->local_connect_enable_new_features;
 	}
 
 }
