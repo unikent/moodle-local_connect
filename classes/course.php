@@ -510,11 +510,23 @@ class course {
      */
     public static function get_course($id) {
         global $CONNECTDB;
-        $data = $CONNECTDB->get_record('courses', array('moodle_id' => $id), "*", IGNORE_MULTIPLE);
-        if (!$data) {
+
+        // Select a bunch of records
+        $data = $CONNECTDB->get_records('courses', array('moodle_id' => $id));
+        if (empty($data)) {
             return false;
         }
-        return new course($data);
+
+        // If there are many pick a primary
+        if (count($data) > 1) {
+            foreach ($data as $datum) {
+                if ($data->link) {
+                    return new course($data);
+                }
+            }
+        }
+
+        return new course($data[0]);
     }
 
     /**
