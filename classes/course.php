@@ -234,9 +234,17 @@ class course {
             'module_delivery_key' => $this->module_delivery_key,
             'session_code' => $this->session_code
         ));
+
+        // If there is no chksum, we are dealing with a new course so add
+        // a placeholder and return true.
         if (!$chksum) {
-            // TODO - what happened here?
-            return false;
+            $DB->insert_record_raw("connect_course_chksum", array(
+                "courseid" => $this->moodle_id,
+                "module_delivery_key" => $this->module_delivery_key,
+                "session_code" => $this->session_code,
+                "chksum" => 'updateme'
+            ));
+            return true;
         }
 
         return $chksum->chksum != $this->chksum;
