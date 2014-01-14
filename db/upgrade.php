@@ -117,8 +117,8 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014010906, 'local', 'connect');
     }
 
-    if ($oldversion < 2014011302) {
-        if (\local_connect\utils::is_enabled()) {
+    if ($oldversion < 2014011410) {
+        if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_features()) {
             // Go through and populate SHAREDB::course_list
             $records = $DB->get_records('course', null, '', 'id, shortname, fullname, summary');
             foreach ($records as $record) {
@@ -133,7 +133,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2014011302, 'local', 'connect');
+        upgrade_plugin_savepoint(true, 2014011410, 'local', 'connect');
     }
 
     return true;

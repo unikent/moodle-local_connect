@@ -9,15 +9,15 @@ require_once('locallib.php');
 
 global $PAGE, $OUTPUT;
 
-if (!\local_connect\utils::enable_new_features()) {
-	print_error('new_feature_disabled', 'local_connect');
-}
-
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/util/enrolment.php');
 
 $PAGE->set_title("Enrolment");
 $PAGE->set_heading("Enrolment");
+
+if (!\local_connect\utils::enable_new_features()) {
+	print_error('new_feature_disabled', 'local_connect');
+}
 
 $PAGE->requires->js_init_call('M.local_enrolment.init', array(), false, array(
     'name' => 'local_enrolment',

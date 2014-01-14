@@ -12,6 +12,10 @@ $PAGE->set_url('/local/connect/rollover.php');
 $title = get_string('rollover_heading', 'local_connect');
 $PAGE->set_title($title);
 
+if (!\local_connect\utils::enable_new_features()) {
+	print_error('new_feature_disabled', 'local_connect');
+}
+
 $PAGE->requires->js_init_call('M.local_rollover.init', array(), false, array(
     'name' => 'local_enrolment',
     'fullpath' => '/local/connect/scripts/rollover.js',
