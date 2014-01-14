@@ -153,7 +153,7 @@ class enrolment {
      * @param  string $username A username
      * @return array(local_connect_enrolment) Enrolment objects
      */
-    public static function get_courses($username) {
+    public static function get_enrolments_for_user($username) {
         global $DB, $CONNECTDB;
 
         // Grab our user object early on.
@@ -182,9 +182,9 @@ class enrolment {
      * @see get_courses
      * @return array(local_connect_enrolment) Enrolment object
      */
-    public static function get_my_courses() {
+    public static function get_my_enrolments() {
         global $USER;
-        return self::get_courses($USER->username);
+        return self::get_enrolments_for_user($USER->username);
     }
 
     /**

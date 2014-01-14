@@ -93,7 +93,7 @@ class observers {
         }
 
         // Sync Enrollments
-        $enrolments = \local_connect\enrolment::get_courses($record->username);
+        $enrolments = \local_connect\enrolment::get_enrolments_for_user($record->username);
         foreach ($enrolments as $enrolment) {
             if (!$enrolment->is_in_moodle()) {
                 $enrolment->create_in_moodle();
