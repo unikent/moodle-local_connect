@@ -49,7 +49,7 @@ class utils {
 	 */
 	public static function enable_new_features() {
 		global $CFG;
-		return $CFG->local_connect_enable_new_features;
+		return $CFG->local_connect_enable_experimental;
 	}
 
 }
