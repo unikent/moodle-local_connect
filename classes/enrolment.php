@@ -102,10 +102,10 @@ class enrolment {
     }
 
     /**
-     * Returns all courses a given user should be enrolled on
+     * Returns all enrolments a given user should have
      * 
      * @param  string $username A username
-     * @return local_connect_enrolment Enrolment object
+     * @return array(local_connect_enrolment) Enrolment objects
      */
     public static function get_courses($username) {
         global $DB, $CONNECTDB;
@@ -113,7 +113,7 @@ class enrolment {
         // Grab our user object early on.
         $user = $DB->get_record('user', array('username' => $username));
 
-        // Select all our courses.
+        // Select all our enrolments.
         $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
                     LEFT JOIN `courses` c
                         ON c.module_delivery_key = e.module_delivery_key
@@ -150,14 +150,63 @@ class enrolment {
     }
 
     /**
-     * Returns all courses the current user should be enrolled on.
+     * Returns all enrolments the current user should have
      * 
      * @see get_courses
-     * @return local_connect_enrolment Enrolment object
+     * @return array(local_connect_enrolment) Enrolment object
      */
     public static function get_my_courses() {
         global $USER;
         return self::get_courses($USER->username);
+    }
+
+    /**
+     * Returns all enrolments for a given course
+     * 
+     * @param  local_connect_course $course A course
+     * @return local_connect_enrolment Enrolment object
+     */
+    public static function get_enrolments_for_course($course) {
+        global $DB, $CONNECTDB;
+
+        // Grab our user object early on.
+        $user = $DB->get_record('user', array('username' => $username));
+
+        // Select all our enrolments.
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
+                    LEFT JOIN `courses` c
+                        ON c.module_delivery_key = e.module_delivery_key
+                WHERE c.module_delivery_key=:deliverykey AND c.session_code = :sessioncode";
+        $data = $CONNECTDB->get_records_sql($sql, array(
+            "deliverykey" => $course->module_delivery_key,
+            "sessioncode" => $course->session_code
+        ));
+
+        // Translate each enrolment datum.
+        foreach ($data as &$enrolment) {
+            // Update the role.
+            $shortname = self::translate_role($enrolment->role);
+            $role = self::get_role($shortname);
+            $enrolment->roleid = $role->id;
+
+            // Update the user.
+            $enrolment->userid = $user->id;
+
+            // Create an object for this enrolment.
+            $enrolment = new static(
+                $enrolment->userid,
+                $enrolment->courseid,
+                $enrolment->roleid,
+                $enrolment->module_title
+            );
+        }
+
+        // Filter out invalid courses.
+        $data = array_filter($data, function($enrolment) {
+            return $enrolment->is_valid();
+        });
+
+        return $data;
     }
 
 
