@@ -36,12 +36,7 @@ class utils {
 	 */
 	public static function is_enabled() {
 		global $CFG;
-
-		$valid_installations = array("2014", "2013", "2012", "archive");
-
-		return $CFG->kent->environment === "dev" || (
-			$CFG->kent->environment === "live" && in_array($CFG->kent->distribution, $valid_installations)
-		);
+		return isset($CFG->local_connect_enable) && $CFG->local_connect_enable;
 	}
 
 	/**
@@ -49,7 +44,7 @@ class utils {
 	 */
 	public static function enable_new_features() {
 		global $CFG;
-		return $CFG->local_connect_enable_new_features;
+		return isset($CFG->local_connect_enable_new_features) && $CFG->local_connect_enable_new_features;
 	}
 
 }

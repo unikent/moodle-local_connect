@@ -10,4 +10,5 @@ $string['connect_disabled'] = 'Connect has been disabled on your system.';
 
 $string['cachedef_kent_connect'] = 'Connect Caching';
 
-$string['local_connect_new_feature_toggle'] = 'Enable new Connect features (Experimental)';
+$string['enable'] = 'Enable Connect';
+$string['new_feature_toggle'] = 'Enable new Connect features (Experimental)';
