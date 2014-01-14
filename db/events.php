@@ -27,11 +27,6 @@ $observers = array(
     array(
         'eventname' => '\core\event\course_created',
         'callback' => '\local_connect\observers::course_created',
-    ),
-  
-    array(
-        'eventname' => '\core\event\user_enrolment_created',
-        'callback' => '\local_connect\observers::user_enrolment_created',
     )
  
 );

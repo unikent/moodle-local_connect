@@ -67,21 +67,5 @@ class observers {
 
         return true;
     }
-
-    /**
-     * A user enrollment has occurred.
-     *
-     * @param \core\event\base $event The event.
-     * @return void
-     */
-    public static function user_enrolment_created(\core\event\user_enrolment_created $event) {
-
-        if (!\local_connect\utils::is_enabled() || !\local_connect\utils::enable_new_features()) {
-            return true;
-        }
-
-        // TODO
-        
-        return true;
-    }
+    
 }
