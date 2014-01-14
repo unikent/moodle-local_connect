@@ -38,7 +38,7 @@ class connect_rollover_form extends moodleform {
         $mform->addRule('source', $strrequired, 'required', null, 'client');
         $mform->setType('source', PARAM_INT);
 
-        $this->add_action_buttons(false, get_string('rollover', 'local_connect'));
+        $this->add_action_buttons(true, get_string('rollover', 'local_connect'));
     }
 
     function definition_after_data() {

@@ -26,4 +26,4 @@ foreach ($data as $datum) {
 	$json_data[] = $datum->shortname;
 }
 
-echo json_encode($json_data);
+echo json_encode(array_unique($json_data));
