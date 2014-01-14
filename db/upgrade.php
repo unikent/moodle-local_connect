@@ -98,7 +98,7 @@ function xmldb_local_connect_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014010906) {
-        if (\local_connect\utils::is_enabled()) {
+        if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_features()) {
         	// Go through and populate connect_course_chksum
         	$records = $CONNECTDB->get_records('courses', null, '', 'chksum, moodle_id, module_delivery_key, session_code');
         	foreach ($records as $record) {

@@ -22,13 +22,15 @@ if (!\local_connect\course::has_access()) {
 // 
 // New stuff
 // 
-switch ($_SERVER['PATH_INFO']) {
-  case '/courses':
-  case '/courses/':
-    $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
-    $courses = \local_connect\course::get_courses($category_restrictions, false);
-    echo json_encode($courses);
-    exit(0);
+if (\local_connect\utils::enable_new_features()) {
+  switch ($_SERVER['PATH_INFO']) {
+    case '/courses':
+    case '/courses/':
+      $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
+      $courses = \local_connect\course::get_courses($category_restrictions, false);
+      echo json_encode($courses);
+      exit(0);
+  }
 }
 
 //

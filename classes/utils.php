@@ -44,4 +44,17 @@ class utils {
 		);
 	}
 
+	/**
+	 * Enable the fancy new connect features?
+	 */
+	public static function enable_new_features() {
+		global $CFG;
+
+		$valid_installations = array("2014", "2013");
+
+		return $CFG->kent->environment === "dev" || (
+			$CFG->kent->environment === "live" && in_array($CFG->kent->distribution, $valid_installations)
+		);
+	}
+
 }
