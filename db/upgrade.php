@@ -136,5 +136,27 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014011410, 'local', 'connect');
     }
 
+    if ($oldversion < 2014011412) {
+
+        // Define table connect_enrolment_chksum to be created.
+        $table = new xmldb_table('connect_enrolment_chksum');
+
+        // Adding fields to table connect_enrolment_chksum.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('moodleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('chksum', XMLDB_TYPE_CHAR, '36', null, null, null, null);
+
+        // Adding keys to table connect_enrolment_chksum.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for connect_enrolment_chksum.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014011412, 'local', 'connect');
+    }
+
     return true;
 }
