@@ -102,6 +102,40 @@ class enrolment {
     }
 
     /**
+     * Filters a raw SQL set of enrolments
+     * 
+     * @return array(local_connect_enrolment) Enrolment object
+     */
+    private static function filter_sql_query_set($data) {
+
+        // Translate each enrolment datum.
+        foreach ($data as &$enrolment) {
+            // Update the role.
+            $shortname = self::translate_role($enrolment->role);
+            $role = self::get_role($shortname);
+            $enrolment->roleid = $role->id;
+
+            // Update the user.
+            $enrolment->userid = $user->id;
+
+            // Create an object for this enrolment.
+            $enrolment = new static(
+                $enrolment->userid,
+                $enrolment->courseid,
+                $enrolment->roleid,
+                $enrolment->module_title
+            );
+        }
+
+        // Filter out invalid courses.
+        $data = array_filter($data, function($enrolment) {
+            return $enrolment->is_valid();
+        });
+
+        return $data;
+    }
+
+    /**
      * Returns all enrolments a given user should have
      * 
      * @param  string $username A username
@@ -122,31 +156,7 @@ class enrolment {
             "username" => $username
         ));
 
-        // Translate each enrolment datum.
-        foreach ($data as &$enrolment) {
-            // Update the role.
-            $shortname = self::translate_role($enrolment->role);
-            $role = self::get_role($shortname);
-            $enrolment->roleid = $role->id;
-
-            // Update the user.
-            $enrolment->userid = $user->id;
-
-            // Create an object for this enrolment.
-            $enrolment = new static(
-                $enrolment->userid,
-                $enrolment->courseid,
-                $enrolment->roleid,
-                $enrolment->module_title
-            );
-        }
-
-        // Filter out invalid courses.
-        $data = array_filter($data, function($enrolment) {
-            return $enrolment->is_valid();
-        });
-
-        return $data;
+        return self::filter_sql_query_set($data);
     }
 
     /**
@@ -167,10 +177,7 @@ class enrolment {
      * @return local_connect_enrolment Enrolment object
      */
     public static function get_enrolments_for_course($course) {
-        global $DB, $CONNECTDB;
-
-        // Grab our user object early on.
-        $user = $DB->get_record('user', array('username' => $username));
+        global $CONNECTDB;
 
         // Select all our enrolments.
         $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
@@ -182,31 +189,7 @@ class enrolment {
             "sessioncode" => $course->session_code
         ));
 
-        // Translate each enrolment datum.
-        foreach ($data as &$enrolment) {
-            // Update the role.
-            $shortname = self::translate_role($enrolment->role);
-            $role = self::get_role($shortname);
-            $enrolment->roleid = $role->id;
-
-            // Update the user.
-            $enrolment->userid = $user->id;
-
-            // Create an object for this enrolment.
-            $enrolment = new static(
-                $enrolment->userid,
-                $enrolment->courseid,
-                $enrolment->roleid,
-                $enrolment->module_title
-            );
-        }
-
-        // Filter out invalid courses.
-        $data = array_filter($data, function($enrolment) {
-            return $enrolment->is_valid();
-        });
-
-        return $data;
+        return self::filter_sql_query_set($data);
     }
 
 
