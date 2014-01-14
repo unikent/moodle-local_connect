@@ -503,6 +503,10 @@ class course {
     public static function has_access() {
         global $DB;
 
+        if (has_capability('moodle/site:config', \context_system::instance())) {
+            return true;
+        }
+
         $cats = $DB->get_records('course_categories');
 
         // Check permissions
