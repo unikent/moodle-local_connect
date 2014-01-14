@@ -498,7 +498,7 @@ class course {
     }
 
     /**
-     * Is this user allowed to grab a list of courses?
+     * Is this user allowed to manage courses?
      */
     public static function has_access() {
         global $DB;

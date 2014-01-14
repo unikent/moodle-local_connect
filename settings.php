@@ -18,7 +18,7 @@ if ($hassiteconfig) {
 	$settings->add(new admin_setting_configcheckbox(
 		'local_connect_enable_new_features',
 		get_string('new_feature_toggle', 'local_connect'),
-		'',
+		get_string('new_feature_toggle_desc', 'local_connect'),
 		0
 	));
 }
