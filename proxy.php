@@ -22,7 +22,6 @@ if (!\local_connect\course::has_access()) {
 // 
 // New stuff
 // 
-/*
 switch ($_SERVER['PATH_INFO']) {
   case '/courses':
   case '/courses/':
@@ -31,7 +30,6 @@ switch ($_SERVER['PATH_INFO']) {
     echo json_encode($courses);
     exit(0);
 }
-*/
 
 //
 // Old Stuff - Ship it off to Connect
