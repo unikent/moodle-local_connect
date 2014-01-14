@@ -22,11 +22,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$observers = array(
+$observers = array (
   
-    array(
+    array (
         'eventname' => '\core\event\course_created',
         'callback' => '\local_connect\observers::course_created',
+    ),
+  
+    array (
+        'eventname' => '\core\event\user_created',
+        'callback' => '\local_connect\observers::user_created',
     )
- 
+
 );

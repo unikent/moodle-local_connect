@@ -67,5 +67,40 @@ class observers {
 
         return true;
     }
-    
+
+    /**
+     * Triggered when 'user_created' event is triggered.
+     *
+     * Sync the new user's enrolments
+     *
+     * @param \core\event\user_created $event
+     */
+    public static function user_created(\core\event\user_created $event) {
+        global $CFG, $DB, $SHAREDB;
+
+        if (!\local_connect\utils::is_enabled() || !\local_connect\utils::enable_new_features()) {
+            return true;
+        }
+        
+        // Grab user info
+        $record = $DB->get_record('user', array(
+            "id" => $event->objectid
+        ));
+
+        // Perhaps this is a new installation...
+        if ($record->id <= 1) {
+            return true;
+        }
+
+        // Sync Enrollments
+        $enrolments = \local_connect\enrolment::get_courses($record->username);
+        foreach ($enrolments as $enrolment) {
+            if (!$enrolment->is_in_moodle()) {
+                $enrolment->create_in_moodle();
+            }
+        }
+
+        return true;
+    }
+
 }
