@@ -16,9 +16,15 @@ if (!\local_connect\course::has_access()) {
 }
 
 /**
+ * Initial setup
+ */
+
+$site_context = context_system::instance();
+$cat_permissions = kent_get_connect_course_categories();
+
+/**
  * Page setup
  */
-$site_context = context_system::instance();
 $PAGE->set_context($site_context);
 $PAGE->set_url('/local/connect/index.php');
 $PAGE->set_pagelayout('datool');
