@@ -97,8 +97,8 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014010901, 'local', 'connect');
     }
 
-    if ($oldversion < 2014010904) {
-        if (\local_connect\utils::is_enabled()) {
+    if ($oldversion < 2014010906) {
+        if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_features()) {
         	// Go through and populate connect_course_chksum
         	$records = $CONNECTDB->get_records('courses', null, '', 'chksum, moodle_id, module_delivery_key, session_code');
         	foreach ($records as $record) {
@@ -114,7 +114,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2014010904, 'local', 'connect');
+        upgrade_plugin_savepoint(true, 2014010906, 'local', 'connect');
     }
 
     if ($oldversion < 2014011302) {

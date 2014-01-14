@@ -7,10 +7,12 @@ global $USER, $PAGE, $CFG;
 
 require_login();
 
-// Are we allowed here?
-$cat_permissions = kent_get_connect_course_categories();
-if (count($cat_permissions) == 0) {
-    print_error('accessdenied', 'local_connect');
+if (!\local_connect\utils::is_enabled()) {
+	print_error('connect_disabled', 'local_connect');
+}
+
+if (!\local_connect\course::has_access()) {
+	print_error('accessdenied', 'local_connect');
 }
 
 /**

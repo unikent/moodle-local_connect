@@ -17,7 +17,7 @@
 /**
  * Local stuff for Moodle Connect
  *
- * @package    core_connect
+ * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -36,12 +36,15 @@ class utils {
 	 */
 	public static function is_enabled() {
 		global $CFG;
+		return isset($CFG->local_connect_enable) && $CFG->local_connect_enable;
+	}
 
-		$valid_installations = array("2014", "2013", "2012", "archive");
-
-		return $CFG->kent->environment === "dev" || (
-			$CFG->kent->environment === "live" && in_array($CFG->kent->distribution, $valid_installations)
-		);
+	/**
+	 * Enable the fancy new connect features?
+	 */
+	public static function enable_new_features() {
+		global $CFG;
+		return isset($CFG->local_connect_enable_new_features) && $CFG->local_connect_enable_new_features;
 	}
 
 }

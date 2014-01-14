@@ -22,16 +22,16 @@ if (!\local_connect\course::has_access()) {
 // 
 // New stuff
 // 
-
-switch ($_SERVER['PATH_INFO']) {
-  case '/courses':
-  case '/courses/':
-    $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
-    $courses = \local_connect\course::get_courses($category_restrictions, false);
-    echo json_encode($courses);
-    exit(0);
+if (\local_connect\utils::enable_new_features()) {
+  switch ($_SERVER['PATH_INFO']) {
+    case '/courses':
+    case '/courses/':
+      $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
+      $courses = \local_connect\course::get_courses($category_restrictions, false);
+      echo json_encode($courses);
+      exit(0);
+  }
 }
-
 
 //
 // Old Stuff - Ship it off to Connect
@@ -39,7 +39,7 @@ switch ($_SERVER['PATH_INFO']) {
 
 //make resource
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $CFG->kent_connect_url . $_SERVER['PATH_INFO'] . '?' . $_SERVER['QUERY_STRING']);
+curl_setopt($ch, CURLOPT_URL, $CFG->kent->paths['connect'] . $_SERVER['PATH_INFO'] . '?' . $_SERVER['QUERY_STRING']);
 curl_setopt($ch, CURLOPT_HEADER, 1);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $_SERVER["REQUEST_METHOD"]);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

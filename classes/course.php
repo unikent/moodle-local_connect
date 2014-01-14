@@ -17,7 +17,7 @@
 /**
  * Local stuff for Moodle Connect
  *
- * @package    core_connect
+ * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -498,10 +498,14 @@ class course {
     }
 
     /**
-     * Is this user allowed to grab a list of courses?
+     * Is this user allowed to manage courses?
      */
     public static function has_access() {
         global $DB;
+
+        if (has_capability('moodle/site:config', \context_system::instance())) {
+            return true;
+        }
 
         $cats = $DB->get_records('course_categories');
 
