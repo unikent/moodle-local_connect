@@ -482,7 +482,12 @@ class course {
      * Syncs enrollments for this Course
      */
     public function sync_enrolments() {
-        // TODO
+        $enrolments = enrolment::get_enrolments_for_course($this);
+        foreach ($enrolments as $enrolment) {
+            if (!$enrolment->is_in_moodle()) {
+                $enrolment->create_in_moodle();
+            }
+        }
     }
 
     /**
