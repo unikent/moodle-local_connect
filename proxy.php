@@ -39,9 +39,16 @@ if (\local_connect\utils::enable_new_features()) {
       echo json_encode($response);
       die;
     case '/courses/disengage/':
-      $response = array();
       $data = json_decode(file_get_contents("php://input"));
-      echo json_encode($response);
+
+      $course = $data->courses;
+      $connect_course = \local_connect\course::get_course_by_uid($course[0], $course[1]);
+      $result = $connect_course->delete();
+      
+      echo json_encode(array(
+        "chksum" => $course->chksum,
+        "result" => $result ? 'success' : 'error',
+      ));
       die;
     case '/courses':
     case '/courses/':
