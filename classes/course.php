@@ -154,6 +154,7 @@ class course {
         global $CONNECTDB;
 
         $sql = "UPDATE courses SET
+                    parent_id=?,
                     moodle_id=?,
                     module_code=?,
                     module_title=?,
@@ -163,6 +164,7 @@ class course {
                 WHERE chksum=?";
 
         return $CONNECTDB->execute($sql, array(
+            $this->parent_id,
             $this->moodle_id,
             $this->module_code,
             $this->module_title,
@@ -500,6 +502,18 @@ class course {
     public function delete() {
         global $DB, $CONNECTDB;
 
+        // Step 0 - If this is a linked course, kill our children.
+        if (!empty($this->children)) {
+            foreach ($this->children as $child) {
+                $course = course::get_course_by_chksum($child);
+                $course->state = 1;
+                $course->moodle_id = 0;
+                $course->parent_id = 0;
+                $course->update();
+            }
+            
+        }
+
         // Step 1 - Move to the 'removed category'.
 
         $category = \local_connect\utils::get_removed_category();
@@ -552,6 +566,18 @@ class course {
     public static function get_course($id) {
         global $CONNECTDB;
         $data = $CONNECTDB->get_record('courses', array('moodle_id' => $id), "*", IGNORE_MULTIPLE);
+        if (!$data) {
+            return false;
+        }
+        return new course($data);
+    }
+
+    /**
+     * Get a Connect Course by chksum
+     */
+    public static function get_course_by_chksum($chksum) {
+        global $CONNECTDB;
+        $data = $CONNECTDB->get_record('courses', array('chksum' => $chksum));
         if (!$data) {
             return false;
         }
