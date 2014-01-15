@@ -1010,6 +1010,14 @@ var Connect = (function() {
 		var _this = this;
 
 		var chksum = $(el).closest('tr').attr('ident');
+		var module_delivery_key = $(el).closest('tr').attr('ident');
+		var session_code = $(el).closest('tr').attr('ident');
+
+		var courses = [ chksum ];
+		if (window.enableConnectAdvanced) {
+			courses = [ module_delivery_key, session_code ];
+		}
+
 			var row = $(el).closest('tr');
 			$(el).removeClass('unlink_row').addClass('ajax_loading');
 			$.ajax({
@@ -1017,7 +1025,7 @@ var Connect = (function() {
 				url: window.dapageUrl + '/courses/disengage/',
 				dataType: 'json',
 				contentType: 'json',
-				data: JSON.stringify({ 'courses' : [ chksum ] }),
+				data: JSON.stringify({ 'courses' : courses }),
 				success: function () {
 
 					if(_this.oTable.fnIsOpen(row[0])) {

@@ -38,6 +38,8 @@ if (\local_connect\utils::enable_new_features()) {
       }
       echo json_encode($response);
       die;
+    case '/courses/disengage/':
+      die;
     case '/courses':
     case '/courses/':
       $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
