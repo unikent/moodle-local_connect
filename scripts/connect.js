@@ -766,7 +766,7 @@ var Connect = (function() {
 				// _this.buttons.pageRefresh.text('The table data has changed. Click here to reload table');
 				callback();
 			},
-			error: function(xhr, request, settings) {console.log(xhr);
+			error: function(xhr, request, settings) {
 				button.stop();
 				$(button.element[0]).removeClass('loading');
 				button.updateText('Error');
