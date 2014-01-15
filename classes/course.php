@@ -245,7 +245,7 @@ class course {
     /**
      * Create this course in Moodle
      */
-    public function create_moodle() {
+    public function create_moodle($shortname_ext = "") {
         global $DB;
 
         // Check we have a category.
@@ -253,6 +253,8 @@ class course {
             print "No category for $this->chksum\n";
             return false;
         }
+
+        $this->shortname = $this->shortname . " " . $shortname_ext;
 
         // Does this shortname exist?
         $course = $DB->get_record('course', array('shortname' => $this->shortname));

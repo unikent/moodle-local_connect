@@ -30,7 +30,7 @@ if (\local_connect\utils::enable_new_features()) {
       $data = json_decode(file_get_contents("php://input"));
       foreach ($data->courses as $course) {
         $connect_course = \local_connect\course::get_course_by_uid($course->module_delivery_key, $course->session_code);
-        $result = $connect_course->create_moodle();
+        $result = $connect_course->create_moodle(isset($course->shortname_ext) ? $course->shortname_ext : "");
         $response[] = array(
           "chksum" => $connect_course->chksum,
           "result" => $result ? 'success' : 'error',
@@ -44,7 +44,7 @@ if (\local_connect\utils::enable_new_features()) {
       $course = $data->courses;
       $connect_course = \local_connect\course::get_course_by_uid($course[0], $course[1]);
       $result = $connect_course->delete();
-      
+
       echo json_encode(array(
         "chksum" => $course->chksum,
         "result" => $result ? 'success' : 'error',
