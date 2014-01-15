@@ -65,7 +65,7 @@ var Connect = (function() {
 			var state = '<div class="status_'+state_zero+' '+(sink_deleted?'sink_deleted':'')+' '+(same_module_code_created?'same_module_code_created':'')+'">'+name+'</div>';
 
 			return [val.chksum, state, val.module_code, val.module_title, val.campus_desc, 
-					duration, val.student_count, val.module_version, val.delivery_department, toolbar];
+					duration, val.student_count, val.module_version, val.delivery_department, toolbar, val.module_delivery_key, val.session_code];
 
 
 			// prepending status box to the dom and hiding it ready for use
@@ -112,6 +112,8 @@ var Connect = (function() {
 			"sPaginationType": "full_numbers",
 			"fnCreatedRow": function( nRow, aData, iDataIndex ) {
 				$(nRow).attr('ident', aData[0]);
+				$(nRow).attr('deliverykey', aData[10]);
+				$(nRow).attr('sessioncode', aData[11]);
 				$(nRow).addClass('parent')
 			},
 			"fnInitComplete": function(oSettings) {
@@ -486,6 +488,8 @@ var Connect = (function() {
 
 					var obj = {
 						id: pushees[i].chksum,
+						module_delivery_key: pushees[i].module_delivery_key,
+						session_code: pushees[i].session_code,
 						code: pushees[i].module_code + ' ' + date,
 						title: pushees[i].module_title + ' ' + date,
 						synopsis: synopsis,// + '  <a href="http://www.kent.ac.uk/courses/modulecatalogue/modules/'+ pushees[i].module_code +'">More</a>',
@@ -667,6 +671,8 @@ var Connect = (function() {
 
 					var data = [{
 						id: row[0].chksum,
+						module_delivery_key: row[0].module_delivery_key,
+						session_code: row[0].session_code,
 						code: shortname,
 						title: _this.formEl.fullName.val(),
 						synopsis: synopsis,
@@ -729,7 +735,7 @@ var Connect = (function() {
 			contentType: 'application/json',
 			dataType: 'json',
 			data: JSON.stringify({'courses': data }),
-			success: function () {
+			success: function (data, status, xhr) {
 				button.stop();
 				_this.buttons.rowsEl.removeClass('row_selected');
 				_this.buttons.pushBtn.removeClass('loading');
@@ -760,7 +766,7 @@ var Connect = (function() {
 				// _this.buttons.pageRefresh.text('The table data has changed. Click here to reload table');
 				callback();
 			},
-			error: function(xhr, request, settings) {
+			error: function(xhr, request, settings) {console.log(xhr);
 				button.stop();
 				$(button.element[0]).removeClass('loading');
 				button.updateText('Error');

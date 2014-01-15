@@ -305,12 +305,25 @@ class course {
         $this->create_forum();
 
         // Add to tracking table.
-        $DB->insert_record_raw("connect_course_chksum", array(
-            "courseid" => $this->moodle_id,
-            "module_delivery_key" => $this->module_delivery_key,
-            "session_code" => $this->session_code,
-            "chksum" => $this->chksum
+        $tracker = $DB->get_record('connect_course_chksum', array(
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
         ));
+        if ($tracker) {
+            $DB->set_field('connect_course_chksum', 'chksum', $this->chksum, array (
+                'module_delivery_key' => $this->module_delivery_key,
+                'session_code' => $this->session_code
+            ));
+        } else {
+            $DB->insert_record_raw("connect_course_chksum", array(
+                "courseid" => $this->moodle_id,
+                "module_delivery_key" => $this->module_delivery_key,
+                "session_code" => $this->session_code,
+                "chksum" => $this->chksum
+            ));
+        }
+
+        return true;
     }
 
     /**
@@ -494,6 +507,24 @@ class course {
         if (!$data) {
             return false;
         }
+        return new course($data);
+    }
+
+    /**
+     * Get a Connect Course by Devliery Key and Session Code
+     */
+    public static function get_course_by_uid($module_delivery_key, $session_code) {
+        global $CONNECTDB;
+
+        $data = $CONNECTDB->get_record('courses', array(
+            'module_delivery_key' => $module_delivery_key, 
+            'session_code' => $session_code
+        ), "*", IGNORE_MULTIPLE);
+
+        if (!$data) {
+            return false;
+        }
+
         return new course($data);
     }
 

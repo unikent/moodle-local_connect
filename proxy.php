@@ -24,12 +24,26 @@ if (!\local_connect\course::has_access()) {
 // 
 if (\local_connect\utils::enable_new_features()) {
   switch ($_SERVER['PATH_INFO']) {
+    case '/courses/schedule':
+    case '/courses/schedule/':
+      $response = array();
+      $data = json_decode(file_get_contents("php://input"));
+      foreach ($data->courses as $course) {
+        $connect_course = \local_connect\course::get_course_by_uid($course->module_delivery_key, $course->session_code);
+        $result = $connect_course->create_moodle();
+        $response[] = array(
+          "chksum" => $connect_course->chksum,
+          "result" => $result ? 'success' : 'error',
+        );
+      }
+      echo json_encode($response);
+      die;
     case '/courses':
     case '/courses/':
       $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
       $courses = \local_connect\course::get_courses($category_restrictions, false);
       echo json_encode($courses);
-      exit(0);
+      die;
   }
 }
 
