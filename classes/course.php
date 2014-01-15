@@ -332,22 +332,23 @@ class course {
 
     /**
      * Link a course to this course
-     * @todo  id_number is not specified
      */
     private function create_link($target) {
-        // Create a linked course
+        // Create a linked course.
         $data = clone($this);
         $data->module_delivery_key = $this->chksum;
         $data->primary_child = $this->chksum;
         $data->shortname = "$this->shortname/$target->shortname";
         $data->chksum = $data->id_chksum = uniqid("link-");
         $data->link = 1;
-        $link = new course($data);
-        $link->create_moodle();
+        $data = new course($data);
 
-        // Add children
-        $link->add_child($this);
-        $link->add_child($target);
+        // Create the course in Moodle.
+        $data->create_moodle();
+
+        // Add children.
+        $data->add_child($this);
+        $data->add_child($target);
     }
 
     /**
