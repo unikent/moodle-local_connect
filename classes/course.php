@@ -328,6 +328,7 @@ class course {
 
     /**
      * Link a course to this course
+     * @todo  id_number is not specified
      */
     private function create_link($target) {
         // Create a linked course
@@ -489,6 +490,51 @@ class course {
         $DB->set_field('connect_course_chksum', 'chksum', $this->chksum, array (
             'courseid' => $this->id
         ));
+    }
+
+    /**
+     * Delete this course
+     */
+    public function delete() {
+        global $DB, $CONNECTDB;
+
+        // Step 1 - Move to the 'removed category'.
+
+        $category = \local_connect\utils::get_removed_category();
+
+        $course = $DB->get_record('course', array('id' => $this->moodle_id));
+
+        $course->category = $category;
+        $course->shortname = date("dmY-His") . "-" . $course->shortname;
+        $course->idnumber = date("dmY-His") . "-" . $course->idnumber;
+
+        update_course($course);
+
+        // Step 2 - Update enrolments.
+        
+        $CONNECTDB->set_field('enrollments', 'state', 1, array (
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
+        
+        $CONNECTDB->set_field('group_enrollments', 'state', 1, array (
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
+
+        // Step 3 - Well we havent errored yet! Finish up.
+        
+        $CONNECTDB->set_field('courses', 'state', 1, array (
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
+        
+        $CONNECTDB->set_field('courses', 'moodle_id', 0, array (
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
+
+        return true;
     }
 
     /**
