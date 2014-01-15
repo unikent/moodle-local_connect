@@ -39,6 +39,9 @@ if (\local_connect\utils::enable_new_features()) {
       echo json_encode($response);
       die;
     case '/courses/disengage/':
+      $response = array();
+      $data = json_decode(file_get_contents("php://input"));
+      echo json_encode($response);
       die;
     case '/courses':
     case '/courses/':
