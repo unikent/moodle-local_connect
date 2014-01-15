@@ -1018,43 +1018,43 @@ var Connect = (function() {
 			courses = [ module_delivery_key, session_code ];
 		}
 
-			var row = $(el).closest('tr');
-			$(el).removeClass('unlink_row').addClass('ajax_loading');
-			$.ajax({
-				type: 'POST',
-				url: window.dapageUrl + '/courses/disengage/',
-				dataType: 'json',
-				contentType: 'json',
-				data: JSON.stringify({ 'courses' : courses }),
-				success: function () {
+		var row = $(el).closest('tr');
+		$(el).removeClass('unlink_row').addClass('ajax_loading');
+		$.ajax({
+			type: 'POST',
+			url: window.dapageUrl + '/courses/disengage/',
+			dataType: 'json',
+			contentType: 'json',
+			data: JSON.stringify({ 'courses' : courses }),
+			success: function () {
 
-					if(_this.oTable.fnIsOpen(row[0])) {
-						row.removeClass('close').addClass('open');
-						_this.oTable.fnClose(row[0]);
-					}
-
-					row.removeClass('row_selected');
-					var aPos = _this.oTable.fnGetPosition(row[0]);
-					_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-					_this.oTable.fnUpdate('', row[0], 8, false)
-
-					_this.oTable.fnDraw();
-
-					_this.selectedDeliveries = [];
-					_this.count = 0;
-					$('#job_number').html(_this.count);
-					_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
-					if($('#jobs ul').hasClass('visible')) {
-						$('#jobs ul').html(_this.delivery_list);
-					}
-
-					_this.buttons.pageRefresh.addClass('highlight');
-				},
-				error: function() {
-					$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_row');
-					_this.statusbox(row, 'Error: we were unable to process your request at this time. Please try later');
+				if(_this.oTable.fnIsOpen(row[0])) {
+					row.removeClass('close').addClass('open');
+					_this.oTable.fnClose(row[0]);
 				}
-			});
+
+				row.removeClass('row_selected');
+				var aPos = _this.oTable.fnGetPosition(row[0]);
+				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
+				_this.oTable.fnUpdate('', row[0], 8, false)
+
+				_this.oTable.fnDraw();
+
+				_this.selectedDeliveries = [];
+				_this.count = 0;
+				$('#job_number').html(_this.count);
+				_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
+				if($('#jobs ul').hasClass('visible')) {
+					$('#jobs ul').html(_this.delivery_list);
+				}
+
+				_this.buttons.pageRefresh.addClass('highlight');
+			},
+			error: function() {
+				$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_row');
+				_this.statusbox(row, 'Error: we were unable to process your request at this time. Please try later');
+			}
+		});
 	};
 
 	Connect.prototype.unlink_child = function(el) {
