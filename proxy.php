@@ -38,7 +38,7 @@ switch ($_SERVER['PATH_INFO']) {
     if (null == $input) {
       header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
     } else {
-      $result = \local_connect\course::schedule_all($input);
+      $result = \local_connect\course::schedule_all($input->courses);
       echo json_encode($result);
     }
     exit(0);

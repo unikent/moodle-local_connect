@@ -53,7 +53,7 @@ class kent_course_tests extends advanced_testcase {
 
     // when we attempt a schedule of the second
     $input = array(
-      array(
+      (object)array(
         'id' => '09875656',
         'code' => '123',
         'title' => '',
@@ -78,7 +78,7 @@ class kent_course_tests extends advanced_testcase {
       'session_code' => '2013', 'chksum' => '0987565', 'parent_id' => null));
 
     $input = array(
-      array(
+      (object)array(
         'id' => '0987565',
         'code' => 'SS803 (2013/2014)',
         'title' => 'Research Methods (2013/2014)',

@@ -646,22 +646,22 @@ class course {
       $r = array();
 
       foreach ($in_courses as $c) {
-        if ($course = $CONNECTDB->get_record('courses',array('chksum'=>$c['id']))) {
+        if ($course = $CONNECTDB->get_record('courses',array('chksum'=>$c->id))) {
           $uc = new course($course);
-          $uc->module_code = $c['code'];
-          $uc->module_title = $c['title'];
-          $uc->synopsis = $c['synopsis'];
-          $uc->category = $c['category'];
+          $uc->module_code = $c->code;
+          $uc->module_title = $c->title;
+          $uc->synopsis = $c->synopsis;
+          $uc->category = $c->category;
           $uc->state = course::$states['scheduled'];
 
           if ($uc->is_unique()) {
             $uc->update();
             $STOMP->send('connect.job.create_course',$uc->chksum);
           } else {
-            $r []= array('error_code'=>'duplicate','id'=>$c['id']);
+            $r []= array('error_code'=>'duplicate','id'=>$c->id);
           }
         } else {
-          $r []= array('error_code'=>'does_not_exist','id'=>$c['id']);
+          $r []= array('error_code'=>'does_not_exist','id'=>$c->id);
         }
       }
 
