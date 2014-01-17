@@ -268,6 +268,8 @@ var Connect = (function() {
 	};
 
 	Connect.prototype.fnFormatDetails = function(row, par_chksm) {
+    var _this = this;
+
 		var sOut = '<table par_ident="'+ par_chksm +'">';
 			sOut += '<tr>';
 			sOut += '<th>Code</th>';
@@ -279,21 +281,22 @@ var Connect = (function() {
 			sOut += '<th>Department</th>';
 			sOut += '<th></th>';
 			sOut += '</tr>';
-			
+
 			$.each(row.children, function(i) {
-				var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10) - 1;
-				var duration = row.children[i].module_week_beginning + ( isNaN(end) ? '' : '-' + end );
-				sOut += '<tr ident="'+ row.children[i].chksum +'">';
+        var child = _this.json[row.children[i]];
+				var end = parseInt(child.module_week_beginning, 10) + parseInt(child.module_length, 10) - 1;
+				var duration = child.module_week_beginning + ( isNaN(end) ? '' : '-' + end );
+				sOut += '<tr ident="'+ child.chksum +'">';
 				sOut += '<td class="code"><div class="'
-									+ (row.children[i].sink_deleted ? 'sink_deleted' : '' )
-									+ '">' + row.children[i].module_code
+									+ (child.sink_deleted ? 'sink_deleted' : '' )
+									+ '">' + child.module_code
 									+ '</div></td>';
-				sOut += '<td class="name">'+ row.children[i].module_title +'</td>';
-				sOut += '<td class="campus">' + row.children[i].campus_desc +'</td>';
+				sOut += '<td class="name">'+ child.module_title +'</td>';
+				sOut += '<td class="campus">' + child.campus_desc +'</td>';
 				sOut += '<td class="duration">'+ duration +'</td>';
-				sOut += '<td class="students">'+ row.children[i].student_count +'</td>';
-				sOut += '<td class="version">'+ row.children[i].module_version +'</td>';
-				sOut += '<td class="department">'+ row.children[i].delivery_department +'</td>';
+				sOut += '<td class="students">'+ child.student_count +'</td>';
+				sOut += '<td class="version">'+ child.module_version +'</td>';
+				sOut += '<td class="department">'+ child.delivery_department +'</td>';
 				if(row.children.length > 1) {
 					sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';
 				} else {
@@ -303,7 +306,7 @@ var Connect = (function() {
 				sOut += '</tr>';
 			});
 			sOut += '</table>';
-			 
+
 			return sOut;
 	}
 

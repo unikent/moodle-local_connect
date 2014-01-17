@@ -562,7 +562,7 @@ class course {
                     CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('\"',c2.chksum,'\"')),''),']') children
                   FROM courses c1
                     LEFT OUTER JOIN courses c2
-                        ON c1.module_delivery_key = c2.parent_id
+                        ON c1.chksum = c2.parent_id
                     LEFT OUTER JOIN (
                                         SELECT 'unprocessed' state, 1 code
                                       UNION
