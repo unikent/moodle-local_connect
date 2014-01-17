@@ -10,6 +10,289 @@ defined('MOODLE_INTERNAL') || die();
 
 class kent_course_tests extends advanced_testcase {
 
+  public function test_merge_sets_weeks_properly() {
+    global $CONNECTDB;
+
+    // given a couple of deliveries
+    $insert = 'insert into courses ' .
+      '(state,module_delivery_key,session_code,chksum,campus,campus_desc,module_week_beginning,module_length,week_beginning_date) ';
+    $CONNECTDB->execute($insert . 'values (?,?,?,?,?,?,?,?,date_add(now(), interval 30 day))',
+      array( \local_connect\course::$states['unprocessed'],
+      '321654', '2013', '321654', '1', 'Canterbury', '1', '5'));
+    $CONNECTDB->execute($insert . 'values (?,?,?,?,?,?,?,?,date_sub(now(), interval 30 day))',
+      array( 'state' => \local_connect\course::$states['unprocessed'],
+      '321654789', '2013', '321654789', '1', 'Canterbury', '13', '6'));
+
+    // and some mocked bits
+    global $STOMP;
+    $origstomp = $STOMP;
+    $STOMP = $this->getMock('\FuseSource\Stomp', array('send'));
+    $STOMP->expects($this->once())->method('send');
+
+    // when we merge them
+    $input = (object)array(
+      'link_courses' => array('321654','321654789'),
+      'code' => '123',
+      'title' => 'a title',
+      'synopsis' => '',
+      'category' => '2',
+      'primary_child' => ''
+    );
+
+    $result = \local_connect\course::merge($input);
+
+    // then we expect to have correct dates set on the link course
+    $link = $CONNECTDB->get_record('courses',array('module_code'=>'123'));
+    $this->assertEquals(1,$link->module_week_beginning);
+    $this->assertEquals(18,$link->module_length);
+    $this->assertTrue(new DateTime($link->week_beginning_date) < new DateTime('now'));
+
+    $STOMP = $origstomp;
+  }
+
+  public function test_merge_single_linked_course() {
+    global $CONNECTDB;
+
+    // given an existing link course
+    $insert = 'insert into courses ' .
+      '(state,module_delivery_key,session_code,chksum,parent_id,campus,campus_desc,link) values (?,?,?,?,?,?,?,?)';
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['created_in_moodle'],
+      'module_delivery_key' => '123456',
+      'session_code' => '2013', 'chksum' => '123456', 'parent_id' => null,
+      'campus' => '58', 'campus_desc' => 'Medway', true));
+
+    // and an unprocessed delivery or two
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['unprocessed'],
+      'module_delivery_key' => '321654',
+      'session_code' => '2013', 'chksum' => '321654', 'parent_id' => null,
+      'campus' => '1', 'campus_desc' => 'Canterbury', null));
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['unprocessed'],
+      'module_delivery_key' => '321654789',
+      'session_code' => '2013', 'chksum' => '321654789', 'parent_id' => null,
+      'campus' => '1', 'campus_desc' => 'Canterbury', null));
+
+    // then we expect the add child job to get called for each child
+    global $STOMP;
+    $origstomp = $STOMP;
+    $STOMP = $this->getMock('\FuseSource\Stomp', array('send'));
+    $STOMP->expects($this->at(0))->method('send')
+      ->with(
+        $this->equalTo('connect.job.add_link_child'),
+        $this->equalTo(json_encode(array('link_course_chksum'=>'123456','chksum'=>'321654')))
+      );
+    $STOMP->expects($this->at(1))->method('send')
+      ->with(
+        $this->equalTo('connect.job.add_link_child'),
+        $this->equalTo(json_encode(array('link_course_chksum'=>'123456','chksum'=>'321654789')))
+      );
+
+    // when we attempt to merge them
+    $input = (object)array(
+      'link_courses' => array('123456','321654','321654789'),
+      'code' => '123',
+      'title' => 'a title',
+      'synopsis' => '',
+      'category' => '2',
+      'primary_child' => ''
+    );
+
+    $result = \local_connect\course::merge($input);
+
+    $STOMP = $origstomp;
+  }
+
+  public function test_merge_link_courses_together_fails() {
+    global $CONNECTDB;
+
+    // given a couple of created link courses
+    $insert = 'insert into courses ' .
+      '(state,module_delivery_key,session_code,chksum,parent_id,campus,campus_desc,link) values (?,?,?,?,?,?,?,?)';
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['created_in_moodle'],
+      'module_delivery_key' => '123456',
+      'session_code' => '2013', 'chksum' => '123456', 'parent_id' => null,
+      'campus' => '58', 'campus_desc' => 'Medway', true));
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['created_in_moodle'],
+      'module_delivery_key' => '321654',
+      'session_code' => '2013', 'chksum' => '321654', 'parent_id' => null,
+      'campus' => '1', 'campus_desc' => 'Canterbury', true));
+
+    // and a valid merge request
+    $input = (object)array(
+      'link_courses' => array('321654','123456'),
+      'code' => 'modulecode',
+      'title' => 'a title',
+      'synopsis' => '',
+      'category' => '2',
+      'primary_child' => ''
+    );
+
+    // when we merge them
+    $result = \local_connect\course::merge($input);
+
+    // then we expect to be told we cant
+    $this->assertEquals('cannot_merge_link_courses',$result['error_code']);
+  }
+
+  public function test_merge_duplicate_module_code() {
+    global $CONNECTDB;
+
+    // given a created course and a couple of new deliveries
+    $insert = 'insert into courses ' .
+      '(state,module_delivery_key,session_code,chksum,parent_id,campus,campus_desc,module_code) values (?,?,?,?,?,?,?,?)';
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['created_in_moodle'],
+      'module_delivery_key' => '123456',
+      'session_code' => '2013', 'chksum' => '123456', 'parent_id' => null,
+      'campus' => '58', 'campus_desc' => 'Medway', 'modulecode'));
+
+    $CONNECTDB->execute($insert, array( 'state' => 1, 'module_delivery_key' => '321654',
+      'session_code' => '2013', 'chksum' => '321654', 'parent_id' => null,
+      'campus' => '1', 'campus_desc' => 'Canterbury', '321654'));
+    $CONNECTDB->execute($insert, array( 'state' => 1, 'module_delivery_key' => '654321',
+      'session_code' => '2013', 'chksum' => '654321', 'parent_id' => null,
+      'campus' => '58', 'campus_desc' => 'Medway', '654321'));
+
+    // and a valid merge request with a duplicate module_code
+    $input = (object)array(
+      'link_courses' => array('321654','654321'),
+      'code' => 'modulecode',
+      'title' => 'a title',
+      'synopsis' => '',
+      'category' => '2',
+      'primary_child' => ''
+    );
+
+    // when we merge them
+    $result = \local_connect\course::merge($input);
+
+    // then we expect a duplicate error
+    $this->assertEquals('duplicate',$result['error_code']);
+  }
+
+  public function test_merge_with_one_already_created() {
+    global $CONNECTDB;
+
+    // given a couple of deliveries that have found their way into moodle
+    $insert = 'insert into courses ' .
+      '(state,module_delivery_key,session_code,chksum,parent_id,campus,campus_desc,moodle_id) values (?,?,?,?,?,?,?,?)';
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['created_in_moodle'],
+      'module_delivery_key' => '123456',
+      'session_code' => '2013', 'chksum' => '123456', 'parent_id' => null,
+      'campus' => '58', 'campus_desc' => 'Medway', 5));
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['unprocessed'],
+      'module_delivery_key' => '321654',
+      'session_code' => '2013', 'chksum' => '321654', 'parent_id' => null,
+      'campus' => '1', 'campus_desc' => 'Canterbury', null));
+
+    // and a valid merge request
+    $input = (object)array(
+      'link_courses' => array('123456','321654'),
+      'code' => '123',
+      'title' => 'a title',
+      'synopsis' => '',
+      'category' => '2',
+      'primary_child' => ''
+    );
+
+    // then we expect it to be scheduled
+    global $STOMP;
+    $origstomp = $STOMP;
+    $STOMP = $this->getMock('\FuseSource\Stomp', array('send'));
+    $STOMP->expects($this->once())->method('send')->with($this->equalTo('connect.job.create_link_course'));
+
+    // when we merge them
+    $result = \local_connect\course::merge($input);
+
+    // and we expect the link course to be created with the moodle_id of the existing course
+    $course = $CONNECTDB->get_record('courses',array('module_code'=>'123'));
+    $this->assertEquals(5,$course->moodle_id);
+
+    $STOMP = $origstomp;
+  }
+
+  public function test_merge_two_already_created_courses() {
+    global $CONNECTDB;
+
+    // given a couple of deliveries that have found their way into moodle
+    $insert = 'insert into courses ' .
+      '(state,module_delivery_key,session_code,chksum,parent_id,campus,campus_desc,moodle_id) values (?,?,?,?,?,?,?,?)';
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['created_in_moodle'],
+      'module_delivery_key' => '123456',
+      'session_code' => '2013', 'chksum' => '123456', 'parent_id' => null,
+      'campus' => '58', 'campus_desc' => 'Medway', 5));
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['created_in_moodle'],
+      'module_delivery_key' => '321654',
+      'session_code' => '2013', 'chksum' => '321654', 'parent_id' => null,
+      'campus' => '1', 'campus_desc' => 'Canterbury', 6));
+
+    // and a valid merge request
+    $input = (object)array(
+      'link_courses' => array('123456','321654'),
+      'code' => '123',
+      'title' => 'a title',
+      'synopsis' => '',
+      'category' => '2',
+      'primary_child' => ''
+    );
+
+    // when we merge them
+    $result = \local_connect\course::merge($input);
+
+    // then we expect an error back
+    $this->assertEquals('too_many_created',$result['error_code']);
+  }
+
+  public function test_merge() {
+    global $CONNECTDB;
+
+    // given a couple of modules from across kent
+    $insert = 'insert into courses ' .
+      '(state,module_delivery_key,session_code,chksum,parent_id,campus,campus_desc) values (?,?,?,?,?,?,?)';
+    $CONNECTDB->execute($insert, array( 'state' => 1, 'module_delivery_key' => '123456',
+      'session_code' => '2013', 'chksum' => '123456', 'parent_id' => null,
+      'campus' => '58', 'campus_desc' => 'Medway'));
+    $CONNECTDB->execute($insert, array( 'state' => 1, 'module_delivery_key' => '321654',
+      'session_code' => '2013', 'chksum' => '321654', 'parent_id' => null,
+      'campus' => '1', 'campus_desc' => 'Canterbury'));
+    $CONNECTDB->execute($insert, array( 'state' => 1, 'module_delivery_key' => '654321',
+      'session_code' => '2013', 'chksum' => '654321', 'parent_id' => null,
+      'campus' => '58', 'campus_desc' => 'Medway'));
+
+    // and a valid merge request
+    $input = (object)array(
+      'link_courses' => array('123456','321654','654321'),
+      'code' => '123',
+      'title' => 'a title',
+      'synopsis' => '',
+      'category' => '2',
+      'primary_child' => ''
+    );
+
+    // then we expect it to be scheduled
+    global $STOMP;
+    $origstomp = $STOMP;
+    $STOMP = $this->getMock('\FuseSource\Stomp', array('send'));
+    $STOMP->expects($this->once())->method('send')->with($this->equalTo('connect.job.create_link_course'));
+
+    // when we merge them
+    $result = \local_connect\course::merge($input);
+
+    // and we expect a new course to have been created
+    $course = $CONNECTDB->get_record('courses',
+      array(
+        'module_code'=>$input->code,
+        'module_title'=>$input->title,
+        'category_id'=>$input->category,
+        'primary_child'=>$input->primary_child
+      )
+    );
+    $this->assertTrue($course !== false);
+
+    // and the child modules should be linked
+    $this->assertEquals(3,$CONNECTDB->count_records('courses',array('parent_id'=>$course->chksum)));
+
+    $STOMP = $origstomp;
+  }
+
   public function test_disengage() {
     // given a created in moodle course
     global $CONNECTDB;

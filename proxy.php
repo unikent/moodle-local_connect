@@ -53,6 +53,22 @@ switch ($_SERVER['PATH_INFO']) {
       echo json_encode($result);
     }
     exit(0);
+  case '/courses/merge':
+  case '/courses/merge/':
+    header('Content-type: application/json');
+    $input = json_decode(file_get_contents('php://input'));
+    if (null == $input) {
+      header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
+    } else {
+      $result = \local_connect\course::merge($input);
+      if (isset($result['error_code'])) {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 422');
+      } else {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 204 Created');
+      }
+      echo json_encode($result);
+    }
+    exit(0);
 }
 
 
