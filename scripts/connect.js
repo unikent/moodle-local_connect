@@ -927,8 +927,10 @@ var Connect = (function() {
 							_this.buttons.mergeBtn.removeClass('loading');
 							$(_this.selectedDeliveries).each(function(index) {
 								var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[index]+']');
-								var aPos = _this.oTable.fnGetPosition(row[0]);
-								_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
+                if (row.length > 0) {
+                  var aPos = _this.oTable.fnGetPosition(row[0]);
+                  _this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
+                }
 							})
 
 							_this.oTable.fnDraw();
