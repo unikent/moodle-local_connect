@@ -562,7 +562,7 @@ class course {
                     CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('\"',c2.chksum,'\"')),''),']') children
                   FROM courses c1
                     LEFT OUTER JOIN courses c2
-                        ON c1.chksum = c2.parent_id
+                        ON c1.module_delivery_key = c2.parent_id
                     LEFT OUTER JOIN (
                                         SELECT 'unprocessed' state, 1 code
                                       UNION
@@ -792,6 +792,26 @@ SQL;
         json_encode(array('link_course_chksum'=>$uuid->uuid,'child_chksums'=>$input->link_courses)));
 
       $tr->allow_commit();
+
+      return $r;
+    }
+
+    public static function unlink($in_courses) {
+      global $CONNECTDB, $STOMP;
+      $r = array();
+
+      foreach ($in_courses as $c) {
+        $course = $CONNECTDB->get_record('courses',array('chksum'=>$c));
+        if ($course == null) {
+          $r []= array('error_code'=>'does_not_exist','id'=>$c);
+        } else if ($course->parent_id == null) {
+          $r []= array('error_code'=>'not_link_course','id'=>$c);
+        } else if (($course->state & course::$states['created_in_moodle']) == 0) {
+          $r []= array('error_code'=>'not_created','id'=>$c);
+        } else {
+          $STOMP->send('connect.job.unlink_course',$course->chksum);
+        }
+      }
 
       return $r;
     }

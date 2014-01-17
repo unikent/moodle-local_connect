@@ -10,6 +10,64 @@ defined('MOODLE_INTERNAL') || die();
 
 class kent_course_tests extends advanced_testcase {
 
+  public function test_unlink_sends_request() {
+    global $CONNECTDB;
+
+    // given a couple of 'children'
+    $insert = 'insert into courses ' .
+      '(state,module_delivery_key,session_code,chksum,parent_id,campus,campus_desc,moodle_id) values (?,?,?,?,?,?,?,?)';
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['created_in_moodle'],
+      'module_delivery_key' => '123456', 'session_code' => '2013', 'chksum' => '123456', 'parent_id' => 'parent',
+      'campus' => '58', 'campus_desc' => 'Medway', 5));
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['created_in_moodle'],
+      'module_delivery_key' => '123457', 'session_code' => '2013', 'chksum' => '654321', 'parent_id' => 'parent',
+      'campus' => '58', 'campus_desc' => 'Medway', 5));
+
+    // then we expect to see both of them sent along the chain
+    global $STOMP;
+    $origstomp = $STOMP;
+    $STOMP = $this->getMock('\FuseSource\Stomp', array('send'));
+    $STOMP->expects($this->at(0))->method('send')
+      ->with(
+        $this->equalTo('connect.job.unlink_course'),
+        $this->equalTo('123456')
+      );
+    $STOMP->expects($this->at(1))->method('send')
+      ->with(
+        $this->equalTo('connect.job.unlink_course'),
+        $this->equalTo('654321')
+      );
+
+    // when we attempt to unlink them
+    $result = \local_connect\course::unlink(array('123456','654321'));
+
+    $STOMP = $origstomp;
+  }
+
+  public function test_unlink_course_wont_unlink_uncreated_or_non_child() {
+    global $CONNECTDB;
+
+    // given a course that isnt a child
+    $insert = 'insert into courses ' .
+      '(state,module_delivery_key,session_code,chksum,parent_id,campus,campus_desc,moodle_id) values (?,?,?,?,?,?,?,?)';
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['created_in_moodle'],
+      'module_delivery_key' => '123456', 'session_code' => '2013', 'chksum' => '123456', 'parent_id' => null,
+      'campus' => '58', 'campus_desc' => 'Medway', 5));
+    // and one that isnt created yet
+    $CONNECTDB->execute($insert, array( 'state' => \local_connect\course::$states['scheduled'],
+      'module_delivery_key' => '123457', 'session_code' => '2013', 'chksum' => 'notcreated', 'parent_id' => '12',
+      'campus' => '58', 'campus_desc' => 'Medway', 5));
+
+    // when we try to unlink them and a non existant one
+    $result = \local_connect\course::unlink(array('123456','nothing','notcreated'));
+
+    // then we expect some errors
+    $this->assertEquals('not_link_course',$result[0]['error_code']);
+    $this->assertEquals('does_not_exist',$result[1]['error_code']);
+    $this->assertEquals('not_created',$result[2]['error_code']);
+
+  }
+
   public function test_merge_sets_weeks_properly() {
     global $CONNECTDB;
 

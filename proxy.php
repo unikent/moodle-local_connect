@@ -69,6 +69,17 @@ switch ($_SERVER['PATH_INFO']) {
       echo json_encode($result);
     }
     exit(0);
+  case '/courses/unlink':
+  case '/courses/unlink/':
+    header('Content-type: application/json');
+    $input = json_decode(file_get_contents('php://input'));
+    if (null == $input) {
+      header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
+    } else {
+      $result = \local_connect\course::unlink($input->courses);
+      echo json_encode($result);
+    }
+    exit(0);
 }
 
 
