@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-function xmldb_connect_install() {
+function xmldb_local_connect_install() {
     global $CFG;
 
     create_role(
