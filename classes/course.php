@@ -733,7 +733,7 @@ class course {
      * @return unknown
      */
     public static function get_courses($category_restrictions = array(), $obj_form = false) {
-        global $CONNECTDB;
+        global $CFG, $CONNECTDB;
 
         $sql = "SELECT
                     c1.chksum,
@@ -759,7 +759,7 @@ class course {
                     CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('\"',c2.chksum,'\"')),''),']') children
                   FROM courses c1
                     LEFT OUTER JOIN courses c2
-                        ON c1.module_delivery_key = c2.parent_id
+                        ON c1.module_delivery_key = c2.parent_id AND c1.session_code = c2.session_code
                     LEFT OUTER JOIN (
                                         SELECT 'unprocessed' state, 1 code
                                       UNION
@@ -776,7 +776,7 @@ class course {
                                         SELECT 'disengaged_from_moodle' state, 64 code
                                     ) statecode
                         ON (c1.state & statecode.code) > 0
-                  WHERE session_code = :sesscode";
+                  WHERE c1.session_code = :sesscode";
 
         // Add the category restrictions if there are any.
         if (!empty($category_restrictions)) {
