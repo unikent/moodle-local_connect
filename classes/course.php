@@ -650,13 +650,17 @@ class course {
         // If there are many pick a primary
         if (count($data) > 1) {
             foreach ($data as $datum) {
-                if ($data->link) {
-                    return new course($data);
+                if ($datum->link) {
+                    return new course($datum);
                 }
             }
         }
 
-        return new course($data[0]);
+        if (is_array($data)) {
+            $data = $data[0];
+        }
+
+        return new course($data);
     }
 
 
