@@ -69,6 +69,10 @@ class sharedbprovider {
     public function __call($name, $arguments) {
         global $SHAREDB;
 
+        if (!\local_connect\utils::enable_sharedb()) {
+            return false;
+        }
+
         // Ensure we are connected
         self::setup_connect_database();
 

@@ -48,6 +48,22 @@ class utils {
 	}
 
 	/**
+	 * Enable the fancy new connect observers?
+	 */
+	public static function enable_new_observers() {
+		global $CFG;
+		return isset($CFG->local_connect_enable_observers) && $CFG->local_connect_enable_observers;
+	}
+
+	/**
+	 * Enable the SHAREDB?
+	 */
+	public static function enable_sharedb() {
+		global $CFG;
+		return isset($CFG->local_connect_enable_sharedb) && $CFG->local_connect_enable_sharedb;
+	}
+
+	/**
 	 * Grab the "removed" category
 	 */
 	public static function get_removed_category() {
