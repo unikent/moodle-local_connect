@@ -541,8 +541,9 @@ class course {
 
         // Update chksum tracker.
         $DB->set_field('connect_course_chksum', 'chksum', $this->chksum, array (
-                'courseid' => $this->id
-            ));
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
     }
 
 
@@ -603,7 +604,8 @@ class course {
 
         // Step 4 - Update chksum tracker.
         $DB->set_field('connect_course_chksum', 'chksum', $this->chksum, array (
-            'courseid' => $this->id
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
         ));
 
         return true;
