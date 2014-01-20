@@ -655,9 +655,9 @@ class course {
                 }
             }
         }
-
+        
         if (is_array($data)) {
-            $data = $data[0];
+            $data = reset($data);
         }
 
         return new course($data);

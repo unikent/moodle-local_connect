@@ -107,6 +107,7 @@ class enrolment {
      * @return array(local_connect_enrolment) Enrolment object
      */
     private static function filter_sql_query_set($data) {
+        global $DB;
 
         // Store of UIDs
         $uid_store = array();
@@ -126,6 +127,8 @@ class enrolment {
                     $uid_store['username'] = null;
                     if ($user) {
                         $enrolment->userid = $uid_store['username'] = $user->id;
+                    } else {
+                        $enrolment->userid = $uid_store['username'] = null;
                     }
                 }
             }
@@ -194,7 +197,7 @@ class enrolment {
      * @return local_connect_enrolment Enrolment object
      */
     public static function get_enrolments_for_course($course) {
-        global $CONNECTDB;
+        global $DB, $CONNECTDB;
 
         // Select all our enrolments.
         $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e

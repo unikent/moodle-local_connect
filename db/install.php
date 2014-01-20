@@ -41,4 +41,11 @@ function xmldb_local_connect_install() {
     	"Students generally have fewer privileges within a course.",
     	"Student"
     );
+    
+    create_role(
+        "Convenor",
+        "convenor",
+        "A Convenor has the same permissions as a teacher, but can manually enrol teachers.",
+        "Teacher (editing)"
+    );
 }
