@@ -775,7 +775,8 @@ class course {
                                       UNION
                                         SELECT 'disengaged_from_moodle' state, 64 code
                                     ) statecode
-                        ON (c1.state & statecode.code) > 0";
+                        ON (c1.state & statecode.code) > 0
+                  WHERE session_code = :sesscode";
 
         // Add the category restrictions if there are any.
         if (!empty($category_restrictions)) {
@@ -787,7 +788,9 @@ class course {
         $sql .= ' GROUP BY c1.chksum';
 
         // Create the parameters.
-        $params = array();
+        $params = array(
+            "sesscode" => $CFG->connect->session_code
+        );
 
         // Add all the restrictions in.
         foreach ($category_restrictions as $k => $id) {
