@@ -64,6 +64,14 @@ class utils {
 	}
 
 	/**
+	 * Enable the cron?
+	 */
+	public static function enable_cron() {
+		global $CFG;
+		return isset($CFG->local_connect_enable_cron) && $CFG->local_connect_enable_cron;
+	}
+
+	/**
 	 * Grab the "removed" category
 	 */
 	public static function get_removed_category() {

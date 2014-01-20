@@ -27,7 +27,7 @@ global $CFG;
 require_once($CFG->libdir . "/clilib.php");
 
 // Only enable this for 2014.
-if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_features()) {
+if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_features() && \local_connect\utils::enable_cron()) {
 	mtrace('');
 
 	// Sync courses

@@ -17,11 +17,16 @@ $string['rollover'] = 'Rollover';
 
 $string['cachedef_kent_connect'] = 'Connect Caching';
 $string['enable'] = 'Enable Connect';
+
 $string['new_feature_toggle'] = 'Enable new Connect features';
 $string['new_feature_toggle_desc'] = 'Warning: These features are experimental and may not work!';
 $string['new_feature_disabled'] = 'This feature is still experimental and has been disabled on your system.';
+
 $string['observer_toggle'] = 'Enable new Connect observers';
 $string['observer_toggle_desc'] = 'Warning: These features are experimental and may break course and enrolment creations!';
 
 $string['sharedb_toggle'] = 'Enable SHAREDB';
 $string['sharedb_toggle_desc'] = 'Warning: This WILL break everything!';
+
+$string['cron_toggle'] = 'Enable Connect Cron';
+$string['cron_toggle_desc'] = 'Warning: This is not a good idea!';
