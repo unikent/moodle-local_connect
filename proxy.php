@@ -36,16 +36,14 @@ if (\local_connect\utils::enable_new_features()) {
       }
       die;
     case '/courses/disengage/':
-      $data = json_decode(file_get_contents("php://input"));
-
-      $course = $data->courses;
-      $connect_course = \local_connect\course::get_course_by_uid($course[0], $course[1]);
-      $result = $connect_course->delete();
-
-      echo json_encode(array(
-        "chksum" => $course->chksum,
-        "result" => $result ? 'success' : 'error',
-      ));
+      header('Content-type: application/json');
+      $input = json_decode(file_get_contents('php://input'));
+      if ($input === null) {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
+      } else {
+        $result = \local_connect\course::disengage_all($input);
+        echo json_encode($result);
+      }
       die;
     case '/courses':
     case '/courses/':

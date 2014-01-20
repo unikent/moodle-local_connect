@@ -733,23 +733,33 @@ class course {
         return $data;
     }
 
-    public static function disengage_all($in_courses) {
-      global $CONNECTDB, $STOMP;
-      $r = array();
+    public static function disengage_all($data) {
+        global $CONNECTDB, $STOMP;
+        $response = array();
 
-      foreach ($in_courses as $c) {
-        if ($course = $CONNECTDB->get_record('courses',array('chksum'=>$c))) {
-          if (($course->state & course::$states['created_in_moodle']) <> 0) {
-            $STOMP->send('connect.job.disengage_course',$c);
-          } else {
-            $r []= array('error_code'=>'not_created_in_moodle','id'=>$c);
-          }
-        } else {
-          $r []= array('error_code'=>'does_not_exist','id'=>$c);
+        foreach ($data->courses as $course) {
+            // Try to find the Connect version of the course.
+            $connect_course = \local_connect\course::get_course_by_uid($course->module_delivery_key, $course->session_code);
+            if (!$connect_course) {
+                $response[] = array(
+                    'error_code' => 'does_not_exist',
+                    'id' => $course
+                );
+                continue;
+            }
+
+            // Make sure this was in Moodle.
+            if (($course->state & course::$states['created_in_moodle']) === 0) {
+                $response[] = array(
+                    'error_code' => 'not_created_in_moodle',
+                    'id' => $course
+                );
+                continue;
+            }
+
+            $connect_course->delete();
         }
-      }
-
-      return $r;
+        return $response;
     }
 
     public static function schedule_all($data) {
