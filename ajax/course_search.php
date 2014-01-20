@@ -16,6 +16,10 @@ if (!isloggedin()) {
 	throw new moodleexception("You must be logged in.");
 }
 
+if (!\local_connect\utils::is_enabled() || !\local_connect\utils::enable_new_features()) {
+	throw new moodleexception("This feature has not been enabled.");
+}
+
 $name = required_param('name', PARAM_ALPHANUMEXT);
 $source = optional_param('source', $CFG->kent->distribution, PARAM_ALPHANUMEXT);
 
