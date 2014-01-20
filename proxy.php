@@ -27,17 +27,13 @@ if (\local_connect\utils::enable_new_features()) {
     case '/courses/schedule':
     case '/courses/schedule/':
       header('Content-type: application/json');
-      $response = array();
-      $data = json_decode(file_get_contents("php://input"));
-      foreach ($data->courses as $course) {
-        $connect_course = \local_connect\course::get_course_by_uid($course->module_delivery_key, $course->session_code);
-        $result = $connect_course->create_moodle(isset($course->shortname_ext) ? $course->shortname_ext : "");
-        $response[] = array(
-          "chksum" => $connect_course->chksum,
-          "result" => $result ? 'success' : 'error',
-        );
+      $input = json_decode(file_get_contents('php://input'));
+      if ($input === null) {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
+      } else {
+        $result = \local_connect\course::schedule_all($input);
+        echo json_encode($result);
       }
-      echo json_encode($response);
       die;
     case '/courses/disengage/':
       $data = json_decode(file_get_contents("php://input"));

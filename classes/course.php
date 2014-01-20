@@ -752,31 +752,43 @@ class course {
       return $r;
     }
 
-    public static function schedule_all($in_courses) {
+    public static function schedule_all($data) {
       global $CONNECTDB, $STOMP;
-      $r = array();
+      $response = array();
 
-      foreach ($in_courses as $c) {
-        if ($course = $CONNECTDB->get_record('courses',array('chksum'=>$c->id))) {
-          $uc = new course($course);
-          $uc->module_code = $c->code;
-          $uc->module_title = $c->title;
-          $uc->synopsis = $c->synopsis;
-          $uc->category = $c->category;
-          $uc->state = course::$states['scheduled'];
+      foreach ($data->courses as $course) {
+        // Try to find the Connect version of the course.
+        $connect_course = \local_connect\course::get_course_by_uid($course->module_delivery_key, $course->session_code);
+        if (!$connect_course) {
+            $response[] = array(
+                'error_code' => 'does_not_exist',
+                'id' => $course->id
+            );
+            continue;
+        }
 
-          if ($uc->is_unique()) {
-            $uc->update();
-            $STOMP->send('connect.job.create_course',$uc->chksum);
-          } else {
-            $r []= array('error_code'=>'duplicate','id'=>$c->id);
-          }
-        } else {
-          $r []= array('error_code'=>'does_not_exist','id'=>$c->id);
+        // Make sure we are unique.
+        if (!$connect_course->is_unique()) {
+            $response[] = array(
+                'error_code' => 'duplicate',
+                'id' => $course->id
+            );
+            continue;
+        }
+
+        // Did we specify a shortname extension?
+        $shortname_ext = isset($course->shortname_ext) ? $course->shortname_ext : "";
+
+        // Attempt to create in Moodle.
+        if (!$connect_course->create_moodle($shortname_ext)) {
+            $response[] = array(
+                'error_code' => 'error',
+                'id' => $course->id
+            );
         }
       }
 
-      return $r;
+      return $response;
     }
 
     public static function merge($input) {
