@@ -17,7 +17,7 @@
 /**
  * Local stuff for Moodle Connect
  *
- * @package    core_connect
+ * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -36,12 +36,38 @@ class utils {
 	 */
 	public static function is_enabled() {
 		global $CFG;
+		return isset($CFG->local_connect_enable) && $CFG->local_connect_enable;
+	}
 
-		$valid_installations = array("2014", "2013", "2012", "archive");
+	/**
+	 * Enable the fancy new connect features?
+	 */
+	public static function enable_new_features() {
+		global $CFG;
+		return isset($CFG->local_connect_enable_new_features) && $CFG->local_connect_enable_new_features;
+	}
 
-		return $CFG->kent->environment === "dev" || (
-			$CFG->kent->environment === "live" && in_array($CFG->kent->distribution, $valid_installations)
-		);
+	/**
+	 * Grab the "removed" category
+	 */
+	public static function get_removed_category() {
+		global $DB, $CFG;
+
+		require_once("$CFG->libdir/coursecatlib.php");
+
+		$category = $DB->get_record('course_categories', array('idnumber' => 'kent_connect_removed'));
+		if (!$category) {
+			$category = new \stdClass();
+			$category->parent = 0;
+			$category->idnumber = 'kent_connect_removed';
+			$category->name = 'Removed';
+			$category->description = 'Holding place for removed modules';
+			$category->sortorder = 999;
+			$category->visible = false;
+			$category = \coursecat::create($category);
+		}
+
+		return $category->id;
 	}
 
 }

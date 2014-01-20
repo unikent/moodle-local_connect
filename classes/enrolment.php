@@ -17,7 +17,7 @@
 /**
  * Local stuff for Moodle Connect
  *
- * @package    core_connect
+ * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -105,7 +105,7 @@ class enrolment {
      * Returns all courses a given user should be enrolled on
      * 
      * @param  string $username A username
-     * @return core_connect_enrolment Enrolment object
+     * @return local_connect_enrolment Enrolment object
      */
     public static function get_courses($username) {
         global $DB, $CONNECTDB;
@@ -153,7 +153,7 @@ class enrolment {
      * Returns all courses the current user should be enrolled on.
      * 
      * @see get_courses
-     * @return core_connect_enrolment Enrolment object
+     * @return local_connect_enrolment Enrolment object
      */
     public static function get_my_courses() {
         global $USER;

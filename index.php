@@ -7,16 +7,24 @@ global $USER, $PAGE, $CFG;
 
 require_login();
 
-// Are we allowed here?
-$cat_permissions = kent_get_connect_course_categories();
-if (count($cat_permissions) == 0) {
-    print_error('accessdenied', 'local_connect');
+if (!\local_connect\utils::is_enabled()) {
+	print_error('connect_disabled', 'local_connect');
 }
+
+if (!\local_connect\course::has_access()) {
+	print_error('accessdenied', 'local_connect');
+}
+
+/**
+ * Initial setup
+ */
+
+$site_context = context_system::instance();
+$cat_permissions = kent_get_connect_course_categories();
 
 /**
  * Page setup
  */
-$site_context = context_system::instance();
 $PAGE->set_context($site_context);
 $PAGE->set_url('/local/connect/index.php');
 $PAGE->set_pagelayout('datool');
@@ -189,10 +197,13 @@ HEREDOC;
 
 echo '<div id="dialog_error">'.get_string('connect_error', 'local_connect').'</div>';
 
+$enableAdvanced = \local_connect\utils::enable_new_features() ? 'true' : 'false';
+
 echo <<<HERE
        <script type="text/javascript">
                window.dapageUrl = '$CFG->wwwroot/local/connect/proxy.php';
                window.coursepageUrl = '$CFG->wwwroot';
+               window.enableConnectAdvanced = $enableAdvanced;
        </script>
 HERE;
 

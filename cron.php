@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Connect Crons
+ * Connect Cron
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
@@ -27,7 +27,7 @@ global $CFG;
 require_once($CFG->libdir . "/clilib.php");
 
 // Only enable this for 2014.
-if (\local_connect\utils::is_enabled() && $CFG->kent->distribution === "2014") {
+if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_features()) {
 	mtrace('');
 
 	// Sync courses

@@ -9,6 +9,10 @@ require(dirname(__FILE__) . '/../../config.php');
 
 global $PAGE, $OUTPUT, $USER;
 
+if (!\local_connect\utils::enable_new_features()) {
+	throw new \moodle_exception(get_string('new_feature_disabled', 'local_connect'));
+}
+
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/util/ajax-enrolment.php');
 

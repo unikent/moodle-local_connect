@@ -22,66 +22,44 @@ if (!\local_connect\course::has_access()) {
 // 
 // New stuff
 // 
-
-switch ($_SERVER['PATH_INFO']) {
-  case '/courses':
-  case '/courses/':
-    header('Content-type: application/json');
-    $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
-    $courses = \local_connect\course::get_courses($category_restrictions, false);
-    echo json_encode($courses);
-    exit(0);
-  case '/courses/schedule':
-  case '/courses/schedule/':
-    header('Content-type: application/json');
-    $input = json_decode(file_get_contents('php://input'));
-    if (null == $input) {
-      header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
-    } else {
-      $result = \local_connect\course::schedule_all($input->courses);
-      echo json_encode($result);
-    }
-    exit(0);
-  case '/courses/disengage':
-  case '/courses/disengage/':
-    header('Content-type: application/json');
-    $input = json_decode(file_get_contents('php://input'));
-    if (null == $input) {
-      header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
-    } else {
-      $result = \local_connect\course::disengage_all($input->courses);
-      echo json_encode($result);
-    }
-    exit(0);
-  case '/courses/merge':
-  case '/courses/merge/':
-    header('Content-type: application/json');
-    $input = json_decode(file_get_contents('php://input'));
-    if (null == $input) {
-      header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
-    } else {
-      $result = \local_connect\course::merge($input);
-      if (isset($result['error_code'])) {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 422');
-      } else {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 204 Created');
+if (\local_connect\utils::enable_new_features()) {
+  switch ($_SERVER['PATH_INFO']) {
+    case '/courses/schedule':
+    case '/courses/schedule/':
+      header('Content-type: application/json');
+      $response = array();
+      $data = json_decode(file_get_contents("php://input"));
+      foreach ($data->courses as $course) {
+        $connect_course = \local_connect\course::get_course_by_uid($course->module_delivery_key, $course->session_code);
+        $result = $connect_course->create_moodle(isset($course->shortname_ext) ? $course->shortname_ext : "");
+        $response[] = array(
+          "chksum" => $connect_course->chksum,
+          "result" => $result ? 'success' : 'error',
+        );
       }
-      echo json_encode($result);
-    }
-    exit(0);
-  case '/courses/unlink':
-  case '/courses/unlink/':
-    header('Content-type: application/json');
-    $input = json_decode(file_get_contents('php://input'));
-    if (null == $input) {
-      header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
-    } else {
-      $result = \local_connect\course::unlink($input->courses);
-      echo json_encode($result);
-    }
-    exit(0);
-}
+      echo json_encode($response);
+      die;
+    case '/courses/disengage/':
+      $data = json_decode(file_get_contents("php://input"));
 
+      $course = $data->courses;
+      $connect_course = \local_connect\course::get_course_by_uid($course[0], $course[1]);
+      $result = $connect_course->delete();
+
+      echo json_encode(array(
+        "chksum" => $course->chksum,
+        "result" => $result ? 'success' : 'error',
+      ));
+      die;
+    case '/courses':
+    case '/courses/':
+      header('Content-type: application/json');
+      $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
+      $courses = \local_connect\course::get_courses($category_restrictions, false);
+      echo json_encode($courses);
+      die;
+  }
+}
 
 //
 // Old Stuff - Ship it off to Connect
@@ -89,7 +67,7 @@ switch ($_SERVER['PATH_INFO']) {
 
 //make resource
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $CFG->kent_connect_url . $_SERVER['PATH_INFO'] . '?' . $_SERVER['QUERY_STRING']);
+curl_setopt($ch, CURLOPT_URL, $CFG->kent->paths['connect'] . $_SERVER['PATH_INFO'] . '?' . $_SERVER['QUERY_STRING']);
 curl_setopt($ch, CURLOPT_HEADER, 1);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $_SERVER["REQUEST_METHOD"]);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

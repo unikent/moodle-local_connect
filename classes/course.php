@@ -17,7 +17,7 @@
 /**
  * Local stuff for Moodle Connect
  *
- * @package    core_connect
+ * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -107,7 +107,8 @@ class course {
       'created_in_moodle' => 8,
       'failed_in_moodle' => 16,
       'disengage' => 32,
-      'disengaged_from_moodle' => 64);
+      'disengaged_from_moodle' => 64
+    );
 
     /**
      * Constructor to build from a database object
@@ -163,6 +164,7 @@ class course {
         global $CONNECTDB;
 
         $sql = "UPDATE courses SET
+                    parent_id=?,
                     moodle_id=?,
                     module_code=?,
                     module_title=?,
@@ -172,6 +174,7 @@ class course {
                 WHERE chksum=?";
 
         return $CONNECTDB->execute($sql, array(
+            $this->parent_id,
             $this->moodle_id,
             $this->module_code,
             $this->module_title,
@@ -257,7 +260,7 @@ class course {
     /**
      * Create this course in Moodle
      */
-    public function create_moodle() {
+    public function create_moodle($shortname_ext = "") {
         global $DB;
 
         // Check we have a category.
@@ -265,6 +268,8 @@ class course {
             print "No category for $this->chksum\n";
             return false;
         }
+
+        $this->shortname = $this->shortname . " " . $shortname_ext;
 
         // Does this shortname exist?
         $course = $DB->get_record('course', array('shortname' => $this->shortname));
@@ -317,31 +322,46 @@ class course {
         $this->create_forum();
 
         // Add to tracking table.
-        $DB->insert_record_raw("connect_course_chksum", array(
-            "courseid" => $this->moodle_id,
-            "module_delivery_key" => $this->module_delivery_key,
-            "session_code" => $this->session_code,
-            "chksum" => $this->chksum
+        $tracker = $DB->get_record('connect_course_chksum', array(
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
         ));
+        if ($tracker) {
+            $DB->set_field('connect_course_chksum', 'chksum', $this->chksum, array (
+                'module_delivery_key' => $this->module_delivery_key,
+                'session_code' => $this->session_code
+            ));
+        } else {
+            $DB->insert_record_raw("connect_course_chksum", array(
+                "courseid" => $this->moodle_id,
+                "module_delivery_key" => $this->module_delivery_key,
+                "session_code" => $this->session_code,
+                "chksum" => $this->chksum
+            ));
+        }
+
+        return true;
     }
 
     /**
      * Link a course to this course
      */
     private function create_link($target) {
-        // Create a linked course
+        // Create a linked course.
         $data = clone($this);
         $data->module_delivery_key = $this->chksum;
         $data->primary_child = $this->chksum;
         $data->shortname = "$this->shortname/$target->shortname";
         $data->chksum = $data->id_chksum = uniqid("link-");
         $data->link = 1;
-        $link = new course($data);
-        $link->create_moodle();
+        $data = new course($data);
 
-        // Add children
-        $link->add_child($this);
-        $link->add_child($target);
+        // Create the course in Moodle.
+        $data->create_moodle();
+
+        // Add children.
+        $data->add_child($this);
+        $data->add_child($target);
     }
 
     /**
@@ -491,6 +511,63 @@ class course {
     }
 
     /**
+     * Delete this course
+     */
+    public function delete() {
+        global $DB, $CONNECTDB;
+
+        // Step 0 - If this is a linked course, kill our children.
+        if (!empty($this->children)) {
+            foreach ($this->children as $child) {
+                $course = course::get_course_by_chksum($child);
+                $course->state = 1;
+                $course->moodle_id = 0;
+                $course->parent_id = 0;
+                $course->update();
+            }
+            
+        }
+
+        // Step 1 - Move to the 'removed category'.
+
+        $category = \local_connect\utils::get_removed_category();
+
+        $course = $DB->get_record('course', array('id' => $this->moodle_id));
+
+        $course->category = $category;
+        $course->shortname = date("dmY-His") . "-" . $course->shortname;
+        $course->idnumber = date("dmY-His") . "-" . $course->idnumber;
+
+        update_course($course);
+
+        // Step 2 - Update enrolments.
+        
+        $CONNECTDB->set_field('enrollments', 'state', 1, array (
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
+        
+        $CONNECTDB->set_field('group_enrollments', 'state', 1, array (
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
+
+        // Step 3 - Well we havent errored yet! Finish up.
+        
+        $CONNECTDB->set_field('courses', 'state', 1, array (
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
+        
+        $CONNECTDB->set_field('courses', 'moodle_id', 0, array (
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
+
+        return true;
+    }
+
+    /**
      * To String override
      */
     public function __toString() {
@@ -510,10 +587,44 @@ class course {
     }
 
     /**
-     * Is this user allowed to grab a list of courses?
+     * Get a Connect Course by chksum
+     */
+    public static function get_course_by_chksum($chksum) {
+        global $CONNECTDB;
+        $data = $CONNECTDB->get_record('courses', array('chksum' => $chksum));
+        if (!$data) {
+            return false;
+        }
+        return new course($data);
+    }
+
+    /**
+     * Get a Connect Course by Devliery Key and Session Code
+     */
+    public static function get_course_by_uid($module_delivery_key, $session_code) {
+        global $CONNECTDB;
+
+        $data = $CONNECTDB->get_record('courses', array(
+            'module_delivery_key' => $module_delivery_key, 
+            'session_code' => $session_code
+        ), "*", IGNORE_MULTIPLE);
+
+        if (!$data) {
+            return false;
+        }
+
+        return new course($data);
+    }
+
+    /**
+     * Is this user allowed to manage courses?
      */
     public static function has_access() {
         global $DB;
+
+        if (has_capability('moodle/site:config', \context_system::instance())) {
+            return true;
+        }
 
         $cats = $DB->get_records('course_categories');
 
