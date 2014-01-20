@@ -97,26 +97,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014010901, 'local', 'connect');
     }
 
-    if ($oldversion < 2014011410) {
-        if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_features()) {
-            // Go through and populate SHAREDB::course_list
-            $records = $DB->get_records('course', null, '', 'id, shortname, fullname, summary');
-            foreach ($records as $record) {
-                if ($record->id == 1) {
-                    continue;
-                }
-                $record->moodle_id = $record->id;
-                $record->moodle_env = $CFG->kent->environment;
-                $record->moodle_dist = $CFG->kent->distribution;
-                $SHAREDB->insert_record("course_list", $record);
-            }
-        }
-
-        // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2014011410, 'local', 'connect');
-    }
-
-    if ($oldversion < 2014011412) {
+    if ($oldversion < 2014012000) {
 
         // Define table connect_enrolment_chksum to be created.
         $table = new xmldb_table('connect_enrolment_chksum');
@@ -135,7 +116,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2014011412, 'local', 'connect');
+        upgrade_plugin_savepoint(true, 2014012000, 'local', 'connect');
     }
 
     return true;
