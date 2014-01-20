@@ -763,42 +763,42 @@ class course {
     }
 
     public static function schedule_all($data) {
-      global $CONNECTDB, $STOMP;
-      $response = array();
+        global $CONNECTDB, $STOMP;
+        $response = array();
 
-      foreach ($data->courses as $course) {
-        // Try to find the Connect version of the course.
-        $connect_course = \local_connect\course::get_course_by_uid($course->module_delivery_key, $course->session_code);
-        if (!$connect_course) {
-            $response[] = array(
-                'error_code' => 'does_not_exist',
-                'id' => $course->id
-            );
-            continue;
+        foreach ($data->courses as $course) {
+            // Try to find the Connect version of the course.
+            $connect_course = \local_connect\course::get_course_by_uid($course->module_delivery_key, $course->session_code);
+            if (!$connect_course) {
+                $response[] = array(
+                    'error_code' => 'does_not_exist',
+                    'id' => $course->id
+                );
+                continue;
+            }
+
+            // Make sure we are unique.
+            if (!$connect_course->is_unique()) {
+                $response[] = array(
+                    'error_code' => 'duplicate',
+                    'id' => $course->id
+                );
+                continue;
+            }
+
+            // Did we specify a shortname extension?
+            $shortname_ext = isset($course->shortname_ext) ? $course->shortname_ext : "";
+
+            // Attempt to create in Moodle.
+            if (!$connect_course->create_moodle($shortname_ext)) {
+                $response[] = array(
+                    'error_code' => 'error',
+                    'id' => $course->id
+                );
+            }
         }
 
-        // Make sure we are unique.
-        if (!$connect_course->is_unique()) {
-            $response[] = array(
-                'error_code' => 'duplicate',
-                'id' => $course->id
-            );
-            continue;
-        }
-
-        // Did we specify a shortname extension?
-        $shortname_ext = isset($course->shortname_ext) ? $course->shortname_ext : "";
-
-        // Attempt to create in Moodle.
-        if (!$connect_course->create_moodle($shortname_ext)) {
-            $response[] = array(
-                'error_code' => 'error',
-                'id' => $course->id
-            );
-        }
-      }
-
-      return $response;
+        return $response;
     }
 
     public static function merge($input) {
