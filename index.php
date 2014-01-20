@@ -16,9 +16,15 @@ if (!\local_connect\course::can_manage()) {
 }
 
 /**
+ * Initial setup
+ */
+
+$site_context = context_system::instance();
+$cat_permissions = kent_get_connect_course_categories();
+
+/**
  * Page setup
  */
-$site_context = context_system::instance();
 $PAGE->set_context($site_context);
 $PAGE->set_url('/local/connect/index.php');
 $PAGE->set_pagelayout('datool');
@@ -191,10 +197,13 @@ HEREDOC;
 
 echo '<div id="dialog_error">'.get_string('connect_error', 'local_connect').'</div>';
 
+$enableAdvanced = \local_connect\utils::enable_new_features() ? 'true' : 'false';
+
 echo <<<HERE
        <script type="text/javascript">
                window.dapageUrl = '$CFG->wwwroot/local/connect/proxy.php';
                window.coursepageUrl = '$CFG->wwwroot';
+               window.enableConnectAdvanced = $enableAdvanced;
        </script>
 HERE;
 

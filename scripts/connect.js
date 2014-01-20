@@ -65,7 +65,7 @@ var Connect = (function() {
 			var state = '<div class="status_'+state_zero+' '+(sink_deleted?'sink_deleted':'')+' '+(same_module_code_created?'same_module_code_created':'')+'">'+name+'</div>';
 
 			return [val.chksum, state, val.module_code, val.module_title, val.campus_desc, 
-					duration, val.student_count, val.module_version, val.delivery_department, toolbar];
+					duration, val.student_count, val.module_version, val.delivery_department, toolbar, val.module_delivery_key, val.session_code];
 
 
 			// prepending status box to the dom and hiding it ready for use
@@ -112,6 +112,8 @@ var Connect = (function() {
 			"sPaginationType": "full_numbers",
 			"fnCreatedRow": function( nRow, aData, iDataIndex ) {
 				$(nRow).attr('ident', aData[0]);
+				$(nRow).attr('deliverykey', aData[10]);
+				$(nRow).attr('sessioncode', aData[11]);
 				$(nRow).addClass('parent')
 			},
 			"fnInitComplete": function(oSettings) {
@@ -268,6 +270,8 @@ var Connect = (function() {
 	};
 
 	Connect.prototype.fnFormatDetails = function(row, par_chksm) {
+    var _this = this;
+
 		var sOut = '<table par_ident="'+ par_chksm +'">';
 			sOut += '<tr>';
 			sOut += '<th>Code</th>';
@@ -279,21 +283,22 @@ var Connect = (function() {
 			sOut += '<th>Department</th>';
 			sOut += '<th></th>';
 			sOut += '</tr>';
-			
+
 			$.each(row.children, function(i) {
-				var end = parseInt(row.children[i].module_week_beginning, 10) + parseInt(row.children[i].module_length, 10) - 1;
-				var duration = row.children[i].module_week_beginning + ( isNaN(end) ? '' : '-' + end );
-				sOut += '<tr ident="'+ row.children[i].chksum +'">';
+        var child = _this.json[row.children[i]];
+				var end = parseInt(child.module_week_beginning, 10) + parseInt(child.module_length, 10) - 1;
+				var duration = child.module_week_beginning + ( isNaN(end) ? '' : '-' + end );
+				sOut += '<tr ident="'+ child.chksum +'">';
 				sOut += '<td class="code"><div class="'
-									+ (row.children[i].sink_deleted ? 'sink_deleted' : '' )
-									+ '">' + row.children[i].module_code
+									+ (child.sink_deleted ? 'sink_deleted' : '' )
+									+ '">' + child.module_code
 									+ '</div></td>';
-				sOut += '<td class="name">'+ row.children[i].module_title +'</td>';
-				sOut += '<td class="campus">' + row.children[i].campus_desc +'</td>';
+				sOut += '<td class="name">'+ child.module_title +'</td>';
+				sOut += '<td class="campus">' + child.campus_desc +'</td>';
 				sOut += '<td class="duration">'+ duration +'</td>';
-				sOut += '<td class="students">'+ row.children[i].student_count +'</td>';
-				sOut += '<td class="version">'+ row.children[i].module_version +'</td>';
-				sOut += '<td class="department">'+ row.children[i].delivery_department +'</td>';
+				sOut += '<td class="students">'+ child.student_count +'</td>';
+				sOut += '<td class="version">'+ child.module_version +'</td>';
+				sOut += '<td class="department">'+ child.delivery_department +'</td>';
 				if(row.children.length > 1) {
 					sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';
 				} else {
@@ -303,7 +308,7 @@ var Connect = (function() {
 				sOut += '</tr>';
 			});
 			sOut += '</table>';
-			 
+
 			return sOut;
 	}
 
@@ -486,6 +491,8 @@ var Connect = (function() {
 
 					var obj = {
 						id: pushees[i].chksum,
+						module_delivery_key: pushees[i].module_delivery_key,
+						session_code: pushees[i].session_code,
 						code: pushees[i].module_code + ' ' + date,
 						title: pushees[i].module_title + ' ' + date,
 						synopsis: synopsis,// + '  <a href="http://www.kent.ac.uk/courses/modulecatalogue/modules/'+ pushees[i].module_code +'">More</a>',
@@ -667,6 +674,8 @@ var Connect = (function() {
 
 					var data = [{
 						id: row[0].chksum,
+						module_delivery_key: row[0].module_delivery_key,
+						session_code: row[0].session_code,
 						code: shortname,
 						title: _this.formEl.fullName.val(),
 						synopsis: synopsis,
@@ -729,7 +738,7 @@ var Connect = (function() {
 			contentType: 'application/json',
 			dataType: 'json',
 			data: JSON.stringify({'courses': data }),
-			success: function () {
+			success: function (data, status, xhr) {
 				button.stop();
 				_this.buttons.rowsEl.removeClass('row_selected');
 				_this.buttons.pushBtn.removeClass('loading');
@@ -924,8 +933,10 @@ var Connect = (function() {
 							_this.buttons.mergeBtn.removeClass('loading');
 							$(_this.selectedDeliveries).each(function(index) {
 								var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[index]+']');
-								var aPos = _this.oTable.fnGetPosition(row[0]);
-								_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
+                if (row.length > 0) {
+                  var aPos = _this.oTable.fnGetPosition(row[0]);
+                  _this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
+                }
 							})
 
 							_this.oTable.fnDraw();
@@ -1004,43 +1015,50 @@ var Connect = (function() {
 		var _this = this;
 
 		var chksum = $(el).closest('tr').attr('ident');
-			var row = $(el).closest('tr');
-			$(el).removeClass('unlink_row').addClass('ajax_loading');
-			$.ajax({
-				type: 'POST',
-				url: window.dapageUrl + '/courses/disengage/',
-				dataType: 'json',
-				contentType: 'json',
-				data: JSON.stringify({ 'courses' : [ chksum ] }),
-				success: function () {
+		var module_delivery_key = $(el).closest('tr').attr('deliverykey');
+		var session_code = $(el).closest('tr').attr('sessioncode');
 
-					if(_this.oTable.fnIsOpen(row[0])) {
-						row.removeClass('close').addClass('open');
-						_this.oTable.fnClose(row[0]);
-					}
+		var course_data = [ chksum ];
+		if (window.enableConnectAdvanced) {
+			course_data = [ module_delivery_key, session_code ];
+		}
 
-					row.removeClass('row_selected');
-					var aPos = _this.oTable.fnGetPosition(row[0]);
-					_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-					_this.oTable.fnUpdate('', row[0], 8, false)
-
-					_this.oTable.fnDraw();
-
-					_this.selectedDeliveries = [];
-					_this.count = 0;
-					$('#job_number').html(_this.count);
-					_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
-					if($('#jobs ul').hasClass('visible')) {
-						$('#jobs ul').html(_this.delivery_list);
-					}
-
-					_this.buttons.pageRefresh.addClass('highlight');
-				},
-				error: function() {
-					$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_row');
-					_this.statusbox(row, 'Error: we were unable to process your request at this time. Please try later');
+		var row = $(el).closest('tr');
+		$(el).removeClass('unlink_row').addClass('ajax_loading');
+		$.ajax({
+			type: 'POST',
+			url: window.dapageUrl + '/courses/disengage/',
+			dataType: 'json',
+			contentType: 'json',
+			data: JSON.stringify({ 'courses' : course_data }),
+			success: function (data, status, xhr) {
+				if(_this.oTable.fnIsOpen(row[0])) {
+					row.removeClass('close').addClass('open');
+					_this.oTable.fnClose(row[0]);
 				}
-			});
+
+				row.removeClass('row_selected');
+				var aPos = _this.oTable.fnGetPosition(row[0]);
+				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
+				_this.oTable.fnUpdate('', row[0], 8, false)
+
+				_this.oTable.fnDraw();
+
+				_this.selectedDeliveries = [];
+				_this.count = 0;
+				$('#job_number').html(_this.count);
+				_this.delivery_list = '<li class="empty_deliv">no items have been selected</li>';
+				if($('#jobs ul').hasClass('visible')) {
+					$('#jobs ul').html(_this.delivery_list);
+				}
+
+				_this.buttons.pageRefresh.addClass('highlight');
+			},
+			error: function() {
+				$('.ajax_loading', row).removeClass('ajax_loading').addClass('unlink_row');
+				_this.statusbox(row, 'Error: we were unable to process your request at this time. Please try later');
+			}
+		});
 	};
 
 	Connect.prototype.unlink_child = function(el) {
