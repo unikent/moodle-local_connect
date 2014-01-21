@@ -763,13 +763,11 @@ class course {
                     c1.parent_id,
                     c1.session_code,
                     c1.category_id,
-                    r.note as delivery_department,
+                    c1.delivery_department,
                     CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('\"',c2.chksum,'\"')),''),']') children
                   FROM courses c1
                     LEFT OUTER JOIN courses c2
                         ON c1.module_delivery_key = c2.parent_id AND c1.session_code = c2.session_code
-                    LEFT OUTER JOIN rules r
-                        ON r.sds_category = c1.delivery_department
                     LEFT OUTER JOIN (
                                         SELECT 'unprocessed' state, 1 code
                                       UNION
