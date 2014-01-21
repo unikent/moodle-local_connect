@@ -820,6 +820,8 @@ class course {
                     $obj->state = json_decode($obj->state);
                 }
 
+                $obj->sink_deleted = $obj->sink_deleted === "1" ? true : false;
+
                 if ($obj_form) {
                     $obj = new course($obj);
                 }
