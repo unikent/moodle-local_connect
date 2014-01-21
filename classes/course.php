@@ -1042,19 +1042,19 @@ class course {
 
         // Create it and join them up.
         $tr = $CONNECTDB->start_delegated_transaction();
-        $uuid = $CONNECTDB->get_record_sql('select uuid() as uuid');
+        $uuid = $CONNECTDB->get_record_sql('SELECT uuid() AS uuid');
         $sql = <<<SQL
-          insert into courses (chksum, module_delivery_key, primary_child
+          INSERT INTO courses (chksum, module_delivery_key, primary_child
             , link, id_chksum, module_code, module_title, synopsis, category_id
             , session_code, delivery_department, campus, campus_desc
             , module_week_beginning, module_length, moodle_id
             , state, created_at, updated_at, week_beginning_date)
-          select ?, ?, ?
+          SELECT ?, ?, ?
             , true, uuid(), ?, ?, ?, ?
             , session_code, delivery_department, campus, campus_desc
             , ?, ?, ?
             , ?, now(), now(), ?
-            from courses where chksum = ?
+            FROM courses WHERE chksum = ?
 SQL;
         $CONNECTDB->execute($sql, array(
             $uuid->uuid,
@@ -1078,7 +1078,7 @@ SQL;
         ));
 
         $tr->allow_commit();
-        
+
         $STOMP->send('connect.job.create_link_course',
             json_encode(array('link_course_chksum'=>$uuid->uuid, 'child_chksums'=>$input->link_courses)));
 
