@@ -1,4 +1,11 @@
 <?php
+/**
+ * /tmp/phptidy-sublime-buffer.php
+ *
+ * @package default
+ */
+
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -21,7 +28,6 @@
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
@@ -37,18 +43,19 @@ class observers {
      * Adds the course to the SHAREDB clone-table
      *
      * @param \core\event\course_created $event
+     * @return unknown
      */
     public static function course_created(\core\event\course_created $event) {
         global $CFG, $DB, $SHAREDB;
 
-        if (!\local_connect\utils::is_enabled() || !\local_connect\utils::enable_new_features() || !\local_connect\utils::enable_new_observers()) {
+        if  (!\local_connect\utils::enable_new_observers() || !\local_connect\utils::enable_sharedb()) {
             return true;
         }
-        
+
         // Update course listings DB
         $record = $DB->get_record('course', array(
-            "id" => $event->objectid
-        ));
+                "id" => $event->objectid
+            ));
 
         if ($record->id == 1) {
             return true;
@@ -57,16 +64,12 @@ class observers {
         $record->moodle_id = $record->id;
         $record->moodle_env = $CFG->kent->environment;
         $record->moodle_dist = $CFG->kent->distribution;
-        $SHAREDB->insert_record("course_list", $record);
 
-        // Sync Enrollments
-        $connect_course = \local_connect\course::get_course($record->moodle_id);
-        if ($connect_course !== false) {
-            $connect_course->sync_enrolments();
-        }
+        $SHAREDB->insert_record("course_list", $record);
 
         return true;
     }
+
 
     /**
      * Triggered when 'user_created' event is triggered.
@@ -74,18 +77,19 @@ class observers {
      * Sync the new user's enrolments
      *
      * @param \core\event\user_created $event
+     * @return unknown
      */
     public static function user_created(\core\event\user_created $event) {
         global $CFG, $DB, $SHAREDB;
 
-        if (!\local_connect\utils::is_enabled() || !\local_connect\utils::enable_new_features() || !\local_connect\utils::enable_new_observers()) {
+        if  (!\local_connect\utils::enable_new_observers()) {
             return true;
         }
-        
+
         // Grab user info
         $record = $DB->get_record('user', array(
-            "id" => $event->objectid
-        ));
+                "id" => $event->objectid
+            ));
 
         // Perhaps this is a new installation...
         if ($record->id <= 1) {
@@ -102,5 +106,6 @@ class observers {
 
         return true;
     }
+
 
 }
