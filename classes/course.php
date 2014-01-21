@@ -918,13 +918,13 @@ class course {
 
 
     /**
-     *
+     * Merge two courses.
+     * 
      * @param unknown $input
      * @return unknown
      */
     public static function merge($input) {
         global $CONNECTDB, $STOMP;
-        $r = array();
 
         $link_course = array(
             'module_code' => $input->code,
@@ -936,85 +936,111 @@ class course {
             'moodle_id' => null
         );
 
-        // lets make sure the module_code is unique
-        if ($CONNECTDB->count_records('courses', array('module_code'=>$link_course['module_code'])) > 0) {
+        // Lets make sure the module_code is unique.d
+        if ($CONNECTDB->count_records('courses', array('module_code' => $link_course['module_code'])) > 0) {
             return array('error_code' => 'duplicate');
         }
 
-        // find all the courses we want to link to and make sure they exist
+        // Find all the courses we want to link to and make sure they exist.
         $courses = $CONNECTDB->get_records_list('courses', 'chksum', $input->link_courses);
         if (count($courses) != count($input->link_courses)) {
             return array('error_code' => 'invalid_course');
         }
 
-        // how many of them are already links?
+        // Grab a list of all courses that are currently linked courses.
         $linked = array_filter($courses, function($v) {
-                return $v->link;
-            });
+            return $v->link;
+        });
+
+        // Check these are not all linked courses.
         if (count($linked) > 1) {
-            // we cant link linked
-            return array('error_code'=>'cannot_merge_link_courses');
-        } else if (count($linked) == 1) {
-                // with jsut one we just add the other merge targets as children
-                $link = array_shift($linked);
-                $children = array_filter($courses, function($v) use ($link) {
-                        return ($v->chksum != $link->chksum) && (($v->state & course::$states['unprocessed']) > 0);
-                    });
-                foreach ($children as $child) {
-                    $STOMP->send('connect.job.add_link_child', json_encode(array('link_course_chksum'=>$link->chksum, 'chksum'=>$child->chksum)));
-                }
-                return array();
-            }
+            return array('error_code' => 'cannot_merge_link_courses');
+        }
 
-        // how many are already created?
-        $already_created = array_filter($courses, function($v) {
-                return (($v->state & course::$states['created_in_moodle']) > 0) && $v->moodle_id;
+        // If we only have one linked course, we just add the other merge targets as children.
+        if (count($linked) == 1) {
+            $link = array_shift($linked);
+            $link = course::get_course_by_uid($link->module_delivery_key, $link->session_code);
+
+            // Filter out children.
+            $children = array_filter($courses, function($v) use ($link) {
+                return ($v->chksum != $link->chksum) && (($v->state & course::$states['unprocessed']) > 0);
             });
 
-        // we cant link multiple created courses yet
-        if (count($already_created) > 1) {
-            return array('error_code'=>'too_many_created');
-        } else if (count($already_created) == 1) {
-                // but if only one has been created ninja its moodle_id
-                // this means itll get ignored by the create bit in the job
-                // and just fall through to having its children sorted,
-                // im not sure thats right, but its how it is right now.
-                $f = array_shift($already_created);
-                $link_course['moodle_id'] = $f->moodle_id;
-                $link_course['state'] = course::$states['created_in_moodle'];
+            // Map them to objects.
+            $children = array_map($courses, function($v) {
+                return course::get_course_by_uid($v->module_delivery_key, $v->session_code);
+            });
+
+            // Create the links.
+            foreach ($children as $child) {
+                $link->add_child($child);
             }
 
-        // grab hold of the 'primary' delivery and base our details on that
-        $t = array_filter($courses, function($v) { return $v->campus_desc == 'Canterbury'; });
-        $only_canterbury = array_shift($t);
+            return array();
+        }
 
-        $t = array_filter($courses, function($v) use ($link_course) { return $v->chksum == $link_course['primary_child']; });
+        // How many are already created?
+        $already_created = array_filter($courses, function($v) {
+            return (($v->state & course::$states['created_in_moodle']) > 0) && $v->moodle_id;
+        });
+
+        // we cant link multiple created courses yet.
+        if (count($already_created) > 1) {
+            return array('error_code' => 'too_many_created');
+        }
+
+        // If only one has been created, ninja its moodle_id
+        // this means it'll get ignored by the create bit in the job
+        // and just fall through to having its children sorted,
+        // im not sure thats right, but its how it is right now.
+        if (count($already_created) == 1) {
+            $f = array_shift($already_created);
+            $link_course['moodle_id'] = $f->moodle_id;
+            $link_course['state'] = course::$states['created_in_moodle'];
+        }
+
+        // Grab hold of the 'primary' delivery and base our details on that.
+
+        $t = array_filter($courses, function($v) use ($link_course) {
+            return $v->chksum == $link_course['primary_child'];
+        });
         $primary_child = array_shift($t);
 
         $keys = array_keys($courses);
         $parent = $courses[array_pop($keys)];
         if ($primary_child !== null) {
             $parent = $primary_child;
-        } else if ($only_canterbury !== null) {
+        }
+        else {
+            $t = array_filter($courses, function($v) {
+                return $v->campus_desc == 'Canterbury';
+            });
+            $only_canterbury = array_shift($t);
+
+            if ($only_canterbury !== null) {
                 $parent = $only_canterbury;
             }
+        }
 
-        // fix up starts and lengths
+        // Fix up starts and lengths.
         $link_course['module_week_beginning'] = array_reduce($courses, function($a, $i) {
-                return ($i->module_week_beginning < $a) ? $i->module_week_beginning : $a;
-            }, '52');
+            return ($i->module_week_beginning < $a) ? $i->module_week_beginning : $a;
+        }, '52');
 
         $link_course['module_length'] = array_reduce($courses, function($a, $i) {
-                $l = ($i->module_week_beginning + $i->module_length);
-                return $l > $a ? $l : $a;
-            }, '0') - $link_course['module_week_beginning'];
+            $l = ($i->module_week_beginning + $i->module_length);
+            return $l > $a ? $l : $a;
+        }, '0') - $link_course['module_week_beginning'];
 
         $link_course['week_beginning_date'] = array_reduce($courses, function($a, $i) {
-                if (null === $a) $a = $i->week_beginning_date;
-                return ($i->week_beginning_date < $a) ? $i->week_beginning_date : $a;
-            });
+            if (null === $a) {
+                $a = $i->week_beginning_date;
+            }
+            return ($i->week_beginning_date < $a) ? $i->week_beginning_date : $a;
+        });
 
-        // create it and join them up
+        // Create it and join them up.
         $tr = $CONNECTDB->start_delegated_transaction();
         $uuid = $CONNECTDB->get_record_sql('select uuid() as uuid');
         $sql = <<<SQL
@@ -1030,24 +1056,34 @@ class course {
             , ?, now(), now(), ?
             from courses where chksum = ?
 SQL;
-        $CONNECTDB->execute($sql,
-            array(
-                $uuid->uuid, $uuid->uuid, $link_course['primary_child'],
-                $link_course['module_code'], $link_course['module_title'],
-                $link_course['synopsis'], $link_course['category_id'],
-                $link_course['module_week_beginning'], $link_course['module_length'],
-                $link_course['moodle_id'], $link_course['state'],
-                $link_course['week_beginning_date'], $parent->chksum));
-        $CONNECTDB->execute(
-            'update courses set parent_id = ? where find_in_set(chksum, ?)',
-            array($uuid->uuid, join(',', $input->link_courses)));
+        $CONNECTDB->execute($sql, array(
+            $uuid->uuid,
+            $uuid->uuid,
+            $link_course['primary_child'],
+            $link_course['module_code'],
+            $link_course['module_title'],
+            $link_course['synopsis'],
+            $link_course['category_id'],
+            $link_course['module_week_beginning'],
+            $link_course['module_length'],
+            $link_course['moodle_id'],
+            $link_course['state'],
+            $link_course['week_beginning_date'],
+            $parent->chksum
+        ));
 
+        $CONNECTDB->execute('update courses set parent_id = ? where find_in_set(chksum, ?)', array(
+            $uuid->uuid,
+            join(',', $input->link_courses)
+        ));
+
+        $tr->allow_commit();
+        
         $STOMP->send('connect.job.create_link_course',
             json_encode(array('link_course_chksum'=>$uuid->uuid, 'child_chksums'=>$input->link_courses)));
 
-        $tr->allow_commit();
 
-        return $r;
+        return array();
     }
 
 
