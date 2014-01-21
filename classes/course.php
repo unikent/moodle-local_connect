@@ -1079,8 +1079,14 @@ SQL;
 
         $tr->allow_commit();
 
-        $STOMP->send('connect.job.create_link_course',
-            json_encode(array('link_course_chksum'=>$uuid->uuid, 'child_chksums'=>$input->link_courses)));
+        // Find the new course.
+        $link = course::get_course_by_uid($uuid->uuid);
+        
+        // Add children.
+        foreach ($input->link_courses as $child) {
+            $child = course::get_course_by_uid($child->module_delivery_key, $child->session_code);
+            $link->add_child($child);
+        }
 
 
         return array();
