@@ -44,7 +44,7 @@ class utils {
 	 */
 	public static function enable_new_features() {
 		global $CFG;
-		return isset($CFG->local_connect_enable_new_features) && $CFG->local_connect_enable_new_features;
+		return static::is_enabled() && isset($CFG->local_connect_enable_new_features) && $CFG->local_connect_enable_new_features;
 	}
 
 	/**
@@ -52,7 +52,7 @@ class utils {
 	 */
 	public static function enable_new_observers() {
 		global $CFG;
-		return isset($CFG->local_connect_enable_observers) && $CFG->local_connect_enable_observers;
+		return static::is_enabled() && isset($CFG->local_connect_enable_observers) && $CFG->local_connect_enable_observers;
 	}
 
 	/**
@@ -60,7 +60,7 @@ class utils {
 	 */
 	public static function enable_sharedb() {
 		global $CFG;
-		return isset($CFG->local_connect_enable_sharedb) && $CFG->local_connect_enable_sharedb;
+		return static::is_enabled() && isset($CFG->local_connect_enable_sharedb) && $CFG->local_connect_enable_sharedb;
 	}
 
 	/**
@@ -68,7 +68,7 @@ class utils {
 	 */
 	public static function enable_cron() {
 		global $CFG;
-		return isset($CFG->local_connect_enable_cron) && $CFG->local_connect_enable_cron;
+		return static::is_enabled() && isset($CFG->local_connect_enable_cron) && $CFG->local_connect_enable_cron;
 	}
 
 	/**
