@@ -763,11 +763,13 @@ class course {
                     c1.parent_id,
                     c1.session_code,
                     c1.category_id,
-                    c1.delivery_department,
+                    r.note as delivery_department,
                     CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('\"',c2.chksum,'\"')),''),']') children
                   FROM courses c1
                     LEFT OUTER JOIN courses c2
                         ON c1.module_delivery_key = c2.parent_id AND c1.session_code = c2.session_code
+                    LEFT OUTER JOIN rules r
+                        ON r.sds_category = c1.delivery_department
                     LEFT OUTER JOIN (
                                         SELECT 'unprocessed' state, 1 code
                                       UNION
@@ -821,6 +823,10 @@ class course {
                 }
 
                 $obj->sink_deleted = $obj->sink_deleted === "1" ? true : false;
+
+                $obj->student_count = intval($obj->student_count);
+                $obj->teacher_count = intval($obj->teacher_count);
+                $obj->convenor_count = intval($obj->convenor_count);
 
                 if ($obj_form) {
                     $obj = new course($obj);
