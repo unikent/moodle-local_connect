@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die;
 function xmldb_local_connect_install() {
     global $CFG;
 
-    if (KENT_ENV != "testing" && KENT_MOODLE != "travis") {
+    if ($CFG->kent->environment != "testing" && $CFG->kent->distribution != "travis") {
         create_role(
         	"Teacher (sds)",
         	"sds_teacher",
