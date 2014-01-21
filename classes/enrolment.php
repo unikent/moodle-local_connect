@@ -197,7 +197,7 @@ class enrolment {
      * @return local_connect_enrolment Enrolment object
      */
     public static function get_enrolments_for_course($course) {
-        global $DB, $CONNECTDB;
+        global $CONNECTDB;
 
         // Select all our enrolments.
         $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
