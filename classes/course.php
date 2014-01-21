@@ -174,7 +174,7 @@ class course {
                     synopsis=?,
                     category_id=?,
                     state=?
-                WHERE chksum=?";
+                WHERE module_delivery_key=? AND session_code=?";
 
         return $CONNECTDB->execute($sql, array(
                 $this->parent_id,
@@ -184,7 +184,8 @@ class course {
                 $this->synopsis,
                 $this->category,
                 $this->state,
-                $this->chksum
+                $this->module_delivery_key,
+                $this->session_code
             ));
     }
 
@@ -363,6 +364,9 @@ class course {
                     "chksum" => $this->chksum
                 ));
         }
+
+        // Sync our enrolments.
+        $this->sync_enrolments();
 
         return true;
     }
