@@ -48,24 +48,27 @@ class observers {
     public static function course_created(\core\event\course_created $event) {
         global $CFG, $DB, $SHAREDB;
 
-        if  (!\local_connect\utils::enable_new_observers() || !\local_connect\utils::enable_sharedb()) {
+        if  (!\local_connect\utils::enable_new_observers()) {
             return true;
         }
 
-        // Update course listings DB
-        $record = $DB->get_record('course', array(
-                "id" => $event->objectid
-            ));
+        // Update ShareDB if it is enabled.
+        if (\local_connect\utils::enable_sharedb()) {
+            // Update course listings DB
+            $record = $DB->get_record('course', array(
+                    "id" => $event->objectid
+                ));
 
-        if ($record->id == 1) {
-            return true;
+            if ($record->id == 1) {
+                return true;
+            }
+
+            $record->moodle_id = $record->id;
+            $record->moodle_env = $CFG->kent->environment;
+            $record->moodle_dist = $CFG->kent->distribution;
+
+            $SHAREDB->insert_record("course_list", $record);
         }
-
-        $record->moodle_id = $record->id;
-        $record->moodle_env = $CFG->kent->environment;
-        $record->moodle_dist = $CFG->kent->distribution;
-
-        $SHAREDB->insert_record("course_list", $record);
 
         return true;
     }
