@@ -86,7 +86,7 @@ class group_enrolment {
     		return false;
     	}
 
-    	return false;
+    	return true;
     }
 
     /**
@@ -109,6 +109,8 @@ class group_enrolment {
      * Create this group enrolment in Moodle
      */
     public function create_in_moodle() {
+        global $CFG;
+        require_once($CFG->dirroot.'/group/lib.php');
 
     	if (!$this->is_valid()) {
     		return false;
