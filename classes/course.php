@@ -31,6 +31,8 @@ require_once dirname(__FILE__) . '/../../../mod/forum/lib.php';
 
 /**
  * Connect courses container
+ *
+ * @todo moodle_id should be handled a bit more intelligently... dont rely on Connect DB
  */
 class course {
 
@@ -365,6 +367,12 @@ class course {
                 ));
         }
 
+        // Sync our groups.
+        $this->sync_groups();
+
+        // Sync our group enrolments.
+        $this->sync_group_enrolments();
+
         // Sync our enrolments.
         $this->sync_enrolments();
 
@@ -617,6 +625,7 @@ class course {
 
     /**
      * Syncs enrollments for this Course
+     * @todo Updates/Deletions
      */
     public function sync_enrolments() {
         $enrolments = enrolment::get_enrolments_for_course($this);
@@ -627,6 +636,25 @@ class course {
         }
     }
 
+    /**
+     * Syncs groups for this Course
+     * @todo Updates/Deletions
+     */
+    public function sync_groups() {
+        $groups = group::get_for_course($this);
+        foreach ($groups as $group) {
+            if (!$group->is_in_moodle()) {
+                $group->create_in_moodle();
+            }
+        }
+    }
+
+    /**
+     * Syncs group enrollments for this Course
+     * @todo Creates/Updates/Deletions
+     */
+    public function sync_group_enrolments() {
+    }
 
     /**
      * To String override
