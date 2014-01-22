@@ -68,6 +68,8 @@ class group {
     private function get_or_create_grouping() {
     	global $DB;
 
+    	$course = $this->get_course();
+    	
 		$grouping = $DB->get_record('groupings', array(
 			'name' => 'Seminar groups',
 			'courseid' => $this->moodle_id
@@ -97,7 +99,7 @@ class group {
         $sql = "SELECT COUNT(g.id) FROM {groups} g WHERE g.courseid=:courseid AND g.name=:name";
         $params = array(
         	"courseid" => $course_moodle_id,
-        	"name" => $this->name
+        	"name" => $this->description
         );
 
         return $DB->count_records_sql($sql, $params) > 0;
@@ -107,11 +109,15 @@ class group {
      * Create this group in Moodle
      */
     public function create_in_moodle() {
+    	global $CFG;
+
     	$course = $this->get_course();
 
     	if (empty($course->moodle_id)) {
     		return false;
     	}
+
+		require_once ($CFG->dirroot . '/group/lib.php');
 
     	$data = new \stdClass();
     	$data->name = $this->description;
