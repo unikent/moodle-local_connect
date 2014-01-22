@@ -58,11 +58,14 @@ class group_enrolment {
      * Grab our Moodle User's ID
      */
     private function get_moodle_user_id() {
+        global $DB;
+
     	if (!isset($this->moodle_user_id)) {
     		$user = $DB->get_record('user', array(
 				'username' => $this->login
 			));
-    		$this->moodle_user_id = $user->id;
+
+    		$this->moodle_user_id = empty($user) ? null : $user->id;
     	}
 
     	return $this->moodle_user_id;
@@ -73,7 +76,8 @@ class group_enrolment {
      */
     public function is_valid() {
     	$group = $this->get_group();
-    	if (empty($group->moodle_id)) {
+        $groupid = $group->get_moodle_id();
+    	if (empty($groupid)) {
     		return false;
     	}
 
@@ -98,7 +102,7 @@ class group_enrolment {
     	$group = $this->get_group();
     	$userid = $this->get_moodle_user_id();
 
-        return groups_is_member($group->moodle_id, $userid);
+        return groups_is_member($group->get_moodle_id(), $userid);
     }
 
     /**
@@ -113,7 +117,7 @@ class group_enrolment {
     	$group = $this->get_group();
     	$userid = $this->get_moodle_user_id();
 
-		return groups_add_member($group->moodle_id, $userid);
+		return groups_add_member($group->get_moodle_id(), $userid);
     }
 
     /**
@@ -123,7 +127,7 @@ class group_enrolment {
         global $CONNECTDB;
 
         // Select all our groups.
-        $sql = "SELECT ge.group_id id, ge.login login
+        $sql = "SELECT ge.chksum, ge.group_id id, ge.login login
         			FROM `group_enrollments` ge
                 WHERE ge.group_id=:group_id";
 

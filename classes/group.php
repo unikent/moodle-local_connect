@@ -34,9 +34,6 @@ class group {
     /** Our id */
     public $id;
 
-    /** Our Moodle id */
-    public $moodle_id;
-
     /** Our description */
     public $description;
 
@@ -49,6 +46,9 @@ class group {
     /** Our Connect course - Dont rely on this being set! Use get_course() */
     private $course;
 
+    /** Our Moodle id - Dont rely on this being set! Use get_moodle_id() */
+    private $moodle_id;
+
     /**
      * Grab our Connect Course
      */
@@ -60,6 +60,27 @@ class group {
     	$this->course = course::get_course_by_uid($this->module_delivery_key, $this->session_code);
 
     	return $this->course;
+    }
+
+    /**
+     * Grab our Moodle ID
+     */
+    public function get_moodle_id() {
+        global $DB;
+
+        if (empty($this->moodle_id)) {
+            $course = $this->get_course();
+            $course_moodle_id = $course->moodle_id;
+
+            $group = $DB->get_record('groups', array(
+                "courseid" => $course_moodle_id,
+                "name" => $this->description
+            ));
+
+            $this->moodle_id = $group->id;
+        }
+
+        return $this->moodle_id;
     }
 
     /**
@@ -160,7 +181,7 @@ class group {
     public static function get($uid) {
         global $CONNECTDB;
 
-        $data = $CONNECTDB->get_record('groups', array(
+        $group = $CONNECTDB->get_record('groups', array(
             'group_id' => $uid
         ));
 

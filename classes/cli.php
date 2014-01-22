@@ -80,4 +80,33 @@ class cli {
 		mtrace("  done.\n");
 	}
 
+	/**
+	 * Run the group enrolment sync cron
+	 */
+	public static function group_enrolment_sync() {
+		mtrace("  Synchronizing group enrolments...\n");
+
+		$data = new \stdClass();
+		$data->id = 126253;
+
+		$groups = \local_connect\group_enrolment::get_for_group($data);foreach ($groups as $group) {
+		if (!$group->is_in_moodle()) {
+			$group->create_in_moodle();
+		}
+	}
+
+		/*$groups = \local_connect\group_enrolment::get_all($CFG->connect->session_code);
+		foreach ($groups as $group) {
+		    if (!$group->is_in_moodle()) {
+		        if ($group->create_in_moodle()) {
+		        	mtrace("    Created group '{$group->id}'!\n");
+		        } else {
+		        	mtrace("    Failed group '{$group->id}'!\n");
+		        }
+		    }
+		}*/
+
+		mtrace("  done.\n");
+	}
+
 }
