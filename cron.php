@@ -31,7 +31,10 @@ if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_featu
 	mtrace('');
 
 	// Sync courses
-	mtrace('  Synchronizing courses...');
 	\local_connect\cli::course_sync();
-	mtrace('  done.');
+	mtrace('');
+	
+	// Sync groups
+	\local_connect\cli::group_sync();
+	mtrace('');
 }

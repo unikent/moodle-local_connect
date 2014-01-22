@@ -35,27 +35,49 @@ class cli {
 	 * Run the course sync cron
 	 */
 	public static function course_sync() {
+		mtrace("  Synchronizing courses...\n");
 		$courses = \local_connect\course::get_courses(array(), true);
 		foreach ($courses as $course) {
 			try {
 
 				if (!$course->is_created() && $course->has_unique_shortname()) {
-					print "Creating $course...\n";
+					mtrace("    Creating $course...\n");
 					$course->create_moodle();
 					continue;
 				}
 
 				if ($course->has_changed()) {
-					print "Updating $course...\n";
+					mtrace("    Updating $course...\n");
 					$course->update_moodle();
 					continue;
 				}
 
 			} catch (Excepton $e) {
 				$msg = $e->getMessage();
-				print "Error: $msg\n";
+				mtrace("    Error: $msg\n");
 			}
 		}
+		mtrace("  done.\n");
+	}
+
+	/**
+	 * Run the group sync cron
+	 */
+	public static function group_sync() {
+		mtrace("  Synchronizing groups...\n");
+
+		$groups = \local_connect\group::get_all($CFG->connect->session_code);
+		foreach ($groups as $group) {
+		    if (!$group->is_in_moodle()) {
+		        if ($group->create_in_moodle()) {
+		        	mtrace("    Created group '{$group->id}'!\n");
+		        } else {
+		        	mtrace("    Failed group '{$group->id}'!\n");
+		        }
+		    }
+		}
+
+		mtrace("  done.\n");
 	}
 
 }

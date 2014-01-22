@@ -40,14 +40,14 @@ class group {
     /** Our description */
     public $description;
 
-    /** Our Connect course */
-    public $course;
-
     /** Our course's module delivery key */
     public $module_delivery_key;
 
     /** Our course's session code */
     public $session_code;
+
+    /** Our Connect course - Dont rely on this being set! Use get_course() */
+    private $course;
 
     /**
      * Grab our Connect Course
@@ -69,7 +69,7 @@ class group {
     	global $DB;
 
     	$course = $this->get_course();
-    	
+
 		$grouping = $DB->get_record('groupings', array(
 			'name' => 'Seminar groups',
 			'courseid' => $this->moodle_id
@@ -127,7 +127,7 @@ class group {
     	$this->moodle_id = groups_create_group($data);
 
 		if ($this->moodle_id === false) {
-			throw new Exception("Could not create group '{$data->name}'!");
+			return false;
 		}
 
 		$grouping_id = $this->get_or_create_grouping();
@@ -163,6 +163,36 @@ class group {
         	$obj->course = $course;
         	$obj->module_delivery_key = $course->module_delivery_key;
         	$obj->session_code = $course->session_code;
+
+        	$group = $obj;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Returns all known groups for a given session code.
+     */
+    public static function get_all($session_code) {
+        global $CONNECTDB;
+
+        // Select all our groups.
+        $sql = "SELECT g.group_id id, g.group_desc description, g.module_delivery_key, g.moodle_id
+        			FROM `groups` g
+                WHERE g.session_code = :sessioncode";
+
+        $data = $CONNECTDB->get_records_sql($sql, array(
+            "sessioncode" => $session_code
+        ));
+
+        // Map to objects.
+        foreach ($data as &$group) {
+        	$obj = new group();
+        	$obj->id = $group->id;
+        	$obj->moodle_id = $group->moodle_id;
+        	$obj->description = $group->description;
+        	$obj->module_delivery_key = $group->module_delivery_key;
+        	$obj->session_code = $session_code;
 
         	$group = $obj;
         }

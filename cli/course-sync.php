@@ -24,6 +24,6 @@
 
 define('CLI_SCRIPT', true);
 
-require(dirname(__FILE__) . '/../../../config.php');
+require (dirname(__FILE__) . '/../../../config.php');
 
 \local_connect\cli::course_sync();
