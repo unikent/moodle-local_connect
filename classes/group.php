@@ -132,10 +132,46 @@ class group {
 
 		$grouping_id = $this->get_or_create_grouping();
 
-		// And add this group to the grouping
+		// And add this group to the grouping.
 		groups_assign_grouping($grouping_id, $this->moodle_id);
 
+        // Sync enrolments.
+        $this->sync_group_enrolments();
+
 		return true;
+    }
+
+    /**
+     * Syncs group enrollments for this Group
+     * @todo Updates/Deletions
+     */
+    public function sync_group_enrolments() {
+        $enrolments = group_enrolment::get_for_group($this);
+        foreach ($enrolments as $enrolment) {
+            if (!$enrolment->is_in_moodle()) {
+                $enrolment->create_in_moodle();
+            }
+        }
+    }
+
+    /**
+     * Returns a group specified by ID
+     */
+    public static function get($uid) {
+        global $CONNECTDB;
+
+        $data = $CONNECTDB->get_record('groups', array(
+            'group_id' => $uid
+        ));
+
+        $obj = new group();
+        $obj->id = $uid;
+        $obj->moodle_id = $group->moodle_id;
+        $obj->description = $group->group_desc;
+        $obj->module_delivery_key = $group->module_delivery_key;
+        $obj->session_code = $group->session_code;
+
+        return $obj;
     }
 
     /**

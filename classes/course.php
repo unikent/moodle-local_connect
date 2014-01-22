@@ -367,14 +367,11 @@ class course {
                 ));
         }
 
-        // Sync our groups.
-        $this->sync_groups();
-
-        // Sync our group enrolments.
-        $this->sync_group_enrolments();
-
         // Sync our enrolments.
         $this->sync_enrolments();
+
+        // Sync our groups.
+        $this->sync_groups();
 
         return true;
     }
@@ -647,13 +644,6 @@ class course {
                 $group->create_in_moodle();
             }
         }
-    }
-
-    /**
-     * Syncs group enrollments for this Course
-     * @todo Creates/Updates/Deletions
-     */
-    public function sync_group_enrolments() {
     }
 
     /**
