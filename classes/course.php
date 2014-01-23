@@ -651,7 +651,7 @@ class course {
      * @return unknown
      */
     public function __toString() {
-        return is_string($this->module_title) ? $this->module_title : "$this->chksum";
+        return is_string($this->module_title) ? "{$this->module_title} ({$this->shortname})" : "$this->chksum";
     }
 
 

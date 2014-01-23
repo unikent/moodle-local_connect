@@ -52,13 +52,13 @@ class user {
 		global $CONNECTDB;
 
 		$user = $CONNECTDB->get_record('enrollments', array(
-			'username' => $username
+			'login' => $username
 		), "*", IGNORE_MULTIPLE);
 
 		$this->uid = $user->ukc;
 		$this->username = $username;
-		$this->firstname = $user->initials;
-		$this->lastname = $user->family_name;
+		$this->firstname = empty($user->initials) ? $username[0] : $user->initials;
+		$this->lastname = empty($user->family_name) ? $username[1] : $user->family_name;
 	}
 
 	/**
@@ -96,7 +96,11 @@ class user {
 		require_once ($CFG->dirroot . "/user/lib.php");
 
 		if ($this->is_in_moodle()) {
-			return true;
+			return $this->get_moodle_id();
+		}
+
+		if (empty($this->username) || empty($this->firstname) || empty($this->lastname)) {
+			return null;
 		}
 
 		$user = new \stdClass();
@@ -106,6 +110,8 @@ class user {
 		$user->email = $this->username . "@kent.ac.uk";
 		$user->auth = "kentsaml";
 		$user->password = "not cached";
+		$user->confirmed = 1;
+		$user->mnethostid = $CFG->mnet_localhost_id;
 
 
 		$this->moodle_id = user_create_user($user, false);

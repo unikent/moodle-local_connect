@@ -83,7 +83,7 @@ class observers {
      * @return unknown
      */
     public static function user_created(\core\event\user_created $event) {
-        global $CFG, $DB, $SHAREDB;
+        global $DB;
 
         if  (!\local_connect\utils::enable_new_observers()) {
             return true;

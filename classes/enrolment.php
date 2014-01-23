@@ -121,15 +121,15 @@ class enrolment {
 
             // Map the username if needs be.
             if (!isset($enrolment->userid)) {
-                if (!isset($uid_store['username'])) {
+                if (!isset($uid_store[$enrolment->username])) {
                     $user = new user($enrolment->username);
                     if (!$user->is_in_moodle()) {
                       $user->create_in_moodle();
                     }
-                    $uid_store['username'] = $user->get_moodle_id();
+                    $uid_store[$enrolment->username] = $user->get_moodle_id();
                 }
                 
-                $enrolment->userid = $uid_store['username'];
+                $enrolment->userid = $uid_store[$enrolment->username];
             }
 
             // Create an object for this enrolment.
