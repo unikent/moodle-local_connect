@@ -21,7 +21,6 @@
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
@@ -54,19 +53,22 @@ class group {
 
     /**
      * Grab our Connect Course
+     * @return unknown
      */
     private function get_course() {
-    	if (isset($this->course)) {
-    		return $this->course;
-    	}
+        if (isset($this->course)) {
+            return $this->course;
+        }
 
-    	$this->course = course::get_course_by_uid($this->module_delivery_key, $this->session_code);
+        $this->course = course::get_course_by_uid($this->module_delivery_key, $this->session_code);
 
-    	return $this->course;
+        return $this->course;
     }
+
 
     /**
      * Grab our Moodle ID
+     * @return unknown
      */
     public function get_moodle_id() {
         global $DB;
@@ -76,9 +78,9 @@ class group {
             $course_moodle_id = $course->moodle_id;
 
             $group = $DB->get_record('groups', array(
-                "courseid" => $course_moodle_id,
-                "name" => $this->description
-            ));
+                    "courseid" => $course_moodle_id,
+                    "name" => $this->description
+                ));
 
             $this->moodle_id = $group->id;
         }
@@ -86,91 +88,98 @@ class group {
         return $this->moodle_id;
     }
 
+
     /**
      * Grab (or create) our grouping ID
+     * @return unknown
      */
     private function get_or_create_grouping() {
-    	global $DB;
+        global $DB;
 
-    	$course = $this->get_course();
+        $course = $this->get_course();
 
-		$grouping = $DB->get_record('groupings', array(
-			'name' => 'Seminar groups',
-			'courseid' => $this->moodle_id
-		));
+        $grouping = $DB->get_record('groupings', array(
+                'name' => 'Seminar groups',
+                'courseid' => $this->moodle_id
+            ));
 
-		// Create?
-		if (!$grouping) {
-	    	$data = new \stdClass();
-			$data->name = "Seminar groups";
-			$data->courseid = $course->moodle_id;
-			$data->description = '';
-			return groups_create_grouping($data);
-		}
+        // Create?
+        if (!$grouping) {
+            $data = new \stdClass();
+            $data->name = "Seminar groups";
+            $data->courseid = $course->moodle_id;
+            $data->description = '';
+            return groups_create_grouping($data);
+        }
 
-		return $grouping->id;
+        return $grouping->id;
     }
+
 
     /**
      * Check to see if this exists in Moodle
+     * @return unknown
      */
     public function is_in_moodle() {
-    	global $DB;
+        global $DB;
 
-    	$course = $this->get_course();
-    	$course_moodle_id = $course->moodle_id;
+        $course = $this->get_course();
+        $course_moodle_id = $course->moodle_id;
 
         $sql = "SELECT COUNT(g.id) FROM {groups} g WHERE g.courseid=:courseid AND g.name=:name";
         $params = array(
-        	"courseid" => $course_moodle_id,
-        	"name" => $this->description
+            "courseid" => $course_moodle_id,
+            "name" => $this->description
         );
 
         return $DB->count_records_sql($sql, $params) > 0;
     }
 
+
     /**
      * Create this group in Moodle
+     * @return unknown
      */
     public function create_in_moodle() {
-    	global $CFG, $CONNECTDB;
+        global $CFG, $CONNECTDB;
 
-    	$course = $this->get_course();
+        $course = $this->get_course();
 
-    	if (empty($course->moodle_id)) {
-    		return false;
-    	}
+        if (empty($course->moodle_id)) {
+            return false;
+        }
 
-		require_once ($CFG->dirroot . '/group/lib.php');
+        require_once $CFG->dirroot . '/group/lib.php';
 
-    	$data = new \stdClass();
-    	$data->name = $this->description;
-		$data->courseid = $course->moodle_id;
-		$data->description = '';
+        $data = new \stdClass();
+        $data->name = $this->description;
+        $data->courseid = $course->moodle_id;
+        $data->description = '';
 
-    	$this->moodle_id = groups_create_group($data);
+        $this->moodle_id = groups_create_group($data);
 
-		if ($this->moodle_id === false) {
-			return false;
-		}
+        if ($this->moodle_id === false) {
+            return false;
+        }
 
         // Set Moodle ID.
         $CONNECTDB->set_field('groups', 'moodle_id', $this->moodle_id, array(
-            'chksum' => $this->chksum,
-            'group_id' => $this->id
-        ));
+                'chksum' => $this->chksum,
+                'group_id' => $this->id
+            ));
 
         // Grab our grouping.
-		$grouping_id = $this->get_or_create_grouping();
+        $grouping_id = $this->get_or_create_grouping();
 
-		// And add this group to the grouping.
-		groups_assign_grouping($grouping_id, $this->moodle_id);
+        // And add this group to the grouping.
+        groups_assign_grouping($grouping_id, $this->moodle_id);
 
         // Sync enrolments.
         $this->sync_group_enrolments();
 
-		return true;
+        return true;
     }
+
 
     /**
      * Syncs group enrollments for this Group
@@ -185,15 +194,18 @@ class group {
         }
     }
 
+
     /**
      * Returns a group specified by ID
+     * @param unknown $uid
+     * @return unknown
      */
     public static function get($uid) {
         global $CONNECTDB;
 
         $group = $CONNECTDB->get_record('groups', array(
-            'group_id' => $uid
-        ));
+                'group_id' => $uid
+            ));
 
         $obj = new group();
         $obj->id = $uid;
@@ -206,59 +218,67 @@ class group {
         return $obj;
     }
 
+
     /**
      * Returns all known groups for a given course.
+     * @param unknown $course
+     * @return unknown
      */
     public static function get_for_course($course) {
         global $CONNECTDB;
 
         // Select all our groups.
         $data = $CONNECTDB->get_records("groups", array(
-            "module_delivery_key" => $course->module_delivery_key,
-            "session_code" => $course->session_code
-        ), '', 'chksum, group_id, group_desc, moodle_id');
+                "module_delivery_key" => $course->module_delivery_key,
+                "session_code" => $course->session_code
+            ), '', 'chksum, group_id, group_desc, moodle_id');
 
         // Map to objects.
         foreach ($data as &$group) {
-        	$obj = new group();
-        	$obj->id = $group->group_id;
-        	$obj->moodle_id = $group->moodle_id;
-        	$obj->description = $group->group_desc;
-        	$obj->course = $course;
-        	$obj->module_delivery_key = $course->module_delivery_key;
-        	$obj->session_code = $course->session_code;
+            $obj = new group();
+            $obj->id = $group->group_id;
+            $obj->moodle_id = $group->moodle_id;
+            $obj->description = $group->group_desc;
+            $obj->course = $course;
+            $obj->module_delivery_key = $course->module_delivery_key;
+            $obj->session_code = $course->session_code;
             $obj->chksum = $group->chksum;
 
-        	$group = $obj;
+            $group = $obj;
         }
 
         return $data;
     }
 
+
     /**
      * Returns all known groups for a given session code.
+     * @param unknown $session_code
+     * @return unknown
      */
     public static function get_all($session_code) {
         global $CONNECTDB;
 
         // Select all our groups.
         $data = $CONNECTDB->get_records("groups", array(
-            "session_code" => $session_code
-        ), '', 'chksum, group_id, group_desc, module_delivery_key, moodle_id');
+                "session_code" => $session_code
+            ), '', 'chksum, group_id, group_desc, module_delivery_key, moodle_id');
 
         // Map to objects.
         foreach ($data as &$group) {
-        	$obj = new group();
-        	$obj->id = $group->group_id;
-        	$obj->moodle_id = $group->moodle_id;
-        	$obj->description = $group->group_desc;
-        	$obj->module_delivery_key = $group->module_delivery_key;
-        	$obj->session_code = $session_code;
+            $obj = new group();
+            $obj->id = $group->group_id;
+            $obj->moodle_id = $group->moodle_id;
+            $obj->description = $group->group_desc;
+            $obj->module_delivery_key = $group->module_delivery_key;
+            $obj->session_code = $session_code;
             $obj->chksum = $group->chksum;
 
-        	$group = $obj;
+            $group = $obj;
         }
 
         return $data;
     }
+
+
 }

@@ -21,7 +21,6 @@
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
@@ -48,17 +47,20 @@ class group_enrolment {
 
     /**
      * Grab our Connect Group
+     * @return unknown
      */
     private function get_group() {
-    	if (!isset($this->group)) {
-    		$this->group = group::get($this->group_id);
-    	}
+        if (!isset($this->group)) {
+            $this->group = group::get($this->group_id);
+        }
 
-    	return $this->group;
+        return $this->group;
     }
+
 
     /**
      * Grab our Moodle User's ID
+     * @return unknown
      */
     private function get_moodle_user_id() {
         $user = new user($this->login);
@@ -66,92 +68,104 @@ class group_enrolment {
         return $this->moodle_user_id;
     }
 
+
     /**
      * Can this be added to Moodle yet?
+     * @return unknown
      */
     public function is_valid() {
-    	$group = $this->get_group();
+        $group = $this->get_group();
         $groupid = $group->get_moodle_id();
-    	if (empty($groupid)) {
-    		return false;
-    	}
+        if (empty($groupid)) {
+            return false;
+        }
 
-    	$userid = $this->get_moodle_user_id();
-    	if (empty($userid)) {
-    		return false;
-    	}
+        $userid = $this->get_moodle_user_id();
+        if (empty($userid)) {
+            return false;
+        }
 
-    	return true;
+        return true;
     }
+
 
     /**
      * Check to see if this exists in Moodle
+     * @return unknown
      */
     public function is_in_moodle() {
-    	global $DB;
+        global $DB;
 
-    	if (!$this->is_valid()) {
-    		return false;
-    	}
+        if (!$this->is_valid()) {
+            return false;
+        }
 
-    	$group = $this->get_group();
-    	$userid = $this->get_moodle_user_id();
+        $group = $this->get_group();
+        $userid = $this->get_moodle_user_id();
 
         return groups_is_member($group->get_moodle_id(), $userid);
     }
 
+
     /**
      * Create this group enrolment in Moodle
+     * @return unknown
      */
     public function create_in_moodle() {
         global $CFG;
-        require_once($CFG->dirroot.'/group/lib.php');
+        require_once $CFG->dirroot.'/group/lib.php';
 
-    	if (!$this->is_valid()) {
-    		return false;
-    	}
+        if (!$this->is_valid()) {
+            return false;
+        }
 
-    	$group = $this->get_group();
-    	$userid = $this->get_moodle_user_id();
+        $group = $this->get_group();
+        $userid = $this->get_moodle_user_id();
 
-		return groups_add_member($group->get_moodle_id(), $userid);
+        return groups_add_member($group->get_moodle_id(), $userid);
     }
+
 
     /**
      * Returns all known group enrollments for a given group.
+     * @param unknown $group
+     * @return unknown
      */
     public static function get_for_group($group) {
         global $CONNECTDB;
 
         // Select all our groups.
         $data = $CONNECTDB->get_records("group_enrollments", array(
-            "group_id" => $group->id
-        ), '', 'chksum, login');
+                "group_id" => $group->id
+            ), '', 'chksum, login');
 
         // Map to objects.
         foreach ($data as &$group_enrolment) {
-        	$obj = new group_enrolment();
+            $obj = new group_enrolment();
 
             $obj->chksum = $group_enrolment->chksum;
-        	$obj->login = $group_enrolment->login;
-        	$obj->group_id = $group->id;
+            $obj->login = $group_enrolment->login;
+            $obj->group_id = $group->id;
 
-        	$group_enrolment = $obj;
+            $group_enrolment = $obj;
         }
 
         return $data;
     }
 
+
     /**
      * Returns all known group enrolments for a given session code.
+     * @param unknown $session_code
+     * @return unknown
      */
     public static function get_all($session_code) {
         global $CONNECTDB;
 
         // Select all our groups.
         $data = $CONNECTDB->get_records("group_enrollments", array(
-            "sessioncode" => $session_code
-        ));
+                "sessioncode" => $session_code
+            ));
 
         // Map to objects.
         foreach ($data as &$group_enrolment) {
@@ -165,4 +179,6 @@ class group_enrolment {
 
         return $data;
     }
+
+
 }
