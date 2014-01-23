@@ -37,4 +37,8 @@ if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_featu
 	// Sync groups
 	\local_connect\cli::group_sync();
 	mtrace('');
+	
+	// Sync group enrolments
+	\local_connect\cli::group_enrolment_sync();
+	mtrace('');
 }
