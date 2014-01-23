@@ -64,6 +64,8 @@ class cli {
 	 * Run the group sync cron
 	 */
 	public static function group_sync() {
+		global $CFG;
+		
 		mtrace("  Synchronizing groups...\n");
 
 		$groups = \local_connect\group::get_all($CFG->connect->session_code);
@@ -84,6 +86,8 @@ class cli {
 	 * Run the group enrolment sync cron
 	 */
 	public static function group_enrolment_sync() {
+		global $CFG;
+
 		mtrace("  Synchronizing group enrolments...\n");
 
 		$group_enrolments = \local_connect\group_enrolment::get_all($CFG->connect->session_code);
