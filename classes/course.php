@@ -31,8 +31,6 @@ require_once dirname(__FILE__) . '/../../../mod/forum/lib.php';
 
 /**
  * Connect courses container
- *
- * @todo moodle_id should be handled a bit more intelligently... dont rely on Connect DB
  */
 class course {
 
@@ -128,7 +126,6 @@ class course {
         $this->synopsis = $obj->synopsis;
         $this->module_week_beginning = $obj->module_week_beginning;
         $this->module_length = $obj->module_length;
-        $this->moodle_id = $obj->moodle_id;
         $this->sink_deleted = $obj->sink_deleted;
         $this->student_count = $obj->student_count;
         $this->teacher_count = $obj->teacher_count;
@@ -157,6 +154,25 @@ class course {
         }
         if (preg_match('/\(\d+\/\d+\)/is', $this->fullname) === 0) {
             $this->fullname .= " ($prev_year/$this->session_code)";
+        }
+
+        // Grab our Moodle ID (if we have one).
+        $this->set_moodle_id();
+    }
+
+    /**
+     * Determines our Moodle ID
+     */
+    private function set_moodle_id() {
+        global $DB;
+
+        $data = $DB->get_record('connect_course_chksum', array(
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ));
+
+        if ($data) {
+            $this->moodle_id = $data->courseid;
         }
     }
 
