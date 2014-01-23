@@ -316,7 +316,7 @@ class course {
         try {
             $course = create_course($this);
             if (!$course) {
-                return false;
+                throw new \moodle_exception("Unknown");
             }
         } catch (\moodle_exception $e) {
             $msg = $e->getMessage();

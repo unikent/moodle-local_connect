@@ -63,6 +63,7 @@ class group_enrolment {
     private function get_moodle_user_id() {
         $user = new user($this->login);
         $this->moodle_user_id = $user->get_moodle_id();
+        return $this->moodle_user_id;
     }
 
     /**
