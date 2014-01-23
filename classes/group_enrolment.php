@@ -61,17 +61,8 @@ class group_enrolment {
      * Grab our Moodle User's ID
      */
     private function get_moodle_user_id() {
-        global $DB;
-
-    	if (!isset($this->moodle_user_id)) {
-    		$user = $DB->get_record('user', array(
-				'username' => $this->login
-			));
-
-    		$this->moodle_user_id = empty($user) ? null : $user->id;
-    	}
-
-    	return $this->moodle_user_id;
+        $user = new user($this->login);
+        $this->moodle_user_id = $user->get_moodle_id();
     }
 
     /**

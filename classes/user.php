@@ -104,6 +104,7 @@ class user {
 		$user->firstname = $this->firstname;
 		$user->lastname = $this->lastname;
 		$user->email = $this->username . "@kent.ac.uk";
+		$user->auth = "kentsaml";
 		$user->password = "not cached";
 
 
