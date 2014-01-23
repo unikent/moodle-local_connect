@@ -119,18 +119,17 @@ class enrolment {
             $role = self::get_role($shortname);
             $enrolment->roleid = $role->id;
 
+            // Map the username if needs be.
             if (!isset($enrolment->userid)) {
-                if (isset($uid_store['username'])) {
-                    $enrolment->userid = $uid_store['username'];
-                } else {
-                    $user = $DB->get_record('user', array('username' => $enrolment->username));
-                    $uid_store['username'] = null;
-                    if ($user) {
-                        $enrolment->userid = $uid_store['username'] = $user->id;
-                    } else {
-                        $enrolment->userid = $uid_store['username'] = null;
+                if (!isset($uid_store['username'])) {
+                    $user = new user($enrolment->username);
+                    if (!$user->is_in_moodle()) {
+                      $user->create_in_moodle();
                     }
+                    $uid_store['username'] = $user->get_moodle_id();
                 }
+                
+                $enrolment->userid = $uid_store['username'];
             }
 
             // Create an object for this enrolment.
