@@ -86,16 +86,16 @@ class cli {
 	public static function group_enrolment_sync() {
 		mtrace("  Synchronizing group enrolments...\n");
 
-		/*$groups = \local_connect\group_enrolment::get_all($CFG->connect->session_code);
-		foreach ($groups as $group) {
-		    if (!$group->is_in_moodle()) {
-		        if ($group->create_in_moodle()) {
-		        	mtrace("    Created group '{$group->id}'!\n");
+		$group_enrolments = \local_connect\group_enrolment::get_all($CFG->connect->session_code);
+		foreach ($group_enrolments as $group_enrolment) {
+		    if (!$group_enrolment->is_in_moodle()) {
+		        if ($group_enrolment->create_in_moodle()) {
+		        	mtrace("    Created group enrolment '{$group_enrolment->chksum}'!\n");
 		        } else {
-		        	mtrace("    Failed group '{$group->id}'!\n");
+		        	mtrace("    Failed group enrolment '{$group_enrolment->chksum}'!\n");
 		        }
 		    }
-		}*/
+		}
 
 		mtrace("  done.\n");
 	}

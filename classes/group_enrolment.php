@@ -31,6 +31,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class group_enrolment {
 
+    /** Our chksum */
+    public $chksum;
+
     /** Our user's login */
     public $login;
 
@@ -129,11 +132,7 @@ class group_enrolment {
         global $CONNECTDB;
 
         // Select all our groups.
-        $sql = "SELECT ge.chksum, ge.group_id id, ge.login login
-        			FROM `group_enrollments` ge
-                WHERE ge.group_id=:group_id";
-
-        $data = $CONNECTDB->get_records_sql($sql, array(
+        $data = $CONNECTDB->get_records("group_enrollments", array(
             "group_id" => $group->id
         ));
 
@@ -141,10 +140,35 @@ class group_enrolment {
         foreach ($data as &$group_enrolment) {
         	$obj = new group_enrolment();
 
+            $obj->chksum = $group_enrolment->chksum;
         	$obj->login = $group_enrolment->login;
-        	$obj->group_id = $group_enrolment->id;
+        	$obj->group_id = $group->id;
 
         	$group_enrolment = $obj;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Returns all known group enrolments for a given session code.
+     */
+    public static function get_all($session_code) {
+        global $CONNECTDB;
+
+        // Select all our groups.
+        $data = $CONNECTDB->get_records("group_enrollments", array(
+            "sessioncode" => $session_code
+        ));
+
+        // Map to objects.
+        foreach ($data as &$group_enrolment) {
+            $obj = new group_enrolment();
+            $obj->chksum = $group_enrolment->chksum;
+            $obj->login = $group_enrolment->login;
+            $obj->group_id = $group_enrolment->group_id;
+
+            $group_enrolment = $obj;
         }
 
         return $data;
