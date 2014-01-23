@@ -213,21 +213,17 @@ class group {
         global $CONNECTDB;
 
         // Select all our groups.
-        $sql = "SELECT g.group_id id, g.group_desc description, g.moodle_id
-        			FROM `groups` g
-                WHERE g.module_delivery_key=:deliverykey AND g.session_code = :sessioncode";
-
-        $data = $CONNECTDB->get_records_sql($sql, array(
-            "deliverykey" => $course->module_delivery_key,
-            "sessioncode" => $course->session_code
-        ));
+        $data = $CONNECTDB->get_records("groups", array(
+            "module_delivery_key" => $course->module_delivery_key,
+            "session_code" => $course->session_code
+        ), '', 'chksum, group_id, group_desc, moodle_id');
 
         // Map to objects.
         foreach ($data as &$group) {
         	$obj = new group();
-        	$obj->id = $group->id;
+        	$obj->id = $group->group_id;
         	$obj->moodle_id = $group->moodle_id;
-        	$obj->description = $group->description;
+        	$obj->description = $group->group_desc;
         	$obj->course = $course;
         	$obj->module_delivery_key = $course->module_delivery_key;
         	$obj->session_code = $course->session_code;
@@ -247,7 +243,7 @@ class group {
 
         // Select all our groups.
         $data = $CONNECTDB->get_records("groups", array(
-            "sessioncode" => $session_code
+            "session_code" => $session_code
         ), '', 'chksum, group_id, group_desc, module_delivery_key, moodle_id');
 
         // Map to objects.
