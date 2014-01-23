@@ -31,6 +31,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class group {
 
+    /** Our chksum */
+    public $chksum;
+
     /** Our id */
     public $id;
 
@@ -130,7 +133,7 @@ class group {
      * Create this group in Moodle
      */
     public function create_in_moodle() {
-    	global $CFG;
+    	global $CFG, $CONNECTDB;
 
     	$course = $this->get_course();
 
@@ -151,6 +154,13 @@ class group {
 			return false;
 		}
 
+        // Set Moodle ID.
+        $CONNECTDB->set_field('groups', 'moodle_id', $this->moodle_id, array(
+            'chksum' => $this->chksum,
+            'group_id' => $this->id
+        ));
+
+        // Grab our grouping.
 		$grouping_id = $this->get_or_create_grouping();
 
 		// And add this group to the grouping.
@@ -187,6 +197,7 @@ class group {
 
         $obj = new group();
         $obj->id = $uid;
+        $obj->chksum = $group->chksum;
         $obj->moodle_id = $group->moodle_id;
         $obj->description = $group->group_desc;
         $obj->module_delivery_key = $group->module_delivery_key;
@@ -220,6 +231,7 @@ class group {
         	$obj->course = $course;
         	$obj->module_delivery_key = $course->module_delivery_key;
         	$obj->session_code = $course->session_code;
+            $obj->chksum = $group->chksum;
 
         	$group = $obj;
         }
@@ -234,22 +246,19 @@ class group {
         global $CONNECTDB;
 
         // Select all our groups.
-        $sql = "SELECT g.group_id id, g.group_desc description, g.module_delivery_key, g.moodle_id
-        			FROM `groups` g
-                WHERE g.session_code = :sessioncode";
-
-        $data = $CONNECTDB->get_records_sql($sql, array(
+        $data = $CONNECTDB->get_records("groups", array(
             "sessioncode" => $session_code
-        ));
+        ), '', 'chksum, group_id, group_desc, module_delivery_key, moodle_id');
 
         // Map to objects.
         foreach ($data as &$group) {
         	$obj = new group();
-        	$obj->id = $group->id;
+        	$obj->id = $group->group_id;
         	$obj->moodle_id = $group->moodle_id;
-        	$obj->description = $group->description;
+        	$obj->description = $group->group_desc;
         	$obj->module_delivery_key = $group->module_delivery_key;
         	$obj->session_code = $session_code;
+            $obj->chksum = $group->chksum;
 
         	$group = $obj;
         }
