@@ -211,6 +211,23 @@ class enrolment {
         return self::filter_sql_query_set($data);
     }
 
+    /**
+     * Returns all enrolments for a given session code
+     */
+    public static function get_all($session_code) {
+        global $CONNECTDB;
+
+        // Select all our enrolments.
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
+                    LEFT JOIN `courses` c
+                        ON c.module_delivery_key = e.module_delivery_key
+                WHERE c.session_code = :sessioncode";
+        $data = $CONNECTDB->get_records_sql($sql, array(
+            "sessioncode" => $session_code
+        ));
+
+        return self::filter_sql_query_set($data);
+    }
 
     /**
      * Translates a Connect role into Moodle role

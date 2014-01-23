@@ -61,6 +61,24 @@ class cli {
 	}
 
 	/**
+	 * Run the enrolment sync cron
+	 */
+	public static function enrolment_sync() {
+		global $CFG;
+
+		mtrace("  Synchronizing enrolments...\n");
+
+		$enrolments = \local_connect\enrolment::get_all($CFG->connect->session_code);
+		foreach ($enrolments as $enrolment) {
+		    if (!$enrolment->is_in_moodle()) {
+		        $enrolment->create_in_moodle();
+		    }
+		}
+
+		mtrace("  done.\n");
+	}
+
+	/**
 	 * Run the group sync cron
 	 */
 	public static function group_sync() {
@@ -71,11 +89,7 @@ class cli {
 		$groups = \local_connect\group::get_all($CFG->connect->session_code);
 		foreach ($groups as $group) {
 		    if (!$group->is_in_moodle()) {
-		        if ($group->create_in_moodle()) {
-		        	mtrace("    Created group '{$group->id}'!\n");
-		        } else {
-		        	mtrace("    Failed group '{$group->id}'!\n");
-		        }
+		        $group->create_in_moodle();
 		    }
 		}
 
@@ -93,11 +107,7 @@ class cli {
 		$group_enrolments = \local_connect\group_enrolment::get_all($CFG->connect->session_code);
 		foreach ($group_enrolments as $group_enrolment) {
 		    if (!$group_enrolment->is_in_moodle()) {
-		        if ($group_enrolment->create_in_moodle()) {
-		        	mtrace("    Created group enrolment '{$group_enrolment->chksum}'!\n");
-		        } else {
-		        	mtrace("    Failed group enrolment '{$group_enrolment->chksum}'!\n");
-		        }
+		        $group_enrolment->create_in_moodle();
 		    }
 		}
 
