@@ -285,7 +285,10 @@ var Connect = (function() {
 			sOut += '</tr>';
 
 			$.each(row.children, function(i) {
-        var child = _this.json[row.children[i]];
+				var child = row.children[i];
+				if (window.enableConnectAdvanced) {
+	        		child = _this.json[child];
+	        	}
 				var end = parseInt(child.module_week_beginning, 10) + parseInt(child.module_length, 10) - 1;
 				var duration = child.module_week_beginning + ( isNaN(end) ? '' : '-' + end );
 				sOut += '<tr ident="'+ child.chksum +'">';
