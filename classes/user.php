@@ -35,10 +35,10 @@ class user {
 
 	/** Our Username */
 	public $username;
-	
+
 	/** Our firstname (usually an initial) */
 	public $firstname;
-	
+
 	/** Our lastname */
 	public $lastname;
 
@@ -113,8 +113,6 @@ class user {
 		$user->confirmed = 1;
 		$user->mnethostid = $CFG->mnet_localhost_id;
 
-
 		$this->moodle_id = user_create_user($user, false);
 	}
-	
 }

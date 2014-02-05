@@ -693,7 +693,7 @@ class course {
                 }
             }
         }
-        
+
         if (is_array($data)) {
             $data = reset($data);
         }
@@ -865,7 +865,7 @@ class course {
                 }
 
                 return $obj;
-            }, $result);
+        }, $result);
 
         return $data;
     }
@@ -1115,13 +1115,12 @@ SQL;
 
         // Find the new course.
         $link = course::get_course_by_uid($uuid->uuid);
-        
+
         // Add children.
         foreach ($input->link_courses as $child) {
             $child = course::get_course_by_uid($child->module_delivery_key, $child->session_code);
             $link->add_child($child);
         }
-
 
         return array();
     }
@@ -1137,14 +1136,23 @@ SQL;
         $r = array();
 
         foreach ($in_courses as $c) {
-            $course = $CONNECTDB->get_record('courses', array('chksum'=>$c));
+            $course = $CONNECTDB->get_record('courses', array('chksum' => $c));
             if ($course == null) {
-                $r []= array('error_code'=>'does_not_exist', 'id'=>$c);
+                $r[] = array(
+                    'error_code' => 'does_not_exist',
+                    'id' => $c
+                );
             } else if ($course->parent_id == null) {
-                    $r []= array('error_code'=>'not_link_course', 'id'=>$c);
-                } else if (($course->state & course::$states['created_in_moodle']) == 0) {
-                    $r []= array('error_code'=>'not_created', 'id'=>$c);
-                } else {
+                $r[] = array(
+                    'error_code' => 'not_link_course',
+                    'id' => $c
+                );
+            } else if (($course->state & course::$states['created_in_moodle']) == 0) {
+                $r[] = array(
+                    'error_code' => 'not_created',
+                    'id' => $c
+                );
+            } else {
                 $STOMP->send('connect.job.unlink_course', $course->chksum);
             }
         }

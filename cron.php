@@ -33,15 +33,15 @@ if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_featu
 	// Sync courses
 	\local_connect\cli::course_sync();
 	mtrace('');
-	
+
 	// Sync enrolments
 	\local_connect\cli::enrolment_sync();
 	mtrace('');
-	
+
 	// Sync groups
 	\local_connect\cli::group_sync();
 	mtrace('');
-	
+
 	// Sync group enrolments
 	\local_connect\cli::group_enrolment_sync();
 	mtrace('');
