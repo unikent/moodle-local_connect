@@ -1,11 +1,4 @@
 <?php
-/**
- * /tmp/phptidy-sublime-buffer.php
- *
- * @package default
- */
-
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
