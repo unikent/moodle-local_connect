@@ -65,8 +65,8 @@ class rollover {
      * 
      * @return array
      */
-    public static function get_source_list($dist = '') {
-        return static::get_course_list('');
+    public static function get_source_list() {
+        return static::get_course_list();
     }
 
     /**
