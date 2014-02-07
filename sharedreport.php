@@ -60,10 +60,11 @@ foreach ($records as $record) {
 
 echo \html_writer::table($table);
 
+echo $OUTPUT->box_end();
+
 // Allow admins to regenerate list.
 if (has_capability('moodle/site:config', \context_system::instance())) {
 	echo '<p><a href="'.$CFG->wwwroot.'/local/connect/regenerate_shared_list.php">Regenerate list</a> (Warning: Do not do this unless you know exactly what it means.)</p>';
 }
 
-echo $OUTPUT->box_end();
 echo $OUTPUT->footer();
