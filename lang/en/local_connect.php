@@ -30,3 +30,5 @@ $string['sharedb_toggle_desc'] = 'Warning: This WILL break everything!';
 
 $string['cron_toggle'] = 'Enable Connect Cron';
 $string['cron_toggle_desc'] = 'Warning: This is not a good idea!';
+
+$string['sharedreport'] = 'Moodle Shared Data';

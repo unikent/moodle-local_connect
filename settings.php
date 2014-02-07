@@ -4,6 +4,7 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) {
     $ADMIN->add('reports', new admin_externalpage('reportconnectreport', get_string('connectreport', 'local_connect'), "$CFG->wwwroot/local/connect/index.php", 'local/kentconnect:manage'));
+    $ADMIN->add('reports', new admin_externalpage('reportconnectsharedreport', get_string('sharedreport', 'local_connect'), "$CFG->wwwroot/local/connect/sharedreport.php", 'local/kentconnect:manage'));
 
 	$settings = new admin_settingpage('local_connect', get_string('pluginname', 'local_connect'));
 	$ADMIN->add('localplugins', $settings);
