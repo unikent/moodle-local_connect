@@ -3,12 +3,11 @@
 defined('MOODLE_INTERNAL') || die;
 
 function xmldb_local_connect_upgrade($oldversion) {
-	global $CFG, $DB, $CONNECTDB, $SHAREDB;
+	global $CFG, $DB, $CONNECTDB;
 
 	$dbman = $DB->get_manager();
 
 	if ($oldversion < 2012052912) {
-
 		$table = new xmldb_table('connect_course_dets');
 
 		$field = new xmldb_field('id');
@@ -55,7 +54,6 @@ function xmldb_local_connect_upgrade($oldversion) {
 	}
 
 	if ($oldversion < 2012052913) {
-
 		$table = new xmldb_table('connect_course_dets');
 		$field = new xmldb_field('unlocked', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'weeks');
 		$dbman->add_field($table, $field);
@@ -72,7 +70,6 @@ function xmldb_local_connect_upgrade($oldversion) {
 	}
 
     if ($oldversion < 2014010901) {
-
         // Define table connect_course_chksum to be created.
         $table = new xmldb_table('connect_course_chksum');
 
@@ -98,7 +95,6 @@ function xmldb_local_connect_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014012000) {
-
         // Define table connect_enrolment_chksum to be created.
         $table = new xmldb_table('connect_enrolment_chksum');
 

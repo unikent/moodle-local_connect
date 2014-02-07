@@ -31,48 +31,52 @@ defined('MOODLE_INTERNAL') || die();
  */
 class rollover {
 
-	/**
-	 * Returns a list of sources for rollover
-	 * 
-	 * @return array
-	 */
-	public static function get_course_list($dist = '', $shortname = '') {
-		global $CFG, $SHAREDB;
+    /**
+     * Returns a list of sources for rollover
+     * 
+     * @return array
+     */
+    public static function get_course_list($dist = '', $shortname = '') {
+        global $CFG, $SHAREDB;
 
-		$sql = 'SELECT * FROM {course_list} WHERE moodle_env = :current_env';
-		$sql .= empty($dist) ? ' AND moodle_dist != :current_dist' : ' AND moodle_dist = :current_dist';
+        if (!\local_connect\utils::enable_sharedb()) {
+            return array();
+        }
 
-		$params = array(
+        $sql = 'SELECT * FROM {course_list} WHERE moodle_env = :current_env';
+        $sql .= empty($dist) ? ' AND moodle_dist != :current_dist' : ' AND moodle_dist = :current_dist';
+
+        $params = array(
             'current_env' => $CFG->kent->environment,
             'current_dist' => empty($dist) ? $CFG->kent->distribution : $dist
         );
 
-		if (!empty($shortname)) {
-			$shortname = "%" . $shortname . "%";
-			$sql .= ' AND ' . $SHAREDB->sql_like('shortname', ':shortname', false);
-			$params['shortname'] = $shortname;
-		}
+        if (!empty($shortname)) {
+            $shortname = "%" . $shortname . "%";
+            $sql .= ' AND ' . $SHAREDB->sql_like('shortname', ':shortname', false);
+            $params['shortname'] = $shortname;
+        }
 
         return $SHAREDB->get_records_sql($sql, $params);
-	}
+    }
 
-	/**
-	 * Returns a list of sources for rollover
-	 * 
-	 * @return array
-	 */
-	public static function get_source_list($dist = '') {
-		return static::get_course_list('');
-	}
+    /**
+     * Returns a list of sources for rollover
+     * 
+     * @return array
+     */
+    public static function get_source_list($dist = '') {
+        return static::get_course_list('');
+    }
 
-	/**
-	 * Returns a list of targets for rollover
-	 * 
-	 * @return array
-	 */
-	public static function get_target_list() {
-		global $CFG;
-		return static::get_course_list($CFG->kent->distribution);
-	}
+    /**
+     * Returns a list of targets for rollover
+     * 
+     * @return array
+     */
+    public static function get_target_list() {
+        global $CFG;
+        return static::get_course_list($CFG->kent->distribution);
+    }
 
 }
