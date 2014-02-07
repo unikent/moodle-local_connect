@@ -44,7 +44,9 @@ class rollover {
         }
 
         $sql = 'SELECT * FROM {course_list} WHERE moodle_env = :current_env';
-        $sql .= empty($dist) ? ' AND moodle_dist != :current_dist' : ' AND moodle_dist = :current_dist';
+        if ($dist !== '*') {
+            $sql .= empty($dist) ? ' AND moodle_dist != :current_dist' : ' AND moodle_dist = :current_dist';
+        }
 
         $params = array(
             'current_env' => $CFG->kent->environment,
