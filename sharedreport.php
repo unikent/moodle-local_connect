@@ -1,4 +1,26 @@
-<?php 
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Local stuff for Moodle Connect
+ *
+ * @package    local_connect
+ * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 global $PAGE, $OUTPUT, $CFG, $SHAREDB;
 
@@ -40,7 +62,7 @@ echo \html_writer::table($table);
 
 // Allow admins to regenerate list.
 if (has_capability('moodle/site:config', \context_system::instance())) {
-	echo '<a href="'.$CFG->wwwroot.'/local/connect/regenerate.php">Regenerate list? (Warning: Do not do this unless you know exactly what it means.)</a>';
+	echo '<p><a href="'.$CFG->wwwroot.'/local/connect/regenerate_shared_list.php">Regenerate list</a> (Warning: Do not do this unless you know exactly what it means.)</p>';
 }
 
 echo $OUTPUT->box_end();

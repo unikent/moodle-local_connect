@@ -39,7 +39,7 @@ class rollover {
     public static function get_course_list($dist = '', $shortname = '') {
         global $CFG, $SHAREDB;
 
-        if (!\local_connect\utils::enable_sharedb()) {
+        if (!utils::enable_sharedb()) {
             return array();
         }
 
@@ -79,4 +79,74 @@ class rollover {
         return static::get_course_list($CFG->kent->distribution);
     }
 
+    /**
+     * Populate the Shared DB list of courses.
+     */
+    public static function populate_sharedb() {
+        global $CFG, $DB, $SHAREDB;
+
+        if (!utils::enable_sharedb()) {
+            return null;
+        }
+
+        // Grab a list of courses in Moodle.
+        $courses = $DB->get_records('course', null, '', 'id,shortname,fullname,summary');
+
+        // Grab a list of courses in ShareDB.
+        $shared_courses = $SHAREDB->get_records('course_list', array(
+            "moodle_env" => $CFG->kent->environment,
+            "moodle_dist" => $CFG->kent->distribution
+        ), '', 'moodle_id,id,shortname,fullname,summary');
+
+        // Cross-reference and update.
+
+        // First, all the new modules.
+        foreach ($courses as $item) {
+            // If this is already here, dont insert.
+            if (isset($shared_courses[$item->id])) {
+                continue;
+            }
+
+            // Insert.
+            $SHAREDB->insert_record("course_list", array(
+                "moodle_env" => $CFG->kent->environment,
+                "moodle_dist" => $CFG->kent->distribution,
+                "moodle_id" => $item->id,
+                "shortname" => $item->shortname,
+                "fullname" => $item->fullname,
+                "summary" => $item->summary
+            ));
+
+            echo "Inserted {$item->id}.\n";
+        }
+
+        // Now, all the deleted modules.
+        $ids = array_map(function($item) {
+            return $item->id;
+        }, $courses);
+        $ids_to_stay = implode(', ', $ids);
+        $SHAREDB->delete_records_select("course_list", "moodle_env=:env AND moodle_dist=:dist AND moodle_id NOT IN ($ids_to_stay)", array(
+            "env" => $CFG->kent->environment,
+            "dist" => $CFG->kent->distribution
+        ));
+
+        // Now update everything remaining.
+        foreach ($courses as $item) {
+            if (!isset($shared_courses[$item->id])) {
+                continue;
+            }
+
+            $shared_obj = $shared_courses[$item->id];
+            if ($shared_obj->shortname != $item->shortname || $shared_obj->fullname != $item->fullname || $shared_obj->summary != $item->summary) {
+                // It needs updating.
+                $shared_obj->shortname = $item->shortname;
+                $shared_obj->fullname = $item->fullname;
+                $shared_obj->summary = $item->summary;
+
+                $SHAREDB->update_record('course_list', $shared_obj);
+
+                echo "Updated {$item->id}.\n";
+            }
+        }
+    }
 }
