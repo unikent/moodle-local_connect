@@ -297,13 +297,12 @@ class course {
         return $chksum->chksum != $this->chksum;
     }
 
-
     /**
      * Create this course in Moodle
      * @param unknown $shortname_ext (optional)
      * @return unknown
      */
-    public function create_moodle($shortname_ext = "") {
+    public function create_in_moodle($shortname_ext = "") {
         global $DB;
 
         // Check we have a category.
@@ -392,6 +391,16 @@ class course {
         return true;
     }
 
+    /**
+     * Create this course in Moodle
+     * @param unknown $shortname_ext (optional)
+     * @return unknown
+     */
+    public function create_moodle($shortname_ext = "") {
+        // TODO - deprecate
+        return $this->create_in_moodle($shortname_ext);
+    }
+
 
     /**
      * Link a course to this course
@@ -464,8 +473,8 @@ class course {
         // Update the container's data.
         $connect_data->course = $this->moodle_id;
         $connect_data->campus = isset($this->campus_desc) ? $this->campus_desc : '';
-        $connect_data->startdate = isset($this->startdate) ? $this->startdate : $CFG->default_course_start_date;
-        $connect_data->enddate = isset($this->module_length) ? strtotime('+'. $this->module_length .' weeks', $connect_data->startdate) : $CFG->default_course_end_date;
+        $connect_data->startdate = isset($this->startdate) ? $this->startdate : $CFG->kent->default_course_start_date;
+        $connect_data->enddate = isset($this->module_length) ? strtotime('+'. $this->module_length .' weeks', $connect_data->startdate) : $CFG->kent->default_course_end_date;
         $connect_data->weeks = isset($this->module_length) ? $this->module_length : 0;
 
         return $connect_data;
