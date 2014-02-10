@@ -119,4 +119,18 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 
 		$this->connect_cleanup();
 	}
+
+	/**
+	 * Test enrolment validity check.
+	 */
+	public function test_enrolment_validity() {
+		$enrolment = new \local_connect\enrolment(0, 1, 1, "test");
+		$this->assertFalse($enrolment->is_valid());
+		$enrolment = new \local_connect\enrolment(1, 0, 1, "test");
+		$this->assertFalse($enrolment->is_valid());
+		$enrolment = new \local_connect\enrolment(1, 1, 0, "test");
+		$this->assertFalse($enrolment->is_valid());
+		$enrolment = new \local_connect\enrolment(1, 1, 1, "test");
+		$this->assertTrue($enrolment->is_valid());
+	}
 }
