@@ -164,8 +164,8 @@ class group_enrolment {
 
         // Select all our groups.
         $data = $CONNECTDB->get_records("group_enrollments", array(
-                "sessioncode" => $session_code
-            ));
+            "session_code" => $session_code
+        ), '', 'chksum,login,group_id');
 
         // Map to objects.
         foreach ($data as &$group_enrolment) {

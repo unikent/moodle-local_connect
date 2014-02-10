@@ -126,19 +126,18 @@ class connect_testcase extends \advanced_testcase
 	/**
 	 * Returns a valid group enrolment for testing.
 	 */
-	protected function generate_group_enrolment($group, $module_delivery_key, $role = 'student') {
+	protected function generate_group_enrolment($group, $role = 'student') {
 		global $CFG;
 
 		static $uid = 10000000;
 
-		$group = $this->generate_group($module_delivery_key);
-		$enrolment = $this->generate_enrolment($module_delivery_key, $role);
+		$enrolment = $this->generate_enrolment($group['module_delivery_key'], $role);
 
 		$data = array(
 			"group_id" => $group['group_id'],
 			"group_desc" => $group['group_desc'],
 			"session_code" => $CFG->connect->session_code,
-			"module_delivery_key" => $module_delivery_key,
+			"module_delivery_key" => $group['module_delivery_key'],
 			"chksum" => uniqid($uid),
 			"id_chksum" => uniqid($uid),
 			"ukc" => $enrolment['ukc'],
@@ -156,9 +155,9 @@ class connect_testcase extends \advanced_testcase
 	/**
 	 * Creates a bunch of group enrolments.
 	 */
-	protected function generate_group_enrolments($count, $group, $module_delivery_key, $role = 'student') {
+	protected function generate_group_enrolments($count, $group, $role = 'student') {
 		for ($i = 0; $i < $count; $i++) {
-			$this->generate_group_enrolment($group, $module_delivery_key, $role);
+			$this->generate_group_enrolment($group, $role);
 		}
 	}
 
