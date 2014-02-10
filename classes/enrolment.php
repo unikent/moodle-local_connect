@@ -133,9 +133,10 @@ class enrolment {
                     if (!$user->is_in_moodle()) {
                       $user->create_in_moodle();
                     }
+
                     $uid_store[$enrolment->username] = $user->get_moodle_id();
                 }
-                
+
                 $enrolment->userid = $uid_store[$enrolment->username];
             }
 
@@ -246,9 +247,10 @@ class enrolment {
         switch ($role) {
             case "student":
             case "teacher":
-                return "sds_$role";
+            return "sds_$role";
+
             default:
-                return $role;
+            return $role;
         }
     }
 
