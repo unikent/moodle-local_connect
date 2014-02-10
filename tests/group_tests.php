@@ -22,7 +22,7 @@ defined('MOODLE_INTERNAL') || die();
 class kent_group_tests extends local_connect\tests\connect_testcase
 {
 	/**
-	 * Make sure we can grab a valid list of enrolments.
+	 * Make sure we can grab a valid list of groups.
 	 */
 	public function test_groups_list() {
 		global $CFG, $DB, $CONNECTDB;
@@ -55,6 +55,53 @@ class kent_group_tests extends local_connect\tests\connect_testcase
 		// Test the global count.
 		$groups = \local_connect\group::get_all($CFG->connect->session_code);
 		$this->assertEquals(21, count($groups));
+
+		// Create another course.
+		$course2 = $this->generate_course();
+		$module_delivery_key2 = $course2['module_delivery_key'];
+		$course2 = \local_connect\course::get_course_by_uid($module_delivery_key2, $CFG->connect->session_code);
+		$this->assertTrue($course2->create_in_moodle());
+
+		// Create a group.
+		$this->generate_groups(20, $module_delivery_key2);
+
+		// Test the course count.
+		$groups = \local_connect\group::get_for_course($course);
+		$this->assertEquals(21, count($groups));
+
+		// Test the course count.
+		$groups = \local_connect\group::get_for_course($course2);
+		$this->assertEquals(20, count($groups));
+
+		$this->connect_cleanup();
+	}
+
+	/**
+	 * Make sure we can create groups in Moodle.
+	 */
+	public function test_groups_create() {
+		global $CFG, $DB, $CONNECTDB;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		// First, create a course.
+		$course = $this->generate_course();
+		$module_delivery_key = $course['module_delivery_key'];
+		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
+		$this->assertTrue($course->create_in_moodle());
+
+		// Create a group.
+		$data = $this->generate_group($module_delivery_key);
+
+		// Get the group.
+		$group = \local_connect\group::get($data['group_id']);
+		$this->assertEquals($data['group_id'], $group->id);
+
+		// Create it in Moodle.
+		$this->assertFalse($group->is_in_moodle());
+		$this->assertTrue($group->create_in_moodle());
+		$this->assertTrue($group->is_in_moodle());
 
 		$this->connect_cleanup();
 	}
