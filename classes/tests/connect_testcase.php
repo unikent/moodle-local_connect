@@ -32,6 +32,7 @@ class connect_testcase extends \advanced_testcase
 		$CONNECTDB->execute("TRUNCATE TABLE {group_enrollments}");
 		$CONNECTDB->execute("TRUNCATE TABLE {enrollments}");
 		$CONNECTDB->execute("TRUNCATE TABLE {courses}");
+		$CONNECTDB->execute("TRUNCATE TABLE {groups}");
 	}
 
 	/**
@@ -53,13 +54,13 @@ class connect_testcase extends \advanced_testcase
 	protected function generate_enrolment($module_delivery_key, $role = 'student') {
 		global $CFG;
 
-		static $eid = 10000000;
+		static $uid = 10000000;
 
 		$generator = \advanced_testcase::getDataGenerator();
 		$user = $generator->create_user();
 
 		$data = array(
-			"ukc" => $eid,
+			"ukc" => $uid,
 			"login" => $user->username,
 			"title" => "Mx",
 			"initials" => $user->firstname,
@@ -67,14 +68,16 @@ class connect_testcase extends \advanced_testcase
 			"session_code" => $CFG->connect->session_code,
 			"module_delivery_key" => $module_delivery_key,
 			"role" => $role,
-			"chksum" => uniqid($eid),
-			"id_chksum" => uniqid($eid),
+			"chksum" => uniqid($uid),
+			"id_chksum" => uniqid($uid),
 			"state" => 1
 		);
 
 		$this->insertDB('enrollments', $data);
 
-		return $eid++;
+		$uid++;
+
+		return $data;
 	}
 
 	/**
@@ -87,17 +90,51 @@ class connect_testcase extends \advanced_testcase
 	}
 
 	/**
+	 * Returns a valid group for testing.
+	 */
+	protected function generate_group($module_delivery_key) {
+		global $CFG;
+
+		static $uid = 100000;
+
+		$data = array(
+			"group_id" => $uid,
+			"group_desc" => "Test Group: $uid",
+			"session_code" => $CFG->connect->session_code,
+			"module_delivery_key" => $module_delivery_key,
+			"chksum" => uniqid($uid),
+			"id_chksum" => uniqid($uid),
+			"state" => 1
+		);
+
+		$this->insertDB('groups', $data);
+
+		$uid++;
+
+		return $data;
+	}
+
+	/**
+	 * Creates a bunch of enrolments.
+	 */
+	protected function generate_groups($count, $module_delivery_key) {
+		for ($i = 0; $i < $count; $i++) {
+			$this->generate_group($module_delivery_key);
+		}
+	}
+
+	/**
 	 * Returns a valid group enrolment for testing.
 	 */
 	protected function generate_group_enrolment($group, $module_delivery_key, $role = 'student') {
 		global $CFG;
 
-		static $eid = 10000000;
+		static $uid = 10000000;
 
 		// TODO
 		// They need to be enroled on a course AND the group needs to exist..
 
-		return $eid++;
+		return $uid++;
 	}
 
 	/**
@@ -159,6 +196,8 @@ class connect_testcase extends \advanced_testcase
 
 		$this->insertDB('courses', $data);
 
-		return $delivery_key++;
+		$delivery_key++;
+
+		return $data;
 	}
 }
