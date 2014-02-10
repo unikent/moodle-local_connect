@@ -238,6 +238,27 @@ class enrolment {
     }
 
     /**
+     * Returns an enrolment, given a session code, module delivery key and login
+     */
+    public static function get($module_delivery_key, $session_code, $login) {
+        global $CONNECTDB;
+
+        // Select all our enrolments.
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
+                    LEFT JOIN `courses` c
+                        ON c.module_delivery_key = e.module_delivery_key
+                WHERE e.session_code = :sessioncode AND e.module_delivery_key = :module_delivery_key AND e.login = :login";
+        $data = $CONNECTDB->get_records_sql($sql, array(
+            "module_delivery_key" => $module_delivery_key,
+            "sessioncode" => $session_code,
+            "login" => $login
+        ));
+
+        $array = self::filter_sql_query_set($data);
+        return array_pop($array);
+    }
+
+    /**
      * Translates a Connect role into Moodle role
      * 
      * @param  string $role A role grabbed out the connect database

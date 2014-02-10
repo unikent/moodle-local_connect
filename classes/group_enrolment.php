@@ -127,6 +127,27 @@ class group_enrolment {
 
 
     /**
+     * Returns a group enrolment, given a group ID and a username.
+     * @param unknown $group
+     * @return unknown
+     */
+    public static function get($group_id, $username) {
+        global $CONNECTDB;
+
+        $data = $CONNECTDB->get_record("group_enrollments", array(
+            "group_id" => $group_id,
+            "login" => $username
+        ), 'chksum');
+
+        $obj = new group_enrolment();
+        $obj->chksum = $data->chksum;
+        $obj->login = $username;
+        $obj->group_id = $group_id;
+
+        return $obj;
+    }
+
+    /**
      * Returns all known group enrollments for a given group.
      * @param unknown $group
      * @return unknown

@@ -25,7 +25,7 @@ class kent_group_enrolment_tests extends local_connect\tests\connect_testcase
 	 * Make sure we can grab a valid list of enrolments.
 	 */
 	public function test_group_enrolment_list() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();
@@ -53,6 +53,46 @@ class kent_group_enrolment_tests extends local_connect\tests\connect_testcase
 		// Test the global count.
 		$enrolments = \local_connect\group_enrolment::get_all($CFG->connect->session_code);
 		$this->assertEquals(53, count($enrolments));
+
+		// Test the group counter.
+		$enrolments = \local_connect\group_enrolment::get_for_group(\local_connect\group::get($group['group_id']));
+		$this->assertEquals(32, count($enrolments));
+		$enrolments = \local_connect\group_enrolment::get_for_group(\local_connect\group::get($group2['group_id']));
+		$this->assertEquals(21, count($enrolments));
+
+		$this->connect_cleanup();
+	}
+
+	/**
+	 * Make sure we can create a valid group enrolment in Moodle.
+	 */
+	public function test_group_enrolment_create() {
+		global $CFG;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		$module_delivery_key = $this->generate_module_delivery_key();
+		$group = $this->generate_group($module_delivery_key);
+
+		// Create the group in Moodle
+		{
+			$obj = \local_connect\group::get($group['group_id']);
+			$obj->create_in_moodle();
+		}
+
+		$enrolment = $this->generate_group_enrolment($group, 'teacher');
+
+		// Create the enrolment in Moodle
+		{
+			$obj = \local_connect\enrolment::get($module_delivery_key, $CFG->connect->session_code, $enrolment['login']);
+			$obj->create_in_moodle();
+		}
+
+		$obj = \local_connect\group_enrolment::get($enrolment['group_id'], $enrolment['login']);
+		$this->assertFalse($obj->is_in_moodle());
+		$this->assertTrue($obj->create_in_moodle());
+		$this->assertTrue($obj->is_in_moodle());
 
 		$this->connect_cleanup();
 	}
