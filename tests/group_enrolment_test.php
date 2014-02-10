@@ -30,6 +30,8 @@ class kent_group_enrolment_tests extends local_connect\tests\connect_testcase
 		$this->resetAfterTest();
 		$this->connect_cleanup();
 
+		$module_delivery_key = $this->generate_module_delivery_key();
+
 		$this->connect_cleanup();
 	}
 }

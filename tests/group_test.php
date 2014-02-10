@@ -31,12 +31,10 @@ class kent_group_tests extends local_connect\tests\connect_testcase
 		$this->connect_cleanup();
 
 		// First, create a course.
-		$course = $this->generate_course();
-		$module_delivery_key = $course['module_delivery_key'];
+		$module_delivery_key = $this->generate_module_delivery_key();
 
 		// And in Moodle.
 		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
-		$this->assertTrue($course->create_in_moodle());
 
 		// Test the global count.
 		$groups = \local_connect\group::get_all($CFG->connect->session_code);
@@ -57,10 +55,8 @@ class kent_group_tests extends local_connect\tests\connect_testcase
 		$this->assertEquals(21, count($groups));
 
 		// Create another course.
-		$course2 = $this->generate_course();
-		$module_delivery_key2 = $course2['module_delivery_key'];
+		$module_delivery_key2 = $this->generate_module_delivery_key();
 		$course2 = \local_connect\course::get_course_by_uid($module_delivery_key2, $CFG->connect->session_code);
-		$this->assertTrue($course2->create_in_moodle());
 
 		// Create a group.
 		$this->generate_groups(20, $module_delivery_key2);
@@ -86,10 +82,7 @@ class kent_group_tests extends local_connect\tests\connect_testcase
 		$this->connect_cleanup();
 
 		// First, create a course.
-		$course = $this->generate_course();
-		$module_delivery_key = $course['module_delivery_key'];
-		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
-		$this->assertTrue($course->create_in_moodle());
+		$module_delivery_key = $this->generate_module_delivery_key();
 
 		// Create a group.
 		$data = $this->generate_group($module_delivery_key);

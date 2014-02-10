@@ -216,4 +216,22 @@ class connect_testcase extends \advanced_testcase
 
 		return $data;
 	}
+
+	/**
+	 * Quick way of grabbing a valid module delivery key for
+	 * a course that exists in Moodle.
+	 */
+	protected function generate_module_delivery_key() {
+		global $CFG;
+
+		// Generate a course.
+		$course = $this->generate_course();
+		$module_delivery_key = $course['module_delivery_key'];
+
+		// Create in Moodle.
+		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
+		$course->create_in_moodle();
+
+		return $module_delivery_key;
+	}
 }

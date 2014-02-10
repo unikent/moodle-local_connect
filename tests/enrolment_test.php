@@ -31,10 +31,7 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$this->connect_cleanup();
 
 		// First, create a course.
-		$course = $this->generate_course();
-		$module_delivery_key = $course['module_delivery_key'];
-		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
-		$this->assertTrue($course->create_in_moodle());
+		$module_delivery_key = $this->generate_module_delivery_key();
 
 		// Test the global count.
 		$enrolments = \local_connect\enrolment::get_all($CFG->connect->session_code);
@@ -69,16 +66,12 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$this->connect_cleanup();
 
 		// First, create a course.
-		$course = $this->generate_course();
-		$module_delivery_key = $course['module_delivery_key'];
+		$module_delivery_key = $this->generate_module_delivery_key();
 		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
-		$this->assertTrue($course->create_in_moodle());
 
 		// Now, create another course.
-		$course2 = $this->generate_course();
-		$module_delivery_key2 = $course2['module_delivery_key'];
+		$module_delivery_key2 = $this->generate_module_delivery_key();
 		$course2 = \local_connect\course::get_course_by_uid($module_delivery_key2, $CFG->connect->session_code);
-		$this->assertTrue($course2->create_in_moodle());
 
 		// Create an enrolment.
 		$this->generate_enrolments(1, $module_delivery_key, 'teacher');
@@ -109,16 +102,10 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$this->connect_cleanup();
 
 		// First, create a course.
-		$course = $this->generate_course();
-		$module_delivery_key = $course['module_delivery_key'];
-		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
-		$this->assertTrue($course->create_in_moodle());
+		$module_delivery_key = $this->generate_module_delivery_key();
 
 		// Now, create another course.
-		$course2 = $this->generate_course();
-		$module_delivery_key2 = $course2['module_delivery_key'];
-		$course2 = \local_connect\course::get_course_by_uid($module_delivery_key2, $CFG->connect->session_code);
-		$this->assertTrue($course2->create_in_moodle());
+		$module_delivery_key2 = $this->generate_module_delivery_key();
 
 		// Create an enrolment.
 		$this->generate_enrolments(10, $module_delivery_key, 'student');
@@ -153,10 +140,7 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$this->connect_cleanup();
 
 		// First, create a course.
-		$course = $this->generate_course();
-		$module_delivery_key = $course['module_delivery_key'];
-		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
-		$this->assertTrue($course->create_in_moodle());
+		$module_delivery_key = $this->generate_module_delivery_key();
 
 		// Create an enrolment.
 		$this->generate_enrolments(1, $module_delivery_key, 'teacher');
