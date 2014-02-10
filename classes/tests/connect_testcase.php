@@ -29,9 +29,9 @@ class connect_testcase extends \advanced_testcase
 	private function insertDB($table, $data) {
 		global $CONNECTDB;
 
-        $fields = implode(',', array_keys($data));
-        $qms    = array_fill(0, count($data), '?');
-        $qms    = implode(',', $qms);
+		$fields = implode(',', array_keys($data));
+		$qms    = array_fill(0, count($data), '?');
+		$qms    = implode(',', $qms);
 
 		$CONNECTDB->execute("INSERT INTO {$table} ($fields) VALUES($qms)", $data);
 	}
@@ -48,7 +48,7 @@ class connect_testcase extends \advanced_testcase
 		$user = $generator->create_user();
 
 		$data = array(
-			"ukc" => $eid++,
+			"ukc" => $eid,
 			"login" => $user->username,
 			"title" => "Mx",
 			"initials" => $user->firstname,
@@ -56,10 +56,14 @@ class connect_testcase extends \advanced_testcase
 			"session_code" => $CFG->connect->session_code,
 			"module_delivery_key" => $module_delivery_key,
 			"role" => $role,
+			"chksum" => uniqid($eid),
+			"id_chksum" => uniqid($eid),
 			"state" => 1
 		);
 
 		$this->insertDB('enrollments', $data);
+
+		return $eid++;
 	}
 
 	/**
@@ -101,10 +105,8 @@ class connect_testcase extends \advanced_testcase
 
 		static $delivery_key = 10000;
 
-		$module_delivery_key = $delivery_key++;
-
 		$data = array(
-			"module_delivery_key" => $module_delivery_key,
+			"module_delivery_key" => $delivery_key,
 			"session_code" => $CFG->connect->session_code,
 			"delivery_department" => '01',
 			"campus" => 1,
@@ -115,11 +117,13 @@ class connect_testcase extends \advanced_testcase
 			"module_title" => $this->generate_module_name(),
 			"module_code" => $this->generate_module_code(),
 			"synopsis" => 'A test course',
+			"chksum" => uniqid($delivery_key),
+			"id_chksum" => uniqid($delivery_key),
 			"state" => 1
 		);
 
 		$this->insertDB('courses', $data);
 
-		return $module_delivery_key;
+		return $delivery_key++;
 	}
 }

@@ -28,11 +28,15 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		global $CONNECTDB;
 
 		$CONNECTDB->execute("TRUNCATE TABLE {enrollments}");
+		$CONNECTDB->execute("TRUNCATE TABLE {courses}");
 
-		// First insert a couple of records for testing.
-		$this->generate_enrolments(30, 1000, 'student');
-		$this->generate_enrolments(2, 1000, 'convenor');
-		$this->generate_enrolments(1, 1000, 'teacher');
+		// First, create a course.
+		$module_delivery_key = $this->generate_course();
+
+		// Next insert a couple of enrolments on this course.
+		$this->generate_enrolments(30, $module_delivery_key, 'student');
+		$this->generate_enrolments(2,  $module_delivery_key, 'convenor');
+		$this->generate_enrolments(1,  $module_delivery_key, 'teacher');
 
 		$enrolments = \local_connect\enrolment::get_all(2014);
 
