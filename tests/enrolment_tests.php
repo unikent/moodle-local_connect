@@ -25,13 +25,17 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 	 * Make sure we can grab a valid list of enrolments.
 	 */
 	public function test_enrolment_list() {
-		global $CONNECTDB;
+		global $CFG, $DB, $CONNECTDB;
+
+        $this->resetAfterTest();
 
 		$CONNECTDB->execute("TRUNCATE TABLE {enrollments}");
 		$CONNECTDB->execute("TRUNCATE TABLE {courses}");
 
 		// First, create a course.
 		$module_delivery_key = $this->generate_course();
+		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
+		$this->assertTrue($course->create_in_moodle());
 
 		// Next insert a couple of enrolments on this course.
 		$this->generate_enrolments(30, $module_delivery_key, 'student');
@@ -41,5 +45,12 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$enrolments = \local_connect\enrolment::get_all(2014);
 
 		$this->assertEquals(33, count($enrolments));
+
+		// Add more.
+		$this->generate_enrolments(30, $module_delivery_key, 'student');
+
+		$enrolments = \local_connect\enrolment::get_all(2014);
+
+		$this->assertEquals(63, count($enrolments));
 	}
 }

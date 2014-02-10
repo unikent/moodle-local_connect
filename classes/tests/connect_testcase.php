@@ -119,6 +119,7 @@ class connect_testcase extends \advanced_testcase
 			"synopsis" => 'A test course',
 			"chksum" => uniqid($delivery_key),
 			"id_chksum" => uniqid($delivery_key),
+			"category_id" => 1,
 			"state" => 1
 		);
 
