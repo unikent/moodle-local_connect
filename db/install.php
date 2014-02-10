@@ -28,28 +28,24 @@ defined('MOODLE_INTERNAL') || die;
 function xmldb_local_connect_install() {
     global $CFG;
 
-    if (\phpunit_util::is_test_site()) {
-        return true;
-    }
-
     create_role(
-    	"Teacher (sds)",
+    	"Teacher (SDS)",
     	"sds_teacher",
     	"Teachers can do anything within a course, including changing the activities and grading students.",
-    	"Teacher (editing)"
+    	"sds_teacher"
     );
-    
+
     create_role(
-    	"Student (sds)",
+    	"Student (SDS)",
     	"sds_student",
     	"Students generally have fewer privileges within a course.",
-    	"Student"
+    	"sds_student"
     );
-    
+
     create_role(
-        "Convenor",
+        "Convenor (SDS)",
         "convenor",
         "A Convenor has the same permissions as a teacher, but can manually enrol teachers.",
-        "Teacher (editing)"
+        "convenor"
     );
 }

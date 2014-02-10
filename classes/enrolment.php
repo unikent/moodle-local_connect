@@ -54,6 +54,13 @@ class enrolment {
     }
 
     /**
+     * Returns the ID of the Moodle user.
+     */
+    public function get_user_id() {
+        return $this->userid;
+    }
+
+    /**
      * Returns true if this is a valid enrolment
      */
     public function is_valid() {
@@ -126,9 +133,10 @@ class enrolment {
                     if (!$user->is_in_moodle()) {
                       $user->create_in_moodle();
                     }
+
                     $uid_store[$enrolment->username] = $user->get_moodle_id();
                 }
-                
+
                 $enrolment->userid = $uid_store[$enrolment->username];
             }
 
@@ -230,6 +238,27 @@ class enrolment {
     }
 
     /**
+     * Returns an enrolment, given a session code, module delivery key and login
+     */
+    public static function get($module_delivery_key, $session_code, $login) {
+        global $CONNECTDB;
+
+        // Select all our enrolments.
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
+                    LEFT JOIN `courses` c
+                        ON c.module_delivery_key = e.module_delivery_key
+                WHERE e.session_code = :sessioncode AND e.module_delivery_key = :module_delivery_key AND e.login = :login";
+        $data = $CONNECTDB->get_records_sql($sql, array(
+            "module_delivery_key" => $module_delivery_key,
+            "sessioncode" => $session_code,
+            "login" => $login
+        ));
+
+        $array = self::filter_sql_query_set($data);
+        return array_pop($array);
+    }
+
+    /**
      * Translates a Connect role into Moodle role
      * 
      * @param  string $role A role grabbed out the connect database
@@ -239,9 +268,10 @@ class enrolment {
         switch ($role) {
             case "student":
             case "teacher":
-                return "sds_$role";
+            return "sds_$role";
+
             default:
-                return $role;
+            return $role;
         }
     }
 
