@@ -28,9 +28,7 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		global $CFG, $DB, $CONNECTDB;
 
         $this->resetAfterTest();
-
-		$CONNECTDB->execute("TRUNCATE TABLE {enrollments}");
-		$CONNECTDB->execute("TRUNCATE TABLE {courses}");
+        $this->connect_cleanup();
 
 		// First, create a course.
 		$module_delivery_key = $this->generate_course();
@@ -52,5 +50,73 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$enrolments = \local_connect\enrolment::get_all(2014);
 
 		$this->assertEquals(63, count($enrolments));
+
+        $this->connect_cleanup();
+	}
+
+	/**
+	 * Make sure we can grab a valid list of enrolments for a specific course.
+	 */
+	public function test_enrolment_course_list() {
+		global $CFG, $DB, $CONNECTDB;
+
+        $this->resetAfterTest();
+        $this->connect_cleanup();
+
+		// First, create a course.
+		$module_delivery_key = $this->generate_course();
+		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
+		$this->assertTrue($course->create_in_moodle());
+
+		// Now, create another course.
+		$module_delivery_key2 = $this->generate_course();
+		$course2 = \local_connect\course::get_course_by_uid($module_delivery_key2, $CFG->connect->session_code);
+		$this->assertTrue($course2->create_in_moodle());
+
+		// Create an enrolment.
+		$this->generate_enrolments(1,  $module_delivery_key, 'teacher');
+		$this->generate_enrolments(1,  $module_delivery_key2, 'teacher');
+
+		// Make sure we have two total
+		$enrolments = \local_connect\enrolment::get_all(2014);
+		$this->assertEquals(2, count($enrolments));
+
+		// Make sure it worked.
+		$enrolments = \local_connect\enrolment::get_enrolments_for_course($course);
+		$this->assertEquals(1, count($enrolments));
+
+		// Make sure it worked (2).
+		$enrolments = \local_connect\enrolment::get_enrolments_for_course($course2);
+		$this->assertEquals(1, count($enrolments));
+
+        $this->connect_cleanup();
+	}
+
+	/**
+	 * Make sure we can create an enrolment.
+	 */
+	public function test_enrolment_creation() {
+		global $CFG, $DB, $CONNECTDB;
+
+        $this->resetAfterTest();
+        $this->connect_cleanup();
+
+		// First, create a course.
+		$module_delivery_key = $this->generate_course();
+		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
+		$this->assertTrue($course->create_in_moodle());
+
+		// Create an enrolment.
+		$this->generate_enrolments(1,  $module_delivery_key, 'teacher');
+
+		// Make sure it worked.
+		$enrolments = \local_connect\enrolment::get_all(2014);
+		$this->assertEquals(1, count($enrolments));
+
+		$enrolment = array_pop($enrolments);
+		$this->assertTrue($enrolment->create_in_moodle());
+		$this->assertTrue($enrolment->is_in_moodle());
+
+        $this->connect_cleanup();
 	}
 }

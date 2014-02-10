@@ -24,6 +24,16 @@ defined('MOODLE_INTERNAL') || die();
 class connect_testcase extends \advanced_testcase
 {
 	/**
+	 * Clean up before/after a test
+	 */
+	protected function connect_cleanup() {
+		global $CONNECTDB;
+
+		$CONNECTDB->execute("TRUNCATE TABLE {enrollments}");
+		$CONNECTDB->execute("TRUNCATE TABLE {courses}");
+	}
+
+	/**
 	 * Insert a record into the Connect DB
 	 */
 	private function insertDB($table, $data) {
