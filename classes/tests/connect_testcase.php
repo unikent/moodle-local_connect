@@ -131,10 +131,26 @@ class connect_testcase extends \advanced_testcase
 
 		static $uid = 10000000;
 
-		// TODO
-		// They need to be enroled on a course AND the group needs to exist..
+		$group = $this->generate_group($module_delivery_key);
+		$enrolment = $this->generate_enrolment($module_delivery_key, $role);
 
-		return $uid++;
+		$data = array(
+			"group_id" => $group['group_id'],
+			"group_desc" => $group['group_desc'],
+			"session_code" => $CFG->connect->session_code,
+			"module_delivery_key" => $module_delivery_key,
+			"chksum" => uniqid($uid),
+			"id_chksum" => uniqid($uid),
+			"ukc" => $enrolment['ukc'],
+			"login" => $enrolment['login'],
+			"state" => 1
+		);
+
+		$this->insertDB('group_enrollments', $data);
+
+		$uid++;
+
+		return $data;
 	}
 
 	/**
