@@ -19,46 +19,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests new Kent enrolment code
  */
-class kent_enrolment_tests extends advanced_testcase
+class kent_enrolment_tests extends local_connect\tests\connect_testcase
 {
-	/**
-	 * Returns a valid enrolment for testing.
-	 */
-	private function generate_enrolment($module_delivery_key, $role = 'student') {
-		global $CONNECTDB;
-		static $eid = 10000000;
-
-		$generator = \advanced_testcase::getDataGenerator();
-		$user = $generator->create_user();
-
-		$data = array(
-			"ukc" => $eid++,
-			"login" => $user->username,
-			"title" => "Mx",
-			"initials" => $user->firstname,
-			"family_name" => $user->lastname,
-			"session_code" => 2014,
-			"module_delivery_key" => $module_delivery_key,
-			"role" => $role,
-			"state" => 1
-		);
-
-        $fields = implode(',', array_keys($data));
-        $qms    = array_fill(0, count($data), '?');
-        $qms    = implode(',', $qms);
-
-		$CONNECTDB->execute("INSERT INTO {enrollments} ($fields) VALUES($qms)", $data);
-	}
-
-	/**
-	 * Creates a bunch of enrolments.
-	 */
-	private function generate_enrolments($count, $module_delivery_key, $role = 'student') {
-		for ($i = 0; $i < $count; $i++) {
-			$this->generate_enrolment($module_delivery_key, $role);
-		}
-	}
-
 	/**
 	 * Make sure we can grab a valid list of enrolments.
 	 */
