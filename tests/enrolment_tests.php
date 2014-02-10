@@ -27,8 +27,8 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 	public function test_enrolment_list() {
 		global $CFG, $DB, $CONNECTDB;
 
-        $this->resetAfterTest();
-        $this->connect_cleanup();
+		$this->resetAfterTest();
+		$this->connect_cleanup();
 
 		// First, create a course.
 		$module_delivery_key = $this->generate_course();
@@ -37,8 +37,8 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 
 		// Next insert a couple of enrolments on this course.
 		$this->generate_enrolments(30, $module_delivery_key, 'student');
-		$this->generate_enrolments(2,  $module_delivery_key, 'convenor');
-		$this->generate_enrolments(1,  $module_delivery_key, 'teacher');
+		$this->generate_enrolments(2, $module_delivery_key, 'convenor');
+		$this->generate_enrolments(1, $module_delivery_key, 'teacher');
 
 		$enrolments = \local_connect\enrolment::get_all(2014);
 
@@ -51,7 +51,7 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 
 		$this->assertEquals(63, count($enrolments));
 
-        $this->connect_cleanup();
+		$this->connect_cleanup();
 	}
 
 	/**
@@ -60,8 +60,8 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 	public function test_enrolment_course_list() {
 		global $CFG, $DB, $CONNECTDB;
 
-        $this->resetAfterTest();
-        $this->connect_cleanup();
+		$this->resetAfterTest();
+		$this->connect_cleanup();
 
 		// First, create a course.
 		$module_delivery_key = $this->generate_course();
@@ -74,8 +74,8 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$this->assertTrue($course2->create_in_moodle());
 
 		// Create an enrolment.
-		$this->generate_enrolments(1,  $module_delivery_key, 'teacher');
-		$this->generate_enrolments(1,  $module_delivery_key2, 'teacher');
+		$this->generate_enrolments(1, $module_delivery_key, 'teacher');
+		$this->generate_enrolments(1, $module_delivery_key2, 'teacher');
 
 		// Make sure we have two total
 		$enrolments = \local_connect\enrolment::get_all(2014);
@@ -89,7 +89,7 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$enrolments = \local_connect\enrolment::get_enrolments_for_course($course2);
 		$this->assertEquals(1, count($enrolments));
 
-        $this->connect_cleanup();
+		$this->connect_cleanup();
 	}
 
 	/**
@@ -98,8 +98,8 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 	public function test_enrolment_creation() {
 		global $CFG, $DB, $CONNECTDB;
 
-        $this->resetAfterTest();
-        $this->connect_cleanup();
+		$this->resetAfterTest();
+		$this->connect_cleanup();
 
 		// First, create a course.
 		$module_delivery_key = $this->generate_course();
@@ -107,7 +107,7 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$this->assertTrue($course->create_in_moodle());
 
 		// Create an enrolment.
-		$this->generate_enrolments(1,  $module_delivery_key, 'teacher');
+		$this->generate_enrolments(1, $module_delivery_key, 'teacher');
 
 		// Make sure it worked.
 		$enrolments = \local_connect\enrolment::get_all(2014);
@@ -117,6 +117,6 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$this->assertTrue($enrolment->create_in_moodle());
 		$this->assertTrue($enrolment->is_in_moodle());
 
-        $this->connect_cleanup();
+		$this->connect_cleanup();
 	}
 }
