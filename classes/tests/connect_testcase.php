@@ -29,6 +29,7 @@ class connect_testcase extends \advanced_testcase
 	protected function connect_cleanup() {
 		global $CONNECTDB;
 
+		$CONNECTDB->execute("TRUNCATE TABLE {group_enrollments}");
 		$CONNECTDB->execute("TRUNCATE TABLE {enrollments}");
 		$CONNECTDB->execute("TRUNCATE TABLE {courses}");
 	}
@@ -82,6 +83,29 @@ class connect_testcase extends \advanced_testcase
 	protected function generate_enrolments($count, $module_delivery_key, $role = 'student') {
 		for ($i = 0; $i < $count; $i++) {
 			$this->generate_enrolment($module_delivery_key, $role);
+		}
+	}
+
+	/**
+	 * Returns a valid group enrolment for testing.
+	 */
+	protected function generate_group_enrolment($group, $module_delivery_key, $role = 'student') {
+		global $CFG;
+
+		static $eid = 10000000;
+
+		// TODO
+		// They need to be enroled on a course AND the group needs to exist..
+
+		return $eid++;
+	}
+
+	/**
+	 * Creates a bunch of group enrolments.
+	 */
+	protected function generate_group_enrolments($count, $group, $module_delivery_key, $role = 'student') {
+		for ($i = 0; $i < $count; $i++) {
+			$this->generate_group_enrolment($group, $module_delivery_key, $role);
 		}
 	}
 
