@@ -54,6 +54,13 @@ class enrolment {
     }
 
     /**
+     * Returns the ID of the Moodle user.
+     */
+    public function get_user_id() {
+        return $this->userid;
+    }
+
+    /**
      * Returns true if this is a valid enrolment
      */
     public function is_valid() {
