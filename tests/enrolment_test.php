@@ -212,26 +212,26 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 
 		// Now create the user (properly - otherwise the observer wont be called).
 		user_create_user(array(
-            'username' => $record['username'],
-            'password' => 'Moodle2012!',
-            'idnumber' => 'idnumbertest1',
-            'firstname' => 'First Name',
-            'lastname' => 'Last Name',
-            'middlename' => 'Middle Name',
-            'lastnamephonetic' => '',
-            'firstnamephonetic' => '',
-            'alternatename' => 'Alternate Name',
-            'email' => 'usertest1@email.com',
-            'description' => 'This is a description for user 1',
-            'city' => 'Canterbury',
-            'country' => 'uk'
-        ));
+			'username' => $record['username'],
+			'password' => 'Moodle2012!',
+			'idnumber' => 'idnumbertest1',
+			'firstname' => 'First Name',
+			'lastname' => 'Last Name',
+			'middlename' => 'Middle Name',
+			'lastnamephonetic' => '',
+			'firstnamephonetic' => '',
+			'alternatename' => 'Alternate Name',
+			'email' => 'usertest1@email.com',
+			'description' => 'This is a description for user 1',
+			'city' => 'Canterbury',
+			'country' => 'uk'
+		));
 
-        $enrolments = \local_connect\enrolment::get_enrolments_for_user($record['username']);
-        $this->assertEquals(1, count($enrolments));
+		$enrolments = \local_connect\enrolment::get_enrolments_for_user($record['username']);
+		$this->assertEquals(1, count($enrolments));
 		$enrolment = array_pop($enrolments);
 
-        // Did the enrolment get created?
+		// Did the enrolment get created?
 		$this->assertTrue($enrolment->is_in_moodle());
 
 		$this->connect_cleanup();
