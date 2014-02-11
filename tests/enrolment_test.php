@@ -143,7 +143,7 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$module_delivery_key = $this->generate_module_delivery_key();
 
 		// Create an enrolment.
-		$this->generate_enrolments(1, $module_delivery_key, 'teacher');
+		$this->generate_enrolment($module_delivery_key, 'teacher');
 
 		// Make sure it worked.
 		$enrolments = \local_connect\enrolment::get_all($CFG->connect->session_code);
@@ -172,5 +172,60 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 
 		$enrolment = new \local_connect\enrolment(1, 1, 1, "test");
 		$this->assertTrue($enrolment->is_valid());
+	}
+
+	/**
+	 * Test the observers.
+	 */
+	public function test_observer() {
+		global $CFG, $DB, $CONNECTDB;
+
+		require_once($CFG->dirroot.'/user/lib.php');
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		// First, create a course.
+		$module_delivery_key = $this->generate_module_delivery_key();
+
+		// Create an enrolment without a user, create the user, check they were enrolled.
+		$enrolment = $this->generate_enrolment($module_delivery_key, 'student');
+		$record = array(
+			"username" => $enrolment['login']
+		);
+
+		// Grab it (Bit crude, I know).
+		$enrolments = \local_connect\enrolment::get_all($CFG->connect->session_code);
+		$this->assertEquals(1, count($enrolments));
+		$enrolment = array_pop($enrolments);
+
+		$this->assertFalse($enrolment->is_in_moodle());
+		$enrolment->create_in_moodle();
+		$this->assertTrue($enrolment->is_in_moodle());
+
+		$DB->delete_records_select('user', 'username = :username', $record);
+		$this->assertFalse($enrolment->is_in_moodle());
+
+		// Now create the user (properly - otherwise the observer wont be called).
+		user_create_user(array(
+            'username' => $record['username'],
+            'password' => 'Moodle2012!',
+            'idnumber' => 'idnumbertest1',
+            'firstname' => 'First Name',
+            'lastname' => 'Last Name',
+            'middlename' => 'Middle Name',
+            'lastnamephonetic' => '',
+            'firstnamephonetic' => '',
+            'alternatename' => 'Alternate Name',
+            'email' => 'usertest1@email.com',
+            'description' => 'This is a description for user 1',
+            'city' => 'Canterbury',
+            'country' => 'uk'
+        ));
+
+        // Did the enrolment get created?
+		$this->assertTrue($enrolment->is_in_moodle());
+
+		$this->connect_cleanup();
 	}
 }
