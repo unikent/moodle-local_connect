@@ -199,11 +199,15 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
 		$this->assertEquals(1, count($enrolments));
 		$enrolment = array_pop($enrolments);
 
+		// Create the enrolment.
 		$this->assertFalse($enrolment->is_in_moodle());
 		$enrolment->create_in_moodle();
 		$this->assertTrue($enrolment->is_in_moodle());
 
-		$DB->delete_records_select('user', 'username = :username', $record);
+		// Delete the user.
+		$user = $DB->get_record('user', $record);
+		user_delete_user($user);
+
 		$this->assertFalse($enrolment->is_in_moodle());
 
 		// Now create the user (properly - otherwise the observer wont be called).
@@ -222,6 +226,10 @@ class kent_enrolment_tests extends local_connect\tests\connect_testcase
             'city' => 'Canterbury',
             'country' => 'uk'
         ));
+
+        $enrolments = \local_connect\enrolment::get_enrolments_for_user($record['username']);
+        $this->assertEquals(1, count($enrolments));
+		$enrolment = array_pop($enrolments);
 
         // Did the enrolment get created?
 		$this->assertTrue($enrolment->is_in_moodle());
