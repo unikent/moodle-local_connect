@@ -4,9 +4,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 class kent_course_tests extends advanced_testcase {
-  public function test_placeholder() {
-    $this->assertTrue(true);
-  }
+	public function test_placeholder() {
+		$this->assertTrue(true);
+	}
 /*
   public function test_unlink_sends_request() {
     global $CONNECTDB;
