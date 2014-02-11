@@ -36,6 +36,11 @@ class utils {
 	 */
 	public static function is_enabled() {
 		global $CFG;
+
+		if (\phpunit_util::is_test_site()) {
+			return true;
+		}
+
 		return isset($CFG->local_connect_enable) && $CFG->local_connect_enable;
 	}
 
@@ -44,6 +49,11 @@ class utils {
 	 */
 	public static function enable_new_features() {
 		global $CFG;
+
+		if (\phpunit_util::is_test_site()) {
+			return true;
+		}
+
 		return static::is_enabled() && isset($CFG->local_connect_enable_new_features) && $CFG->local_connect_enable_new_features;
 	}
 
@@ -52,6 +62,11 @@ class utils {
 	 */
 	public static function enable_new_observers() {
 		global $CFG;
+
+		if (\phpunit_util::is_test_site()) {
+			return true;
+		}
+
 		return static::is_enabled() && isset($CFG->local_connect_enable_observers) && $CFG->local_connect_enable_observers;
 	}
 
@@ -60,6 +75,11 @@ class utils {
 	 */
 	public static function enable_sharedb() {
 		global $CFG;
+
+		if (\phpunit_util::is_test_site()) {
+			return true;
+		}
+
 		return static::is_enabled() && isset($CFG->local_connect_enable_sharedb) && $CFG->local_connect_enable_sharedb;
 	}
 
@@ -68,6 +88,11 @@ class utils {
 	 */
 	public static function enable_cron() {
 		global $CFG;
+
+		if (\phpunit_util::is_test_site()) {
+			return true;
+		}
+
 		return static::is_enabled() && isset($CFG->local_connect_enable_cron) && $CFG->local_connect_enable_cron;
 	}
 
