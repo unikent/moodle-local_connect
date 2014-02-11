@@ -41,16 +41,12 @@ class observers {
     public static function course_created(\core\event\course_created $event) {
         global $CFG, $DB, $SHAREDB;
 
-        if  (!\local_connect\utils::enable_new_observers()) {
-            return true;
-        }
-
         // Update ShareDB if it is enabled.
-        if (\local_connect\utils::enable_sharedb()) {
+        if (utils::enable_sharedb()) {
             // Update course listings DB
             $record = $DB->get_record('course', array(
-                    "id" => $event->objectid
-                ));
+                "id" => $event->objectid
+            ));
 
             if ($record->id == 1) {
                 return true;
@@ -78,25 +74,23 @@ class observers {
     public static function user_created(\core\event\user_created $event) {
         global $DB;
 
-        if  (!\local_connect\utils::enable_new_observers()) {
-            return true;
-        }
-
-        // Grab user info
-        $record = $DB->get_record('user', array(
+        if (utils::enable_new_features()) {
+            // Grab user info
+            $record = $DB->get_record('user', array(
                 "id" => $event->objectid
             ));
 
-        // Perhaps this is a new installation...
-        if ($record->id <= 1) {
-            return true;
-        }
+            // Perhaps this is a new installation...
+            if ($record->id <= 1) {
+                return true;
+            }
 
-        // Sync Enrollments
-        $enrolments = \local_connect\enrolment::get_enrolments_for_user($record->username);
-        foreach ($enrolments as $enrolment) {
-            if (!$enrolment->is_in_moodle()) {
-                $enrolment->create_in_moodle();
+            // Sync Enrollments
+            $enrolments = enrolment::get_enrolments_for_user($record->username);
+            foreach ($enrolments as $enrolment) {
+                if (!$enrolment->is_in_moodle()) {
+                    $enrolment->create_in_moodle();
+                }
             }
         }
 
