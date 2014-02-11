@@ -62,6 +62,44 @@ class observers {
         return true;
     }
 
+    /**
+     * Triggered when 'course_updated' event is triggered.
+     *
+     * Updates the course in the SHAREDB clone-table
+     *
+     * @param \core\event\course_updated $event
+     * @return unknown
+     */
+    public static function course_updated(\core\event\course_updated $event) {
+        global $CFG, $DB, $SHAREDB;
+
+        // Update ShareDB if it is enabled.
+        if (utils::enable_sharedb()) {
+            // Update course listings DB
+            $moodle = $DB->get_record('course', array(
+                "id" => $event->objectid
+            ));
+
+            if ($moodle->id == 1) {
+                return true;
+            }
+
+            $record = $SHAREDB->get_record('course_list', array(
+                "moodle_id" => $moodle->id,
+                "moodle_env" => $CFG->kent->environment,
+                "moodle_dist" => $CFG->kent->distribution
+            ));
+
+            $record->shortname = $moodle->shortname;
+            $record->fullname = $moodle->fullname;
+            $record->summary = $moodle->summary;
+
+            $SHAREDB->update_record("course_list", $record);
+        }
+
+        return true;
+    }
+
 
     /**
      * Triggered when 'user_created' event is triggered.

@@ -23,12 +23,17 @@
  */
 
 $observers = array (
-  
+
     array (
         'eventname' => '\core\event\course_created',
         'callback' => '\local_connect\observers::course_created',
     ),
-  
+
+    array (
+        'eventname' => '\core\event\course_updated',
+        'callback' => '\local_connect\observers::course_updated',
+    ),
+
     array (
         'eventname' => '\core\event\user_created',
         'callback' => '\local_connect\observers::user_created',
