@@ -27,12 +27,13 @@ class connect_testcase extends \advanced_testcase
 	 * Clean up before/after a test
 	 */
 	protected function connect_cleanup() {
-		global $CONNECTDB;
+		global $CONNECTDB, $SHAREDB;
 
 		$CONNECTDB->execute("TRUNCATE TABLE {group_enrollments}");
 		$CONNECTDB->execute("TRUNCATE TABLE {enrollments}");
 		$CONNECTDB->execute("TRUNCATE TABLE {courses}");
 		$CONNECTDB->execute("TRUNCATE TABLE {groups}");
+		$SHAREDB->execute("TRUNCATE TABLE {course_list}");
 	}
 
 	/**
