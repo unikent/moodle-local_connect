@@ -221,6 +221,15 @@ class connect_testcase extends \advanced_testcase
 	}
 
 	/**
+	 * Returns a valid course module key for testing against.
+	 */
+	protected function generate_courses($count) {
+		for ($i = 0; $i < $count; $i++) {
+			$this->generate_course();
+		}
+	}
+
+	/**
 	 * Quick way of grabbing a valid module delivery key for
 	 * a course that exists in Moodle.
 	 */
