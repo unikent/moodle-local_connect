@@ -152,6 +152,7 @@ class course {
         if (preg_match('/\(\d+\/\d+\)/is', $this->shortname) === 0) {
             $this->shortname .= " ($prev_year/$this->session_code)";
         }
+
         if (preg_match('/\(\d+\/\d+\)/is', $this->fullname) === 0) {
             $this->fullname .= " ($prev_year/$this->session_code)";
         }
@@ -225,9 +226,9 @@ class course {
             $this->session_code,
             $this->module_code,
             $this->chksum,
-            course::$states['scheduled'] |
-            course::$states['processing'] |
-            course::$states['created_in_moodle']
+            self::$states['scheduled'] |
+            self::$states['processing'] |
+            self::$states['created_in_moodle']
         );
 
         return $CONNECTDB->count_records_sql($sql, $params) === 0;
@@ -323,6 +324,7 @@ class course {
                     $link_course->add_child($this);
                 }
             }
+
             $this->moodle_id = $course->id;
             return false;
         }
@@ -591,18 +593,17 @@ class course {
         // Step 0 - If this is a linked course, kill our children.
         if (!empty($this->children)) {
             foreach ($this->children as $child) {
-                $course = course::get_course_by_chksum($child);
+                $course = self::get_course_by_chksum($child);
                 $course->state = 1;
                 $course->moodle_id = 0;
                 $course->parent_id = 0;
                 $course->update();
             }
-
         }
 
         // Step 1 - Move to the 'removed category'.
 
-        $category = \local_connect\utils::get_removed_category();
+        $category = utils::get_removed_category();
 
         $course = $DB->get_record('course', array('id' => $this->moodle_id));
 
@@ -718,10 +719,12 @@ class course {
      */
     public static function get_course_by_chksum($chksum) {
         global $CONNECTDB;
+
         $data = $CONNECTDB->get_record('courses', array('chksum' => $chksum));
         if (!$data) {
             return false;
         }
+
         return new course($data);
     }
 
@@ -886,12 +889,12 @@ class course {
      * @return unknown
      */
     public static function disengage_all($data) {
-        global $CONNECTDB, $STOMP;
+        global $CONNECTDB;
         $response = array();
 
         foreach ($data->courses as $course) {
             // Try to find the Connect version of the course.
-            $connect_course = \local_connect\course::get_course_by_uid($course->module_delivery_key, $course->session_code);
+            $connect_course = self::get_course_by_uid($course->module_delivery_key, $course->session_code);
             if (!$connect_course) {
                 $response[] = array(
                     'error_code' => 'does_not_exist',
@@ -901,7 +904,7 @@ class course {
             }
 
             // Make sure this was in Moodle.
-            if (($course->state & course::$states['created_in_moodle']) === 0) {
+            if (($course->state & self::$states['created_in_moodle']) === 0) {
                 $response[] = array(
                     'error_code' => 'not_created_in_moodle',
                     'id' => $course
@@ -911,6 +914,7 @@ class course {
 
             $connect_course->delete();
         }
+
         return $response;
     }
 
@@ -921,12 +925,12 @@ class course {
      * @return unknown
      */
     public static function schedule_all($data) {
-        global $CONNECTDB, $STOMP;
+        global $CONNECTDB;
         $response = array();
 
         foreach ($data->courses as $course) {
             // Try to find the Connect version of the course.
-            $connect_course = \local_connect\course::get_course_by_uid($course->module_delivery_key, $course->session_code);
+            $connect_course = self::get_course_by_uid($course->module_delivery_key, $course->session_code);
             if (!$connect_course) {
                 $response[] = array(
                     'error_code' => 'does_not_exist',
@@ -967,7 +971,7 @@ class course {
      * @return unknown
      */
     public static function merge($input) {
-        global $CONNECTDB, $STOMP;
+        global $CONNECTDB;
 
         $link_course = array(
             'module_code' => $input->code,
@@ -975,7 +979,7 @@ class course {
             'primary_child' => $input->primary_child,
             'synopsis' => $input->synopsis,
             'category_id' => $input->category,
-            'state' => course::$states['scheduled'],
+            'state' => self::$states['scheduled'],
             'moodle_id' => null
         );
 
@@ -1003,7 +1007,7 @@ class course {
         // If we only have one linked course, we just add the other merge targets as children.
         if (count($linked) == 1) {
             $link = array_shift($linked);
-            $link = course::get_course_by_uid($link->module_delivery_key, $link->session_code);
+            $link = self::get_course_by_uid($link->module_delivery_key, $link->session_code);
 
             // Filter out children.
             $children = array_filter($courses, function($v) use ($link) {
@@ -1040,7 +1044,7 @@ class course {
         if (count($already_created) == 1) {
             $f = array_shift($already_created);
             $link_course['moodle_id'] = $f->moodle_id;
-            $link_course['state'] = course::$states['created_in_moodle'];
+            $link_course['state'] = self::$states['created_in_moodle'];
         }
 
         // Grab hold of the 'primary' delivery and base our details on that.
@@ -1054,8 +1058,7 @@ class course {
         $parent = $courses[array_pop($keys)];
         if ($primary_child !== null) {
             $parent = $primary_child;
-        }
-        else {
+        } else {
             $t = array_filter($courses, function($v) {
                 return $v->campus_desc == 'Canterbury';
             });
@@ -1080,6 +1083,7 @@ class course {
             if (null === $a) {
                 $a = $i->week_beginning_date;
             }
+
             return ($i->week_beginning_date < $a) ? $i->week_beginning_date : $a;
         });
 
@@ -1123,11 +1127,11 @@ SQL;
         $tr->allow_commit();
 
         // Find the new course.
-        $link = course::get_course_by_uid($uuid->uuid);
+        $link = self::get_course_by_uid($uuid->uuid);
 
         // Add children.
         foreach ($input->link_courses as $child) {
-            $child = course::get_course_by_uid($child->module_delivery_key, $child->session_code);
+            $child = self::get_course_by_uid($child->module_delivery_key, $child->session_code);
             $link->add_child($child);
         }
 
@@ -1156,7 +1160,7 @@ SQL;
                     'error_code' => 'not_link_course',
                     'id' => $c
                 );
-            } else if (($course->state & course::$states['created_in_moodle']) == 0) {
+            } else if (($course->state & self::$states['created_in_moodle']) == 0) {
                 $r[] = array(
                     'error_code' => 'not_created',
                     'id' => $c
@@ -1168,6 +1172,4 @@ SQL;
 
         return $r;
     }
-
-
 }
