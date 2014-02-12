@@ -191,6 +191,9 @@ class connect_testcase extends \advanced_testcase
 		global $CFG;
 
 		static $delivery_key = 10000;
+		static $campuses = array("Canterbury", "Medway", "Rome");
+
+		shuffle($campuses);
 
 		$data = array(
 			"module_delivery_key" => $delivery_key,
@@ -198,7 +201,7 @@ class connect_testcase extends \advanced_testcase
 			"delivery_department" => '01',
 			"campus" => 1,
 			"module_version" => 1,
-			"campus_desc" => 'Canterbury',
+			"campus_desc" => $campuses[0],
 			"module_week_beginning" => 1,
 			"module_length" => 12,
 			"module_title" => $this->generate_module_name(),
