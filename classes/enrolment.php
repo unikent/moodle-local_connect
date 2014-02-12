@@ -98,29 +98,14 @@ class enrolment extends data
      * Check to see if a user is enrolled on this module in Moodle
      */
     public function is_in_moodle() {
-        global $DB;
-
-        // TODO - is_enrolled($context, $user, 'moodle/role:assign')?
+        global $CFG;
+        require_once($CFG->libdir . "/accesslib.php");
 
         // Get course context.
         $context = \context_course::instance($this->courseid, MUST_EXIST);
 
-        $sql = "SELECT COUNT(ue.id)
-                  FROM {user_enrolments} ue
-                  JOIN {enrol} e ON (e.id=ue.enrolid AND e.courseid=:courseid)
-                  JOIN {user} u ON u.id=ue.userid
-                  JOIN {role_assignments} ra ON ra.userid=u.id AND contextid=:contextid
-                WHERE ue.userid=:userid AND ue.status=:active AND e.status=:enabled AND u.deleted=0 AND ra.roleid=:roleid";
-        $params = array(
-            'enabled' => ENROL_INSTANCE_ENABLED,
-            'active' => ENROL_USER_ACTIVE,
-            'userid' => $this->userid,
-            'courseid' => $this->courseid,
-            'roleid' => $this->roleid,
-            'contextid' => $context->id
-        );
-
-        return $DB->count_records_sql($sql, $params) > 0;
+        // Check enrolment status.
+        return is_enrolled($context, $this->userid);
     }
 
     /**
