@@ -57,7 +57,7 @@ if (\local_connect\utils::enable_new_features()) {
             if (null == $input) {
                 header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
             } else {
-                $result = \local_connect\course::merge($input);
+                $result = \local_connect\course::process_merge($input);
                 if (isset($result['error_code'])) {
                     header($_SERVER['SERVER_PROTOCOL'] . ' 422');
                 } else {
