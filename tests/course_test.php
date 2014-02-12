@@ -65,4 +65,44 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $this->connect_cleanup();
     }
+
+    /**
+     * Test we can create a linked course and then unlink it.
+     */
+    public function test_unlink_course() {
+        $this->resetAfterTest();
+        $this->connect_cleanup();
+
+        // Create two courses.
+        $this->generate_courses(2);
+
+        $courses = \local_connect\course::get_courses(array(), true);
+        $this->assertEquals(2, count($courses));
+
+        $link_course = array(
+            'module_code' => "TST",
+            'module_title' => "TEST MERGE",
+            'primary_child' => reset($courses),
+            'synopsis' => "This is a test",
+            'category_id' => 1,
+            'state' => \local_connect\course::$states['scheduled'],
+            'moodle_id' => null
+        );
+
+        $this->assertEquals(array(), \local_connect\course::merge($link_course, $courses));
+
+        $courses = \local_connect\course::get_courses();
+        $this->assertEquals(3, count($courses));
+
+        // Unlink!
+        $course = reset($courses);
+        $course->unlink();
+
+        $courses = \local_connect\course::get_courses();
+        $this->assertEquals(3, count($courses));
+
+        // TODO - test more stuff, enrolments etc
+
+        $this->connect_cleanup();
+    }
 }

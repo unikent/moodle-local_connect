@@ -251,6 +251,15 @@ class course extends data
 
 
     /**
+     * Do we have children?
+     * @return unknown
+     */
+    public function has_children() {
+        return $this->link;
+    }
+
+
+    /**
      * Has this course been scheduled for rollover?
      * @return unknown
      */
@@ -429,49 +438,23 @@ class course extends data
     /**
      * Link a course to this course
      * @param unknown $target
-     */
-    private function create_link($target) {
-        // Create a linked course.
-        $data = clone($this);
-        $data->module_delivery_key = $this->chksum;
-        $data->primary_child = $this->chksum;
-        $data->shortname = "$this->shortname/$target->shortname";
-        $data->chksum = $data->id_chksum = uniqid("link-");
-        $data->link = 1;
-        $data = new course($data);
-
-        // Create the course in Moodle.
-        $data->create_moodle();
-
-        // Add children.
-        $data->add_child($this);
-        $data->add_child($target);
-    }
-
-
-    /**
-     * Link a course to this course
-     * @param unknown $target
      * @return unknown
      */
     private function add_child($target) {
         global $CONNECTDB, $DB;
 
-        // Is this a link course?
-        if ($this->link === 0) {
-            return $this->create_link($target);
-        }
-
         // Link them up
         $CONNECTDB->set_field('courses', 'parent_id', $this->chksum, array (
-                'chksum' => $target->chksum
-            ));
+            'chksum' => $target->chksum
+        ));
         $CONNECTDB->set_field('courses', 'moodle_id', $this->moodle_id, array (
-                'chksum' => $target->chksum
-            ));
-        $CONNECTDB->set_field('courses', 'state', '8', array (
-                'chksum' => $target->chksum
-            ));
+            'chksum' => $target->chksum
+        ));
+        $CONNECTDB->set_field('courses', 'state', self::$states['created_in_moodle'], array (
+            'chksum' => $target->chksum
+        ));
+
+        $this->sync_enrolments();
     }
 
 
@@ -704,6 +687,26 @@ class course extends data
                 $group->create_in_moodle();
             }
         }
+    }
+
+    /**
+     * Get children of this course.
+     * @return unknown
+     */
+    public function get_children() {
+        global $CONNECTDB;
+
+        // Select a bunch of records
+        $data = $CONNECTDB->get_records('courses', array(
+            'parent_id' => $this->chksum
+        ));
+
+        $courses = array();
+        foreach ($data as $datum) {
+            $courses[] = new course($datum);
+        }
+
+        return $courses;
     }
 
     /**
