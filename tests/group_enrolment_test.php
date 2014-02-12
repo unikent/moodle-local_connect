@@ -96,4 +96,40 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 
 		$this->connect_cleanup();
 	}
+
+	/**
+	 * Make sure we can delete a group enrolment in Moodle.
+	 */
+	public function test_group_enrolment_delete() {
+		global $CFG;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		$module_delivery_key = $this->generate_module_delivery_key();
+		$group = $this->generate_group($module_delivery_key);
+
+		// Create the group in Moodle
+		{
+			$obj = \local_connect\group::get($group['group_id']);
+			$obj->create_in_moodle();
+		}
+
+		$enrolment = $this->generate_group_enrolment($group, 'teacher');
+
+		// Create the enrolment in Moodle
+		{
+			$obj = \local_connect\enrolment::get($module_delivery_key, $CFG->connect->session_code, $enrolment['login']);
+			$obj->create_in_moodle();
+		}
+
+		$obj = \local_connect\group_enrolment::get($enrolment['group_id'], $enrolment['login']);
+		$this->assertFalse($obj->is_in_moodle());
+		$this->assertTrue($obj->create_in_moodle());
+		$this->assertTrue($obj->is_in_moodle());
+		$obj->delete();
+		$this->assertFalse($obj->is_in_moodle());
+
+		$this->connect_cleanup();
+	}
 }

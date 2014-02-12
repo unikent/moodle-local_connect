@@ -126,15 +126,6 @@ class group_enrolment extends data
     }
 
     /**
-     * Save to the Connect database
-     * 
-     * @return boolean
-     */
-    public function save() {
-        // Do nothing.
-    }
-
-    /**
      * Delete from Moodle
      * 
      * @return boolean

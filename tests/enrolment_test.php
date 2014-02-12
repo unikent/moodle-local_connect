@@ -82,11 +82,11 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$this->assertEquals(2, count($enrolments));
 
 		// Make sure it worked.
-		$enrolments = \local_connect\enrolment::get_enrolments_for_course($course);
+		$enrolments = \local_connect\enrolment::get_for_course($course);
 		$this->assertEquals(1, count($enrolments));
 
 		// Make sure it worked (2).
-		$enrolments = \local_connect\enrolment::get_enrolments_for_course($course2);
+		$enrolments = \local_connect\enrolment::get_for_course($course2);
 		$this->assertEquals(1, count($enrolments));
 
 		$this->connect_cleanup();
@@ -124,7 +124,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		), 'id,username');
 
 		// Make sure it worked.
-		$enrolments = \local_connect\enrolment::get_enrolments_for_user($user->username);
+		$enrolments = \local_connect\enrolment::get_for_user($user->username);
 		$this->assertEquals(1, count($enrolments));
 
 		$this->connect_cleanup();
@@ -227,12 +227,45 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 			'country' => 'uk'
 		));
 
-		$enrolments = \local_connect\enrolment::get_enrolments_for_user($record['username']);
+		$enrolments = \local_connect\enrolment::get_for_user($record['username']);
 		$this->assertEquals(1, count($enrolments));
 		$enrolment = array_pop($enrolments);
 
 		// Did the enrolment get created?
 		$this->assertTrue($enrolment->is_in_moodle());
+
+		$this->connect_cleanup();
+	}
+
+	/**
+	 * Test an enrolment deletion.
+	 */
+	public function test_deletion() {
+		global $CFG;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		// First, create a course.
+		$module_delivery_key = $this->generate_module_delivery_key();
+
+		// Create an enrolment.
+		$this->generate_enrolments(10, $module_delivery_key, 'student');
+
+		// Make sure it worked.
+		$enrolments = \local_connect\enrolment::get_all($CFG->connect->session_code);
+		$this->assertEquals(10, count($enrolments));
+
+		$enrolment = array_pop($enrolments);
+		$this->assertFalse($enrolment->is_in_moodle());
+		$this->assertTrue($enrolment->create_in_moodle());
+		$this->assertTrue($enrolment->is_in_moodle());
+		$enrolment->delete();
+		$this->assertFalse($enrolment->is_in_moodle());
+
+		// Re-test counts to make sure connect wasnt affected.
+		$enrolments = \local_connect\enrolment::get_all($CFG->connect->session_code);
+		$this->assertEquals(10, count($enrolments));
 
 		$this->connect_cleanup();
 	}

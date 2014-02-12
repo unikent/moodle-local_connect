@@ -665,7 +665,7 @@ class course extends data
      * Get enrollments for this Course
      */
     public function get_enrolments() {
-        return enrolment::get_enrolments_for_course($this);
+        return enrolment::get_for_course($this);
     }
 
     /**

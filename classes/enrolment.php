@@ -54,15 +54,6 @@ class enrolment extends data
     }
 
     /**
-     * Save to the Connect database
-     * 
-     * @return boolean
-     */
-    public function save() {
-      // Do nothing.
-    }
-
-    /**
      * Delete from Moodle
      * 
      * @return boolean
@@ -145,7 +136,7 @@ class enrolment extends data
                 if (!isset($uid_store[$enrolment->username])) {
                     $user = new user($enrolment->username);
                     if (!$user->is_in_moodle()) {
-                      $user->create_in_moodle();
+                        $user->create_in_moodle();
                     }
 
                     $uid_store[$enrolment->username] = $user->get_moodle_id();
@@ -177,15 +168,15 @@ class enrolment extends data
      * @param  string $username A username
      * @return array(local_connect_enrolment) Enrolment objects
      */
-    public static function get_enrolments_for_user($username) {
+    public static function get_for_user($username) {
         global $DB, $CONNECTDB;
 
         // Grab our user object early on.
         $user = $DB->get_record('user', array('username' => $username));
 
         // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
-                    LEFT JOIN `courses` c
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM {enrollments} e
+                    LEFT JOIN {courses} c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE e.login=:username";
         $data = $CONNECTDB->get_records_sql($sql, array(
@@ -208,7 +199,7 @@ class enrolment extends data
      */
     public static function get_my_enrolments() {
         global $USER;
-        return self::get_enrolments_for_user($USER->username);
+        return self::get_for_user($USER->username);
     }
 
     /**
@@ -217,12 +208,12 @@ class enrolment extends data
      * @param  local_connect_course $course A course
      * @return local_connect_enrolment Enrolment object
      */
-    public static function get_enrolments_for_course($course) {
+    public static function get_for_course($course) {
         global $CONNECTDB;
 
         // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
-                    LEFT JOIN `courses` c
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM {enrollments} e
+                    LEFT JOIN {courses} c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE c.module_delivery_key=:deliverykey AND c.session_code = :sessioncode";
         $data = $CONNECTDB->get_records_sql($sql, array(
@@ -240,8 +231,8 @@ class enrolment extends data
         global $CONNECTDB;
 
         // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
-                    LEFT JOIN `courses` c
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM {enrollments} e
+                    LEFT JOIN {courses} c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE c.session_code = :sessioncode";
         $data = $CONNECTDB->get_records_sql($sql, array(
@@ -258,8 +249,8 @@ class enrolment extends data
         global $CONNECTDB;
 
         // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM `enrollments` e
-                    LEFT JOIN `courses` c
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM {enrollments} e
+                    LEFT JOIN {courses} c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE e.session_code = :sessioncode AND e.module_delivery_key = :module_delivery_key AND e.login = :login";
         $data = $CONNECTDB->get_records_sql($sql, array(
@@ -309,7 +300,9 @@ class enrolment extends data
         }
 
         // Grab new data.
-        $role = $DB->get_record('role', array('shortname' => $shortname));
+        $role = $DB->get_record('role', array(
+            'shortname' => $shortname
+        ));
 
         // Set cache.
         $cache[$shortname] = $role;

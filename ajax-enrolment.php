@@ -22,7 +22,7 @@ $response = array(
 	"result" => ""
 );
 
-$enrolments = \local_connect\enrolment::get_enrolments_for_user($USER->username);
+$enrolments = \local_connect\enrolment::get_for_user($USER->username);
 foreach ($enrolments as $enrolment) {
 	if (!$enrolment->is_in_moodle()) {
 		if ($enrolment->create_in_moodle()) {
