@@ -71,27 +71,13 @@ class enrolment extends data
       global $DB;
 
       $enrol = enrol_get_plugin('manual');
-      $instances = enrol_get_instances($this->courseid, true);
-
-      $sql = "SELECT ue.enrolid, ue.userid
-                FROM {user_enrolments} ue
-                JOIN {enrol} e ON (e.id=ue.enrolid AND e.courseid=:courseid)
-                JOIN {user} u ON u.id=ue.userid
-                JOIN {role_assignments} ra ON ra.userid=u.id AND contextid=:contextid
-              WHERE ue.userid=:userid AND ue.status=:active AND e.status=:enabled AND u.deleted=0 AND ra.roleid=:roleid";
-
-      $records = $DB->get_records_sql($sql, array(
-          'enabled' => ENROL_INSTANCE_ENABLED,
-          'active' => ENROL_USER_ACTIVE,
-          'userid' => $this->userid,
-          'courseid' => $this->courseid,
-          'roleid' => $this->roleid,
-          'contextid' => $context->id
-      ));
-
-      foreach ($records as $record) {
-        $enrol->unenrol_user($instances[$record->enrolid], $record->userid);
-      }
+      $instances = $DB->get_records('enrol', array(
+        'enrol' => 'manual',
+        'courseid' => $this->courseid,
+        'status' => ENROL_INSTANCE_ENABLED
+      ), 'sortorder, id ASC');
+      $instance = reset($instances);
+      $enrol->unenrol_user($instance, $this->userid);
     }
 
     /**
