@@ -103,6 +103,9 @@ class course extends data
     /** Our children */
     public $children;
 
+    /** Week beginning date */
+    public $week_beginning_date;
+
     public static $states = array(
         'unprocessed' => 1,
         'scheduled' => 2,
@@ -141,6 +144,7 @@ class course extends data
         $this->numsections = $this->module_length != null ? $this->module_length : 1;
         $this->link = isset($obj->link) ? $obj->link : 0;
         $this->maxbytes = '67108864';
+        $this->week_beginning_date = isset($obj->week_beginning_date) ? $obj->week_beginning_date : null;
 
         // Get our UID
         $this->uid = $obj->module_delivery_key . "-" . $obj->session_code;
@@ -452,8 +456,6 @@ class course extends data
      */
     private function add_child($target) {
         global $CONNECTDB, $DB;
-
-        print "Linking $this->moodle_id with $target->chksum.\n";
 
         // Is this a link course?
         if ($this->link === 0) {
@@ -842,6 +844,7 @@ class course extends data
                     c1.session_code,
                     c1.category_id,
                     c1.delivery_department,
+                    c1.week_beginning_date,
                     CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('\"',c2.chksum,'\"')),''),']') children
                   FROM courses c1
                     LEFT OUTER JOIN courses c2
@@ -1139,10 +1142,13 @@ class course extends data
             , ?, now(), now(), ?
             FROM courses WHERE chksum = ?
 SQL;
+
+        $primary_child = $link_course['primary_child'];
+
         $CONNECTDB->execute($sql, array(
             $uuid->uuid,
             $uuid->uuid,
-            $link_course['primary_child'],
+            is_object($primary_child) ? $primary_child->chksum : $primary_child,
             $link_course['module_code'],
             $link_course['module_title'],
             $link_course['synopsis'],
@@ -1165,7 +1171,7 @@ SQL;
         $tr->allow_commit();
 
         // Find the new course.
-        $link = self::get_course_by_uid($uuid->uuid);
+        $link = self::get_course_by_chksum($uuid->uuid);
 
         // Add children.
         foreach ($courses as $child) {
