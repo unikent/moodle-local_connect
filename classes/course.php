@@ -32,8 +32,8 @@ require_once dirname(__FILE__) . '/../../../mod/forum/lib.php';
 /**
  * Connect courses container
  */
-class course {
-
+class course extends data
+{
     /** Our UID */
     public $uid;
 
@@ -208,6 +208,14 @@ class course {
             ));
     }
 
+    /**
+     * Save this Course to ConnectDB (alias for update)
+     * @return unknown
+     */
+    public function save() {
+        $this->update();
+    }
+
 
     /**
      * Is this course unique?
@@ -243,13 +251,20 @@ class course {
         return in_array($this->state, array(2, 4, 6, 8, 10, 12));
     }
 
+    /**
+     * Has this course been created in Moodle?
+     * @return unknown
+     */
+    public function is_in_moodle() {
+        return !empty($this->moodle_id);
+    }
 
     /**
      * Has this course been created in Moodle?
      * @return unknown
      */
     public function is_created() {
-        return !empty($this->moodle_id);
+        return $this->is_in_moodle();
     }
 
 
@@ -647,11 +662,25 @@ class course {
     }
 
     /**
+     * Get enrollments for this Course
+     */
+    public function get_enrolments() {
+        return enrolment::get_enrolments_for_course($this);
+    }
+
+    /**
+     * Get group enrollments for this Course
+     */
+    public function get_group_enrolments() {
+        return group_enrolment::get_for_course($this);
+    }
+
+    /**
      * Syncs enrollments for this Course
      * @todo Updates/Deletions
      */
     public function sync_enrolments() {
-        $enrolments = enrolment::get_enrolments_for_course($this);
+        $enrolments = $this->get_enrolments();
         foreach ($enrolments as $enrolment) {
             if (!$enrolment->is_in_moodle()) {
                 $enrolment->create_in_moodle();
@@ -1144,32 +1173,63 @@ SQL;
      * @param unknown $in_courses
      * @return unknown
      */
-    public static function unlink($in_courses) {
+    public static function process_unlink($in_courses) {
         global $CONNECTDB, $STOMP;
         $r = array();
 
         foreach ($in_courses as $c) {
-            $course = $CONNECTDB->get_record('courses', array('chksum' => $c));
-            if ($course == null) {
+            $course = self::get_course_by_chksum($c);
+
+            // Does it exist?
+            if ($course === false) {
                 $r[] = array(
                     'error_code' => 'does_not_exist',
                     'id' => $c
                 );
-            } else if ($course->parent_id == null) {
+                continue;
+            }
+
+            if ($course->parent_id == null) {
                 $r[] = array(
                     'error_code' => 'not_link_course',
                     'id' => $c
                 );
-            } else if (($course->state & self::$states['created_in_moodle']) == 0) {
+                continue;
+            }
+
+            // Was this ever created?
+            if ($course->is_in_moodle()) {
                 $r[] = array(
                     'error_code' => 'not_created',
                     'id' => $c
                 );
-            } else {
-                $STOMP->send('connect.job.unlink_course', $course->chksum);
+                continue;
             }
+
+            // All good!
+            $course->unlink();
         }
 
         return $r;
+    }
+
+    /**
+     * Process a course unlink
+     */
+    private function unlink() {
+        // Remove this course's enrolments and group enrolments
+        $enrolments = $this->get_enrolments();
+        $group_enrolments = $this->get_group_enrolments();
+        $todo = array_merge($enrolments, $group_enrolments);
+        foreach ($todo as $enrolment) {
+            if ($todo->is_in_moodle()) {
+                $todo->delete();
+            }
+        }
+
+        // Unset parent and state
+        $this->parent_id = null;
+        $this->state = self::$states['unprocessed'];
+        $this->save();
     }
 }

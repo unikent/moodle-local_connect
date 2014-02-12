@@ -28,8 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Connect group container
  */
-class group {
-
+class group extends data
+{
     /** Our chksum */
     public $chksum;
 

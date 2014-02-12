@@ -29,7 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Connect user container
  */
-class user {
+class user extends data
+{
 	/** Our UKC ID */
 	public $uid;
 

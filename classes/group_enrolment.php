@@ -28,8 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Connect group enrolment container
  */
-class group_enrolment {
-
+class group_enrolment extends data
+{
     /** Our chksum */
     public $chksum;
 
@@ -125,6 +125,51 @@ class group_enrolment {
         return groups_add_member($group->get_moodle_id(), $userid);
     }
 
+    /**
+     * Save to the Connect database
+     * 
+     * @return boolean
+     */
+    public function save() {
+        // Do nothing.
+    }
+
+    /**
+     * Delete from Moodle
+     * 
+     * @return boolean
+     */
+    public function delete() {
+        global $CFG;
+        require_once $CFG->dirroot.'/group/lib.php';
+
+        if (!$this->is_valid()) {
+            return false;
+        }
+
+        $group = $this->get_group();
+        $userid = $this->get_moodle_user_id();
+
+        groups_remove_member($group->get_moodle_id(), $userid);
+    }
+
+    /**
+     * Filter an SQL Query Set into objects (to keep it DRY)
+     */
+    private static function filter_sql_query_set($data) {
+        foreach ($data as &$group_enrolment) {
+            $obj = new group_enrolment();
+
+            $obj->chksum = $group_enrolment->chksum;
+            $obj->login = $group_enrolment->login;
+            $obj->group_id = $group_enrolment->group_id;
+
+            $group_enrolment = $obj;
+        }
+
+        return $data;
+    }
+
 
     /**
      * Returns a group enrolment, given a group ID and a username.
@@ -157,23 +202,29 @@ class group_enrolment {
 
         // Select all our groups.
         $data = $CONNECTDB->get_records("group_enrollments", array(
-                "group_id" => $group->id
-            ), '', 'chksum, login');
+            "group_id" => $group->id
+        ), '', 'chksum, login, group_id');
 
-        // Map to objects.
-        foreach ($data as &$group_enrolment) {
-            $obj = new group_enrolment();
-
-            $obj->chksum = $group_enrolment->chksum;
-            $obj->login = $group_enrolment->login;
-            $obj->group_id = $group->id;
-
-            $group_enrolment = $obj;
-        }
-
-        return $data;
+        return self::filter_sql_query_set($data);
     }
 
+    /**
+     * Returns all group enrolments for a given course
+     * 
+     * @param  local_connect_course $course A course
+     * @return local_connect_enrolment Enrolment object
+     */
+    public static function get_for_course($course) {
+        global $CONNECTDB;
+
+        // Select all our group enrolments.
+        $data = $CONNECTDB->get_records("group_enrollments", array(
+            "deliverykey" => $course->module_delivery_key,
+            "sessioncode" => $course->session_code
+        ), '', 'chksum, login, group_id');
+
+        return self::filter_sql_query_set($data);
+    }
 
     /**
      * Returns all known group enrolments for a given session code.
@@ -188,17 +239,7 @@ class group_enrolment {
             "session_code" => $session_code
         ), '', 'chksum,login,group_id');
 
-        // Map to objects.
-        foreach ($data as &$group_enrolment) {
-            $obj = new group_enrolment();
-            $obj->chksum = $group_enrolment->chksum;
-            $obj->login = $group_enrolment->login;
-            $obj->group_id = $group_enrolment->group_id;
-
-            $group_enrolment = $obj;
-        }
-
-        return $data;
+        return self::filter_sql_query_set($data);
     }
 
 
