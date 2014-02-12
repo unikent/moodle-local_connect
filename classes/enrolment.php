@@ -68,16 +68,16 @@ class enrolment extends data
      * @return boolean
      */
     public function delete() {
-      global $DB;
+        global $DB;
 
-      $enrol = enrol_get_plugin('manual');
-      $instances = $DB->get_records('enrol', array(
-        'enrol' => 'manual',
-        'courseid' => $this->courseid,
-        'status' => ENROL_INSTANCE_ENABLED
-      ), 'sortorder, id ASC');
-      $instance = reset($instances);
-      $enrol->unenrol_user($instance, $this->userid);
+        $enrol = enrol_get_plugin('manual');
+        $instances = $DB->get_records('enrol', array(
+            'enrol' => 'manual',
+            'courseid' => $this->courseid,
+            'status' => ENROL_INSTANCE_ENABLED
+        ), 'sortorder, id ASC');
+        $instance = reset($instances);
+        $enrol->unenrol_user($instance, $this->userid);
     }
 
     /**
