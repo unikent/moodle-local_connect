@@ -211,6 +211,19 @@ class enrolment extends data
     public static function get_for_course($course) {
         global $CONNECTDB;
 
+        // If this course has children, get the enrolments for those instead.
+        if ($course->has_children()) {
+            $data = array();
+
+            foreach ($course->get_children() as $child) {
+                if ($child != $course) {
+                    $data = array_merge($data, self::get_for_course($child));
+                }
+            }
+
+            return $data;
+        }
+
         // Select all our enrolments.
         $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM {enrollments} e
                     LEFT JOIN {courses} c
