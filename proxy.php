@@ -29,61 +29,65 @@ if (!\local_connect\course::can_manage()) {
 //
 if (\local_connect\utils::enable_new_features()) {
     switch ($_SERVER['PATH_INFO']) {
-    case '/courses/schedule':
-    case '/courses/schedule/':
-        header('Content-type: application/json');
-        $input = json_decode(file_get_contents('php://input'));
-        if ($input === null) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
-        } else {
-            $result = \local_connect\course::schedule_all($input);
-            echo json_encode($result);
-        }
-        die;
-    case '/courses/disengage/':
-        header('Content-type: application/json');
-        $input = json_decode(file_get_contents('php://input'));
-        if ($input === null) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
-        } else {
-            $result = \local_connect\course::disengage_all($input);
-            echo json_encode($result);
-        }
-        die;
-    case '/courses/merge':
-    case '/courses/merge/':
-        header('Content-type: application/json');
-        $input = json_decode(file_get_contents('php://input'));
-        if (null == $input) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
-        } else {
-            $result = \local_connect\course::merge($input);
-            if (isset($result['error_code'])) {
-                header($_SERVER['SERVER_PROTOCOL'] . ' 422');
+        case '/courses/schedule':
+        case '/courses/schedule/':
+            header('Content-type: application/json');
+            $input = json_decode(file_get_contents('php://input'));
+            if ($input === null) {
+                header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
             } else {
-                header($_SERVER['SERVER_PROTOCOL'] . ' 204 Created');
+                $result = \local_connect\course::schedule_all($input);
+                echo json_encode($result);
             }
-            echo json_encode($result);
-        }
-        exit(0);
-    case '/courses/unlink':
-    case '/courses/unlink/':
-        header('Content-type: application/json');
-        $input = json_decode(file_get_contents('php://input'));
-        if (null == $input) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
-        } else {
-            $result = \local_connect\course::unlink($input->courses);
-            echo json_encode($result);
-        }
-        exit(0);
-    case '/courses':
-    case '/courses/':
-        header('Content-type: application/json');
-        $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
-        $courses = \local_connect\course::get_courses($category_restrictions, false);
-        echo json_encode($courses);
-        die;
+            die;
+        case '/courses/disengage/':
+            header('Content-type: application/json');
+            $input = json_decode(file_get_contents('php://input'));
+            if ($input === null) {
+                header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
+            } else {
+                $result = \local_connect\course::disengage_all($input);
+                echo json_encode($result);
+            }
+            die;
+        case '/courses/merge':
+        case '/courses/merge/':
+            header('Content-type: application/json');
+            $input = json_decode(file_get_contents('php://input'));
+            if (null == $input) {
+                header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
+            } else {
+                $result = \local_connect\course::merge($input);
+                if (isset($result['error_code'])) {
+                    header($_SERVER['SERVER_PROTOCOL'] . ' 422');
+                } else {
+                    header($_SERVER['SERVER_PROTOCOL'] . ' 204 Created');
+                }
+
+                echo json_encode($result);
+            }
+            exit(0);
+        case '/courses/unlink':
+        case '/courses/unlink/':
+            header('Content-type: application/json');
+            $input = json_decode(file_get_contents('php://input'));
+            if (null == $input) {
+                header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
+            } else {
+                $result = \local_connect\course::process_unlink($input->courses);
+                echo json_encode($result);
+            }
+            exit(0);
+        case '/courses':
+        case '/courses/':
+            header('Content-type: application/json');
+            $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
+            $courses = \local_connect\course::get_courses($category_restrictions, false);
+            echo json_encode($courses);
+            die;
+        default:
+            // Do nothing.
+        break;
     }
 }
 
@@ -106,10 +110,9 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 //get contents
 $response = curl_exec( $ch );
 
-if ( !$response ) {
+if (!$response) {
     header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
 } else {
-
     $lines = explode("\r\n\r\n", $response);
 
     if (count($lines) > 2) {
