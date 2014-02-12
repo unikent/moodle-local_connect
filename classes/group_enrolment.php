@@ -210,8 +210,8 @@ class group_enrolment extends data
 
         // Select all our group enrolments.
         $data = $CONNECTDB->get_records("group_enrollments", array(
-            "deliverykey" => $course->module_delivery_key,
-            "sessioncode" => $course->session_code
+            "module_delivery_key" => $course->module_delivery_key,
+            "session_code" => $course->session_code
         ), '', 'chksum, login, group_id');
 
         return self::filter_sql_query_set($data);

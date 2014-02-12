@@ -91,7 +91,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $this->assertEquals(array(), \local_connect\course::merge($link_course, $courses));
 
-        $courses = \local_connect\course::get_courses();
+        $courses = \local_connect\course::get_courses(array(), true);
         $this->assertEquals(3, count($courses));
 
         // Unlink!
