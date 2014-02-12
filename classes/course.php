@@ -177,12 +177,11 @@ class course extends data
         }
     }
 
-
     /**
-     * Update this course in Connect
+     * Save this Course to ConnectDB
      * @return unknown
      */
-    public function update() {
+    public function save() {
         global $CONNECTDB;
 
         $sql = "UPDATE courses SET
@@ -196,24 +195,25 @@ class course extends data
                 WHERE module_delivery_key=? AND session_code=?";
 
         return $CONNECTDB->execute($sql, array(
-                $this->parent_id,
-                $this->moodle_id,
-                $this->module_code,
-                $this->module_title,
-                $this->synopsis,
-                $this->category,
-                $this->state,
-                $this->module_delivery_key,
-                $this->session_code
-            ));
+            $this->parent_id,
+            $this->moodle_id,
+            $this->module_code,
+            $this->module_title,
+            $this->synopsis,
+            $this->category,
+            $this->state,
+            $this->module_delivery_key,
+            $this->session_code
+        ));
     }
 
+
     /**
-     * Save this Course to ConnectDB (alias for update)
+     * Update this course in Connect (alias for save)
      * @return unknown
      */
-    public function save() {
-        $this->update();
+    public function update() {
+        return $this->save();
     }
 
 
@@ -361,7 +361,7 @@ class course extends data
         $this->state = 8;
 
         // Tell Connect about the new course.
-        $this->update();
+        $this->save();
 
         // Add in sections.
         $DB->set_field('course_sections', 'name', $this->module_title, array (
@@ -612,7 +612,7 @@ class course extends data
                 $course->state = 1;
                 $course->moodle_id = 0;
                 $course->parent_id = 0;
-                $course->update();
+                $course->save();
             }
         }
 
@@ -1216,7 +1216,7 @@ SQL;
     /**
      * Process a course unlink
      */
-    private function unlink() {
+    public function unlink() {
         // Remove this course's enrolments and group enrolments
         $enrolments = $this->get_enrolments();
         $group_enrolments = $this->get_group_enrolments();
@@ -1228,6 +1228,7 @@ SQL;
         }
 
         // Unset parent and state
+        $this->moodle_id = null;
         $this->parent_id = null;
         $this->state = self::$states['unprocessed'];
         $this->save();

@@ -78,9 +78,9 @@ class group extends data
             $course_moodle_id = $course->moodle_id;
 
             $group = $DB->get_record('groups', array(
-                    "courseid" => $course_moodle_id,
-                    "name" => $this->description
-                ));
+                "courseid" => $course_moodle_id,
+                "name" => $this->description
+            ));
 
             $this->moodle_id = $group->id;
         }
@@ -99,9 +99,9 @@ class group extends data
         $course = $this->get_course();
 
         $grouping = $DB->get_record('groupings', array(
-                'name' => 'Seminar groups',
-                'courseid' => $this->moodle_id
-            ));
+            'name' => 'Seminar groups',
+            'courseid' => $this->moodle_id
+        ));
 
         // Create?
         if (!$grouping) {
@@ -164,9 +164,9 @@ class group extends data
 
         // Set Moodle ID.
         $CONNECTDB->set_field('groups', 'moodle_id', $this->moodle_id, array(
-                'chksum' => $this->chksum,
-                'group_id' => $this->id
-            ));
+            'chksum' => $this->chksum,
+            'group_id' => $this->id
+        ));
 
         // Grab our grouping.
         $grouping_id = $this->get_or_create_grouping();
@@ -204,8 +204,8 @@ class group extends data
         global $CONNECTDB;
 
         $group = $CONNECTDB->get_record('groups', array(
-                'group_id' => $uid
-            ));
+            'group_id' => $uid
+        ));
 
         $obj = new group();
         $obj->id = $uid;
@@ -229,9 +229,9 @@ class group extends data
 
         // Select all our groups.
         $data = $CONNECTDB->get_records("groups", array(
-                "module_delivery_key" => $course->module_delivery_key,
-                "session_code" => $course->session_code
-            ), '', 'chksum, group_id, group_desc, moodle_id');
+            "module_delivery_key" => $course->module_delivery_key,
+            "session_code" => $course->session_code
+        ), '', 'chksum, group_id, group_desc, moodle_id');
 
         // Map to objects.
         foreach ($data as &$group) {
@@ -261,8 +261,8 @@ class group extends data
 
         // Select all our groups.
         $data = $CONNECTDB->get_records("groups", array(
-                "session_code" => $session_code
-            ), '', 'chksum, group_id, group_desc, module_delivery_key, moodle_id');
+            "session_code" => $session_code
+        ), '', 'chksum, group_id, group_desc, module_delivery_key, moodle_id');
 
         // Map to objects.
         foreach ($data as &$group) {
