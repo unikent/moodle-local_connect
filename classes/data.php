@@ -49,12 +49,16 @@ abstract class data {
 	 * 
 	 * @return boolean
 	 */
-	//public abstract function save();
+	public function save() {
+		// Not implemented.
+	}
 
 	/**
 	 * Delete from Moodle
 	 * 
 	 * @return boolean
 	 */
-	//public abstract function delete();
+	public function delete() {
+		// Not implemented.
+	}
 }
