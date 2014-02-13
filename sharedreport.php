@@ -30,6 +30,9 @@ require_once($CFG->libdir.'/adminlib.php');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/sharedreport.php');
 
+$page    = optional_param('page', 0, PARAM_INT);
+$perpage = optional_param('perpage', 30, PARAM_INT);
+
 admin_externalpage_setup('reportconnectsharedreport', '', null, '', array('pagelayout' => 'report'));
 
 // Dont show anything if there is nothing to show!
@@ -47,7 +50,8 @@ $table->attributes = array('class' => 'admintable generaltable');
 $table->data = array();
 
 // Grab a list of courses we can see.
-$records = $SHAREDB->get_records('course_list');
+$total_count = $SHAREDB->count_records('course_list');
+$records = $SHAREDB->get_records('course_list', null, '', 'id,moodle_env,moodle_dist,moodle_id,shortname,fullname', $page * $perpage, $perpage);
 foreach ($records as $record) {
 	$table->data[] = new \html_table_row(array(
 		$record->moodle_env,
@@ -59,6 +63,10 @@ foreach ($records as $record) {
 }
 
 echo \html_writer::table($table);
+
+// Output paging bar.
+$baseurl = new moodle_url('/local/connect/sharedreport.php', array('perpage' => $perpage));
+echo $OUTPUT->paging_bar($total_count, $page, $perpage, $baseurl);
 
 echo $OUTPUT->box_end();
 
