@@ -51,7 +51,7 @@ if (has_capability('moodle/site:config', \context_system::instance())) {
 	echo '<p><a href="'.$CFG->wwwroot.'/local/connect/regenerate_shared_list.php">Regenerate list</a> (Warning: Do not do this unless you know exactly what it means.)</p>';
 }
 
-// Output table.
+// Output table displaying all courses in the Shared Database, with paging.
 {
 	echo $OUTPUT->box_start('reportbox');
 
@@ -84,4 +84,5 @@ if (has_capability('moodle/site:config', \context_system::instance())) {
 	echo $OUTPUT->paging_bar($total_count, $page, $perpage, $baseurl);
 }
 
+// Output footer.
 echo $OUTPUT->footer();
