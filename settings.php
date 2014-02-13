@@ -26,7 +26,7 @@ if ($hassiteconfig) {
 	$settings->add(new admin_setting_configcheckbox(
 		'local_connect_enable_sharedb',
 		get_string('sharedb_toggle', 'local_connect'),
-		get_string('sharedb_toggle_desc', 'local_connect'),
+		"This is currently experimental though it appears to be stable. Be careful!",
 		0
 	));
 
@@ -34,6 +34,13 @@ if ($hassiteconfig) {
 		'local_connect_enable_cron',
 		get_string('cron_toggle', 'local_connect'),
 		get_string('cron_toggle_desc', 'local_connect'),
+		0
+	));
+
+	$settings->add(new admin_setting_configcheckbox(
+		'local_connect_enable_rollover',
+		"Enable new-style rollover",
+		"Warning: Rollover may not work after checking this! SHAREDB must be enabled for this to have any hope of working.",
 		0
 	));
 }

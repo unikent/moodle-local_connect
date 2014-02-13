@@ -100,6 +100,19 @@ class utils {
 	}
 
 	/**
+	 * Enable rollover?
+	 */
+	public static function enable_rollover() {
+		global $CFG;
+
+		if (\phpunit_util::is_test_site()) {
+			return true;
+		}
+
+		return static::is_enabled() && isset($CFG->local_connect_enable_rollover) && $CFG->local_connect_enable_rollover;
+	}
+
+	/**
 	 * Grab the "removed" category
 	 */
 	public static function get_removed_category() {
