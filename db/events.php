@@ -35,6 +35,11 @@ $observers = array (
     ),
 
     array (
+        'eventname' => '\core\event\course_deleted',
+        'callback' => '\local_connect\observers::course_deleted',
+    ),
+
+    array (
         'eventname' => '\core\event\user_created',
         'callback' => '\local_connect\observers::user_created',
     )

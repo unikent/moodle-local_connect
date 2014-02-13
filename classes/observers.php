@@ -100,6 +100,38 @@ class observers {
         return true;
     }
 
+    /**
+     * Triggered when 'course_deleted' event is triggered.
+     *
+     * Deletes the course from the SHAREDB clone-table
+     *
+     * @param \core\event\course_deleted $event
+     * @return unknown
+     */
+    public static function course_deleted(\core\event\course_deleted $event) {
+        global $CFG, $DB, $SHAREDB;
+
+        // Update ShareDB if it is enabled.
+        if (utils::enable_sharedb()) {
+            // Update course listings DB
+            $moodle = $DB->get_record('course', array(
+                "id" => $event->objectid
+            ));
+
+            if ($moodle->id == 1) {
+                return true;
+            }
+
+            $SHAREDB->delete_records("course_list", array(
+                "moodle_id" => $moodle->id,
+                "moodle_env" => $CFG->kent->environment,
+                "moodle_dist" => $CFG->kent->distribution
+            ));
+        }
+
+        return true;
+    }
+
 
     /**
      * Triggered when 'user_created' event is triggered.
