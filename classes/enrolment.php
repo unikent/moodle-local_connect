@@ -312,6 +312,9 @@ class enrolment extends data
             return $cache[$shortname];
         }
 
+        // Create the role if it doesnt exist.
+        self::create_role($shortname);
+
         // Grab new data.
         $role = $DB->get_record('role', array(
             'shortname' => $shortname
@@ -321,5 +324,44 @@ class enrolment extends data
         $cache[$shortname] = $role;
 
         return $role;
+    }
+
+    /**
+     * Create the given role if it doesnt already exist.
+     */
+    private static function create_role($shortname) {
+        global $DB, $CFG;
+
+        static $data_map = array(
+            "sds_student" => array(
+                "Student (SDS)",
+                "sds_student",
+                "Students generally have fewer privileges within a course.",
+                "student"
+            ),
+            "sds_teacher" => array(
+                "Teacher (SDS)",
+                "sds_teacher",
+                "Teachers can do anything within a course, including changing the activities and grading students.",
+                "editingteacher"
+            ),
+            "convenor" => array(
+                "Convenor (SDS)",
+                "convenor",
+                "A Convenor has the same permissions as a teacher, but can manually enrol teachers.",
+                "editingteacher"
+            )
+        );
+
+        if (!isset($data_map[$shortname])) {
+            throw new \moodle_exception("Invalid Connect Role - $shortname!");
+        }
+
+        if (!$DB->record_exists('role', array('shortname' => $shortname))) {
+            require_once($CFG->libdir . "/accesslib.php");
+
+            // Create it!
+            create_role($data_map[$shortname]);
+        }
     }
 }
