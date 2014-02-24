@@ -29,23 +29,23 @@ function xmldb_local_connect_install() {
     global $CFG;
 
     create_role(
-    	"Teacher (SDS)",
-    	"sds_teacher",
-    	"Teachers can do anything within a course, including changing the activities and grading students.",
-    	"sds_teacher"
+        "Student (SDS)",
+        "sds_student",
+        "Students generally have fewer privileges within a course.",
+        "student"
     );
 
     create_role(
-    	"Student (SDS)",
-    	"sds_student",
-    	"Students generally have fewer privileges within a course.",
-    	"sds_student"
+    	"Teacher (SDS)",
+    	"sds_teacher",
+    	"Teachers can do anything within a course, including changing the activities and grading students.",
+    	"editingteacher"
     );
 
     create_role(
         "Convenor (SDS)",
         "convenor",
         "A Convenor has the same permissions as a teacher, but can manually enrol teachers.",
-        "convenor"
+        "editingteacher"
     );
 }
