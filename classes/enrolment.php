@@ -361,7 +361,7 @@ class enrolment extends data
             require_once($CFG->libdir . "/accesslib.php");
 
             // Create it!
-            create_role($data_map[$shortname]);
+            call_user_func_array("create_role", $data_map[$shortname]);
         }
     }
 }
