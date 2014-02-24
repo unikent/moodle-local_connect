@@ -26,9 +26,6 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->libdir . "/phpunit/classes/util.php");
-
 /**
  * Connect utils
  */
