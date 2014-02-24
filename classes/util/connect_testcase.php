@@ -23,6 +23,35 @@ defined('MOODLE_INTERNAL') || die();
  */
 class connect_testcase extends \advanced_testcase
 {
+    /**
+     * Sets up the fixture, for example, open a network connection.
+     * This method is called before a test is executed.
+     */
+    protected function setUp() {
+    	global $CFG;
+        $this->resetAfterTest();
+    	$CFG->local_connect_enable = true;
+    	$CFG->local_connect_enable_new_features = true;
+    	$CFG->local_connect_enable_observers = true;
+    	$CFG->local_connect_enable_sharedb = true;
+    	$CFG->local_connect_enable_cron = true;
+    	$CFG->local_connect_enable_rollover = true;
+    }
+
+    /**
+     * Tears down the fixture, for example, close a network connection.
+     * This method is called after a test is executed.
+     */
+    protected function tearDown() {
+    	global $CFG;
+    	unset($CFG->local_connect_enable);
+    	unset($CFG->local_connect_enable_new_features);
+    	unset($CFG->local_connect_enable_observers);
+    	unset($CFG->local_connect_enable_sharedb);
+    	unset($CFG->local_connect_enable_cron);
+    	unset($CFG->local_connect_enable_rollover);
+    }
+
 	/**
 	 * Clean up before/after a test
 	 */
@@ -251,32 +280,4 @@ class connect_testcase extends \advanced_testcase
 
 		return $module_delivery_key;
 	}
-
-    /**
-     * Sets up the fixture, for example, open a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp() {
-    	global $CFG;
-    	$CFG->local_connect_enable = true;
-    	$CFG->local_connect_enable_new_features = true;
-    	$CFG->local_connect_enable_observers = true;
-    	$CFG->local_connect_enable_sharedb = true;
-    	$CFG->local_connect_enable_cron = true;
-    	$CFG->local_connect_enable_rollover = true;
-    }
-
-    /**
-     * Tears down the fixture, for example, close a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown() {
-    	global $CFG;
-    	unset($CFG->local_connect_enable);
-    	unset($CFG->local_connect_enable_new_features);
-    	unset($CFG->local_connect_enable_observers);
-    	unset($CFG->local_connect_enable_sharedb);
-    	unset($CFG->local_connect_enable_cron);
-    	unset($CFG->local_connect_enable_rollover);
-    }
 }

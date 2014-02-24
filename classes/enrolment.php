@@ -300,17 +300,6 @@ class enrolment extends data
      */
     private static function get_role($shortname) {
         global $DB;
-        static $cache;
-
-        // Initialize cache.
-        if (!is_array($cache)) {
-            $cache = array();
-        }
-
-        // Check cache.
-        if (isset($cache[$shortname])) {
-            return $cache[$shortname];
-        }
 
         // Create the role if it doesnt exist.
         self::create_role($shortname);
@@ -319,9 +308,6 @@ class enrolment extends data
         $role = $DB->get_record('role', array(
             'shortname' => $shortname
         ));
-
-        // Set cache.
-        $cache[$shortname] = $role;
 
         return $role;
     }
