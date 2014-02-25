@@ -49,17 +49,19 @@ class user extends data
 	/**
 	 * Create a user object from a username
 	 */
-	public function __construct($username) {
+	public function __construct($user) {
 		global $CONNECTDB;
 
-		$user = $CONNECTDB->get_record('enrollments', array(
-			'login' => $username
-		), "*", IGNORE_MULTIPLE);
+		if (is_string($user)) {
+			$user = $CONNECTDB->get_record('enrollments', array(
+				'login' => $user
+			), "ukc, login, initials, family_name", IGNORE_MULTIPLE);
+		}
 
 		$this->uid = $user->ukc;
-		$this->username = $username;
-		$this->firstname = empty($user->initials) ? $username[0] : $user->initials;
-		$this->lastname = empty($user->family_name) ? $username[1] : $user->family_name;
+		$this->username = $user->login;
+		$this->firstname = empty($user->initials) ? $user->login[0] : $user->initials;
+		$this->lastname = empty($user->family_name) ? $user->login[1] : $user->family_name;
 	}
 
 	/**
@@ -115,5 +117,49 @@ class user extends data
 		$user->mnethostid = $CFG->mnet_localhost_id;
 
 		$this->moodle_id = user_create_user($user, false);
+	}
+
+	/**
+	 * Returns a list of all known students.
+	 */
+	public static function get_by_role($role) {
+		global $CONNECTDB;
+
+		// Allow a special "staff" case that covers convenors and teachers.
+		$selector = '=';
+		if ($role === 'staff') {
+			$selector = '<>';
+			$role = 'student';
+		}
+
+		$sql = "SELECT e.ukc, e.login, e.initials, e.family_name FROM {enrollments} e
+			WHERE e.role $selector :role
+			GROUP BY e.login";
+		$data = $CONNECTDB->get_records_sql($sql, array(
+			"role" => $role
+		));
+
+		$result = array();
+		foreach ($data as $obj) {
+			if (!isset($result[$obj->login]) && !empty($obj->login)) {
+				$result[$obj->login] = new static($obj);
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Returns a list of all known students.
+	 */
+	public static function get_students() {
+		return static::get_by_role('student');
+	}
+
+	/**
+	 * Returns a list of all known students.
+	 */
+	public static function get_staff() {
+		return static::get_by_role('staff');
 	}
 }
