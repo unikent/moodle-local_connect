@@ -606,11 +606,11 @@ class course extends data
 
         // Step 1 - Move to the 'removed category'.
 
-        $category = utils::get_removed_category();
+        $category = \local_catman\core::get_category();
 
         $course = $DB->get_record('course', array('id' => $this->moodle_id));
 
-        $course->category = $category;
+        $course->category = $category->id;
         $course->shortname = date("dmY-His") . "-" . $course->shortname;
         $course->idnumber = date("dmY-His") . "-" . $course->idnumber;
 
