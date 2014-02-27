@@ -63,7 +63,7 @@ class group_enrolment extends data
      * @return unknown
      */
     private function get_moodle_user_id() {
-        $user = new user($this->login);
+        $user = user::get($this->login);
         $this->moodle_user_id = $user->get_moodle_id();
         return $this->moodle_user_id;
     }
