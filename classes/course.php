@@ -39,74 +39,29 @@ class course extends data
     /** Our UID */
     public $uid;
 
-    /** Our chksum */
-    public $chksum;
-
-    /** Our state */
-    public $state;
-
-    /** Our module code */
-    public $module_code;
-
-    /** Our module title */
-    public $module_title;
-
-    /** Our module version */
-    public $module_version;
-
-    /** Our campus */
-    public $campus;
-
-    /** Are we a linked course? */
-    public $link;
-
-    /** Our campus desc */
-    public $campus_desc;
-
-    /** Our synopsis */
-    public $synopsis;
-
-    /** Our module delivery key */
-    public $module_delivery_key;
-
-    /** Our module week beginning */
-    public $module_week_beginning;
-
-    /** Our module length */
-    public $module_length;
-
-    /** Our moodle id */
-    public $moodle_id;
-
-    /** Our sink deleted */
-    public $sink_deleted;
-
-    /** Our student count */
-    public $student_count;
-
-    /** Our teacher count */
-    public $teacher_count;
-
-    /** Our convenor_count */
-    public $convenor_count;
-
-    /** Our parent id */
-    public $parent_id;
-
-    /** Our session code */
-    public $session_code;
-
     /** Our category id */
     public $category;
-
-    /** Our delivery department */
-    public $delivery_department;
 
     /** Our children */
     public $children;
 
     /** Week beginning date */
     public $week_beginning_date;
+
+    /** Number of sections */
+    public $numsections;
+
+    /** Shortname */
+    public $shortname;
+
+    /** Fullname */
+    public $fullname;
+
+    /** Maxbytes */
+    public $maxbytes;
+
+    /** Visiblity */
+    public $visible;
 
     public static $states = array(
         'unprocessed' => 1,
@@ -426,7 +381,7 @@ class course extends data
         return  $course->shortname !== $this->shortname ||
                 $course->fullname !== $this->fullname ||
                 $course->category !== $this->category ||
-                $course->summary !== $this->summary;
+                $course->summary !== $this->synopsis;
     }
 
     /**
@@ -466,7 +421,13 @@ class course extends data
 
         // Create the course.
         try {
-            $course = create_course($this);
+            $obj = new \stdClass();
+            $obj->category = $this->category;
+            $obj->shortname = $this->shortname;
+            $obj->fullname = $this->fullname;
+            $obj->summary = $this->synopsis;
+            $obj->visible = $this->visible;
+            $course = create_course($obj);
             if (!$course) {
                 throw new \moodle_exception("Unknown");
             }

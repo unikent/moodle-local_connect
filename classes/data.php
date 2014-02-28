@@ -55,11 +55,19 @@ abstract class data {
 	}
 
 	/**
+	 * Get all of our data as an object
+	 */
+	protected final function get_data() {
+		return (object)$this->_data;
+	}
+
+	/**
 	 * Magic method!
 	 */
 	public function __get($name) {
 		if (!in_array($name, $this->valid_fields())) {
-			throw new \moodle_exception("Invalid field: $name!");
+			debugging("Invalid field: $name!");
+			return null;
 		}
 
 		if (isset($this->_data[$name])) {
@@ -74,12 +82,13 @@ abstract class data {
 	 */
 	public function __set($name, $value) {
 		if (!in_array($name, $this->valid_fields())) {
-			throw new \moodle_exception("Invalid field: $name!");
+			debugging("Invalid field: $name!");
+			return;
 		}
 
 		$validation = "validate_" . $name;
 		if (method_exists($this, $validation)) {
-			if (!$validation($value)) {
+			if (!$this->$validation($value)) {
 				throw new \moodle_exception("Invalid value for field '$name': $value!");
 			}
 		}
