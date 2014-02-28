@@ -46,6 +46,27 @@ class user extends data
 	/** Our Moodle ID (dont rely on this, use get_moodle_id()) */
 	private $moodle_id;
 
+    /**
+     * A list of valid fields for this data object.
+     */
+    protected final function valid_fields() {
+        return array("uid", "username", "firstname", "lastname");
+    }
+
+    /**
+     * A list of immutable fields for this data object.
+     */
+    protected function immutable_fields() {
+        return array("uid");
+    }
+
+    /**
+     * A list of key fields for this data object.
+     */
+    protected function key_fields() {
+        return array("username");
+    }
+
 	/**
 	 * Returns the Moodle user ID (or null)
 	 */

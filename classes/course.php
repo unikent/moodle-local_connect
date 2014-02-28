@@ -119,6 +119,27 @@ class course extends data
     );
 
     /**
+     * A list of valid fields for this data object.
+     */
+    protected final function valid_fields() {
+        return array("module_delivery_key", "session_code", "delivery_department", "campus", "module_version", "campus_desc", "module_week_beginning", "module_length", "module_title", "module_code", "chksum", "moodle_id", "sink_deleted", "state", "created_at", "updated_at", "synopsis", "week_beginning_date", "category_id", "parent_id", "student_count", "teacher_count", "convenor_count", "link", "json_cache", "primary_child", "id_chksum", "last_checked");
+    }
+
+    /**
+     * A list of immutable fields for this data object.
+     */
+    protected function immutable_fields() {
+        return array("module_delivery_key", "session_code");
+    }
+
+    /**
+     * A list of key fields for this data object.
+     */
+    protected function key_fields() {
+        return array("module_delivery_key", "session_code");
+    }
+
+    /**
      * Constructor to build from a database object
      * @param unknown $obj
      */

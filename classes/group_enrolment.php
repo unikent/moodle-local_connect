@@ -49,6 +49,27 @@ class group_enrolment extends data
     private $active;
 
     /**
+     * A list of valid fields for this data object.
+     */
+    protected final function valid_fields() {
+        return array("group_id", "group_desc", "module_delivery_key", "ukc", "login", "session_code", "chksum", "sink_deleted", "moodle_id", "state", "created_at", "updated_at", "id_chksum", "last_checked");
+    }
+
+    /**
+     * A list of immutable fields for this data object.
+     */
+    protected function immutable_fields() {
+        return array("group_id", "module_delivery_key", "session_code", "login");
+    }
+
+    /**
+     * A list of key fields for this data object.
+     */
+    protected function key_fields() {
+        return array("group_id", "login");
+    }
+
+    /**
      * Sync method
      */
     public function sync($dry = false) {

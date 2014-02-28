@@ -30,6 +30,30 @@ defined('MOODLE_INTERNAL') || die();
  * Connect data container
  */
 abstract class data {
+	/** Stores all our data */
+	private $_data;
+
+	public function __construct() {
+		$this->_data = array();
+	}
+
+	/**
+	 * A list of valid fields for this data object.
+	 */
+	protected abstract function valid_fields();
+
+    /**
+     * A list of key fields for this data object.
+     */
+    protected abstract function key_fields();
+
+	/**
+	 * A list of immutable fields for this data object.
+	 */
+	protected function immutable_fields() {
+		return array();
+	}
+
 	/**
 	 * Is this in Moodle?
 	 * 

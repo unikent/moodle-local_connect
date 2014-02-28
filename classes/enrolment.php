@@ -54,6 +54,27 @@ class enrolment extends data
     }
 
     /**
+     * A list of valid fields for this data object.
+     */
+    protected final function valid_fields() {
+        return array("ukc", "login", "title", "initials", "family_name", "session_code", "module_delivery_key", "role", "chksum", "moodle_id", "sink_deleted", "state", "created_at", "updated_at", "id_chksum", "last_checked");
+    }
+
+    /**
+     * A list of immutable fields for this data object.
+     */
+    protected function immutable_fields() {
+        return array("ukc", "login", "module_delivery_key", "session_code", "role");
+    }
+
+    /**
+     * A list of key fields for this data object.
+     */
+    protected function key_fields() {
+        return array("login", "module_delivery_key", "session_code");
+    }
+
+    /**
      * Delete from Moodle
      * 
      * @return boolean

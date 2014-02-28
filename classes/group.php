@@ -52,6 +52,27 @@ class group extends data
     private $moodle_id;
 
     /**
+     * A list of valid fields for this data object.
+     */
+    protected final function valid_fields() {
+        return array("group_id", "group_desc", "module_delivery_key", "session_code", "moodle_id", "state", "created_at", "updated_at", "chksum", "id_chksum", "last_checked");
+    }
+
+    /**
+     * A list of immutable fields for this data object.
+     */
+    protected function immutable_fields() {
+        return array("group_id", "module_delivery_key", "session_code");
+    }
+
+    /**
+     * A list of key fields for this data object.
+     */
+    protected function key_fields() {
+        return array("group_id");
+    }
+
+    /**
      * The big sync method.
      */
     public function sync($dry = false) {
