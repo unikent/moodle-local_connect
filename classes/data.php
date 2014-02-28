@@ -65,6 +65,11 @@ abstract class data {
 	 * Magic method!
 	 */
 	public function __get($name) {
+		$additional = "_get_" . $name;
+		if (method_exists($this, $additional)) {
+			return $this->$additional();
+		}
+
 		if (!in_array($name, $this->valid_fields())) {
 			debugging("Invalid field: $name!");
 			return null;

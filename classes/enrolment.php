@@ -236,7 +236,7 @@ class enrolment extends data
         if ($course->has_children()) {
             $data = array();
 
-            foreach ($course->get_children() as $child) {
+            foreach ($course->children as $child) {
                 if ($child != $course) {
                     $data = array_merge($data, self::get_for_course($child));
                 }

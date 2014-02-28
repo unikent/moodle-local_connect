@@ -42,9 +42,6 @@ class course extends data
     /** Our category id */
     public $category;
 
-    /** Our children */
-    public $children;
-
     /** Week beginning date */
     public $week_beginning_date;
 
@@ -97,7 +94,6 @@ class course extends data
         $this->session_code = $obj->session_code;
         $this->category = $obj->category_id;
         $this->delivery_department = $obj->delivery_department;
-        $this->children = isset($obj->children) ? $obj->children : null;
         $this->numsections = $this->module_length != null ? $this->module_length : 1;
         $this->link = isset($obj->link) ? $obj->link : 0;
         $this->maxbytes = '67108864';
@@ -758,7 +754,7 @@ class course extends data
      * Get children of this course.
      * @return unknown
      */
-    public function get_children() {
+    public function _get_children() {
         global $CONNECTDB;
 
         // Select a bunch of records
@@ -892,33 +888,7 @@ class course extends data
     public static function get_courses($category_restrictions = array(), $obj_form = false) {
         global $CFG, $CONNECTDB;
 
-        $sql = "SELECT
-                    c1.chksum,
-                    c1.state,
-                    c1.module_code,
-                    c1.module_title,
-                    c1.module_version,
-                    c1.campus,
-                    c1.campus_desc,
-                    c1.synopsis,
-                    c1.module_delivery_key,
-                    c1.module_week_beginning,
-                    c1.module_length,
-                    c1.moodle_id,
-                    c1.sink_deleted,
-                    c1.student_count,
-                    c1.teacher_count,
-                    c1.convenor_count,
-                    c1.parent_id,
-                    c1.session_code,
-                    c1.category_id,
-                    c1.delivery_department,
-                    c1.week_beginning_date,
-                    CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('\"',c2.chksum,'\"')),''),']') children
-                  FROM courses c1
-                    LEFT OUTER JOIN courses c2
-                        ON c1.module_delivery_key = c2.parent_id AND c1.session_code = c2.session_code
-                  WHERE c1.session_code = :sesscode";
+        $sql = "SELECT c1.* FROM {courses} c1 WHERE c1.session_code = :sesscode";
 
         // Add the category restrictions if there are any.
         if (!empty($category_restrictions)) {
