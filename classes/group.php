@@ -198,7 +198,7 @@ class group extends data
 
         $course = $this->get_course();
 
-        if (empty($course->moodle_id)) {
+        if (!$course->is_in_moodle()) {
             return false;
         }
 

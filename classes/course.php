@@ -60,6 +60,9 @@ class course extends data
     /** Visiblity */
     public $visible;
 
+    /** Our Moodle ID (stored) */
+    public $_moodle_id;
+
     public static $states = array(
         'unprocessed' => 1,
         'scheduled' => 2,
@@ -75,6 +78,8 @@ class course extends data
      * @param unknown $obj
      */
     public function __construct($obj) {
+        parent::__construct();
+
         $this->chksum = $obj->chksum;
         $this->state = $obj->state;
         $this->module_code = $obj->module_code;
@@ -116,9 +121,6 @@ class course extends data
         if (preg_match('/\(\d+\/\d+\)/is', $this->fullname) === 0) {
             $this->fullname .= " ($prev_year/$this->session_code)";
         }
-
-        // Grab our Moodle ID (if we have one).
-        $this->set_moodle_id();
     }
 
     /**
@@ -162,7 +164,7 @@ class course extends data
     public function sync($dry = false) {
         // Should we be deleting this?
         if ($this->sink_deleted) {
-            if ($this->is_created()) {
+            if ($this->is_in_moodle()) {
                 if (!$dry) {
                     $this->delete();
                 }
@@ -174,7 +176,7 @@ class course extends data
         }
 
         // Should we be creating this?
-        if (!$this->is_created() && $this->has_unique_shortname()) {
+        if (!$this->is_in_moodle() && $this->has_unique_shortname()) {
             if (!$dry) {
                 $this->create_moodle();
             }
@@ -197,22 +199,6 @@ class course extends data
      */
     public function get_duration() {
         return $this->module_week_beginning . ' - ' . ($this->module_week_beginning + $this->module_length);
-    }
-
-    /**
-     * Determines our Moodle ID
-     */
-    private function set_moodle_id() {
-        global $DB;
-
-        $data = $DB->get_record('connect_course_chksum', array(
-            'module_delivery_key' => $this->module_delivery_key,
-            'session_code' => $this->session_code
-        ));
-
-        if ($data) {
-            $this->moodle_id = $data->courseid;
-        }
     }
 
     /**
@@ -270,13 +256,18 @@ class course extends data
     /**
      * Return the Moodle course for this.
      */
-    public function get_moodle_id() {
+    public function _get_moodle_id() {
         global $DB;
-        $obj = $DB->get_record('connect_course_chksum', array (
-            'module_delivery_key' => $this->module_delivery_key,
-            'session_code' => $this->session_code
-        ), 'courseid');
-        return $obj ? $obj->courseid : null;
+
+        if ($this->_moodle_id === null) {
+            $obj = $DB->get_record('connect_course_chksum', array (
+                'module_delivery_key' => $this->module_delivery_key,
+                'session_code' => $this->session_code
+            ), 'courseid');
+            $this->_moodle_id = $obj ? $obj->courseid : false;
+        }
+
+        return $this->_moodle_id === false ? null : $this->_moodle_id;
     }
 
     /**
@@ -286,7 +277,7 @@ class course extends data
     public function is_in_moodle() {
         global $DB;
 
-        $id = $this->get_moodle_id();
+        $id = $this->moodle_id;
         if (!$id) {
             return false;
         }
@@ -327,11 +318,11 @@ class course extends data
         global $DB;
 
         // Cant do this if the course doesnt exist.
-        if (!$this->is_created()) {
+        if (!$this->is_in_moodle()) {
             return false;
         }
 
-        $moodle_id = $this->get_moodle_id();
+        $moodle_id = $this->moodle_id;
 
         // If there is no chksum, we are dealing with a new course so add
         // a placeholder and return true.
@@ -410,7 +401,7 @@ class course extends data
         }
 
         // Update connect's reference.
-        $this->moodle_id = $course->id;
+        $this->_moodle_id = $course->id;
         $this->state = 8;
 
         // Tell Connect about the new course.
@@ -481,15 +472,10 @@ class course extends data
         global $CONNECTDB, $DB;
 
         // Link them up
-        $CONNECTDB->set_field('courses', 'parent_id', $this->chksum, array (
-            'chksum' => $target->chksum
-        ));
-        $CONNECTDB->set_field('courses', 'moodle_id', $this->moodle_id, array (
-            'chksum' => $target->chksum
-        ));
-        $CONNECTDB->set_field('courses', 'state', self::$states['created_in_moodle'], array (
-            'chksum' => $target->chksum
-        ));
+        $target->parent_id = $this->chksum;
+        $target->moodle_id = $this->moodle_id;
+        $target->state = self::$states['created_in_moodle'];
+        $target->save();
 
         $this->sync_enrolments();
     }
@@ -504,8 +490,8 @@ class course extends data
 
         // Try to find an existing set of data.
         $connect_data = $DB->get_record('connect_course_dets', array(
-                'course' => $this->moodle_id
-            ));
+            'course' => $this->moodle_id
+        ));
 
         // Create a data container.
         if (!$connect_data) {
@@ -635,7 +621,7 @@ class course extends data
             foreach ($this->children as $child) {
                 $course = self::get_course_by_chksum($child);
                 $course->state = 1;
-                $course->moodle_id = 0;
+                $course->_moodle_id = null;
                 $course->parent_id = 0;
                 $course->save();
             }
@@ -1237,7 +1223,7 @@ SQL;
         }
 
         // Unset parent and state
-        $this->moodle_id = null;
+        $this->_moodle_id = null;
         $this->parent_id = null;
         $this->state = self::$states['unprocessed'];
         $this->save();

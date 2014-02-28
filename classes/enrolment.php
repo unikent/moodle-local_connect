@@ -47,6 +47,8 @@ class enrolment extends data
      * Our constructor
      */
     public function __construct($userid, $courseid, $roleid, $moduletitle) {
+        parent::__construct();
+
         $this->userid = $userid;
         $this->courseid = $courseid;
         $this->roleid = $roleid;
