@@ -37,6 +37,11 @@ abstract class data {
 		$this->_data = array();
 	}
 
+    /**
+     * The name of our connect table.
+     */
+    protected abstract function get_table();
+
 	/**
 	 * A list of valid fields for this data object.
 	 */
@@ -123,25 +128,33 @@ abstract class data {
 	public function save() {
 		global $CONNECTDB;
 
+        $table = $this->get_table();
+        if ($table === null) {
+        	return false;
+        }
+
 		$params = (array)$this->get_data();
 
         $sets = array();
         foreach ($params as $field => $value) {
         	if (!in_array($field, $this->immutable_fields())) {
-	            $sets[] = "$field = ?";
+	            $sets[] = "$field = :" . $field;
+	        } else {
+	        	unset($params[$field]);
 	        }
         }
 
 		$ids = array();
         foreach ($this->key_fields() as $key) {
-        	$ids .= $key . " = ?";
-        	$sets[] = $this->_data[$key];
+        	$ids[] = $key . " = :" . $key;
+        	$params[$key] = $this->_data[$key];
         }
 
         $idstr = implode(' AND ', $ids);
+        $sets = implode(', ', $sets);
         $sql = "UPDATE {$table} SET $sets WHERE $idstr";
 
-		$CONNECTDB->execute($sql, $params);
+		return $CONNECTDB->execute($sql, $params);
 	}
 
 	/**

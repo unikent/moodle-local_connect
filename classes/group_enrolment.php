@@ -49,6 +49,13 @@ class group_enrolment extends data
     private $active;
 
     /**
+     * The name of our connect table.
+     */
+    protected function get_table() {
+        return 'group_enrollments';
+    }
+
+    /**
      * A list of valid fields for this data object.
      */
     protected final function valid_fields() {

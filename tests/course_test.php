@@ -96,7 +96,11 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         // Unlink!
         $course = reset($courses);
+        $course = \local_connect\course::get_course_by_chksum($course->chksum);
+        $this->assertEquals(\local_connect\course::$states['created_in_moodle'], $course->state);
         $course->unlink();
+        $course = \local_connect\course::get_course_by_chksum($course->chksum);
+        $this->assertEquals(\local_connect\course::$states['unprocessed'], $course->state);
 
         $courses = \local_connect\course::get_courses();
         $this->assertEquals(3, count($courses));

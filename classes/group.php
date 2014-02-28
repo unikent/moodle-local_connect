@@ -52,6 +52,13 @@ class group extends data
     private $moodle_id;
 
     /**
+     * The name of our connect table.
+     */
+    protected function get_table() {
+        return 'groups';
+    }
+
+    /**
      * A list of valid fields for this data object.
      */
     protected final function valid_fields() {

@@ -122,6 +122,13 @@ class course extends data
     }
 
     /**
+     * The name of our connect table.
+     */
+    protected function get_table() {
+        return 'courses';
+    }
+
+    /**
      * A list of valid fields for this data object.
      */
     protected final function valid_fields() {
@@ -207,37 +214,6 @@ class course extends data
             $this->moodle_id = $data->courseid;
         }
     }
-
-    /**
-     * Save this Course to ConnectDB
-     * @return unknown
-     */
-    public function save() {
-        global $CONNECTDB;
-
-        $sql = "UPDATE courses SET
-                    parent_id=?,
-                    moodle_id=?,
-                    module_code=?,
-                    module_title=?,
-                    synopsis=?,
-                    category_id=?,
-                    state=?
-                WHERE module_delivery_key=? AND session_code=?";
-
-        return $CONNECTDB->execute($sql, array(
-            $this->parent_id,
-            $this->moodle_id,
-            $this->module_code,
-            $this->module_title,
-            $this->synopsis,
-            $this->category,
-            $this->state,
-            $this->module_delivery_key,
-            $this->session_code
-        ));
-    }
-
 
     /**
      * Update this course in Connect (alias for save)

@@ -54,6 +54,13 @@ class enrolment extends data
     }
 
     /**
+     * The name of our connect table.
+     */
+    protected function get_table() {
+        return 'enrollments';
+    }
+
+    /**
      * A list of valid fields for this data object.
      */
     protected final function valid_fields() {
