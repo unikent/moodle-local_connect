@@ -82,7 +82,7 @@ class group extends data
                 "name" => $this->description
             ));
 
-            $this->moodle_id = $group->id;
+            $this->moodle_id = $group ? $group->id : null;
         }
 
         return $this->moodle_id;
