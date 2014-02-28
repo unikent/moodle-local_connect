@@ -107,19 +107,10 @@ class cli {
 
 		$group_enrolments = group_enrolment::get_all($CFG->connect->session_code);
 		foreach ($group_enrolments as $group_enrolment) {
-		    if (!$group_enrolment->is_in_moodle()) {
-		    	mtrace("    Creating group enrollment: " . $group_enrolment->chksum);
-	    		if (!$dry_run) {
-		        	$group_enrolment->create_in_moodle();
-		    	}
-		    } else {
-		    	if (!$group_enrolment->is_active()) {
-		    		mtrace("    Deleting group enrollment: " . $group_enrolment->chksum);
-		    		if (!$dry_run) {
-			    		$group_enrolment->delete();
-			    	}
-		    	}
-		    }
+		    $result = $group_enrolment->sync();
+	    	if ($result !== null) {
+	    		mtrace("    " . $result);
+	    	}
 		}
 
 		mtrace("  done.\n");

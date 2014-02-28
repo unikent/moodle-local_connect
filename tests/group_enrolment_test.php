@@ -132,4 +132,48 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 
 		$this->connect_cleanup();
 	}
+
+	/**
+	 * Make sure we can sync properly.
+	 */
+	public function test_group_enrolment_sync() {
+		global $CFG, $CONNECTDB;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		$module_delivery_key = $this->generate_module_delivery_key();
+		$group = $this->generate_group($module_delivery_key);
+
+		// Create the group in Moodle
+		{
+			$obj = \local_connect\group::get($group['group_id']);
+			$obj->create_in_moodle();
+		}
+
+		$enrolment = $this->generate_group_enrolment($group, 'teacher');
+
+		// Create the enrolment in Moodle
+		{
+			$obj = \local_connect\enrolment::get($module_delivery_key, $CFG->connect->session_code, $enrolment['login']);
+			$obj->create_in_moodle();
+		}
+
+		$obj = \local_connect\group_enrolment::get($enrolment['group_id'], $enrolment['login']);
+		$this->assertFalse($obj->is_in_moodle());
+		$this->assertEquals("Creating group enrollment: {$obj->chksum}", $obj->sync());
+		$this->assertTrue($obj->is_in_moodle());
+
+		$CONNECTDB->set_field('group_enrollments', 'sink_deleted', 1, array(
+			'chksum' => $obj->chksum,
+            "group_id" => $enrolment['group_id'],
+            "login" => $enrolment['login']
+		));
+
+		$obj = \local_connect\group_enrolment::get($enrolment['group_id'], $enrolment['login']);
+		$this->assertEquals("Deleting group enrollment: {$obj->chksum}", $obj->sync());
+		$this->assertFalse($obj->is_in_moodle());
+
+		$this->connect_cleanup();
+	}
 }

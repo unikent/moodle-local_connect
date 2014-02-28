@@ -49,6 +49,29 @@ class group_enrolment extends data
     private $active;
 
     /**
+     * Sync method
+     */
+    public function sync($dry = false) {
+        // Easy option.
+        if (!$this->is_in_moodle()) {
+            if (!$dry) {
+                $this->create_in_moodle();
+            }
+
+            return "Creating group enrollment: " . $this->chksum;
+        }
+
+        // We are in Moodle but, are we supposed to be?
+        if (!$this->is_active()) {
+            if (!$dry) {
+                $this->delete();
+            }
+
+            return "Deleting group enrollment: " . $this->chksum;
+        }
+    }
+
+    /**
      * Are we active?
      */
     public function is_active() {
