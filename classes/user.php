@@ -47,24 +47,6 @@ class user extends data
 	private $moodle_id;
 
 	/**
-	 * Create a user object from a username
-	 */
-	public function __construct($user) {
-		global $CONNECTDB;
-
-		if (is_string($user)) {
-			$user = $CONNECTDB->get_record('enrollments', array(
-				'login' => $user
-			), "ukc, login, initials, family_name", IGNORE_MULTIPLE);
-		}
-
-		$this->uid = $user->ukc;
-		$this->username = $user->login;
-		$this->firstname = empty($user->initials) ? $user->login[0] : $user->initials;
-		$this->lastname = empty($user->family_name) ? $user->login[1] : $user->family_name;
-	}
-
-	/**
 	 * Returns the Moodle user ID (or null)
 	 */
 	public function get_moodle_id() {
@@ -120,6 +102,37 @@ class user extends data
 	}
 
 	/**
+	 * Delete this user from Moodle
+	 */
+	public function delete() {
+		$user = new \stdClass();
+		$user->id = $this->get_moodle_id();
+		$user->username = $this->username;
+		delete_user($user);
+
+		$this->moodle_id = null;
+	}
+
+	/**
+	 * Get a user by Username
+	 */
+	public static function get($username) {
+		global $CONNECTDB;
+
+		$user = $CONNECTDB->get_record('enrollments', array(
+			'login' => $username
+		), "*", IGNORE_MULTIPLE);
+
+		$obj = new static();
+		$obj->uid = $user->ukc;
+		$obj->username = $username;
+		$obj->firstname = $user->initials;
+		$obj->lastname = $user->family_name;
+
+		return $obj;
+	}
+
+	/**
 	 * Returns a list of all known students.
 	 */
 	public static function get_by_role($role) {
@@ -142,7 +155,12 @@ class user extends data
 		$result = array();
 		foreach ($data as $obj) {
 			if (!isset($result[$obj->login]) && !empty($obj->login)) {
-				$result[$obj->login] = new static($obj);
+				$user = new static();
+                $user->uid = $obj->ukc;
+                $user->username = $obj->login;
+                $user->firstname = $obj->initials;
+                $user->lastname = $obj->family_name;
+                $result[$obj->login] = $user;
 			}
 		}
 

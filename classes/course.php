@@ -1198,7 +1198,7 @@ SQL;
      * @return unknown
      */
     public static function process_unlink($in_courses) {
-        global $CONNECTDB, $STOMP;
+        global $CONNECTDB;
         $r = array();
 
         foreach ($in_courses as $c) {
