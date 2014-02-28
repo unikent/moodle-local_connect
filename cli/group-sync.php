@@ -25,5 +25,12 @@
 define('CLI_SCRIPT', true);
 
 require (dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->libdir . '/clilib.php');
 
-\local_connect\cli::group_sync();
+list($options, $unrecognized) = cli_get_params(
+    array(
+        'dry' => false
+    )
+);
+
+\local_connect\cli::group_sync($options['dry']);
