@@ -140,6 +140,13 @@ class course extends data
     }
 
     /**
+     * Validation for state.
+     */
+    public function validate_state($value) {
+        return in_array($value, self::$states);
+    }
+
+    /**
      * Constructor to build from a database object
      * @param unknown $obj
      */
