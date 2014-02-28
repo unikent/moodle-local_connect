@@ -967,7 +967,11 @@ class course extends data
                 }
 
                 if (!empty($obj->state)) {
-                    $obj->state = json_decode($obj->state);
+                    $obj->state = 0;
+                    $state = json_decode($obj->state);
+                    foreach ($state as $s) {
+                        $obj->state = $obj->state | self::$states[$s];
+                    }
                 }
 
                 $obj->sink_deleted = $obj->sink_deleted === "1" ? true : false;
