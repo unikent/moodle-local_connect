@@ -100,7 +100,7 @@ class course extends data
         $this->week_beginning_date = isset($obj->week_beginning_date) ? $obj->week_beginning_date : null;
 
         // Get our UID
-        $this->uid = $obj->module_delivery_key . "-" . $obj->session_code;
+        $this->uid = $this->module_delivery_key . "-" . $this->session_code;
 
         // Set some required vars
         $this->shortname = $this->module_code;

@@ -121,7 +121,27 @@ abstract class data {
 	 * @return boolean
 	 */
 	public function save() {
-		// Not implemented.
+		global $CONNECTDB;
+
+		$params = (array)$this->get_data();
+
+        $sets = array();
+        foreach ($params as $field => $value) {
+        	if (!in_array($field, $this->immutable_fields())) {
+	            $sets[] = "$field = ?";
+	        }
+        }
+
+		$ids = array();
+        foreach ($this->key_fields() as $key) {
+        	$ids .= $key . " = ?";
+        	$sets[] = $this->_data[$key];
+        }
+
+        $idstr = implode(' AND ', $ids);
+        $sql = "UPDATE {$table} SET $sets WHERE $idstr";
+
+		$CONNECTDB->execute($sql, $params);
 	}
 
 	/**
