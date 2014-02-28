@@ -55,6 +55,39 @@ abstract class data {
 	}
 
 	/**
+	 * Magic method!
+	 */
+	public function __get($name) {
+		if (!in_array($name, $this->valid_fields())) {
+			throw new \moodle_exception("Invalid field: $name!");
+		}
+
+		if (isset($this->_data[$name])) {
+			return $this->_data[$name];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Magic!
+	 */
+	public function __set($name, $value) {
+		if (!in_array($name, $this->valid_fields())) {
+			throw new \moodle_exception("Invalid field: $name!");
+		}
+
+		$validation = "validate_" . $name;
+		if (method_exists($this, $validation)) {
+			if (!$validation($value)) {
+				throw new \moodle_exception("Invalid value for field '$name': $value!");
+			}
+		}
+
+		$this->_data[$name] = $value;
+	}
+
+	/**
 	 * Is this in Moodle?
 	 * 
 	 * @return boolean
