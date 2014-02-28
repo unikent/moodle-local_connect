@@ -105,4 +105,38 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $this->connect_cleanup();
     }
+
+    /**
+     * Test we can sync a course.
+     */
+    public function test_course_sync() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->connect_cleanup();
+
+        $data = $this->generate_course();
+        $course = \local_connect\course::get_course_by_chksum($data['chksum']);
+
+        // Creates.
+        $this->assertFalse($course->is_in_moodle());
+        $this->assertEquals("Creating Course: " . $course->chksum, $course->sync());
+        $this->assertTrue($course->is_in_moodle());
+
+        // Updates.
+        $course->fullname = "TESTING NAME CHANGE";
+        $this->assertEquals("Updating Course: " . $course->chksum, $course->sync());
+        $this->assertTrue($course->is_in_moodle());
+        $mcourse = $DB->get_record('course', array(
+            "id" => $course->moodle_id
+        ), 'id,fullname');
+        $this->assertEquals($course->fullname, $mcourse->fullname);
+
+        // Deletes.
+        $course->sink_deleted = true;
+        $this->assertEquals("Deleting Course: " . $course->chksum, $course->sync());
+        $this->assertFalse($course->is_in_moodle());
+
+        $this->connect_cleanup();
+    }
 }

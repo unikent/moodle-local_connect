@@ -34,23 +34,15 @@ class cli {
 	/**
 	 * Run the course sync cron
 	 */
-	public static function course_sync() {
+	public static function course_sync($dry_run = false) {
 		mtrace("  Synchronizing courses...\n");
 		$courses = course::get_courses(array(), true);
 		foreach ($courses as $course) {
 			try {
-
-				if (!$course->is_created() && $course->has_unique_shortname()) {
-					mtrace("    Creating $course...\n");
-					$course->create_moodle();
-					continue;
-				}
-
-				if ($course->has_changed()) {
-					mtrace("    Updating $course...\n");
-					$course->update_moodle();
-					continue;
-				}
+				$result = $course->sync($dry_run);
+		    	if ($result !== null) {
+		    		mtrace("    " . $result);
+		    	}
 			} catch (Excepton $e) {
 				$msg = $e->getMessage();
 				mtrace("    Error: $msg\n");

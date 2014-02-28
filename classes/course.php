@@ -30,7 +30,9 @@ require_once dirname(__FILE__) . '/../../../mod/aspirelists/lib.php';
 require_once dirname(__FILE__) . '/../../../mod/forum/lib.php';
 
 /**
- * Connect courses container
+ * Connect courses container.
+ * This is all a bit dodgy as "it was the first one" to be moved to PHP so was a bit of a learning experience.
+ * I shall re-write this at some point but if you are reading this then I probably never did, so sorry.
  */
 class course extends data
 {
@@ -169,6 +171,42 @@ class course extends data
     }
 
     /**
+     * Here is the big sync method.
+     */
+    public function sync($dry = false) {
+        // Should we be deleting this?
+        if ($this->sink_deleted) {
+            if ($this->is_created()) {
+                if (!$dry) {
+                    $this->delete();
+                }
+
+                return "Deleting Course: $this->chksum";
+            }
+
+            return null;
+        }
+
+        // Should we be creating this?
+        if (!$this->is_created() && $this->has_unique_shortname()) {
+            if (!$dry) {
+                $this->create_moodle();
+            }
+
+            return "Creating Course: $this->chksum";
+        }
+
+        // Have we changed at all?
+        if ($this->has_changed()) {
+            if (!$dry) {
+                $this->update_moodle();
+            }
+
+            return "Updating Course: $this->chksum";
+        }
+    }
+
+    /**
      * Determines our Moodle ID
      */
     private function set_moodle_id() {
@@ -268,11 +306,35 @@ class course extends data
     }
 
     /**
+     * Return the Moodle course for this.
+     */
+    public function get_moodle_id() {
+        global $DB;
+        $obj = $DB->get_record('connect_course_chksum', array (
+            'module_delivery_key' => $this->module_delivery_key,
+            'session_code' => $this->session_code
+        ), 'courseid');
+        return $obj ? $obj->courseid : null;
+    }
+
+    /**
      * Has this course been created in Moodle?
      * @return unknown
      */
     public function is_in_moodle() {
-        return !empty($this->moodle_id);
+        global $DB;
+
+        $id = $this->get_moodle_id();
+        if (!$id) {
+            return false;
+        }
+
+        $category = \local_catman\core::get_category();
+        $course = $DB->get_record('course', array(
+            'id' => $id
+        ));
+
+        return $course && $course->category !== $category;
     }
 
     /**
@@ -307,16 +369,11 @@ class course extends data
             return false;
         }
 
-        // Check our chksum against the value stored in the DB
-        $chksum = $DB->get_record('connect_course_chksum', array (
-            'courseid' => $this->moodle_id,
-            'module_delivery_key' => $this->module_delivery_key,
-            'session_code' => $this->session_code
-        ));
+        $moodle_id = $this->get_moodle_id();
 
         // If there is no chksum, we are dealing with a new course so add
         // a placeholder and return true.
-        if (!$chksum) {
+        if (!$moodle_id) {
             $DB->insert_record_raw("connect_course_chksum", array(
                 "courseid" => $this->moodle_id,
                 "module_delivery_key" => $this->module_delivery_key,
@@ -326,7 +383,15 @@ class course extends data
             return true;
         }
 
-        return $chksum->chksum != $this->chksum;
+        // Basically we just need to check: category, shortname, fullname and summary.
+        $course = $DB->get_record('course', array(
+            'id' => $moodle_id
+        ));
+
+        return  $course->shortname !== $this->shortname ||
+                $course->fullname !== $this->fullname ||
+                $course->category !== $this->category ||
+                $course->summary !== $this->summary;
     }
 
     /**
@@ -336,6 +401,10 @@ class course extends data
      */
     public function create_in_moodle($shortname_ext = "") {
         global $DB;
+
+        if ($this->sink_deleted) {
+            return false;
+        }
 
         // Check we have a category.
         if (!isset($this->category)) {
@@ -813,9 +882,10 @@ class course extends data
         return false;
     }
 
-
     /**
-     * Returns an array of all courses in Connect
+     * Returns an array of all courses in Connect.
+     * This is a little complicated and is due to be simplified using magic methods and
+     * other such things.
      *
      * @param array category_restrictions A list of categories we dont want
      * @param boolean obj_form Should all objects be of this class type?
