@@ -127,21 +127,21 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		// Check the Moodle name.
 		$mgid = $group->get_moodle_id();
 		$mgroup = $DB->get_record('groups', array(
-            "id" => mgid
+            "id" => $mgid
         ));
         $this->assertEquals($mgroup->name, $group->description);
 
         // Try changing the group name and synching it.
 		$group->description = "TEST CHANGE";
 		$mgroup = $DB->get_record('groups', array(
-            "id" => mgid
+            "id" => $mgid
         ));
         $this->assertNotEquals($mgroup->name, $group->description);
 		$this->assertEquals("Updating group: $group->chksum", $group->sync());
 
 		// Check the Moodle name again.
 		$mgroup = $DB->get_record('groups', array(
-            "id" => mgid
+            "id" => $mgid
         ));
         $this->assertEquals($mgroup->name, $group->description);
 

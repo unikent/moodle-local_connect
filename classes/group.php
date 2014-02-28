@@ -69,7 +69,7 @@ class group extends data
         // We are currently in Moodle!
         $group = $DB->get_record('groups', array(
             'id' => $this->get_moodle_id()
-        ), 'id,name');
+        ), 'id,courseid,name');
 
         // Does our data match up?
         if ($group->name !== $this->description) {
@@ -77,6 +77,7 @@ class group extends data
                 $data = new \stdClass();
                 $data->id = $group->id;
                 $data->name = $this->description;
+                $data->courseid = $group->courseid;
                 groups_update_group($data);
             }
 
