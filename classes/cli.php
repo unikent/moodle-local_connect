@@ -88,7 +88,7 @@ class cli {
 
 		$groups = group::get_all($CFG->connect->session_code);
 		foreach ($groups as $group) {
-	    	$result = $group->sync();
+	    	$result = $group->sync($dry_run);
 	    	if ($result !== null) {
 	    		mtrace("    " . $result);
 	    	}
@@ -107,7 +107,7 @@ class cli {
 
 		$group_enrolments = group_enrolment::get_all($CFG->connect->session_code);
 		foreach ($group_enrolments as $group_enrolment) {
-		    $result = $group_enrolment->sync();
+		    $result = $group_enrolment->sync($dry_run);
 	    	if ($result !== null) {
 	    		mtrace("    " . $result);
 	    	}
