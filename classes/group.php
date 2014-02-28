@@ -95,7 +95,6 @@ class group extends data
         }
 
         $this->course = course::get_course_by_uid($this->module_delivery_key, $this->session_code);
-
         return $this->course;
     }
 
@@ -109,10 +108,13 @@ class group extends data
 
         if (empty($this->moodle_id)) {
             $course = $this->get_course();
-            $course_moodle_id = $course->moodle_id;
+            if (!$course) {
+                $this->moodle_id = null;
+                return null;
+            }
 
             $group = $DB->get_record('groups', array(
-                "courseid" => $course_moodle_id,
+                "courseid" => $course->moodle_id,
                 "name" => $this->description
             ));
 
