@@ -341,7 +341,7 @@ class course extends data
             'id' => $id
         ));
 
-        return $course && $course->category !== $category;
+        return $course && $course->category !== $category->id;
     }
 
     /**
