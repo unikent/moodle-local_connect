@@ -894,7 +894,7 @@ class course extends data
 
         $sql = "SELECT
                     c1.chksum,
-                    CONCAT('[',COALESCE(GROUP_CONCAT(CONCAT('\"',statecode.state,'\"')),''),']') state,
+                    c1.state,
                     c1.module_code,
                     c1.module_title,
                     c1.module_version,
@@ -918,22 +918,6 @@ class course extends data
                   FROM courses c1
                     LEFT OUTER JOIN courses c2
                         ON c1.module_delivery_key = c2.parent_id AND c1.session_code = c2.session_code
-                    LEFT OUTER JOIN (
-                                        SELECT 'unprocessed' state, 1 code
-                                      UNION
-                                        SELECT 'scheduled' state, 2 code
-                                      UNION
-                                        SELECT 'processing' state, 4 code
-                                      UNION
-                                        SELECT 'created_in_moodle' state, 8 code
-                                      UNION
-                                        SELECT 'failed_in_moodle' state, 16 code
-                                      UNION
-                                        SELECT 'disengage' state, 32 code
-                                      UNION
-                                        SELECT 'disengaged_from_moodle' state, 64 code
-                                    ) statecode
-                        ON (c1.state & statecode.code) > 0
                   WHERE c1.session_code = :sesscode";
 
         // Add the category restrictions if there are any.
@@ -964,14 +948,6 @@ class course extends data
 
                 if (!empty($obj->children)) {
                     $obj->children = json_decode($obj->children);
-                }
-
-                if (!empty($obj->state)) {
-                    $obj->state = 0;
-                    $state = json_decode($obj->state);
-                    foreach ($state as $s) {
-                        $obj->state = $obj->state | self::$states[$s];
-                    }
                 }
 
                 $obj->sink_deleted = $obj->sink_deleted === "1" ? true : false;
