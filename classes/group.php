@@ -121,18 +121,7 @@ class group extends data
      * @return unknown
      */
     public function is_in_moodle() {
-        global $DB;
-
-        $course = $this->get_course();
-        $course_moodle_id = $course->moodle_id;
-
-        $sql = "SELECT COUNT(g.id) FROM {groups} g WHERE g.courseid=:courseid AND g.name=:name";
-        $params = array(
-            "courseid" => $course_moodle_id,
-            "name" => $this->description
-        );
-
-        return $DB->count_records_sql($sql, $params) > 0;
+        return $this->get_moodle_id() !== null;
     }
 
 
