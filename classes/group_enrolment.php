@@ -45,6 +45,16 @@ class group_enrolment extends data
     /** Our Moodle user id - Dont rely on this being set! Use get_moodle_user_id() */
     private $moodle_user_id;
 
+    /** Have we been deleted? */
+    private $active;
+
+    /**
+     * Are we active?
+     */
+    public function is_active() {
+        return $this->active;
+    }
+
     /**
      * Grab our Connect Group
      * @return unknown
@@ -115,7 +125,7 @@ class group_enrolment extends data
         global $CFG;
         require_once $CFG->dirroot.'/group/lib.php';
 
-        if (!$this->is_valid()) {
+        if (!$this->is_valid() || !$this->is_active()) {
             return false;
         }
 
@@ -154,6 +164,7 @@ class group_enrolment extends data
             $obj->chksum = $group_enrolment->chksum;
             $obj->login = $group_enrolment->login;
             $obj->group_id = $group_enrolment->group_id;
+            $obj->active = $group_enrolment->sink_deleted == '0';
 
             $group_enrolment = $obj;
         }
@@ -173,12 +184,13 @@ class group_enrolment extends data
         $data = $CONNECTDB->get_record("group_enrollments", array(
             "group_id" => $group_id,
             "login" => $username
-        ), 'chksum');
+        ), 'chksum, sink_deleted');
 
         $obj = new group_enrolment();
         $obj->chksum = $data->chksum;
         $obj->login = $username;
         $obj->group_id = $group_id;
+        $obj->active = $data->sink_deleted == '0';
 
         return $obj;
     }
@@ -194,7 +206,7 @@ class group_enrolment extends data
         // Select all our groups.
         $data = $CONNECTDB->get_records("group_enrollments", array(
             "group_id" => $group->id
-        ), '', 'chksum, login, group_id');
+        ), '', 'chksum, login, group_id, sink_deleted');
 
         return self::filter_sql_query_set($data);
     }
@@ -212,7 +224,7 @@ class group_enrolment extends data
         $data = $CONNECTDB->get_records("group_enrollments", array(
             "module_delivery_key" => $course->module_delivery_key,
             "session_code" => $course->session_code
-        ), '', 'chksum, login, group_id');
+        ), '', 'chksum, login, group_id, sink_deleted');
 
         return self::filter_sql_query_set($data);
     }
@@ -228,7 +240,7 @@ class group_enrolment extends data
         // Select all our groups.
         $data = $CONNECTDB->get_records("group_enrollments", array(
             "session_code" => $session_code
-        ), '', 'chksum,login,group_id');
+        ), '', 'chksum, login, group_id, sink_deleted');
 
         return self::filter_sql_query_set($data);
     }

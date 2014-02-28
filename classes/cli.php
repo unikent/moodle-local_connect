@@ -36,7 +36,7 @@ class cli {
 	 */
 	public static function course_sync() {
 		mtrace("  Synchronizing courses...\n");
-		$courses = \local_connect\course::get_courses(array(), true);
+		$courses = course::get_courses(array(), true);
 		foreach ($courses as $course) {
 			try {
 
@@ -51,12 +51,12 @@ class cli {
 					$course->update_moodle();
 					continue;
 				}
-
 			} catch (Excepton $e) {
 				$msg = $e->getMessage();
 				mtrace("    Error: $msg\n");
 			}
 		}
+
 		mtrace("  done.\n");
 	}
 
@@ -68,7 +68,7 @@ class cli {
 
 		mtrace("  Synchronizing enrolments...\n");
 
-		$enrolments = \local_connect\enrolment::get_all($CFG->connect->session_code);
+		$enrolments = enrolment::get_all($CFG->connect->session_code);
 		foreach ($enrolments as $enrolment) {
 		    if (!$enrolment->is_in_moodle()) {
 		        $enrolment->create_in_moodle();
@@ -86,7 +86,7 @@ class cli {
 
 		mtrace("  Synchronizing groups...\n");
 
-		$groups = \local_connect\group::get_all($CFG->connect->session_code);
+		$groups = group::get_all($CFG->connect->session_code);
 		foreach ($groups as $group) {
 		    if (!$group->is_in_moodle()) {
 		        $group->create_in_moodle();
@@ -104,10 +104,14 @@ class cli {
 
 		mtrace("  Synchronizing group enrolments...\n");
 
-		$group_enrolments = \local_connect\group_enrolment::get_all($CFG->connect->session_code);
+		$group_enrolments = group_enrolment::get_all($CFG->connect->session_code);
 		foreach ($group_enrolments as $group_enrolment) {
 		    if (!$group_enrolment->is_in_moodle()) {
 		        $group_enrolment->create_in_moodle();
+		    } else {
+		    	if (!$group_enrolment->is_active()) {
+		    		$group_enrolment->delete();
+		    	}
 		    }
 		}
 
