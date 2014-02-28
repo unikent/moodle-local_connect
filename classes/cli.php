@@ -99,7 +99,7 @@ class cli {
 	/**
 	 * Run the group enrolment sync cron
 	 */
-	public static function group_enrolment_sync() {
+	public static function group_enrolment_sync($dry_run = false) {
 		global $CFG;
 
 		mtrace("  Synchronizing group enrolments...\n");
@@ -107,10 +107,16 @@ class cli {
 		$group_enrolments = group_enrolment::get_all($CFG->connect->session_code);
 		foreach ($group_enrolments as $group_enrolment) {
 		    if (!$group_enrolment->is_in_moodle()) {
-		        $group_enrolment->create_in_moodle();
+		    	mtrace("    Creating group enrollment: " . $group_enrolment->chksum);
+	    		if (!$dry_run) {
+		        	$group_enrolment->create_in_moodle();
+		    	}
 		    } else {
 		    	if (!$group_enrolment->is_active()) {
-		    		$group_enrolment->delete();
+		    		mtrace("    Deleting group enrollment: " . $group_enrolment->chksum);
+		    		if (!$dry_run) {
+			    		$group_enrolment->delete();
+			    	}
 		    	}
 		    }
 		}
