@@ -52,6 +52,39 @@ class group extends data
     private $moodle_id;
 
     /**
+     * The big sync method.
+     */
+    public function sync($dry = false) {
+        global $DB;
+
+        // The easiest path!
+        if (!$this->is_in_moodle()) {
+            if (!$dry) {
+                $this->create_in_moodle();
+            }
+
+            return 'Creating group: ' . $this->chksum;
+        }
+
+        // We are currently in Moodle!
+        $group = $DB->get_record('groups', array(
+            'id' => $this->get_moodle_id()
+        ), 'id,name');
+
+        // Does our data match up?
+        if ($group->name !== $this->description) {
+            if (!$dry) {
+                $data = new \stdClass();
+                $data->id = $group->id;
+                $data->name = $this->description;
+                groups_update_group($data);
+            }
+
+            return 'Updating group: ' . $this->chksum;
+        }
+    }
+
+    /**
      * Grab our Connect Course
      * @return unknown
      */

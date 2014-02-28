@@ -98,6 +98,55 @@ class kent_group_tests extends local_connect\util\connect_testcase
 
 		$this->connect_cleanup();
 	}
+
+	/**
+	 * Make sure we can sync groups in Moodle.
+	 */
+	public function test_groups_sync() {
+		global $CFG, $DB, $CONNECTDB;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		// First, create a course.
+		$module_delivery_key = $this->generate_module_delivery_key();
+
+		// Create a group.
+		$data = $this->generate_group($module_delivery_key);
+
+		// Get the group.
+		$group = \local_connect\group::get($data['group_id']);
+		$this->assertEquals($data['group_id'], $group->id);
+
+		// Sync it.
+		$this->assertFalse($group->is_in_moodle());
+		$this->assertEquals("Creating group: $group->chksum", $group->sync());
+		$this->assertTrue($group->is_in_moodle());
+		$this->assertEquals(null, $group->sync());
+
+		// Check the Moodle name.
+		$mgid = $group->get_moodle_id();
+		$mgroup = $DB->get_record('groups', array(
+            "id" => mgid
+        ));
+        $this->assertEquals($mgroup->name, $group->description);
+
+        // Try changing the group name and synching it.
+		$group->description = "TEST CHANGE";
+		$mgroup = $DB->get_record('groups', array(
+            "id" => mgid
+        ));
+        $this->assertNotEquals($mgroup->name, $group->description);
+		$this->assertEquals("Updating group: $group->chksum", $group->sync());
+
+		// Check the Moodle name again.
+		$mgroup = $DB->get_record('groups', array(
+            "id" => mgid
+        ));
+        $this->assertEquals($mgroup->name, $group->description);
+
+		$this->connect_cleanup();
+	}
 }
 
 

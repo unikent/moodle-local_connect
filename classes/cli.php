@@ -88,12 +88,10 @@ class cli {
 
 		$groups = group::get_all($CFG->connect->session_code);
 		foreach ($groups as $group) {
-		    if (!$group->is_in_moodle()) {
-		    	mtrace("    Creating group: " . $group->chksum);
-	    		if (!$dry_run) {
-			        $group->create_in_moodle();
-			    }
-		    }
+	    	$result = $group->sync();
+	    	if ($result !== null) {
+	    		mtrace("    " . $result);
+	    	}
 		}
 
 		mtrace("  done.\n");
