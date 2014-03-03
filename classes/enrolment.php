@@ -87,6 +87,20 @@ class enrolment extends data
      * Here is the big sync method.
      */
     public function sync($dry = false) {
+        // Should we be deleting this?
+        if ($this->sink_deleted) {
+            if ($this->is_in_moodle()) {
+                if (!$dry) {
+                    $this->delete();
+                }
+
+                return "Deleting Enrolment: $this->chksum";
+            }
+
+            return null;
+        }
+
+        // Or creating it?
         if (!$this->is_in_moodle()) {
             if (!$dry) {
                 $this->create_in_moodle();

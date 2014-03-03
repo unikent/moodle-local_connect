@@ -286,4 +286,31 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 
 		$this->connect_cleanup();
 	}
+
+	/**
+	 * Make sure we can sync properly.
+	 */
+	public function test_enrolment_sync() {
+		global $CFG, $CONNECTDB;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		// First, create a course.
+		$module_delivery_key = $this->generate_module_delivery_key();
+
+		// Create an enrolment.
+		$this->generate_enrolment($module_delivery_key, 'teacher');
+
+		// Make sure it worked.
+		$enrolments = \local_connect\enrolment::get_all($CFG->connect->session_code);
+		$this->assertEquals(1, count($enrolments));
+
+		$enrolment = array_pop($enrolments);
+		$this->assertFalse($enrolment->is_in_moodle());
+		$this->assertTrue($enrolment->sync());
+		$this->assertTrue($enrolment->is_in_moodle());
+
+		$this->connect_cleanup();
+	}
 }

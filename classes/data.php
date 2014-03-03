@@ -200,7 +200,7 @@ abstract class data {
 	 * 
 	 * @return boolean
 	 */
-	public function sync() {
+	public function sync($dry = false) {
 		debugging("sync() has not been implemented for this!", DEBUG_DEVELOPER);
 	}
 }

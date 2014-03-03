@@ -80,6 +80,19 @@ class group_enrolment extends data
      * Sync method
      */
     public function sync($dry = false) {
+        // Should we be deleting this?
+        if ($this->sink_deleted) {
+            if ($this->is_in_moodle()) {
+                if (!$dry) {
+                    $this->delete();
+                }
+
+                return "Deleting Group Enrolment: $this->chksum";
+            }
+
+            return null;
+        }
+
         // Easy option.
         if (!$this->is_in_moodle()) {
             if (!$dry) {
