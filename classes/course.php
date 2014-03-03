@@ -158,7 +158,7 @@ class course extends data
         // Should we be creating this?
         if (!$this->is_in_moodle() && $this->has_unique_shortname()) {
             if (!$dry) {
-                $this->create_moodle();
+                $this->create_in_moodle();
             }
 
             return "Creating Course: $this->chksum";
@@ -442,15 +442,6 @@ class course extends data
         $this->sync_groups();
 
         return true;
-    }
-
-    /**
-     * Create this course in Moodle
-     * @param unknown $shortname_ext (optional)
-     * @return unknown
-     */
-    public function create_moodle($shortname_ext = "") {
-        return $this->create_in_moodle($shortname_ext);
     }
 
 
@@ -960,7 +951,7 @@ class course extends data
             $shortname_ext = isset($course->shortname_ext) ? $course->shortname_ext : "";
 
             // Attempt to create in Moodle.
-            if (!$connect_course->create_moodle($shortname_ext)) {
+            if (!$connect_course->create_in_moodle($shortname_ext)) {
                 $response[] = array(
                     'error_code' => 'error',
                     'id' => $course->id
