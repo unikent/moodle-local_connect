@@ -55,7 +55,7 @@ class group extends data
      * Grab our Connect Course
      * @return unknown
      */
-    private function get_course() {
+    public function get_course() {
         if (isset($this->course)) {
             return $this->course;
         }
@@ -194,6 +194,49 @@ class group extends data
         }
     }
 
+    /**
+     * Returns the number of students enrolled in this group.
+     */
+    public function count_students() {
+        // First we need a list of all students.
+        $students = user::get_students();
+
+        // Now we need all enrolments.
+        $enrolments = group_enrolment::get_for_group($this);
+
+        $result = 0;
+
+        // Count the students out.
+        foreach ($enrolments as $enrolment) {
+            if (isset($students[$enrolment->login])) {
+                $result++;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns the number of staff enrolled in this group.
+     */
+    public function count_staff() {
+        // First we need a list of all staff.
+        $staff = user::get_staff();
+
+        // Now we need all enrolments.
+        $enrolments = group_enrolment::get_for_group($this);
+
+        $result = 0;
+
+        // Count the staff out.
+        foreach ($enrolments as $enrolment) {
+            if (isset($staff[$enrolment->login])) {
+                $result++;
+            }
+        }
+
+        return $result;
+    }
 
     /**
      * Returns a group specified by ID
@@ -256,13 +299,13 @@ class group extends data
      * @param unknown $session_code
      * @return unknown
      */
-    public static function get_all($session_code) {
+    public static function get_all($session_code, $sort = '', $limitfrom = 0, $limitnum = 0) {
         global $CONNECTDB;
 
         // Select all our groups.
         $data = $CONNECTDB->get_records("groups", array(
             "session_code" => $session_code
-        ), '', 'chksum, group_id, group_desc, module_delivery_key, moodle_id');
+        ), $sort, 'chksum, group_id, group_desc, module_delivery_key, moodle_id', $limitfrom, $limitnum);
 
         // Map to objects.
         foreach ($data as &$group) {

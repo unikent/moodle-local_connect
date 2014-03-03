@@ -98,6 +98,39 @@ class kent_group_tests extends local_connect\util\connect_testcase
 
 		$this->connect_cleanup();
 	}
+
+	/**
+	 * Test user counting for groups.
+	 */
+	public function test_groups_counts() {
+		global $CFG, $DB, $CONNECTDB;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		// First, create a course.
+		$module_delivery_key = $this->generate_module_delivery_key();
+
+		// Create a group.
+		$group = $this->generate_group($module_delivery_key);
+
+		// Set some enrolments.
+		$this->generate_group_enrolments(30, $group, 'student');
+		$this->generate_group_enrolments(2, $group, 'teacher');
+
+		// Get the group.
+		$obj = \local_connect\group::get($group['group_id']);
+
+		$this->assertEquals(30, $obj->count_students());
+		$this->assertEquals(2, $obj->count_staff());
+
+		$this->generate_group_enrolments(2, $group, 'teacher');
+
+		$this->assertEquals(30, $obj->count_students());
+		$this->assertEquals(4, $obj->count_staff());
+
+		$this->connect_cleanup();
+	}
 }
 
 

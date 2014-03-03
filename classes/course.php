@@ -169,6 +169,13 @@ class course extends data
     }
 
     /**
+     * Returns the duration of this course in the format: "i - i"
+     */
+    public function get_duration() {
+        return $this->module_week_beginning . ' - ' . ($this->module_week_beginning + $this->module_length);
+    }
+
+    /**
      * Determines our Moodle ID
      */
     private function set_moodle_id() {
