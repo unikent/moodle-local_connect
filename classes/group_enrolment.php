@@ -45,9 +45,6 @@ class group_enrolment extends data
     /** Our Moodle user id - Dont rely on this being set! Use get_moodle_user_id() */
     private $moodle_user_id;
 
-    /** Have we been deleted? */
-    private $active;
-
     /**
      * The name of our connect table.
      */
@@ -101,22 +98,6 @@ class group_enrolment extends data
 
             return "Creating group enrollment: " . $this->chksum;
         }
-
-        // We are in Moodle but, are we supposed to be?
-        if (!$this->is_active()) {
-            if (!$dry) {
-                $this->delete();
-            }
-
-            return "Deleting group enrollment: " . $this->chksum;
-        }
-    }
-
-    /**
-     * Are we active?
-     */
-    public function is_active() {
-        return $this->active;
     }
 
     /**
@@ -189,7 +170,7 @@ class group_enrolment extends data
         global $CFG;
         require_once $CFG->dirroot.'/group/lib.php';
 
-        if (!$this->is_valid() || !$this->is_active()) {
+        if (!$this->is_valid() || $this->sink_deleted) {
             return false;
         }
 
@@ -228,7 +209,6 @@ class group_enrolment extends data
             $obj->chksum = $group_enrolment->chksum;
             $obj->login = $group_enrolment->login;
             $obj->group_id = $group_enrolment->group_id;
-            $obj->active = $group_enrolment->sink_deleted == '0';
 
             $group_enrolment = $obj;
         }
@@ -254,7 +234,6 @@ class group_enrolment extends data
         $obj->chksum = $data->chksum;
         $obj->login = $username;
         $obj->group_id = $group_id;
-        $obj->active = $data->sink_deleted == '0';
 
         return $obj;
     }
