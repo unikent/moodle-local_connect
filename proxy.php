@@ -81,7 +81,7 @@ if (\local_connect\utils::enable_new_features()) {
         case '/courses':
         case '/courses/':
             header('Content-type: application/json');
-            $category_restrictions = isset($_GET['category_restrictions']) ? $_GET['category_restrictions'] : array();
+            $category_restrictions = isset($_GET['category_restrictions']) ? json_decode(urldecode($_GET['category_restrictions'])) : array();
             $courses = \local_connect\course::get_courses($category_restrictions, false);
             echo json_encode($courses);
             die;
