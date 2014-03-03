@@ -402,6 +402,7 @@ class course extends data
 
         // Update connect's reference.
         $this->_moodle_id = $course->id;
+        $this->moodle_id = $course->id;
         $this->state = 8;
 
         // Tell Connect about the new course.
