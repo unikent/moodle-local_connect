@@ -192,6 +192,15 @@ abstract class data {
 	 * @return boolean
 	 */
 	public function delete() {
-		// Not implemented.
+		debugging("delete() has not been implemented for this!", DEBUG_DEVELOPER);
+	}
+
+	/**
+	 * Sync with Moodle
+	 * 
+	 * @return boolean
+	 */
+	public function sync() {
+		debugging("sync() has not been implemented for this!", DEBUG_DEVELOPER);
 	}
 }
