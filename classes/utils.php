@@ -78,28 +78,4 @@ class utils {
 		global $CFG;
 		return static::is_enabled() && isset($CFG->local_connect_enable_rollover) && $CFG->local_connect_enable_rollover;
 	}
-
-	/**
-	 * Grab the "removed" category
-	 */
-	public static function get_removed_category() {
-		global $DB, $CFG;
-
-		require_once("$CFG->libdir/coursecatlib.php");
-
-		$category = $DB->get_record('course_categories', array('idnumber' => 'kent_connect_removed'));
-		if (!$category) {
-			$category = new \stdClass();
-			$category->parent = 0;
-			$category->idnumber = 'kent_connect_removed';
-			$category->name = 'Removed';
-			$category->description = 'Holding place for removed modules';
-			$category->sortorder = 999;
-			$category->visible = false;
-			$category = \coursecat::create($category);
-		}
-
-		return $category->id;
-	}
-
 }
