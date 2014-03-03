@@ -62,9 +62,10 @@ class cli {
 
 		$enrolments = enrolment::get_all($CFG->connect->session_code);
 		foreach ($enrolments as $enrolment) {
-		    if (!$enrolment->is_in_moodle()) {
-		        $enrolment->create_in_moodle();
-		    }
+	    	$result = $enrolment->sync($dry_run);
+	    	if ($result !== null) {
+	    		mtrace("    " . $result);
+	    	}
 		}
 
 		mtrace("  done.\n");
