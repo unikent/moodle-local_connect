@@ -173,8 +173,9 @@ class user extends data
 			$role = 'student';
 		}
 
-		$sql = "SELECT e.login, e.ukc, e.initials, e.family_name FROM {enrollments} e
-			WHERE e.role $selector :role
+		$sql = "SELECT e.login, e.ukc, e.initials, e.family_name
+			FROM {enrollments} e
+				WHERE e.role $selector :role
 			GROUP BY e.login";
 		$data = $CONNECTDB->get_records_sql($sql, array(
 			"role" => $role

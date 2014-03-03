@@ -158,7 +158,7 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->assertEquals(null, $group->sync());
 
 		// Check the Moodle name.
-		$mgid = $group->get_moodle_id();
+		$mgid = $group->moodle_id;
 		$mgroup = $DB->get_record('groups', array(
             "id" => $mgid
         ));

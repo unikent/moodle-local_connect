@@ -121,7 +121,7 @@ class group_enrolment extends data
      */
     public function is_valid() {
         $group = $this->group;
-        $groupid = $group->get_moodle_id();
+        $groupid = $group->moodle_id;
         if (empty($groupid)) {
             return false;
         }
@@ -149,7 +149,7 @@ class group_enrolment extends data
         $group = $this->group;
         $userid = $this->get_moodle_user_id();
 
-        return groups_is_member($group->get_moodle_id(), $userid);
+        return groups_is_member($group->moodle_id, $userid);
     }
 
 
@@ -168,7 +168,7 @@ class group_enrolment extends data
         $group = $this->group;
         $userid = $this->get_moodle_user_id();
 
-        return groups_add_member($group->get_moodle_id(), $userid);
+        return groups_add_member($group->moodle_id, $userid);
     }
 
     /**
@@ -187,7 +187,7 @@ class group_enrolment extends data
         $group = $this->group;
         $userid = $this->get_moodle_user_id();
 
-        groups_remove_member($group->get_moodle_id(), $userid);
+        groups_remove_member($group->moodle_id, $userid);
     }
 
     /**

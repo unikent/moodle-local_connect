@@ -30,26 +30,17 @@ defined('MOODLE_INTERNAL') || die();
  */
 class group extends data
 {
-    /** Our chksum */
-    public $chksum;
-
     /** Our id */
     public $id;
 
     /** Our description */
     public $description;
 
-    /** Our course's module delivery key */
-    public $module_delivery_key;
+    /** Our Connect course - Dont rely on this being set! Use ->course */
+    private $_course;
 
-    /** Our course's session code */
-    public $session_code;
-
-    /** Our Connect course - Dont rely on this being set! Use get_course() */
-    private $course;
-
-    /** Our Moodle id - Dont rely on this being set! Use get_moodle_id() */
-    private $moodle_id;
+    /** Our Moodle id - Dont rely on this being set! Use ->moodle_id */
+    private $_moodle_id;
 
     /**
      * The name of our connect table.
@@ -96,7 +87,7 @@ class group extends data
 
         // We are currently in Moodle!
         $group = $DB->get_record('groups', array(
-            'id' => $this->get_moodle_id()
+            'id' => $this->moodle_id
         ), 'id,courseid,name');
 
         // Does our data match up?
@@ -117,13 +108,12 @@ class group extends data
      * Grab our Connect Course
      * @return unknown
      */
-    public function get_course() {
-        if (isset($this->course)) {
-            return $this->course;
+    protected function _get_course() {
+        if (!isset($this->_course)) {
+            $this->_course = course::get_course_by_uid($this->module_delivery_key, $this->session_code);
         }
 
-        $this->course = course::get_course_by_uid($this->module_delivery_key, $this->session_code);
-        return $this->course;
+        return $this->_course;
     }
 
 
@@ -131,13 +121,13 @@ class group extends data
      * Grab our Moodle ID
      * @return unknown
      */
-    public function get_moodle_id() {
+    protected function _get_moodle_id() {
         global $DB;
 
-        if (empty($this->moodle_id)) {
-            $course = $this->get_course();
+        if (empty($this->_moodle_id)) {
+            $course = $this->course;
             if (!$course) {
-                $this->moodle_id = null;
+                $this->_moodle_id = null;
                 return null;
             }
 
@@ -146,10 +136,10 @@ class group extends data
                 "name" => $this->description
             ));
 
-            $this->moodle_id = $group ? $group->id : null;
+            $this->_moodle_id = $group ? $group->id : null;
         }
 
-        return $this->moodle_id;
+        return $this->_moodle_id;
     }
 
 
@@ -160,7 +150,7 @@ class group extends data
     private function get_or_create_grouping() {
         global $DB;
 
-        $course = $this->get_course();
+        $course = $this->course;
 
         $grouping = $DB->get_record('groupings', array(
             'name' => 'Seminar groups',
@@ -185,7 +175,7 @@ class group extends data
      * @return unknown
      */
     public function is_in_moodle() {
-        return $this->get_moodle_id() !== null;
+        return $this->moodle_id !== null;
     }
 
 
@@ -196,7 +186,7 @@ class group extends data
     public function create_in_moodle() {
         global $CFG, $CONNECTDB;
 
-        $course = $this->get_course();
+        $course = $this->course;
 
         if (!$course->is_in_moodle()) {
             return false;
@@ -209,9 +199,9 @@ class group extends data
         $data->courseid = $course->moodle_id;
         $data->description = '';
 
-        $this->moodle_id = groups_create_group($data);
+        $this->_moodle_id = groups_create_group($data);
 
-        if ($this->moodle_id === false) {
+        if ($this->_moodle_id === false) {
             return false;
         }
 
@@ -306,7 +296,7 @@ class group extends data
         $obj = new group();
         $obj->id = $uid;
         $obj->chksum = $group->chksum;
-        $obj->moodle_id = $group->moodle_id;
+        $obj->_moodle_id = $group->moodle_id;
         $obj->description = $group->group_desc;
         $obj->module_delivery_key = $group->module_delivery_key;
         $obj->session_code = $group->session_code;
@@ -333,9 +323,9 @@ class group extends data
         foreach ($data as &$group) {
             $obj = new group();
             $obj->id = $group->group_id;
-            $obj->moodle_id = $group->moodle_id;
+            $obj->_moodle_id = $group->moodle_id;
             $obj->description = $group->group_desc;
-            $obj->course = $course;
+            $obj->_course = $course;
             $obj->module_delivery_key = $course->module_delivery_key;
             $obj->session_code = $course->session_code;
             $obj->chksum = $group->chksum;
@@ -364,7 +354,7 @@ class group extends data
         foreach ($data as &$group) {
             $obj = new group();
             $obj->id = $group->group_id;
-            $obj->moodle_id = $group->moodle_id;
+            $obj->_moodle_id = $group->moodle_id;
             $obj->description = $group->group_desc;
             $obj->module_delivery_key = $group->module_delivery_key;
             $obj->session_code = $session_code;
