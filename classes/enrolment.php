@@ -134,7 +134,7 @@ class enrolment extends data
             // Map the username if needs be.
             if (!isset($enrolment->userid)) {
                 if (!isset($uid_store[$enrolment->username])) {
-                    $user = new user($enrolment->username);
+                    $user = user::get($enrolment->username);
                     if (!$user->is_in_moodle()) {
                         $user->create_in_moodle();
                     }

@@ -47,22 +47,6 @@ class user extends data
 	private $moodle_id;
 
 	/**
-	 * Create a user object from a username
-	 */
-	public function __construct($username) {
-		global $CONNECTDB;
-
-		$user = $CONNECTDB->get_record('enrollments', array(
-			'login' => $username
-		), "*", IGNORE_MULTIPLE);
-
-		$this->uid = $user->ukc;
-		$this->username = $username;
-		$this->firstname = empty($user->initials) ? $username[0] : $user->initials;
-		$this->lastname = empty($user->family_name) ? $username[1] : $user->family_name;
-	}
-
-	/**
 	 * Returns the Moodle user ID (or null)
 	 */
 	public function get_moodle_id() {
@@ -115,5 +99,36 @@ class user extends data
 		$user->mnethostid = $CFG->mnet_localhost_id;
 
 		$this->moodle_id = user_create_user($user, false);
+	}
+
+	/**
+	 * Delete this user from Moodle
+	 */
+	public function delete() {
+		$user = new \stdClass();
+		$user->id = $this->get_moodle_id();
+		$user->username = $this->username;
+		delete_user($user);
+
+		$this->moodle_id = null;
+	}
+
+	/**
+	 * Get a user by Username
+	 */
+	public static function get($username) {
+		global $CONNECTDB;
+
+		$user = $CONNECTDB->get_record('enrollments', array(
+			'login' => $username
+		), "*", IGNORE_MULTIPLE);
+
+		$obj = new static();
+		$obj->uid = $user->ukc;
+		$obj->username = $username;
+		$obj->firstname = empty($user->initials) ? $username[0] : $user->initials;
+		$obj->lastname = empty($user->family_name) ? $username[1] : $user->family_name;
+
+		return $obj;
 	}
 }
