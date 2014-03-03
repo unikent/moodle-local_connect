@@ -151,8 +151,7 @@ class enrolment extends data
     private static function filter_sql_query_set($data) {
         global $DB;
 
-        // Store of UIDs
-        $uid_store = array();
+        $cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'local_connect', 'enrolment_uids');
 
         // Translate each enrolment datum.
         foreach ($data as &$enrolment) {
@@ -163,16 +162,17 @@ class enrolment extends data
 
             // Map the username if needs be.
             if (!isset($enrolment->userid)) {
-                if (!isset($uid_store[$enrolment->username])) {
+                if (!$uid = $cache->get($enrolment->username)) {
                     $user = user::get($enrolment->username);
                     if (!$user->is_in_moodle()) {
                         $user->create_in_moodle();
                     }
 
-                    $uid_store[$enrolment->username] = $user->get_moodle_id();
+                    $uid = $user->get_moodle_id();
+                    $cache->set($enrolment->username, $uid);
                 }
 
-                $enrolment->userid = $uid_store[$enrolment->username];
+                $enrolment->userid = $uid;
             }
 
             // Create an object for this enrolment.
@@ -338,13 +338,18 @@ class enrolment extends data
     private static function get_role($shortname) {
         global $DB;
 
-        // Create the role if it doesnt exist.
-        self::create_role($shortname);
+        $cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'local_connect', 'enrolment_roles');
+        if (!$role = $cache->get($shortname)) {
+            // Create the role if it doesnt exist.
+            self::create_role($shortname);
 
-        // Grab new data.
-        $role = $DB->get_record('role', array(
-            'shortname' => $shortname
-        ));
+            // Grab new data.
+            $role = $DB->get_record('role', array(
+                'shortname' => $shortname
+            ));
+
+            $cache->set($shortname, $role);
+        }
 
         return $role;
     }
