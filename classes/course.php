@@ -39,9 +39,6 @@ class course extends data
     /** Our UID */
     public $uid;
 
-    /** Our category id */
-    public $category;
-
     /** Week beginning date */
     public $week_beginning_date;
 
@@ -80,25 +77,8 @@ class course extends data
     public function __construct($obj) {
         parent::__construct();
 
-        $this->chksum = $obj->chksum;
-        $this->state = $obj->state;
-        $this->module_code = $obj->module_code;
-        $this->module_title = $obj->module_title;
-        $this->module_version = $obj->module_version;
-        $this->module_delivery_key = $obj->module_delivery_key;
-        $this->campus = $obj->campus;
-        $this->campus_desc = $obj->campus_desc;
-        $this->synopsis = $obj->synopsis;
-        $this->module_week_beginning = $obj->module_week_beginning;
-        $this->module_length = $obj->module_length;
-        $this->sink_deleted = $obj->sink_deleted;
-        $this->student_count = $obj->student_count;
-        $this->teacher_count = $obj->teacher_count;
-        $this->convenor_count = $obj->convenor_count;
-        $this->parent_id = $obj->parent_id;
-        $this->session_code = $obj->session_code;
-        $this->category = $obj->category_id;
-        $this->delivery_department = $obj->delivery_department;
+        $this->set_class_data($obj);
+
         $this->numsections = $this->module_length != null ? $this->module_length : 1;
         $this->link = isset($obj->link) ? $obj->link : 0;
         $this->maxbytes = '67108864';
@@ -271,6 +251,14 @@ class course extends data
     }
 
     /**
+     * There used to be a class var called 'category' which was changed to category_id
+     */
+    public function _get_category() {
+        debugging('local_connect::course->category is no longer valid! Use category_id instead!', DEBUG_DEVELOPER);
+        return $this->category_id;
+    }
+
+    /**
      * Has this course been created in Moodle?
      * @return unknown
      */
@@ -346,7 +334,7 @@ class course extends data
 
         return  $course->shortname !== $this->shortname ||
                 $course->fullname !== $this->fullname ||
-                $course->category !== $this->category ||
+                $course->category !== $this->category_id ||
                 $course->summary !== $this->synopsis;
     }
 
@@ -363,8 +351,8 @@ class course extends data
         }
 
         // Check we have a category.
-        if (!isset($this->category)) {
-            print "No category for $this->chksum\n";
+        if (!isset($this->category_id)) {
+            debugging("No category set for course: {$this->chksum}!\n", DEBUG_DEVELOPER);
             return false;
         }
 
@@ -388,7 +376,7 @@ class course extends data
         // Create the course.
         try {
             $obj = new \stdClass();
-            $obj->category = $this->category;
+            $obj->category = $this->category_id;
             $obj->shortname = $this->shortname;
             $obj->fullname = $this->fullname;
             $obj->summary = $this->synopsis;
@@ -462,7 +450,6 @@ class course extends data
      * @return unknown
      */
     public function create_moodle($shortname_ext = "") {
-        // TODO - deprecate
         return $this->create_in_moodle($shortname_ext);
     }
 
@@ -601,6 +588,7 @@ class course extends data
         $this->visible = $course->visible;
         $uc = (object)array_merge((array)$course, (array)$this);
         $uc->shortname = $course->shortname;
+        $uc->category = $this->category_id;
 
         // Update this course in Moodle.
         update_course($uc);

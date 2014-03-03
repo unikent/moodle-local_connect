@@ -153,7 +153,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $data = $this->generate_course();
         $course = \local_connect\course::get_course_by_chksum($data['chksum']);
-        $course->create_in_moodle();
+        $this->assertTrue($course->create_in_moodle());
 
         $data = $this->generate_course();
         $course2 = \local_connect\course::get_course_by_chksum($data['chksum']);
