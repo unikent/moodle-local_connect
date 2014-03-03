@@ -161,7 +161,7 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 
 		$obj = \local_connect\group_enrolment::get($enrolment['group_id'], $enrolment['login']);
 		$this->assertFalse($obj->is_in_moodle());
-		$this->assertEquals("Creating Group Enrollment: {$obj->chksum}", $obj->sync());
+		$this->assertEquals("Creating Group Enrolment: {$obj->chksum}", $obj->sync());
 		$this->assertTrue($obj->is_in_moodle());
 
 		$CONNECTDB->set_field('group_enrollments', 'sink_deleted', 1, array(
@@ -172,7 +172,7 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 
 		$obj = \local_connect\group_enrolment::get($enrolment['group_id'], $enrolment['login']);
 		$this->assertTrue($obj->is_in_moodle());
-		$this->assertEquals("Deleting Group Enrollment: {$obj->chksum}", $obj->sync());
+		$this->assertEquals("Deleting Group Enrolment: {$obj->chksum}", $obj->sync());
 		$this->assertFalse($obj->is_in_moodle());
 
 		$this->connect_cleanup();
