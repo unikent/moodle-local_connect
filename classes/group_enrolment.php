@@ -30,20 +30,11 @@ defined('MOODLE_INTERNAL') || die();
  */
 class group_enrolment extends data
 {
-    /** Our chksum */
-    public $chksum;
-
-    /** Our user's login */
-    public $login;
-
-    /** Our Connect group ID */
-    public $group_id;
-
-    /** Our Connect group - Dont rely on this being set! Use get_group() */
-    private $group;
+    /** Our Connect group - Dont rely on this being set! Use ->group */
+    private $_group;
 
     /** Our Moodle user id - Dont rely on this being set! Use get_moodle_user_id() */
-    private $moodle_user_id;
+    private $_moodle_user_id;
 
     /**
      * The name of our connect table.
@@ -96,7 +87,7 @@ class group_enrolment extends data
                 $this->create_in_moodle();
             }
 
-            return "Creating group enrollment: " . $this->chksum;
+            return "Creating Group Enrolment: " . $this->chksum;
         }
     }
 
@@ -104,12 +95,12 @@ class group_enrolment extends data
      * Grab our Connect Group
      * @return unknown
      */
-    private function get_group() {
-        if (!isset($this->group)) {
-            $this->group = group::get($this->group_id);
+    protected function _get_group() {
+        if (!isset($this->_group)) {
+            $this->_group = group::get($this->group_id);
         }
 
-        return $this->group;
+        return $this->_group;
     }
 
 
@@ -119,8 +110,8 @@ class group_enrolment extends data
      */
     private function get_moodle_user_id() {
         $user = user::get($this->login);
-        $this->moodle_user_id = $user->get_moodle_id();
-        return $this->moodle_user_id;
+        $this->_moodle_user_id = $user->get_moodle_id();
+        return $this->_moodle_user_id;
     }
 
 
@@ -129,7 +120,7 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_valid() {
-        $group = $this->get_group();
+        $group = $this->group;
         $groupid = $group->get_moodle_id();
         if (empty($groupid)) {
             return false;
@@ -155,7 +146,7 @@ class group_enrolment extends data
             return false;
         }
 
-        $group = $this->get_group();
+        $group = $this->group;
         $userid = $this->get_moodle_user_id();
 
         return groups_is_member($group->get_moodle_id(), $userid);
@@ -174,7 +165,7 @@ class group_enrolment extends data
             return false;
         }
 
-        $group = $this->get_group();
+        $group = $this->group;
         $userid = $this->get_moodle_user_id();
 
         return groups_add_member($group->get_moodle_id(), $userid);
@@ -193,7 +184,7 @@ class group_enrolment extends data
             return false;
         }
 
-        $group = $this->get_group();
+        $group = $this->group;
         $userid = $this->get_moodle_user_id();
 
         groups_remove_member($group->get_moodle_id(), $userid);
@@ -205,10 +196,7 @@ class group_enrolment extends data
     private static function filter_sql_query_set($data) {
         foreach ($data as &$group_enrolment) {
             $obj = new group_enrolment();
-
-            $obj->chksum = $group_enrolment->chksum;
-            $obj->login = $group_enrolment->login;
-            $obj->group_id = $group_enrolment->group_id;
+            $obj->set_class_data($group_enrolment);
 
             $group_enrolment = $obj;
         }
@@ -228,12 +216,10 @@ class group_enrolment extends data
         $data = $CONNECTDB->get_record("group_enrollments", array(
             "group_id" => $group_id,
             "login" => $username
-        ), 'chksum, sink_deleted');
+        ));
 
         $obj = new group_enrolment();
-        $obj->chksum = $data->chksum;
-        $obj->login = $username;
-        $obj->group_id = $group_id;
+        $obj->set_class_data($data);
 
         return $obj;
     }
