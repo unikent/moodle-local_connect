@@ -203,9 +203,13 @@ class enrolment extends data
 
         // Grab our user object early on.
         $user = $DB->get_record('user', array('username' => $username));
+        if (!$user) {
+            return array();
+        }
 
         // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM {enrollments} e
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title, e.module_delivery_key
+                FROM {enrollments} e
                     LEFT JOIN {courses} c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE e.login=:username";
@@ -255,7 +259,8 @@ class enrolment extends data
         }
 
         // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM {enrollments} e
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title, e.module_delivery_key
+                FROM {enrollments} e
                     LEFT JOIN {courses} c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE c.module_delivery_key=:deliverykey AND c.session_code = :sessioncode";
@@ -274,7 +279,8 @@ class enrolment extends data
         global $CONNECTDB;
 
         // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM {enrollments} e
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title, e.module_delivery_key
+                FROM {enrollments} e
                     LEFT JOIN {courses} c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE c.session_code = :sessioncode";
@@ -292,7 +298,8 @@ class enrolment extends data
         global $CONNECTDB;
 
         // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title FROM {enrollments} e
+        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title, e.module_delivery_key
+                FROM {enrollments} e
                     LEFT JOIN {courses} c
                         ON c.module_delivery_key = e.module_delivery_key
                 WHERE e.session_code = :sessioncode AND e.module_delivery_key = :module_delivery_key AND e.login = :login";

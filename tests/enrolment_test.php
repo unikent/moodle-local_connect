@@ -269,4 +269,21 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 
 		$this->connect_cleanup();
 	}
+
+	/**
+	 * Test we can still work with non-connect users.
+	 */
+	public function test_non_connect_users() {
+		global $CFG;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		$user = $this->getDataGenerator()->create_user();
+		$this->assertEquals(0, count(\local_connect\enrolment::get_for_user($user->username)));
+
+		$this->assertEquals(0, count(\local_connect\enrolment::get_for_user("RandomUser")));
+
+		$this->connect_cleanup();
+	}
 }
