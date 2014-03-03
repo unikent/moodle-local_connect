@@ -143,4 +143,25 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $this->connect_cleanup();
     }
+
+    /**
+     * Test shortnames are always unique.
+     */
+    public function test_course_shortname_check() {
+        $this->resetAfterTest();
+        $this->connect_cleanup();
+
+        $data = $this->generate_course();
+        $course = \local_connect\course::get_course_by_chksum($data['chksum']);
+        $course->create_in_moodle();
+
+        $data = $this->generate_course();
+        $course2 = \local_connect\course::get_course_by_chksum($data['chksum']);
+
+        $this->assertTrue($course2->has_unique_shortname());
+        $course2->shortname = $course->shortname;
+        $this->assertFalse($course2->has_unique_shortname());
+
+        $this->connect_cleanup();
+    }
 }

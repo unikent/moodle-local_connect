@@ -304,9 +304,12 @@ class course extends data
      * @return unknown
      */
     public function has_unique_shortname() {
-        global $CONNECTDB;
-        $sql = "SELECT COUNT(*) as count FROM courses WHERE module_code=?";
-        return $CONNECTDB->count_records_sql($sql, array($this->module_code)) == 1;
+        global $DB;
+
+        $expected = $this->is_in_moodle() ? 1 : 0;
+        return $expected === $DB->count_records('course', array(
+            "shortname" => $this->shortname
+        ));
     }
 
 
