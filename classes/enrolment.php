@@ -203,12 +203,14 @@ class enrolment extends data
             }
 
             // Create an object for this enrolment.
-            $enrolment = new static(
+            $obj = new static(
                 $enrolment->userid,
                 $enrolment->courseid,
                 $enrolment->roleid,
                 $enrolment->module_title
             );
+            $obj->set_class_data($enrolment);
+            $enrolment = $obj;
         }
 
         // Filter out invalid courses.
