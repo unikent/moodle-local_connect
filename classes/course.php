@@ -67,7 +67,7 @@ class course extends data
         'created_in_moodle' => 8,
         'failed_in_moodle' => 16,
         'disengage' => 32,
-        'disengaged_from_moodle' => 64
+        'disengaged_from_moodle' => 65
     );
 
     /**
