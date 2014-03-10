@@ -259,6 +259,27 @@ class course extends data
     }
 
     /**
+     * Get enrollments for this Course
+     */
+    public function get_enrolments() {
+        return enrolment::get_for_course($this);
+    }
+
+    /**
+     * Get group enrollments for this Course
+     */
+    public function get_group_enrolments() {
+        return group_enrolment::get_for_course($this);
+    }
+
+    /**
+     * Get groups for this Course
+     */
+    public function get_groups() {
+        return group::get_for_course($this);
+    }
+
+    /**
      * Has this course been created in Moodle?
      * @return unknown
      */
@@ -653,27 +674,6 @@ class course extends data
         ));
 
         return true;
-    }
-
-    /**
-     * Get enrollments for this Course
-     */
-    public function get_enrolments() {
-        return enrolment::get_for_course($this);
-    }
-
-    /**
-     * Get group enrollments for this Course
-     */
-    public function get_group_enrolments() {
-        return group_enrolment::get_for_course($this);
-    }
-
-    /**
-     * Get groups for this Course
-     */
-    public function get_groups() {
-        return group::get_for_course($this);
     }
 
     /**
