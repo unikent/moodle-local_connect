@@ -75,7 +75,7 @@ class cli {
 	 * Run the group sync cron
 	 */
 	public static function group_sync($dry_run = false, $course_id = null) {
-		global $CFG, $DB;
+		global $CFG;
 
 		$groups = array();
 
