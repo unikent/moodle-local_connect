@@ -34,7 +34,7 @@ class cli {
 	/**
 	 * Run the course sync cron
 	 */
-	public static function course_sync($dry_run = false, $course_id = null) {
+	public static function course_sync($dry_run = false, $course_id = null, $create = false) {
 		$courses = array();
 
 		// What are we syncing, one or all?
@@ -45,9 +45,21 @@ class cli {
 			$connect_course = course::get_course($course_id);
 
 			// Validate the course.
-			if (!$connect_course || !$connect_course->is_in_moodle()) {
-				mtrace("  Invalid course: $course_id");
+			if (!$connect_course) {
+				mtrace("  Invalid course: '{$course_id}'");
 				return false;
+			}
+
+			// Are we in Moodle?
+			if (!$connect_course->is_in_moodle()) {
+				if (!$create) {
+					mtrace("  Course '{$course_id}' does not exist in Moodle (pass --create to create it).");
+					return false;
+				}
+
+				$connect_course->create_in_moodle();
+				mtrace("  Created course!\n");
+				return;
 			}
 
 			$courses = array($connect_course);
