@@ -34,9 +34,28 @@ class cli {
 	/**
 	 * Run the course sync cron
 	 */
-	public static function course_sync($dry_run = false) {
-		mtrace("  Synchronizing courses...\n");
-		$courses = course::get_courses(array(), true);
+	public static function course_sync($dry_run = false, $course_id = null) {
+		$courses = array();
+
+		// What are we syncing, one or all?
+		if (isset($course_id)) {
+			mtrace("  Synchronizing course: '{$course_id}'...\n");
+
+			// Get the connect version of the course.
+			$connect_course = course::get_course($course_id);
+
+			// Validate the course.
+			if (!$connect_course || !$connect_course->is_in_moodle()) {
+				mtrace("  Invalid course: $course_id");
+				return false;
+			}
+
+			$courses = array($connect_course);
+		} else {
+			mtrace("  Synchronizing courses...\n");
+			$courses = course::get_courses(array(), true);
+		}
+
 		foreach ($courses as $course) {
 			try {
 				$result = $course->sync($dry_run);
