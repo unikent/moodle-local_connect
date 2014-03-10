@@ -36,7 +36,7 @@ list($options, $unrecognized) = cli_get_params(
 );
 
 if ($options['create'] && !isset($options['course'])) {
-	die("Create specified, but no connect course ID was specified!");
+	die("'--create' was passed, but no connect course ID was specified.");
 }
 
 \local_connect\cli::course_sync($options['dry'], $options['course'], $options['create']);
