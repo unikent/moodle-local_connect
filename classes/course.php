@@ -670,6 +670,13 @@ class course extends data
     }
 
     /**
+     * Get groups for this Course
+     */
+    public function get_groups() {
+        return group::get_for_course($this);
+    }
+
+    /**
      * Syncs enrollments for this Course
      * @todo Updates/Deletions
      */
