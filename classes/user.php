@@ -114,7 +114,7 @@ class user extends data
 		$user->confirmed = 1;
 		$user->mnethostid = $CFG->mnet_localhost_id;
 
-		$this->moodle_id = user_create_user($user, false);
+		$this->_moodle_id = user_create_user($user, false);
 	}
 
 	/**
@@ -126,7 +126,7 @@ class user extends data
 		$user->username = $this->username;
 		delete_user($user);
 
-		$this->moodle_id = null;
+		$this->_moodle_id = null;
 	}
 
 	/**
@@ -140,7 +140,7 @@ class user extends data
 		), "ukc, initials as firstname, family_name as lastname, login as username", IGNORE_MULTIPLE);
 
 		$obj = new static();
-		$obj->set_data($user);
+		$obj->set_class_data($user);
 
 		return $obj;
 	}
@@ -173,7 +173,7 @@ class user extends data
 			}
 
 			$user = new static();
-            $user->set_data($obj);
+            $user->set_class_data($obj);
             $result[$obj->username] = $user;
 		}
 
