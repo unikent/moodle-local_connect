@@ -55,7 +55,7 @@ class cli {
 	/**
 	 * Run the enrolment sync cron
 	 */
-	public static function enrolment_sync() {
+	public static function enrolment_sync($dry_run = false, $course_id = null) {
 		global $CFG;
 
 		mtrace("  Synchronizing enrolments...\n");
@@ -93,7 +93,7 @@ class cli {
 	/**
 	 * Run the group enrolment sync cron
 	 */
-	public static function group_enrolment_sync($dry_run = false) {
+	public static function group_enrolment_sync($dry_run = false, $course_id = null) {
 		global $CFG;
 
 		mtrace("  Synchronizing group enrolments...\n");
