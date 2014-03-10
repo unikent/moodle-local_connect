@@ -114,9 +114,27 @@ class cli {
 	public static function group_enrolment_sync($dry_run = false, $course_id = null) {
 		global $CFG;
 
-		mtrace("  Synchronizing group enrolments...\n");
+		$group_enrolments = array();
 
-		$group_enrolments = group_enrolment::get_all($CFG->connect->session_code);
+		if (isset($course_id)) {
+			mtrace("  Synchronizing group enrolments for course: '{$course_id}'...\n");
+
+			// Get the connect version of the course.
+			$connect_course = course::get_course($course_id);
+
+			// Validate the course.
+			if (!$connect_course || !$connect_course->is_in_moodle()) {
+				mtrace("  Invalid course ID: $course_id");
+				return false;
+			}
+
+			// We have a valid course!
+			$group_enrolments = group_enrolment::get_for_course($connect_course);
+		} else {
+			mtrace("  Synchronizing group enrolments...\n");
+			$group_enrolments = group_enrolment::get_all($CFG->connect->session_code);
+		}
+
 		foreach ($group_enrolments as $group_enrolment) {
 		    $result = $group_enrolment->sync($dry_run);
 	    	if ($result !== null) {
