@@ -43,8 +43,8 @@ class user extends data
 	/** Our lastname */
 	public $lastname;
 
-	/** Our Moodle ID (dont rely on this, use get_moodle_id()) */
-	private $moodle_id;
+	/** Our Moodle ID (dont rely on this, use moodle_id) */
+	private $_moodle_id;
 
     /**
      * The name of our connect table.
@@ -77,18 +77,18 @@ class user extends data
 	/**
 	 * Returns the Moodle user ID (or null)
 	 */
-	public function get_moodle_id() {
+	public function _get_moodle_id() {
 		global $DB;
 
-		if (empty($this->moodle_id)) {
+		if (empty($this->_moodle_id)) {
 			$user = $DB->get_record('user', array(
 				'username' => $this->username
 			));
 
-			$this->moodle_id = empty($user) ? null : $user->id;
+			$this->_moodle_id = empty($user) ? null : $user->id;
 		}
 
-		return $this->moodle_id;
+		return $this->_moodle_id;
 	}
 
 	/**
@@ -96,7 +96,7 @@ class user extends data
 	 * @return boolean [description]
 	 */
 	public function is_in_moodle() {
-		$userid = $this->get_moodle_id();
+		$userid = $this->moodle_id;
 		return $userid !== null;
 	}
 
@@ -109,7 +109,7 @@ class user extends data
 		require_once ($CFG->dirroot . "/user/lib.php");
 
 		if ($this->is_in_moodle()) {
-			return $this->get_moodle_id();
+			return $this->moodle_id;
 		}
 
 		if (empty($this->username) || empty($this->firstname) || empty($this->lastname)) {
@@ -134,7 +134,7 @@ class user extends data
 	 */
 	public function delete() {
 		$user = new \stdClass();
-		$user->id = $this->get_moodle_id();
+		$user->id = $this->moodle_id;
 		$user->username = $this->username;
 		delete_user($user);
 

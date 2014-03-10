@@ -261,22 +261,42 @@ class course extends data
     /**
      * Get enrollments for this Course
      */
-    public function get_enrolments() {
+    public function _get_enrolments() {
         return enrolment::get_for_course($this);
     }
 
     /**
      * Get group enrollments for this Course
      */
-    public function get_group_enrolments() {
+    public function _get_group_enrolments() {
         return group_enrolment::get_for_course($this);
     }
 
     /**
      * Get groups for this Course
      */
-    public function get_groups() {
+    public function _get_groups() {
         return group::get_for_course($this);
+    }
+
+    /**
+     * Get children of this course.
+     * @return unknown
+     */
+    public function _get_children() {
+        global $CONNECTDB;
+
+        // Select a bunch of records
+        $data = $CONNECTDB->get_records('courses', array(
+            'parent_id' => $this->chksum
+        ));
+
+        $courses = array();
+        foreach ($data as $datum) {
+            $courses[] = new course($datum);
+        }
+
+        return $courses;
     }
 
     /**
@@ -681,8 +701,7 @@ class course extends data
      * @todo Updates/Deletions
      */
     public function sync_enrolments() {
-        $enrolments = $this->get_enrolments();
-        foreach ($enrolments as $enrolment) {
+        foreach ($this->enrolments as $enrolment) {
             if (!$enrolment->is_in_moodle()) {
                 $enrolment->create_in_moodle();
             }
@@ -694,32 +713,11 @@ class course extends data
      * @todo Updates/Deletions
      */
     public function sync_groups() {
-        $groups = group::get_for_course($this);
-        foreach ($groups as $group) {
+        foreach ($this->groups as $group) {
             if (!$group->is_in_moodle()) {
                 $group->create_in_moodle();
             }
         }
-    }
-
-    /**
-     * Get children of this course.
-     * @return unknown
-     */
-    public function _get_children() {
-        global $CONNECTDB;
-
-        // Select a bunch of records
-        $data = $CONNECTDB->get_records('courses', array(
-            'parent_id' => $this->chksum
-        ));
-
-        $courses = array();
-        foreach ($data as $datum) {
-            $courses[] = new course($datum);
-        }
-
-        return $courses;
     }
 
     /**
@@ -1203,8 +1201,8 @@ SQL;
      */
     public function unlink() {
         // Remove this course's enrolments and group enrolments
-        $enrolments = $this->get_enrolments();
-        $group_enrolments = $this->get_group_enrolments();
+        $enrolments = $this->enrolments;
+        $group_enrolments = $this->group_enrolments;
         $todo = array_merge($enrolments, $group_enrolments);
         foreach ($todo as $enrolment) {
             if ($todo->is_in_moodle()) {

@@ -110,7 +110,7 @@ class group_enrolment extends data
      */
     private function get_moodle_user_id() {
         $user = user::get($this->login);
-        $this->_moodle_user_id = $user->get_moodle_id();
+        $this->_moodle_user_id = $user->moodle_id;
         return $this->_moodle_user_id;
     }
 
