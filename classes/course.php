@@ -93,14 +93,8 @@ class course extends data
         $this->visible = 0;
 
         // Force 2012/2013 on shortnames and titles for everything.
-        $prev_year = date('Y', strtotime('1-1-' . $this->session_code . ' -1 year'));
-        if (preg_match('/\(\d+\/\d+\)/is', $this->shortname) === 0) {
-            $this->shortname .= " ($prev_year/$this->session_code)";
-        }
-
-        if (preg_match('/\(\d+\/\d+\)/is', $this->fullname) === 0) {
-            $this->fullname .= " ($prev_year/$this->session_code)";
-        }
+        $this->append_date($this->shortname);
+        $this->append_date($this->fullname);
     }
 
     /**
@@ -172,6 +166,23 @@ class course extends data
 
             return "Updating Course: $this->chksum";
         }
+    }
+
+    /**
+     * Adds the shortname date if required.
+     */
+    private function append_date(&$val) {
+        if (preg_match('/\(\d+\/\d+\)/is', $val) === 0) {
+            $val .= " {$this->bracket_period}";
+        }
+    }
+
+    /**
+     * Returns the addition to the shortname (e.g. (2013/2014))
+     */
+    public function _get_bracket_period() {
+        $prev_year = date('Y', strtotime('1-1-' . $this->session_code . ' -1 year'));
+        return "({$prev_year} / {$this->session_code})";
     }
 
     /**
@@ -358,7 +369,8 @@ class course extends data
 
         // Append shortname extension if it exists.
         if (!empty($shortname_ext)) {
-            $this->shortname = $this->shortname . " " . $shortname_ext;
+            $this->shortname = $this->module_code . " " . $shortname_ext;
+            $this->append_date($this->shortname);
         }
 
         // Does this shortname exist?
