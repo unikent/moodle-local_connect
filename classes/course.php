@@ -356,7 +356,10 @@ class course extends data
             return false;
         }
 
-        $this->shortname = $this->shortname . " " . $shortname_ext;
+        // Append shortname extension if it exists.
+        if (!empty($shortname_ext)) {
+            $this->shortname = $this->shortname . " " . $shortname_ext;
+        }
 
         // Does this shortname exist?
         $course = $DB->get_record('course', array('shortname' => $this->shortname));
