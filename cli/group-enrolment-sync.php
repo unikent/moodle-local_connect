@@ -29,8 +29,9 @@ require_once($CFG->libdir . '/clilib.php');
 
 list($options, $unrecognized) = cli_get_params(
     array(
-        'dry' => false
+        'dry' => false,
+        'course' => null
     )
 );
 
-\local_connect\cli::group_enrolment_sync($options['dry']);
+\local_connect\cli::group_enrolment_sync($options['dry'], $options['course']);
