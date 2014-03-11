@@ -244,7 +244,8 @@ abstract class connect_testcase extends \advanced_testcase
 			"chksum" => uniqid($delivery_key),
 			"id_chksum" => uniqid($delivery_key),
 			"category_id" => 1,
-			"state" => 1
+			"state" => 1,
+			"link" => 0
 		);
 
 		$this->insertDB('courses', $data);
