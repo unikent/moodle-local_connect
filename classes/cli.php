@@ -123,12 +123,30 @@ class cli {
 	/**
 	 * Run the group sync cron
 	 */
-	public static function group_sync($dry_run = false) {
+	public static function group_sync($dry_run = false, $course_id = null) {
 		global $CFG;
 
-		mtrace("  Synchronizing groups...\n");
+		$groups = array();
 
-		$groups = group::get_all($CFG->connect->session_code);
+		if (isset($course_id)) {
+			mtrace("  Synchronizing groups for course: '{$course_id}'...\n");
+
+			// Get the connect version of the course.
+			$connect_course = course::get_course($course_id);
+
+			// Validate the course.
+			if (!$connect_course || !$connect_course->is_in_moodle()) {
+				mtrace("  Invalid course ID: $course_id");
+				return false;
+			}
+
+			// We have a valid course!
+			$groups = group::get_for_course($connect_course);
+		} else {
+			mtrace("  Synchronizing groups...\n");
+			$groups = group::get_all($CFG->connect->session_code);
+		}
+
 		foreach ($groups as $group) {
 	    	$result = $group->sync($dry_run);
 	    	if ($result !== null) {
