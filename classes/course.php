@@ -230,7 +230,7 @@ class course extends data
      * @return unknown
      */
     public function is_scheduled() {
-        return in_array($this->state, array(2, 4, 6, 8, 10, 12));
+        return $this->state & self::$states['scheduled'];
     }
 
     /**
