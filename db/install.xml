@@ -57,7 +57,7 @@
         <KEY NAME="unique_name" TYPE="unique" FIELDS="name"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="connect_enrollments" COMMENT="Connect Enrollments">
+    <TABLE NAME="connect_enrolments" COMMENT="Connect Enrolments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -79,7 +79,7 @@
         <INDEX NAME="unique_course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="connect_group_enrollments" COMMENT="Connect Group Enrollments">
+    <TABLE NAME="connect_group_enrolments" COMMENT="Connect Group Enrolments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="group" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>

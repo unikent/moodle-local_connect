@@ -134,18 +134,18 @@ function xmldb_local_connect_upgrade($oldversion) {
             }
         }
 
-        // Connect Enrollments.
+        // Connect Enrolments.
         {
-            // Define table connect_enrollments to be created.
-            $table = new xmldb_table('connect_enrollments');
+            // Define table connect_enrolments to be created.
+            $table = new xmldb_table('connect_enrolments');
 
-            // Adding fields to table connect_enrollments.
+            // Adding fields to table connect_enrolments.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
             $table->add_field('course', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('role', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, null);
 
-            // Adding indexes to table connect_enrollments.
+            // Adding indexes to table connect_enrolments.
             $table->add_index('unique_course', XMLDB_INDEX_NOTUNIQUE, array('course'));
             $table->add_index('unique_user', XMLDB_INDEX_NOTUNIQUE, array('user'));
 
@@ -174,17 +174,17 @@ function xmldb_local_connect_upgrade($oldversion) {
             }
         }
 
-        // Connect Group Enrollments.
+        // Connect Group Enrolments.
         {
-            // Define table connect_group_enrollments to be created.
-            $table = new xmldb_table('connect_group_enrollments');
+            // Define table connect_group_enrolments to be created.
+            $table = new xmldb_table('connect_group_enrolments');
 
-            // Adding fields to table connect_group_enrollments.
+            // Adding fields to table connect_group_enrolments.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
             $table->add_field('group', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
 
-            // Adding indexes to table connect_group_enrollments.
+            // Adding indexes to table connect_group_enrolments.
             $table->add_index('unique_group', XMLDB_INDEX_NOTUNIQUE, array('group'));
             $table->add_index('unique_user', XMLDB_INDEX_NOTUNIQUE, array('user'));
 
