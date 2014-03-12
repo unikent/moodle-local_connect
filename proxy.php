@@ -24,6 +24,7 @@ if (!\local_connect\course::can_manage()) {
  *   1) We can use the fancy new stuff
  *   2) The fancy new stuff does not do what we want yet, so we use the old stuff.
  */
+
 //
 // New stuff
 //
