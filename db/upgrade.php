@@ -126,6 +126,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
 
             // Adding keys to table connect_campus.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $table->add_key('unique_name', XMLDB_KEY_UNIQUE, array('name'));
 
             // Conditionally launch create table.
@@ -146,6 +147,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             $table->add_field('role', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, null);
 
             // Adding indexes to table connect_enrolments.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $table->add_index('unique_course', XMLDB_INDEX_NOTUNIQUE, array('course'));
             $table->add_index('unique_user', XMLDB_INDEX_NOTUNIQUE, array('user'));
 
@@ -166,6 +168,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
 
             // Adding indexes to table connect_group.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $table->add_index('unique_course', XMLDB_INDEX_NOTUNIQUE, array('course'));
 
             // Conditionally launch create table.
@@ -185,6 +188,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
 
             // Adding indexes to table connect_group_enrolments.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $table->add_index('unique_group', XMLDB_INDEX_NOTUNIQUE, array('group'));
             $table->add_index('unique_user', XMLDB_INDEX_NOTUNIQUE, array('user'));
 
@@ -204,6 +208,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
 
             // Adding keys to table connect_role.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $table->add_key('unique_name', XMLDB_KEY_UNIQUE, array('name'));
 
             // Conditionally launch create table.
@@ -226,6 +231,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             $table->add_field('family_name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
 
             // Adding keys to table connect_user.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $table->add_key('unique_login', XMLDB_KEY_UNIQUE, array('login'));
 
             // Conditionally launch create table.
@@ -257,6 +263,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             $table->add_key('unique_module_delivery_key_session_code_module_version', XMLDB_KEY_UNIQUE, array('module_delivery_key', 'session_code', 'module_version'));
 
             // Adding indexes to table connect_course.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $table->add_index('unique_module_delivery_key_session_code', XMLDB_INDEX_NOTUNIQUE, array('module_delivery_key', 'session_code'));
             $table->add_index('unique_category', XMLDB_INDEX_NOTUNIQUE, array('category'));
             $table->add_index('unique_module_code', XMLDB_INDEX_NOTUNIQUE, array('module_code'));

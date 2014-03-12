@@ -54,6 +54,7 @@
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="unique_name" TYPE="unique" FIELDS="name"/>
       </KEYS>
     </TABLE>
@@ -64,6 +65,9 @@
         <FIELD NAME="user" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="role" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
       <INDEXES>
         <INDEX NAME="unique_course" UNIQUE="false" FIELDS="course"/>
         <INDEX NAME="unique_user" UNIQUE="false" FIELDS="user"/>
@@ -75,6 +79,9 @@
         <FIELD NAME="course" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
       <INDEXES>
         <INDEX NAME="unique_course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
@@ -85,6 +92,9 @@
         <FIELD NAME="group" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
       <INDEXES>
         <INDEX NAME="unique_group" UNIQUE="false" FIELDS="group"/>
         <INDEX NAME="unique_user" UNIQUE="false" FIELDS="user"/>
@@ -106,6 +116,7 @@
         <FIELD NAME="category" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="unique_module_delivery_key_session_code_module_version" TYPE="unique" FIELDS="module_delivery_key, session_code, module_version"/>
       </KEYS>
       <INDEXES>
@@ -120,6 +131,7 @@
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="unique_name" TYPE="unique" FIELDS="name"/>
       </KEYS>
     </TABLE>
@@ -133,6 +145,7 @@
         <FIELD NAME="family_name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="unique_login" TYPE="unique" FIELDS="login"/>
       </KEYS>
     </TABLE>
