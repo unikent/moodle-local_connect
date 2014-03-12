@@ -115,7 +115,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014012000, 'local', 'connect');
     }
 
-    if ($oldversion < 2014031200) {
+    if ($oldversion < 2014031201) {
         // Connect Campus.
         {
             // Define table connect_campus to be created.
@@ -142,14 +142,16 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding fields to table connect_enrolments.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
             $table->add_field('course', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('role', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, null);
 
             // Adding indexes to table connect_enrolments.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-            $table->add_index('unique_course', XMLDB_INDEX_NOTUNIQUE, array('course'));
-            $table->add_index('unique_user', XMLDB_INDEX_NOTUNIQUE, array('user'));
+            $table->add_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
+            $table->add_index('index_course', XMLDB_INDEX_NOTUNIQUE, array('course'));
+            $table->add_index('index_user', XMLDB_INDEX_NOTUNIQUE, array('user'));
 
             // Conditionally launch create table.
             if (!$dbman->table_exists($table)) {
@@ -164,12 +166,14 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding fields to table connect_group.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
             $table->add_field('course', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
 
             // Adding indexes to table connect_group.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-            $table->add_index('unique_course', XMLDB_INDEX_NOTUNIQUE, array('course'));
+            $table->add_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
+            $table->add_index('index_course', XMLDB_INDEX_NOTUNIQUE, array('course'));
 
             // Conditionally launch create table.
             if (!$dbman->table_exists($table)) {
@@ -184,13 +188,15 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding fields to table connect_group_enrolments.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
             $table->add_field('group', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
 
             // Adding indexes to table connect_group_enrolments.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-            $table->add_index('unique_group', XMLDB_INDEX_NOTUNIQUE, array('group'));
-            $table->add_index('unique_user', XMLDB_INDEX_NOTUNIQUE, array('user'));
+            $table->add_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
+            $table->add_index('index_group', XMLDB_INDEX_NOTUNIQUE, array('group'));
+            $table->add_index('index_user', XMLDB_INDEX_NOTUNIQUE, array('user'));
 
             // Conditionally launch create table.
             if (!$dbman->table_exists($table)) {
@@ -224,6 +230,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding fields to table connect_user.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
             $table->add_field('ukc', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
             $table->add_field('login', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
             $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
@@ -233,6 +240,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             // Adding keys to table connect_user.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $table->add_key('unique_login', XMLDB_KEY_UNIQUE, array('login'));
+            $table->add_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
 
             // Conditionally launch create table.
             if (!$dbman->table_exists($table)) {
@@ -247,6 +255,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding fields to table connect_course.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
             $table->add_field('module_delivery_key', XMLDB_TYPE_CHAR, '36', null, XMLDB_NOTNULL, null, null);
             $table->add_field('session_code', XMLDB_TYPE_CHAR, '4', null, XMLDB_NOTNULL, null, null);
             $table->add_field('module_version', XMLDB_TYPE_CHAR, '4', null, XMLDB_NOTNULL, null, null);
@@ -264,9 +273,10 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding indexes to table connect_course.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-            $table->add_index('unique_module_delivery_key_session_code', XMLDB_INDEX_NOTUNIQUE, array('module_delivery_key', 'session_code'));
-            $table->add_index('unique_category', XMLDB_INDEX_NOTUNIQUE, array('category'));
-            $table->add_index('unique_module_code', XMLDB_INDEX_NOTUNIQUE, array('module_code'));
+            $table->add_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
+            $table->add_index('index_module_delivery_key_session_code', XMLDB_INDEX_NOTUNIQUE, array('module_delivery_key', 'session_code'));
+            $table->add_index('index_category', XMLDB_INDEX_NOTUNIQUE, array('category'));
+            $table->add_index('index_module_code', XMLDB_INDEX_NOTUNIQUE, array('module_code'));
 
             // Conditionally launch create table.
             if (!$dbman->table_exists($table)) {
@@ -275,7 +285,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2014031200, 'local', 'connect');
+        upgrade_plugin_savepoint(true, 2014031201, 'local', 'connect');
     }
 
     return true;

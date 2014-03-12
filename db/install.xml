@@ -60,6 +60,7 @@
     <TABLE NAME="connect_enrolments" COMMENT="Connect Enrolments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="course" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="role" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
@@ -68,13 +69,15 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="unique_course" UNIQUE="false" FIELDS="course"/>
-        <INDEX NAME="unique_user" UNIQUE="false" FIELDS="user"/>
+        <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
+        <INDEX NAME="index_course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="index_user" UNIQUE="false" FIELDS="user"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="connect_group" COMMENT="Connect Groups">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="course" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -82,12 +85,14 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="unique_course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
+        <INDEX NAME="index_course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="connect_group_enrolments" COMMENT="Connect Group Enrolments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="group" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -95,13 +100,15 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="unique_group" UNIQUE="false" FIELDS="group"/>
-        <INDEX NAME="unique_user" UNIQUE="false" FIELDS="user"/>
+        <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
+        <INDEX NAME="index_group" UNIQUE="false" FIELDS="group"/>
+        <INDEX NAME="index_user" UNIQUE="false" FIELDS="user"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="connect_course" COMMENT="Connect Courses">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="module_delivery_key" TYPE="char" LENGTH="36" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="session_code" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="module_version" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
@@ -119,24 +126,30 @@
         <KEY NAME="unique_module_delivery_key_session_code_module_version" TYPE="unique" FIELDS="module_delivery_key, session_code, module_version"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="unique_module_delivery_key_session_code" UNIQUE="false" FIELDS="module_delivery_key, session_code"/>
-        <INDEX NAME="unique_category" UNIQUE="false" FIELDS="category"/>
-        <INDEX NAME="unique_module_code" UNIQUE="false" FIELDS="module_code"/>
+        <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
+        <INDEX NAME="index_module_delivery_key_session_code" UNIQUE="false" FIELDS="module_delivery_key, session_code"/>
+        <INDEX NAME="index_category" UNIQUE="false" FIELDS="category"/>
+        <INDEX NAME="index_module_code" UNIQUE="false" FIELDS="module_code"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="connect_role" COMMENT="A list of roles known to connect">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="unique_name" TYPE="unique" FIELDS="name"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="connect_user" COMMENT="Connect Users">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="ukc" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="login" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
@@ -147,6 +160,9 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="unique_login" TYPE="unique" FIELDS="login"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>
