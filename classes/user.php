@@ -31,20 +31,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class user extends data
 {
-	/** Our UKC ID */
-	public $uid;
-
-	/** Our Username */
-	public $username;
-
-	/** Our firstname (usually an initial) */
-	public $firstname;
-
-	/** Our lastname */
-	public $lastname;
-
-	/** Our Moodle ID (dont rely on this, use get_moodle_id()) */
-	private $moodle_id;
+	/** Our Moodle ID (dont rely on this, use moodle_id) */
+	private $_moodle_id;
 
     /**
      * The name of our connect table.
@@ -77,18 +65,18 @@ class user extends data
 	/**
 	 * Returns the Moodle user ID (or null)
 	 */
-	public function get_moodle_id() {
+	public function _get_moodle_id() {
 		global $DB;
 
-		if (empty($this->moodle_id)) {
+		if (empty($this->_moodle_id)) {
 			$user = $DB->get_record('user', array(
 				'username' => $this->username
 			));
 
-			$this->moodle_id = empty($user) ? null : $user->id;
+			$this->_moodle_id = empty($user) ? null : $user->id;
 		}
 
-		return $this->moodle_id;
+		return $this->_moodle_id;
 	}
 
 	/**
@@ -96,7 +84,7 @@ class user extends data
 	 * @return boolean [description]
 	 */
 	public function is_in_moodle() {
-		$userid = $this->get_moodle_id();
+		$userid = $this->moodle_id;
 		return $userid !== null;
 	}
 
@@ -109,7 +97,7 @@ class user extends data
 		require_once ($CFG->dirroot . "/user/lib.php");
 
 		if ($this->is_in_moodle()) {
-			return $this->get_moodle_id();
+			return $this->moodle_id;
 		}
 
 		if (empty($this->username) || empty($this->firstname) || empty($this->lastname)) {
@@ -126,7 +114,7 @@ class user extends data
 		$user->confirmed = 1;
 		$user->mnethostid = $CFG->mnet_localhost_id;
 
-		$this->moodle_id = user_create_user($user, false);
+		$this->_moodle_id = user_create_user($user, false);
 	}
 
 	/**
@@ -134,11 +122,11 @@ class user extends data
 	 */
 	public function delete() {
 		$user = new \stdClass();
-		$user->id = $this->get_moodle_id();
+		$user->id = $this->moodle_id;
 		$user->username = $this->username;
 		delete_user($user);
 
-		$this->moodle_id = null;
+		$this->_moodle_id = null;
 	}
 
 	/**
@@ -149,13 +137,10 @@ class user extends data
 
 		$user = $CONNECTDB->get_record('enrollments', array(
 			'login' => $username
-		), "*", IGNORE_MULTIPLE);
+		), "ukc, initials as firstname, family_name as lastname, login as username", IGNORE_MULTIPLE);
 
 		$obj = new static();
-		$obj->uid = $user->ukc;
-		$obj->username = $username;
-		$obj->firstname = $user->initials;
-		$obj->lastname = $user->family_name;
+		$obj->set_class_data($user);
 
 		return $obj;
 	}
@@ -173,7 +158,7 @@ class user extends data
 			$role = 'student';
 		}
 
-		$sql = "SELECT e.login, e.ukc, e.initials, e.family_name
+		$sql = "SELECT e.login as username, e.ukc as uid, e.initials as firstname, e.family_name as lastname
 			FROM {enrollments} e
 				WHERE e.role $selector :role
 			GROUP BY e.login";
@@ -183,14 +168,13 @@ class user extends data
 
 		$result = array();
 		foreach ($data as $obj) {
-			if (!isset($result[$obj->login]) && !empty($obj->login)) {
-				$user = new static();
-                $user->uid = $obj->ukc;
-                $user->username = $obj->login;
-                $user->firstname = $obj->initials;
-                $user->lastname = $obj->family_name;
-                $result[$obj->login] = $user;
+			if (isset($result[$obj->username]) || empty($obj->username)) {
+				continue;
 			}
+
+			$user = new static();
+            $user->set_class_data($obj);
+            $result[$obj->username] = $user;
 		}
 
 		return $result;

@@ -195,7 +195,7 @@ class enrolment extends data
                         $user->create_in_moodle();
                     }
 
-                    $uid = $user->get_moodle_id();
+                    $uid = $user->moodle_id;
                     $cache->set($enrolment->username, $uid);
                 }
 
