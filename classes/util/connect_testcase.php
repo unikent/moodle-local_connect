@@ -68,6 +68,8 @@ abstract class connect_testcase extends \advanced_testcase
 		$DB->execute("TRUNCATE TABLE {connect_user}");
 		$DB->execute("TRUNCATE TABLE {connect_enrolments}");
 		$DB->execute("TRUNCATE TABLE {connect_role}");
+		$DB->execute("TRUNCATE TABLE {connect_course}");
+		$DB->execute("TRUNCATE TABLE {connect_course_links}");
 
 		// Delete the roles too.
 		$DB->delete_records('role', array('shortname' => 'sds_student'));
@@ -275,25 +277,5 @@ abstract class connect_testcase extends \advanced_testcase
 		for ($i = 0; $i < $count; $i++) {
 			$this->generate_course();
 		}
-	}
-
-	/**
-	 * Quick way of grabbing a valid module delivery key for
-	 * a course that exists in Moodle.
-	 */
-	protected function generate_module_delivery_key() {
-		global $CFG, $DB;
-
-		// Generate a course.
-		$course = $this->generate_course();
-		$module_delivery_key = $DB->get_field('connect_course', 'module_delivery_key', array(
-			"id" => $course
-		));
-
-		// Create in Moodle.
-		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
-		$course->create_in_moodle();
-
-		return $module_delivery_key;
 	}
 }
