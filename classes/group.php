@@ -70,7 +70,7 @@ class group extends data
                 $this->create_in_moodle();
             }
 
-            return 'Creating group: ' . $this->chksum;
+            return 'Creating group: ' . $this->id;
         }
 
         // We are currently in Moodle!
@@ -85,7 +85,7 @@ class group extends data
                 groups_update_group($group);
             }
 
-            return 'Updating group: ' . $this->chksum;
+            return 'Updating group: ' . $this->id;
         }
     }
 
@@ -226,23 +226,18 @@ class group extends data
 
     /**
      * Returns a group specified by ID
-     * @param unknown $uid
+     * @param unknown $id
      * @return unknown
      */
-    public static function get($uid) {
-        global $CONNECTDB;
+    public static function get($id) {
+        global $DB;
 
-        $group = $CONNECTDB->get_record('groups', array(
-            'group_id' => $uid
+        $group = $DB->get_record('connect_group', array(
+            'id' => $id
         ));
 
         $obj = new group();
-        $obj->id = $uid;
-        $obj->chksum = $group->chksum;
-        $obj->_moodle_id = $group->moodle_id;
-        $obj->description = $group->group_desc;
-        $obj->module_delivery_key = $group->module_delivery_key;
-        $obj->session_code = $group->session_code;
+        $obj->set_class_data($group);
 
         return $obj;
     }
@@ -254,25 +249,17 @@ class group extends data
      * @return unknown
      */
     public static function get_for_course($course) {
-        global $CONNECTDB;
+        global $DB;
 
         // Select all our groups.
-        $data = $CONNECTDB->get_records("groups", array(
-            "module_delivery_key" => $course->module_delivery_key,
-            "session_code" => $course->session_code
-        ), '', 'chksum, group_id, group_desc, moodle_id');
+        $data = $DB->get_records('connect_group', array(
+            'course' => $course->id
+        ));
 
         // Map to objects.
         foreach ($data as &$group) {
             $obj = new group();
-            $obj->id = $group->group_id;
-            $obj->_moodle_id = $group->moodle_id;
-            $obj->description = $group->group_desc;
-            $obj->_course = $course;
-            $obj->module_delivery_key = $course->module_delivery_key;
-            $obj->session_code = $course->session_code;
-            $obj->chksum = $group->chksum;
-
+            $obj->set_class_data($group);
             $group = $obj;
         }
 
@@ -286,22 +273,17 @@ class group extends data
      * @return unknown
      */
     public static function get_all($session_code, $sort = '', $limitfrom = 0, $limitnum = 0) {
-        global $CONNECTDB;
+        global $DB;
 
         // Select all our groups.
-        $data = $CONNECTDB->get_records("groups", array(
+        $data = $DB->get_records('connect_group', array(
             "session_code" => $session_code
-        ), $sort, 'chksum, group_id, group_desc, module_delivery_key, moodle_id', $limitfrom, $limitnum);
+        ), $sort, '*', $limitfrom, $limitnum);
 
         // Map to objects.
         foreach ($data as &$group) {
             $obj = new group();
-            $obj->id = $group->group_id;
-            $obj->_moodle_id = $group->moodle_id;
-            $obj->description = $group->group_desc;
-            $obj->module_delivery_key = $group->module_delivery_key;
-            $obj->session_code = $session_code;
-            $obj->chksum = $group->chksum;
+            $obj->set_class_data($group);
 
             $group = $obj;
         }
