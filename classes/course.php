@@ -337,13 +337,17 @@ class course extends data
      * @return unknown
      */
     private function add_child($target) {
-        global $CONNECTDB, $DB;
+        global $DB;
 
-        // Link them up
-        $target->parent_id = $this->chksum;
-        $target->moodle_id = $this->moodle_id;
-        $target->state = self::$states['created_in_moodle'];
-        $target->save();
+        $data = array(
+            'parent' => $this->id,
+            'child' => $target->id
+        );
+
+        // Add a link.
+        if (!$DB->record_exists('connect_course_links', $data)) {
+            $DB->insert_record('connect_course_links', $data);
+        }
 
         $this->sync_enrolments();
     }
