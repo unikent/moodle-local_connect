@@ -65,7 +65,7 @@ class cli {
 			$courses = array($connect_course);
 		} else {
 			mtrace("  Synchronizing courses...\n");
-			$courses = course::get_courses(array(), true);
+			$courses = course::get_all(array(), true);
 		}
 
 		foreach ($courses as $course) {

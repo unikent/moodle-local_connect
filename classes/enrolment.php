@@ -257,7 +257,7 @@ class enrolment extends data
     /**
      * Returns all enrolments the current user should have
      * 
-     * @see get_courses
+     * @see get_all
      * @return array(local_connect_enrolment) Enrolment object
      */
     public static function get_my_enrolments() {

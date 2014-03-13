@@ -543,56 +543,29 @@ class course extends data
      *
      * @param array category_restrictions A list of categories we dont want
      * @param boolean obj_form Should all objects be of this class type?
-     * @param unknown $category_restrictions (optional)
-     * @param unknown $obj_form (optional)
-     * @return unknown
+     * @param array $category_restrictions (optional)
+     * @param boolean $obj_form (optional)
+     * @return array
      */
-    public static function get_courses($category_restrictions = array(), $obj_form = false) {
-        global $CFG, $CONNECTDB;
+    public static function get_all($category_restrictions = array(), $obj_form = true) {
+        global $DB;
 
-        $sql = "SELECT c1.* FROM {courses} c1 WHERE c1.session_code = :sesscode";
-
-        // Add the category restrictions if there are any.
+        $params = array();
         if (!empty($category_restrictions)) {
-            $inQuery = implode(',', array_fill(0, count($category_restrictions), ':cat_'));
-            $sql .= " WHERE c1.category_id IN ({$inQuery})";
+            $params['category'] = $category_restrictions;
         }
 
-        // Also a group by.
-        $sql .= ' GROUP BY c1.chksum';
-
-        // Create the parameters.
-        $params = array(
-            "sesscode" => $CFG->connect->session_code
-        );
-
-        // Add all the restrictions in.
-        foreach ($category_restrictions as $k => $id) {
-            $params["cat_" . ($k + 1)] = $id;
-        }
-
-        // Run this massive query.
-        $result = $CONNECTDB->get_records_sql($sql, $params);
+        $result = $DB->get_records('connect_course', $params);
 
         // Decode various elements.
-        $data = array_map(function($obj) use ($obj_form) {
-                global $CONNECTDB;
+        $data = array_map(function($datum) use ($obj_form) {
+            if ($obj_form) {
+                $obj = new course();
+                $obj->set_class_data($datum);
+                $datum = $obj;
+            }
 
-                if (!empty($obj->children)) {
-                    $obj->children = json_decode($obj->children);
-                }
-
-                $obj->sink_deleted = $obj->sink_deleted === "1" ? true : false;
-
-                $obj->student_count = intval($obj->student_count);
-                $obj->teacher_count = intval($obj->teacher_count);
-                $obj->convenor_count = intval($obj->convenor_count);
-
-                if ($obj_form) {
-                    $obj = new course($obj);
-                }
-
-                return $obj;
+            return $datum;
         }, $result);
 
         return $data;

@@ -30,7 +30,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $this->generate_courses(20);
 
-        $this->assertEquals(20, count(\local_connect\course::get_courses()));
+        $this->assertEquals(20, count(\local_connect\course::get_all()));
 
         $this->connect_cleanup();
     }
@@ -100,7 +100,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
         // Create two courses.
         $this->generate_courses(2);
 
-        $courses = \local_connect\course::get_courses(array(), true);
+        $courses = \local_connect\course::get_all(array(), true);
         $this->assertEquals(2, count($courses));
 
         $link_course = array(
@@ -115,7 +115,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $this->assertEquals(array(), \local_connect\course::merge($link_course, $courses));
 
-        $courses = \local_connect\course::get_courses();
+        $courses = \local_connect\course::get_all();
         $this->assertEquals(3, count($courses));
 
         $this->connect_cleanup();
@@ -131,7 +131,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
         // Create two courses.
         $this->generate_courses(2);
 
-        $courses = \local_connect\course::get_courses(array(), true);
+        $courses = \local_connect\course::get_all(array(), true);
         $this->assertEquals(2, count($courses));
 
         $link_course = array(
@@ -146,7 +146,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $this->assertEquals(array(), \local_connect\course::merge($link_course, $courses));
 
-        $courses = \local_connect\course::get_courses(array(), true);
+        $courses = \local_connect\course::get_all(array(), true);
         $this->assertEquals(3, count($courses));
 
         // Unlink!
@@ -157,7 +157,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $course = \local_connect\course::get_course_by_chksum($course->chksum);
         $this->assertEquals(\local_connect\course::$states['unprocessed'], $course->state);
 
-        $courses = \local_connect\course::get_courses();
+        $courses = \local_connect\course::get_all();
         $this->assertEquals(3, count($courses));
 
         // TODO - test more stuff, enrolments etc
