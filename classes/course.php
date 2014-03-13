@@ -421,63 +421,33 @@ class course extends data
 
     /**
      * Delete this course
-     * @return unknown
+     * @todo Remove enrolments as well.
+     * @return boolean
      */
     public function delete() {
         global $DB, $CONNECTDB;
 
-        // Step 0 - If this is a linked course, kill our children.
-        if (!empty($this->children)) {
-            foreach ($this->children as $child) {
-                $course = self::get_course_by_chksum($child);
-                $course->state = 1;
-                $course->_moodle_id = null;
-                $course->parent_id = 0;
-                $course->save();
-            }
-        }
+        $course = $DB->get_record('course', array(
+            'id' => $this->mid
+        ));
+
+        // Step 0 - If this is a linked course, kill our children (bit mean really).
+        $DB->delete_records('connect_course_links', 'parent', $this->id);
 
         // Step 1 - Move to the 'removed category'.
-
         $category = \local_catman\core::get_category();
-
-        $course = $DB->get_record('course', array('id' => $this->mid));
-
         $course->category = $category->id;
+
+        // Step 2 - Also update shortname/id.
         $course->shortname = date("dmY-His") . "-" . $course->shortname;
         $course->idnumber = date("dmY-His") . "-" . $course->idnumber;
 
+        // Step 3 - Commit to DB.
         update_course($course);
 
-        // Step 2 - Update enrolments.
-
-        $CONNECTDB->set_field('enrollments', 'state', 1, array (
-                'module_delivery_key' => $this->module_delivery_key,
-                'session_code' => $this->session_code
-            ));
-
-        $CONNECTDB->set_field('group_enrollments', 'state', 1, array (
-                'module_delivery_key' => $this->module_delivery_key,
-                'session_code' => $this->session_code
-            ));
-
-        // Step 3 - Well we havent errored yet! Finish up.
-
-        $CONNECTDB->set_field('courses', 'state', 1, array (
-                'module_delivery_key' => $this->module_delivery_key,
-                'session_code' => $this->session_code
-            ));
-
-        $CONNECTDB->set_field('courses', 'moodle_id', 0, array (
-                'module_delivery_key' => $this->module_delivery_key,
-                'session_code' => $this->session_code
-            ));
-
-        // Step 4 - Update chksum tracker.
-        $DB->set_field('connect_course_chksum', 'chksum', $this->chksum, array (
-            'module_delivery_key' => $this->module_delivery_key,
-            'session_code' => $this->session_code
-        ));
+        // Step 4 - Update this entry (TODO - move to observer?).
+        $this->mid = 0;
+        $this->save();
 
         return true;
     }
