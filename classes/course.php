@@ -191,6 +191,16 @@ class course extends data
     }
 
     /**
+     * Get parent of this course.
+     * @return unknown
+     */
+    public function _get_parent() {
+        global $DB;
+        $id = $DB->get_field('connect_course_links', 'parent', array('child' => $this->id));
+        return self::get($id);
+    }
+
+    /**
      * Is this course unique?
      * @return boolean
      */
@@ -199,6 +209,14 @@ class course extends data
         return $DB->count_records('connect_course', array('module_code' => $this->module_code)) === 1;
     }
 
+    /**
+     * Is this a child?
+     * @return boolean
+     */
+    public function is_child() {
+        global $DB;
+        return $DB->count_records('connect_course_links', array('child' => $this->id)) >= 1;
+    }
 
     /**
      * Do we have children?
@@ -418,10 +436,23 @@ class course extends data
         update_course($course);
     }
 
+    /**
+     * Delete this course's enrolments.
+     */
+    public function delete_enrolments() {
+        $enrolments = $this->enrolments;
+        $group_enrolments = $this->group_enrolments;
+        $todo = array_merge($enrolments, $group_enrolments);
+        foreach ($todo as $enrolment) {
+            if ($todo->is_in_moodle()) {
+                $todo->delete();
+            }
+        }
+    }
 
     /**
      * Delete this course
-     * @todo Remove enrolments as well.
+     * 
      * @return boolean
      */
     public function delete() {
@@ -449,7 +480,24 @@ class course extends data
         $this->mid = 0;
         $this->save();
 
+        // Step 5 - Delete enrolments.
+        $this->delete_enrolments();
+
         return true;
+    }
+
+    /**
+     * Process a course unlink
+     */
+    public function unlink() {
+        global $DB;
+
+        $this->delete_enrolments();
+
+        // Delete link.
+        $DB->delete_records('connect_course_links', array(
+            'child' => $this->id
+        ));
     }
 
     /**
@@ -708,63 +756,14 @@ class course extends data
      * @return unknown
      */
     public static function process_unlink($in_courses) {
-        global $CONNECTDB;
-        $r = array();
-
         foreach ($in_courses as $c) {
-            $course = self::get_course_by_chksum($c);
-
-            // Does it exist?
-            if ($course === false) {
-                $r[] = array(
-                    'error_code' => 'does_not_exist',
-                    'id' => $c
-                );
-                continue;
-            }
-
-            if ($course->parent_id == null) {
-                $r[] = array(
-                    'error_code' => 'not_link_course',
-                    'id' => $c
-                );
-                continue;
-            }
-
-            // Was this ever created?
-            if ($course->is_in_moodle()) {
-                $r[] = array(
-                    'error_code' => 'not_created',
-                    'id' => $c
-                );
-                continue;
-            }
-
+            $course = self::get($c);
             // All good!
-            $course->unlink();
-        }
-
-        return $r;
-    }
-
-    /**
-     * Process a course unlink
-     */
-    public function unlink() {
-        // Remove this course's enrolments and group enrolments
-        $enrolments = $this->enrolments;
-        $group_enrolments = $this->group_enrolments;
-        $todo = array_merge($enrolments, $group_enrolments);
-        foreach ($todo as $enrolment) {
-            if ($todo->is_in_moodle()) {
-                $todo->delete();
+            if (!$course->unlink()) {
+                debugging("Could not remove child '$course'!");
             }
         }
 
-        // Unset parent and state
-        $this->_moodle_id = null;
-        $this->parent_id = null;
-        $this->state = self::$states['unprocessed'];
-        $this->save();
+        return array();
     }
 }
