@@ -457,6 +457,10 @@ class course extends data
      * @todo Updates/Deletions
      */
     public function sync_enrolments() {
+        if (!$this->is_in_moodle()) {
+            return;
+        }
+
         foreach ($this->enrolments as $enrolment) {
             if (!$enrolment->is_in_moodle()) {
                 $enrolment->create_in_moodle();
@@ -469,6 +473,10 @@ class course extends data
      * @todo Updates/Deletions
      */
     public function sync_groups() {
+        if (!$this->is_in_moodle()) {
+            return;
+        }
+
         foreach ($this->groups as $group) {
             if (!$group->is_in_moodle()) {
                 $group->create_in_moodle();
@@ -481,7 +489,7 @@ class course extends data
      * @return unknown
      */
     public function __toString() {
-        return is_string($this->module_title) ? "{$this->module_title} ({$this->shortname})" : "$this->chksum";
+        return !empty($this->module_title) ? $this->shortname : $this->id;
     }
 
 
