@@ -34,7 +34,7 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$module_delivery_key = $this->generate_module_delivery_key();
 
 		// And in Moodle.
-		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
+		$course = \local_connect\course::get_by_uid($module_delivery_key, $CFG->connect->session_code);
 
 		// Test the global count.
 		$groups = \local_connect\group::get_all($CFG->connect->session_code);
@@ -56,7 +56,7 @@ class kent_group_tests extends local_connect\util\connect_testcase
 
 		// Create another course.
 		$module_delivery_key2 = $this->generate_module_delivery_key();
-		$course2 = \local_connect\course::get_course_by_uid($module_delivery_key2, $CFG->connect->session_code);
+		$course2 = \local_connect\course::get_by_uid($module_delivery_key2, $CFG->connect->session_code);
 
 		// Create a group.
 		$this->generate_groups(20, $module_delivery_key2);

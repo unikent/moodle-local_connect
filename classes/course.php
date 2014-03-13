@@ -498,46 +498,18 @@ class course extends data
      * @param unknown $id
      * @return unknown
      */
-    public static function get_course($id) {
-        global $CONNECTDB;
+    public static function get_by_moodle_id($id) {
+        global $DB;
 
         // Select a bunch of records
-        $data = $CONNECTDB->get_records('courses', array('moodle_id' => $id));
-        if (empty($data)) {
-            return false;
-        }
-
-        // If there are many pick a primary
-        if (count($data) > 1) {
-            foreach ($data as $datum) {
-                if ($datum->link) {
-                    return new course($datum);
-                }
-            }
-        }
-
-        if (is_array($data)) {
-            $data = reset($data);
-        }
-
-        return new course($data);
-    }
-
-
-    /**
-     * Get a Connect Course by chksum
-     * @param unknown $chksum
-     * @return unknown
-     */
-    public static function get_course_by_chksum($chksum) {
-        global $CONNECTDB;
-
-        $data = $CONNECTDB->get_record('courses', array('chksum' => $chksum));
+        $data = $DB->get_record('connect_course', array('mid' => $id));
         if (!$data) {
             return false;
         }
 
-        return new course($data);
+        $course = new course();
+        $course->set_class_data($data);
+        return $course;
     }
 
 
@@ -547,19 +519,21 @@ class course extends data
      * @param unknown $session_code
      * @return unknown
      */
-    public static function get_course_by_uid($module_delivery_key, $session_code) {
-        global $CONNECTDB;
+    public static function get_by_uid($module_delivery_key, $session_code) {
+        global $DB;
 
-        $data = $CONNECTDB->get_record('courses', array(
-                'module_delivery_key' => $module_delivery_key,
-                'session_code' => $session_code
-            ), "*", IGNORE_MULTIPLE);
+        $data = $DB->get_record('connect_course', array(
+            'module_delivery_key' => $module_delivery_key,
+            'session_code' => $session_code
+        ), "*");
 
         if (!$data) {
             return false;
         }
 
-        return new course($data);
+        $course = new course();
+        $course->set_class_data($data);
+        return $course;
     }
 
 
@@ -662,7 +636,7 @@ class course extends data
 
         foreach ($data->courses as $course) {
             // Try to find the Connect version of the course.
-            $connect_course = self::get_course_by_uid($course->module_delivery_key, $course->session_code);
+            $connect_course = self::get_by_uid($course->module_delivery_key, $course->session_code);
             if (!$connect_course) {
                 $response[] = array(
                     'error_code' => 'does_not_exist',
@@ -698,7 +672,7 @@ class course extends data
 
         foreach ($data->courses as $course) {
             // Try to find the Connect version of the course.
-            $connect_course = self::get_course_by_uid($course->module_delivery_key, $course->session_code);
+            $connect_course = self::get_by_uid($course->module_delivery_key, $course->session_code);
             if (!$connect_course) {
                 $response[] = array(
                     'error_code' => 'does_not_exist',

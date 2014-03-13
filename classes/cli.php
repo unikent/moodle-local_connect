@@ -42,7 +42,7 @@ class cli {
 			mtrace("  Synchronizing course: '{$course_id}'...\n");
 
 			// Get the connect version of the course.
-			$connect_course = course::get_course($course_id);
+			$connect_course = course::get_by_moodle_id($course_id);
 
 			// Validate the course.
 			if (!$connect_course) {
@@ -95,7 +95,7 @@ class cli {
 			mtrace("  Synchronizing enrolments for course: '{$course_id}'...\n");
 
 			// Get the connect version of the course.
-			$connect_course = course::get_course($course_id);
+			$connect_course = course::get_by_moodle_id($course_id);
 
 			// Validate the course.
 			if (!$connect_course || !$connect_course->is_in_moodle()) {
@@ -132,7 +132,7 @@ class cli {
 			mtrace("  Synchronizing groups for course: '{$course_id}'...\n");
 
 			// Get the connect version of the course.
-			$connect_course = course::get_course($course_id);
+			$connect_course = course::get_by_moodle_id($course_id);
 
 			// Validate the course.
 			if (!$connect_course || !$connect_course->is_in_moodle()) {
@@ -169,7 +169,7 @@ class cli {
 			mtrace("  Synchronizing group enrolments for course: '{$course_id}'...\n");
 
 			// Get the connect version of the course.
-			$connect_course = course::get_course($course_id);
+			$connect_course = course::get_by_moodle_id($course_id);
 
 			// Validate the course.
 			if (!$connect_course || !$connect_course->is_in_moodle()) {

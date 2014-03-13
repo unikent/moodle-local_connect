@@ -67,11 +67,11 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 
 		// First, create a course.
 		$module_delivery_key = $this->generate_module_delivery_key();
-		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
+		$course = \local_connect\course::get_by_uid($module_delivery_key, $CFG->connect->session_code);
 
 		// Now, create another course.
 		$module_delivery_key2 = $this->generate_module_delivery_key();
-		$course2 = \local_connect\course::get_course_by_uid($module_delivery_key2, $CFG->connect->session_code);
+		$course2 = \local_connect\course::get_by_uid($module_delivery_key2, $CFG->connect->session_code);
 
 		// Create an enrolment.
 		$this->generate_enrolments(1, $module_delivery_key, 'teacher');
