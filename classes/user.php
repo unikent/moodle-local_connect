@@ -155,16 +155,16 @@ class user extends data
 			$role = 'student';
 		}
 
+		$roleid = $DB->get_field('connect_role', 'id', array(
+			'name' => $role
+		));
+
 		$sql = "SELECT cu.*
 			FROM {connect_user} cu
-			INNER JOIN (
-				SELECT cr.name as role, ce.user
-				FROM {connect_enrolments} ce
-				INNER JOIN {connect_role} cr ON cr.id=ce.role
-			) cre ON cre.user=cu.id
-			WHERE cre.role $selector :role";
+			INNER JOIN {connect_enrolments} ce ON ce.user=cu.id
+			WHERE ce.role $selector :role";
 		$data = $DB->get_records_sql($sql, array(
-			"role" => $role
+			"role" => $roleid
 		));
 
 		$result = array();
