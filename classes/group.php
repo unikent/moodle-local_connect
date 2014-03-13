@@ -130,11 +130,12 @@ class group extends data
      * @return unknown
      */
     public function create_in_moodle() {
-        global $CFG, $CONNECTDB;
+        global $CFG;
 
         $course = course::get($this->course);
 
         if (!$course->is_in_moodle()) {
+            debugging("Attempting to create group '{$this->id}' but course '{$this->course}' doesnt exist!", DEBUG_DEVELOPER);
             return false;
         }
 
@@ -148,6 +149,7 @@ class group extends data
         // Grab a Moodle ID.
         $this->mid = groups_create_group($data);
         if ($this->mid === false) {
+            debugging("Failed attempting to create group '{$this->id}'!", DEBUG_DEVELOPER);
             return false;
         }
 
@@ -272,13 +274,11 @@ class group extends data
      * @param unknown $session_code
      * @return unknown
      */
-    public static function get_all($session_code, $sort = '', $limitfrom = 0, $limitnum = 0) {
+    public static function get_all($sort = '', $limitfrom = 0, $limitnum = 0) {
         global $DB;
 
         // Select all our groups.
-        $data = $DB->get_records('connect_group', array(
-            "session_code" => $session_code
-        ), $sort, '*', $limitfrom, $limitnum);
+        $data = $DB->get_records('connect_group', array(), $sort, '*', $limitfrom, $limitnum);
 
         // Map to objects.
         foreach ($data as &$group) {

@@ -30,36 +30,34 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->resetAfterTest();
 		$this->connect_cleanup();
 
-		// First, create a course.
-		$module_delivery_key = $this->generate_module_delivery_key();
-
-		// And in Moodle.
-		$course = \local_connect\course::get_by_uid($module_delivery_key, $CFG->connect->session_code);
+		// Create course.
+		$course = \local_connect\course::get($this->generate_course());
+		$course->create_in_moodle();
 
 		// Test the global count.
-		$groups = \local_connect\group::get_all($CFG->connect->session_code);
+		$groups = \local_connect\group::get_all();
 		$this->assertEquals(0, count($groups));
 
 		// Create a group.
-		$this->generate_group($module_delivery_key);
+		$this->generate_group($course->id);
 
 		// Test the global count.
-		$groups = \local_connect\group::get_all($CFG->connect->session_code);
+		$groups = \local_connect\group::get_all();
 		$this->assertEquals(1, count($groups));
 
 		// Create a group.
-		$this->generate_groups(20, $module_delivery_key);
+		$this->generate_groups(20, $course->id);
 
 		// Test the global count.
-		$groups = \local_connect\group::get_all($CFG->connect->session_code);
+		$groups = \local_connect\group::get_all();
 		$this->assertEquals(21, count($groups));
 
 		// Create another course.
-		$module_delivery_key2 = $this->generate_module_delivery_key();
-		$course2 = \local_connect\course::get_by_uid($module_delivery_key2, $CFG->connect->session_code);
+		$course2 = \local_connect\course::get($this->generate_course());
+		$course2->create_in_moodle();
 
 		// Create a group.
-		$this->generate_groups(20, $module_delivery_key2);
+		$this->generate_groups(20, $course2->id);
 
 		// Test the course count.
 		$groups = \local_connect\group::get_for_course($course);
@@ -82,14 +80,15 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->connect_cleanup();
 
 		// First, create a course.
-		$module_delivery_key = $this->generate_module_delivery_key();
+		$course = \local_connect\course::get($this->generate_course());
+		$course->create_in_moodle();
 
 		// Create a group.
-		$data = $this->generate_group($module_delivery_key);
+		$groupid = $this->generate_group($course->id);
 
 		// Get the group.
-		$group = \local_connect\group::get($data['group_id']);
-		$this->assertEquals($data['group_id'], $group->id);
+		$group = \local_connect\group::get($groupid);
+		$this->assertEquals($groupid, $group->id);
 
 		// Create it in Moodle.
 		$this->assertFalse($group->is_in_moodle());
@@ -109,10 +108,11 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->connect_cleanup();
 
 		// First, create a course.
-		$module_delivery_key = $this->generate_module_delivery_key();
+		$course = \local_connect\course::get($this->generate_course());
+		$course->create_in_moodle();
 
 		// Create a group.
-		$group = $this->generate_group($module_delivery_key);
+		$group = $this->generate_group($course->id);
 
 		// Set some enrolments.
 		$this->generate_group_enrolments(30, $group, 'student');
@@ -142,41 +142,41 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->connect_cleanup();
 
 		// First, create a course.
-		$module_delivery_key = $this->generate_module_delivery_key();
+		$course = \local_connect\course::get($this->generate_course());
+		$course->create_in_moodle();
 
 		// Create a group.
-		$data = $this->generate_group($module_delivery_key);
+		$groupid = $this->generate_group($course->id);
 
 		// Get the group.
-		$group = \local_connect\group::get($data['group_id']);
-		$this->assertEquals($data['group_id'], $group->id);
+		$group = \local_connect\group::get($groupid);
+		$this->assertEquals($groupid, $group->id);
 
 		// Sync it.
 		$this->assertFalse($group->is_in_moodle());
-		$this->assertEquals("Creating group: $group->chksum", $group->sync());
+		$this->assertEquals("Creating group: $group->id", $group->sync());
 		$this->assertTrue($group->is_in_moodle());
 		$this->assertEquals(null, $group->sync());
 
 		// Check the Moodle name.
-		$mgid = $group->moodle_id;
 		$mgroup = $DB->get_record('groups', array(
-            "id" => $mgid
+            "id" => $group->mid
         ));
-        $this->assertEquals($mgroup->name, $group->description);
+        $this->assertEquals($mgroup->name, $group->name);
 
         // Try changing the group name and synching it.
-		$group->description = "TEST CHANGE";
+		$group->name = "TEST CHANGE";
 		$mgroup = $DB->get_record('groups', array(
-            "id" => $mgid
+            "id" => $group->mid
         ));
-        $this->assertNotEquals($mgroup->name, $group->description);
-		$this->assertEquals("Updating group: $group->chksum", $group->sync());
+        $this->assertNotEquals($mgroup->name, $group->name);
+		$this->assertEquals("Updating group: $group->id", $group->sync());
 
 		// Check the Moodle name again.
 		$mgroup = $DB->get_record('groups', array(
-            "id" => $mgid
+            "id" => $group->mid
         ));
-        $this->assertEquals($mgroup->name, $group->description);
+        $this->assertEquals($mgroup->name, $group->name);
 
 		$this->connect_cleanup();
 	}

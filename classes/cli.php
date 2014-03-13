@@ -144,7 +144,7 @@ class cli {
 			$groups = group::get_for_course($connect_course);
 		} else {
 			mtrace("  Synchronizing groups...\n");
-			$groups = group::get_all($CFG->connect->session_code);
+			$groups = group::get_all();
 		}
 
 		foreach ($groups as $group) {

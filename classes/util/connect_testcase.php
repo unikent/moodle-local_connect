@@ -155,34 +155,22 @@ abstract class connect_testcase extends \advanced_testcase
 	/**
 	 * Returns a valid group for testing.
 	 */
-	protected function generate_group($module_delivery_key) {
-		global $CFG;
-
+	protected function generate_group($courseid) {
+		global $DB;
 		static $uid = 100000;
-
-		$data = array(
-			"group_id" => $uid,
-			"group_desc" => "Test Group: $uid",
-			"session_code" => $CFG->connect->session_code,
-			"module_delivery_key" => $module_delivery_key,
-			"chksum" => uniqid($uid),
-			"id_chksum" => uniqid($uid),
-			"state" => 1
-		);
-
-		$this->insertDB('groups', $data);
-
-		$uid++;
-
-		return $data;
+		return $DB->insert_record('connect_group', array(
+			"mid" => 0,
+			"course" => $courseid,
+			"name" => "Test Group: " . $uid++
+		));
 	}
 
 	/**
 	 * Creates a bunch of enrolments.
 	 */
-	protected function generate_groups($count, $module_delivery_key) {
+	protected function generate_groups($count, $courseid) {
 		for ($i = 0; $i < $count; $i++) {
-			$this->generate_group($module_delivery_key);
+			$this->generate_group($courseid);
 		}
 	}
 
