@@ -37,21 +37,6 @@ abstract class data {
 		$this->_data = array();
 	}
 
-	/**
-	 * Given an object containing data, set appropriate class vars.
-	 */
-	protected function set_class_data($obj) {
-		if (!is_array($obj)) {
-			$obj = get_object_vars($obj);
-		}
-
-		foreach ($obj as $key => $value) {
-			if (in_array($key, $this->valid_fields())) {
-				$this->$key = $value;
-			}
-		}
-	}
-
     /**
      * The name of our connect table.
      */
@@ -81,6 +66,21 @@ abstract class data {
 	 */
 	protected final function get_data() {
 		return (object)$this->_data;
+	}
+
+	/**
+	 * Given an object containing data, set appropriate class vars.
+	 */
+	protected function set_class_data($obj) {
+		if (!is_array($obj)) {
+			$obj = get_object_vars($obj);
+		}
+
+		foreach ($obj as $key => $value) {
+			if (in_array($key, $this->valid_fields())) {
+				$this->$key = $value;
+			}
+		}
 	}
 
 	/**
