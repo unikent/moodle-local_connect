@@ -355,11 +355,13 @@ class course extends data
     private function create_reading_list() {
         global $DB;
 
-        $module = $DB->get_record('modules', array('name' => 'aspirelists'));
+        $module = $DB->get_record('modules', array(
+            'name' => 'aspirelists'
+        ));
 
         // Create a data container.
         $rl = new \stdClass();
-        $rl->course     = $this->moodle_id;
+        $rl->course     = $this->mid;
         $rl->name       = 'Reading list';
         $rl->intro      = '';
         $rl->introformat  = 1;
@@ -370,13 +372,13 @@ class course extends data
         $instance = aspirelists_add_instance($rl, new \stdClass());
 
         // Find the first course section.
-        $section = $DB->get_record_sql("SELECT id, sequence FROM {course_sections} WHERE course=:cid AND section=0", array (
-                "cid" => $this->moodle_id
-            ));
+        $section = $DB->get_record_sql("SELECT id, sequence FROM {course_sections} WHERE course=:cid AND section=0", array(
+            'cid' => $this->mid
+        ));
 
         // Create a module container.
         $cm = new \stdClass();
-        $cm->course     = $this->moodle_id;
+        $cm->course     = $this->mid;
         $cm->module     = $module->id;
         $cm->instance   = $instance;
         $cm->section    = $section->id;
@@ -386,9 +388,9 @@ class course extends data
         $coursemodule = add_course_module($cm);
 
         // Add it to the section.
-        $DB->set_field('course_sections', 'sequence', "$coursemodule,$section->sequence", array (
-                'id' => $section->id
-            ));
+        $DB->set_field('course_sections', 'sequence', "$coursemodule,$section->sequence", array(
+            'id' => $section->id
+        ));
     }
 
 
@@ -396,7 +398,7 @@ class course extends data
      * Add a forum module to this course
      */
     private function create_forum() {
-        forum_get_course_forum($this->moodle_id, 'news');
+        forum_get_course_forum($this->mid, 'news');
     }
 
 
@@ -407,11 +409,11 @@ class course extends data
         global $DB;
 
         $course = $DB->get_record('course', array(
-                'id' => $this->moodle_id
+                'id' => $this->mid
             ));
 
         $connect_data = $DB->get_record('connect_course_dets', array(
-                'course' => $this->moodle_id
+                'course' => $this->mid
             ));
 
         // Set some special vars.
@@ -452,7 +454,7 @@ class course extends data
 
         $category = \local_catman\core::get_category();
 
-        $course = $DB->get_record('course', array('id' => $this->moodle_id));
+        $course = $DB->get_record('course', array('id' => $this->mid));
 
         $course->category = $category->id;
         $course->shortname = date("dmY-His") . "-" . $course->shortname;
