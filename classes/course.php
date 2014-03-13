@@ -192,7 +192,7 @@ class course extends data
 
     /**
      * Do we have children?
-     * @return unknown
+     * @return boolean
      */
     public function has_children() {
         global $DB;
@@ -201,36 +201,15 @@ class course extends data
 
     /**
      * Has this course been created in Moodle?
-     * @return unknown
+     * @return boolean
      */
     public function is_in_moodle() {
-        global $DB;
-
-        $id = $this->moodle_id;
-        if (!$id) {
-            return false;
-        }
-
-        $category = \local_catman\core::get_category();
-        $course = $DB->get_record('course', array(
-            'id' => $id
-        ));
-
-        return $course && $course->category !== $category->id;
+        return $this->mid !== 0;
     }
-
-    /**
-     * Has this course been created in Moodle?
-     * @return unknown
-     */
-    public function is_created() {
-        return $this->is_in_moodle();
-    }
-
 
     /**
      * Does this course have a unique shortname?
-     * @return unknown
+     * @return boolean
      */
     public function has_unique_shortname() {
         global $DB;
@@ -254,24 +233,10 @@ class course extends data
             return false;
         }
 
-        $moodle_id = $this->moodle_id;
-
-        // If there is no chksum, we are dealing with a new course so add
-        // a placeholder and return true.
-        if (!$moodle_id) {
-            $DB->insert_record_raw("connect_course_chksum", array(
-                "courseid" => $this->moodle_id,
-                "module_delivery_key" => $this->module_delivery_key,
-                "session_code" => $this->session_code,
-                "chksum" => 'updateme'
-            ));
-            return true;
-        }
-
         // Basically we just need to check: category, shortname, fullname and summary.
         $course = $DB->get_record('course', array(
-            'id' => $moodle_id
-        ));
+            'id' => $this->mid
+        ), 'id, shortname, fullname, category, summary');
 
         return  $course->shortname !== $this->shortname ||
                 $course->fullname !== $this->fullname ||
