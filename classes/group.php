@@ -30,44 +30,32 @@ defined('MOODLE_INTERNAL') || die();
  */
 class group extends data
 {
-    /** Our id */
-    public $id;
-
-    /** Our description */
-    public $description;
-
-    /** Our Connect course - Dont rely on this being set! Use ->course */
-    private $_course;
-
-    /** Our Moodle id - Dont rely on this being set! Use ->moodle_id */
-    private $_moodle_id;
-
     /**
      * The name of our connect table.
      */
     protected function get_table() {
-        return 'groups';
+        return 'connect_group';
     }
 
     /**
      * A list of valid fields for this data object.
      */
     protected final function valid_fields() {
-        return array("group_id", "group_desc", "module_delivery_key", "session_code", "moodle_id", "state", "created_at", "updated_at", "chksum", "id_chksum", "last_checked");
+        return array("id", "mid", "course", "name");
     }
 
     /**
      * A list of immutable fields for this data object.
      */
     protected function immutable_fields() {
-        return array("group_id", "module_delivery_key", "session_code");
+        return array("id");
     }
 
     /**
      * A list of key fields for this data object.
      */
     protected function key_fields() {
-        return array("group_id");
+        return array("id");
     }
 
     /**
@@ -87,61 +75,19 @@ class group extends data
 
         // We are currently in Moodle!
         $group = $DB->get_record('groups', array(
-            'id' => $this->moodle_id
+            'id' => $this->mid
         ), 'id,courseid,name');
 
         // Does our data match up?
-        if ($group->name !== $this->description) {
+        if ($group->name !== $this->name) {
             if (!$dry) {
-                $data = new \stdClass();
-                $data->id = $group->id;
-                $data->name = $this->description;
-                $data->courseid = $group->courseid;
-                groups_update_group($data);
+                $group->name = $this->name;
+                groups_update_group($group);
             }
 
             return 'Updating group: ' . $this->chksum;
         }
     }
-
-    /**
-     * Grab our Connect Course
-     * @return unknown
-     */
-    protected function _get_course() {
-        if (!isset($this->_course)) {
-            $this->_course = course::get_course_by_uid($this->module_delivery_key, $this->session_code);
-        }
-
-        return $this->_course;
-    }
-
-
-    /**
-     * Grab our Moodle ID
-     * @return unknown
-     */
-    protected function _get_moodle_id() {
-        global $DB;
-
-        if (empty($this->_moodle_id)) {
-            $course = $this->course;
-            if (!$course) {
-                $this->_moodle_id = null;
-                return null;
-            }
-
-            $group = $DB->get_record('groups', array(
-                "courseid" => $course->moodle_id,
-                "name" => $this->description
-            ));
-
-            $this->_moodle_id = $group ? $group->id : null;
-        }
-
-        return $this->_moodle_id;
-    }
-
 
     /**
      * Grab (or create) our grouping ID
@@ -150,18 +96,18 @@ class group extends data
     private function get_or_create_grouping() {
         global $DB;
 
-        $course = $this->course;
+        $course = course::get($this->course);
 
         $grouping = $DB->get_record('groupings', array(
             'name' => 'Seminar groups',
-            'courseid' => $this->moodle_id
+            'courseid' => $this->mid
         ));
 
         // Create?
         if (!$grouping) {
             $data = new \stdClass();
             $data->name = "Seminar groups";
-            $data->courseid = $course->moodle_id;
+            $data->courseid = $course->mid;
             $data->description = '';
             return groups_create_grouping($data);
         }
@@ -175,7 +121,7 @@ class group extends data
      * @return unknown
      */
     public function is_in_moodle() {
-        return $this->moodle_id !== null;
+        return !empty($this->mid);
     }
 
 
@@ -186,7 +132,7 @@ class group extends data
     public function create_in_moodle() {
         global $CFG, $CONNECTDB;
 
-        $course = $this->course;
+        $course = course::get($this->course);
 
         if (!$course->is_in_moodle()) {
             return false;
@@ -195,27 +141,24 @@ class group extends data
         require_once $CFG->dirroot . '/group/lib.php';
 
         $data = new \stdClass();
-        $data->name = $this->description;
-        $data->courseid = $course->moodle_id;
+        $data->name = $this->name;
+        $data->courseid = $course->mid;
         $data->description = '';
 
-        $this->_moodle_id = groups_create_group($data);
-
-        if ($this->_moodle_id === false) {
+        // Grab a Moodle ID.
+        $this->mid = groups_create_group($data);
+        if ($this->mid === false) {
             return false;
         }
 
-        // Set Moodle ID.
-        $CONNECTDB->set_field('groups', 'moodle_id', $this->moodle_id, array(
-            'chksum' => $this->chksum,
-            'group_id' => $this->id
-        ));
+        // Save the Moodle ID to DB.
+        $this->save();
 
         // Grab our grouping.
         $grouping_id = $this->get_or_create_grouping();
 
         // And add this group to the grouping.
-        groups_assign_grouping($grouping_id, $this->moodle_id);
+        groups_assign_grouping($grouping_id, $this->mid);
 
         // Sync enrolments.
         $this->sync_group_enrolments();

@@ -49,7 +49,7 @@ class user extends data
      * A list of immutable fields for this data object.
      */
     protected function immutable_fields() {
-        return array("id", "mid", "ukc");
+        return array("id", "ukc");
     }
 
     /**
