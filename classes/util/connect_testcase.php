@@ -67,6 +67,8 @@ abstract class connect_testcase extends \advanced_testcase
 		// Clear out the connect tables.
 		$DB->execute("TRUNCATE TABLE {connect_user}");
 		$DB->execute("TRUNCATE TABLE {connect_enrolments}");
+		$DB->execute("TRUNCATE TABLE {connect_group_enrolments}");
+		$DB->execute("TRUNCATE TABLE {connect_group}");
 		$DB->execute("TRUNCATE TABLE {connect_role}");
 		$DB->execute("TRUNCATE TABLE {connect_course}");
 		$DB->execute("TRUNCATE TABLE {connect_course_links}");

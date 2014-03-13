@@ -61,21 +61,8 @@ class course extends data
      * Here is the big sync method.
      */
     public function sync($dry = false) {
-        // Should we be deleting this?
-        if ($this->sink_deleted) {
-            if ($this->is_in_moodle()) {
-                if (!$dry) {
-                    $this->delete();
-                }
-
-                return "Deleting Course: $this->id";
-            }
-
-            return null;
-        }
-
         // Should we be creating this?
-        if (!$this->is_in_moodle() && $this->has_unique_shortname()) {
+        if (!$this->is_in_moodle() && $this->is_unique_shortname($this->shortname)) {
             if (!$dry) {
                 $this->create_in_moodle();
             }
@@ -136,7 +123,7 @@ class course extends data
     /**
      * Get the name of the campus.
      */
-    public function __get_campus_name() {
+    public function _get_campus_name() {
         global $DB;
         return $DB->get_field('connect_role', 'name', array(
             'id' => $this->campus
@@ -219,6 +206,15 @@ class course extends data
     }
 
     /**
+     * Is this a parent?
+     * @return boolean
+     */
+    public function is_parent() {
+        global $DB;
+        return $DB->count_records('connect_course_links', array('parent' => $this->id)) >= 1;
+    }
+
+    /**
      * Do we have children?
      * @return boolean
      */
@@ -232,19 +228,19 @@ class course extends data
      * @return boolean
      */
     public function is_in_moodle() {
-        return $this->mid !== 0;
+        return !empty($this->mid);
     }
 
     /**
      * Does this course have a unique shortname?
      * @return boolean
      */
-    public function has_unique_shortname() {
+    public function is_unique_shortname($shortname) {
         global $DB;
 
         $expected = $this->is_in_moodle() ? 1 : 0;
         return $expected === $DB->count_records('course', array(
-            "shortname" => $this->shortname
+            "shortname" => $shortname
         ));
     }
 
@@ -290,7 +286,7 @@ class course extends data
         }
 
         // Ensure the shortname is unique.
-        if (!$this->has_unique_shortname()) {
+        if (!$this->is_unique_shortname($shortname)) {
             debugging("Shortname '$shortname' must be unique for course: '{$this->id}'", DEBUG_DEVELOPER);
             return false;
         }
@@ -356,12 +352,15 @@ class course extends data
             'child' => $target->id
         );
 
-        // Add a link.
-        if (!$DB->record_exists('connect_course_links', $data)) {
-            $DB->insert_record('connect_course_links', $data);
+        if ($DB->record_exists('connect_course_links', $data)) {
+            return false;
         }
 
+        // Add a link.
+        $DB->insert_record('connect_course_links', $data);
         $this->sync_enrolments();
+
+        return true;
     }
 
     /**
@@ -623,17 +622,15 @@ class course extends data
         $result = $DB->get_records('connect_course', $params);
 
         // Decode various elements.
-        $data = array_map(function($datum) use ($obj_form) {
+        foreach ($result as &$datum) {
             if ($obj_form) {
                 $obj = new course();
                 $obj->set_class_data($datum);
                 $datum = $obj;
             }
+        }
 
-            return $datum;
-        }, $result);
-
-        return $data;
+        return $result;
     }
 
 
@@ -753,7 +750,6 @@ class course extends data
         if (!$link_course->is_in_moodle()) {
             if (!$link_course->create_in_moodle()) {
                 debugging("Could not create linked course: $link_course");
-                return array();
             }
         }
 
@@ -764,7 +760,7 @@ class course extends data
             }
         }
 
-        return array();
+        return $link_course;
     }
 
     /**

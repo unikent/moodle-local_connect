@@ -210,7 +210,7 @@ class group_enrolment extends data
      * @param unknown $group
      * @return unknown
      */
-    public static function get($group_id, $username) {
+    public static function get_by_uid($group_id, $username) {
         global $CONNECTDB;
 
         $data = $CONNECTDB->get_record("group_enrollments", array(

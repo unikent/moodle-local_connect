@@ -323,7 +323,7 @@ class enrolment extends data
     /**
      * Returns an enrolment, given a session code, module delivery key and login
      */
-    public static function get($module_delivery_key, $session_code, $login) {
+    public static function get_by_uid($module_delivery_key, $session_code, $login) {
         global $CONNECTDB;
 
         // Select all our enrolments.

@@ -40,12 +40,16 @@ abstract class data {
     /**
      * The name of our connect table.
      */
-    protected abstract static function get_table();
+    protected static function get_table() {
+    	return null;
+    }
 
 	/**
 	 * A list of valid fields for this data object.
 	 */
-	protected abstract static function valid_fields();
+	protected static function valid_fields() {
+		return array();
+	}
 
     /**
      * A list of key fields for this data object.

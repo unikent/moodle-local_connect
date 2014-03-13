@@ -16,6 +16,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . "/local/connect/classes/course.php");
+
 /**
  * Tests new Kent course code
  */
@@ -49,22 +52,17 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         // Creates.
         $this->assertFalse($course->is_in_moodle());
-        $this->assertEquals("Creating Course: " . $course->chksum, $course->sync());
+        $this->assertEquals("Creating Course: " . $course->id, $course->sync());
         $this->assertTrue($course->is_in_moodle());
 
         // Updates.
-        $course->fullname = "TESTING NAME CHANGE";
-        $this->assertEquals("Updating Course: " . $course->chksum, $course->sync());
+        $course->module_title = "TESTING NAME CHANGE";
+        $this->assertEquals("Updating Course: " . $course->id, $course->sync());
         $this->assertTrue($course->is_in_moodle());
         $mcourse = $DB->get_record('course', array(
-            "id" => $course->moodle_id
+            "id" => $course->mid
         ), 'id,fullname');
         $this->assertEquals($course->fullname, $mcourse->fullname);
-
-        // Deletes.
-        $course->sink_deleted = true;
-        $this->assertEquals("Deleting Course: " . $course->chksum, $course->sync());
-        $this->assertFalse($course->is_in_moodle());
 
         $this->connect_cleanup();
     }
@@ -76,16 +74,16 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $this->resetAfterTest();
         $this->connect_cleanup();
 
-        $data = $this->generate_course();
-        $course = \local_connect\course::get_course_by_chksum($data['chksum']);
+        $courseid = $this->generate_course();
+        $course = \local_connect\course::get($courseid);
         $this->assertTrue($course->create_in_moodle());
 
-        $data = $this->generate_course();
-        $course2 = \local_connect\course::get_course_by_chksum($data['chksum']);
+        $courseid = $this->generate_course();
+        $course2 = \local_connect\course::get($courseid);
 
-        $this->assertTrue($course2->has_unique_shortname());
-        $course2->shortname = $course->shortname;
-        $this->assertFalse($course2->has_unique_shortname());
+        $this->assertTrue($course2->is_unique_shortname($course2->shortname));
+        $course2->module_code = $course->module_code;
+        $this->assertFalse($course2->is_unique_shortname($course2->shortname));
 
         $this->connect_cleanup();
     }
@@ -98,25 +96,24 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $this->connect_cleanup();
 
         // Create two courses.
-        $this->generate_courses(2);
+        $course1 = \local_connect\course::get($this->generate_course());
+        $course2 = \local_connect\course::get($this->generate_course());
+        $this->assertEquals(2, count(\local_connect\course::get_all()));
 
-        $courses = \local_connect\course::get_all(array(), true);
-        $this->assertEquals(2, count($courses));
+        $this->assertFalse($course1->is_child());
+        $this->assertFalse($course2->is_child());
 
-        $link_course = array(
-            'module_code' => "TST",
-            'module_title' => "TEST MERGE",
-            'primary_child' => reset($courses),
+        $lc = \local_connect\course::process_merge((object)array(
+            'code' => "TST",
+            'title' => "TEST MERGE",
             'synopsis' => "This is a test",
-            'category_id' => 1,
-            'state' => \local_connect\course::$states['scheduled'],
-            'moodle_id' => null
-        );
+            'category' => 1,
+            'link_courses' => array($course1->id, $course2->id)
+        ));
 
-        $this->assertEquals(array(), \local_connect\course::merge($link_course, $courses));
-
-        $courses = \local_connect\course::get_all();
-        $this->assertEquals(3, count($courses));
+        $this->assertTrue($lc->is_parent());
+        $this->assertTrue($course1->is_child());
+        $this->assertTrue($course2->is_child());
 
         $this->connect_cleanup();
     }
@@ -125,40 +122,34 @@ class kent_course_tests extends local_connect\util\connect_testcase
      * Test we can create a linked course and then unlink it.
      */
     public function test_unlink_course() {
+        global $DB;
+
         $this->resetAfterTest();
         $this->connect_cleanup();
 
         // Create two courses.
-        $this->generate_courses(2);
+        $course1 = \local_connect\course::get($this->generate_course());
+        $course2 = \local_connect\course::get($this->generate_course());
+        $this->assertEquals(2, count(\local_connect\course::get_all()));
 
-        $courses = \local_connect\course::get_all(array(), true);
-        $this->assertEquals(2, count($courses));
-
-        $link_course = array(
-            'module_code' => "TST",
-            'module_title' => "TEST MERGE",
-            'primary_child' => reset($courses),
+        $lc = \local_connect\course::process_merge((object)array(
+            'code' => "TST",
+            'title' => "TEST MERGE",
             'synopsis' => "This is a test",
-            'category_id' => 1,
-            'state' => \local_connect\course::$states['scheduled'],
-            'moodle_id' => null
-        );
+            'category' => 1,
+            'link_courses' => array($course1->id, $course2->id)
+        ));
 
-        $this->assertEquals(array(), \local_connect\course::merge($link_course, $courses));
-
-        $courses = \local_connect\course::get_all(array(), true);
-        $this->assertEquals(3, count($courses));
+        $this->assertTrue($lc->is_parent());
+        $this->assertTrue($course1->is_child());
+        $this->assertTrue($course2->is_child());
 
         // Unlink!
-        $course = reset($courses);
-        $course = \local_connect\course::get_course_by_chksum($course->chksum);
-        $this->assertEquals(\local_connect\course::$states['created_in_moodle'], $course->state);
-        $course->unlink();
-        $course = \local_connect\course::get_course_by_chksum($course->chksum);
-        $this->assertEquals(\local_connect\course::$states['unprocessed'], $course->state);
+        $course1->unlink();
 
-        $courses = \local_connect\course::get_all();
-        $this->assertEquals(3, count($courses));
+        $this->assertTrue($lc->is_parent());
+        $this->assertFalse($course1->is_child());
+        $this->assertTrue($course2->is_child());
 
         // TODO - test more stuff, enrolments etc
 
