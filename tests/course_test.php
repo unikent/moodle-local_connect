@@ -44,8 +44,8 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $this->resetAfterTest();
         $this->connect_cleanup();
 
-        $data = $this->generate_course();
-        $course = \local_connect\course::get_course_by_chksum($data['chksum']);
+        $id = $this->generate_course();
+        $course = \local_connect\course::get($id);
 
         // Creates.
         $this->assertFalse($course->is_in_moodle());

@@ -58,28 +58,28 @@ class enrolment extends data
     /**
      * The name of our connect table.
      */
-    protected function get_table() {
+    protected static function get_table() {
         return 'enrollments';
     }
 
     /**
      * A list of valid fields for this data object.
      */
-    protected final function valid_fields() {
+    protected final static function valid_fields() {
         return array("ukc", "login", "title", "initials", "family_name", "session_code", "module_delivery_key", "role", "chksum", "moodle_id", "sink_deleted", "state", "created_at", "updated_at", "id_chksum", "last_checked");
     }
 
     /**
      * A list of immutable fields for this data object.
      */
-    protected function immutable_fields() {
+    protected static function immutable_fields() {
         return array("ukc", "login", "module_delivery_key", "session_code", "role");
     }
 
     /**
      * A list of key fields for this data object.
      */
-    protected function key_fields() {
+    protected static function key_fields() {
         return array("login", "module_delivery_key", "session_code");
     }
 

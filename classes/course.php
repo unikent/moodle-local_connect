@@ -36,30 +36,7 @@ require_once dirname(__FILE__) . '/../../../mod/forum/lib.php';
  */
 class course extends data
 {
-    /** Our UID */
-    public $uid;
-
-    /** Week beginning date */
-    public $week_beginning_date;
-
-    /** Number of sections */
-    public $numsections;
-
-    /** Shortname */
-    public $shortname;
-
-    /** Fullname */
-    public $fullname;
-
-    /** Maxbytes */
-    public $maxbytes;
-
-    /** Visiblity */
-    public $visible;
-
-    /** Our Moodle ID (stored) */
-    public $_moodle_id;
-
+    /** Our possible states */
     public static $states = array(
         'unprocessed' => 1,
         'scheduled' => 2,
@@ -71,64 +48,30 @@ class course extends data
     );
 
     /**
-     * Constructor to build from a database object
-     * @param unknown $obj
-     */
-    public function __construct($obj) {
-        parent::__construct();
-
-        $this->set_class_data($obj);
-
-        $this->numsections = $this->module_length != null ? $this->module_length : 1;
-        $this->link = isset($obj->link) ? $obj->link : 0;
-        $this->maxbytes = '67108864';
-        $this->week_beginning_date = isset($obj->week_beginning_date) ? $obj->week_beginning_date : null;
-
-        // Get our UID
-        $this->uid = $this->module_delivery_key . "-" . $this->session_code;
-
-        // Set some required vars
-        $this->shortname = $this->module_code;
-        $this->fullname = $this->module_title;
-        $this->visible = 0;
-
-        // Force 2012/2013 on shortnames and titles for everything.
-        $this->append_date($this->shortname);
-        $this->append_date($this->fullname);
-    }
-
-    /**
      * The name of our connect table.
      */
-    protected function get_table() {
-        return 'courses';
+    protected static function get_table() {
+        return 'connect_course';
     }
 
     /**
      * A list of valid fields for this data object.
      */
-    protected final function valid_fields() {
-        return array("module_delivery_key", "session_code", "delivery_department", "campus", "module_version", "campus_desc", "module_week_beginning", "module_length", "module_title", "module_code", "chksum", "moodle_id", "sink_deleted", "state", "created_at", "updated_at", "synopsis", "week_beginning_date", "category_id", "parent_id", "student_count", "teacher_count", "convenor_count", "link", "json_cache", "primary_child", "id_chksum", "last_checked");
+    protected final static function valid_fields() {
+        return array("id", "mid", "module_delivery_key", "session_code", "delivery_department", "campus", "module_version", "campus_desc", "module_week_beginning", "module_length", "module_title", "module_code", "chksum", "moodle_id", "sink_deleted", "state", "created_at", "updated_at", "synopsis", "week_beginning_date", "category_id", "parent_id", "student_count", "teacher_count", "convenor_count", "link", "json_cache", "primary_child", "id_chksum", "last_checked");
     }
 
     /**
      * A list of immutable fields for this data object.
      */
-    protected function immutable_fields() {
-        return array("module_delivery_key", "session_code");
-    }
-
-    /**
-     * A list of key fields for this data object.
-     */
-    protected function key_fields() {
-        return array("module_delivery_key", "session_code");
+    protected static function immutable_fields() {
+        return array("id", "module_delivery_key", "session_code");
     }
 
     /**
      * Validation for state.
      */
-    public function validate_state($value) {
+    public function _validate_state($value) {
         return in_array($value, self::$states);
     }
 
@@ -171,10 +114,26 @@ class course extends data
     /**
      * Adds the shortname date if required.
      */
-    private function append_date(&$val) {
+    private function append_date($val) {
         if (preg_match('/\(\d+\/\d+\)/is', $val) === 0) {
             $val .= " {$this->bracket_period}";
         }
+
+        return $val;
+    }
+
+    /**
+     * Returns the shortname
+     */
+    public function _get_shortname() {
+        return $this->append_date($this->module_code);
+    }
+
+    /**
+     * Returns the fullname
+     */
+    public function _get_fullname() {
+        return $this->append_date($this->module_title);
     }
 
     /**
@@ -409,9 +368,9 @@ class course extends data
         }
 
         // Append shortname extension if it exists.
+        $shortname = $this->shortname;
         if (!empty($shortname_ext)) {
-            $this->shortname = $this->module_code . " " . $shortname_ext;
-            $this->append_date($this->shortname);
+            $shortname = $this->append_date($this->module_code . " " . $shortname_ext);
         }
 
         // Does this shortname exist?
@@ -433,10 +392,10 @@ class course extends data
         try {
             $obj = new \stdClass();
             $obj->category = $this->category_id;
-            $obj->shortname = $this->shortname;
+            $obj->shortname = $shortname;
             $obj->fullname = $this->fullname;
             $obj->summary = $this->synopsis;
-            $obj->visible = $this->visible;
+            $obj->visible = 0;
             $course = create_course($obj);
             if (!$course) {
                 throw new \moodle_exception("Unknown");
@@ -632,7 +591,6 @@ class course extends data
         $this->create_connect_extras();
 
         // Set some special vars.
-        $this->visible = $course->visible;
         $uc = (object)array_merge((array)$course, (array)$this);
         $uc->shortname = $course->shortname;
         $uc->category = $this->category_id;

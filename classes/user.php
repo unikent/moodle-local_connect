@@ -34,28 +34,28 @@ class user extends data
     /**
      * The name of our connect table.
      */
-    protected function get_table() {
+    protected static function get_table() {
         return "connect_user";
     }
 
     /**
      * A list of valid fields for this data object.
      */
-    protected final function valid_fields() {
+    protected final static function valid_fields() {
         return array("id", "mid", "ukc", "login", "title", "initials", "family_name");
     }
 
     /**
      * A list of immutable fields for this data object.
      */
-    protected function immutable_fields() {
+    protected static function immutable_fields() {
         return array("id", "ukc");
     }
 
     /**
      * A list of key fields for this data object.
      */
-    protected function key_fields() {
+    protected static function key_fields() {
         return array("id");
     }
 
@@ -108,22 +108,6 @@ class user extends data
 
 		$this->mid = null;
 		$this->save();
-	}
-
-	/**
-	 * Get a user by ID
-	 */
-	public static function get($id) {
-		global $DB;
-
-		$user = $DB->get_record("connect_user", array(
-			'id' => $id
-		));
-
-		$obj = new static();
-		$obj->set_class_data($user);
-
-		return $obj;
 	}
 
 	/**

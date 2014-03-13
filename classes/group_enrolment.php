@@ -39,28 +39,28 @@ class group_enrolment extends data
     /**
      * The name of our connect table.
      */
-    protected function get_table() {
+    protected static function get_table() {
         return 'group_enrollments';
     }
 
     /**
      * A list of valid fields for this data object.
      */
-    protected final function valid_fields() {
+    protected final static function valid_fields() {
         return array("group_id", "group_desc", "module_delivery_key", "ukc", "login", "session_code", "chksum", "sink_deleted", "moodle_id", "state", "created_at", "updated_at", "id_chksum", "last_checked");
     }
 
     /**
      * A list of immutable fields for this data object.
      */
-    protected function immutable_fields() {
+    protected static function immutable_fields() {
         return array("group_id", "module_delivery_key", "session_code", "login");
     }
 
     /**
      * A list of key fields for this data object.
      */
-    protected function key_fields() {
+    protected static function key_fields() {
         return array("group_id", "login");
     }
 

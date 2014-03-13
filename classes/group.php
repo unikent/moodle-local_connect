@@ -33,28 +33,28 @@ class group extends data
     /**
      * The name of our connect table.
      */
-    protected function get_table() {
+    protected static function get_table() {
         return 'connect_group';
     }
 
     /**
      * A list of valid fields for this data object.
      */
-    protected final function valid_fields() {
+    protected final static function valid_fields() {
         return array("id", "mid", "course", "name");
     }
 
     /**
      * A list of immutable fields for this data object.
      */
-    protected function immutable_fields() {
+    protected static function immutable_fields() {
         return array("id");
     }
 
     /**
      * A list of key fields for this data object.
      */
-    protected function key_fields() {
+    protected static function key_fields() {
         return array("id");
     }
 

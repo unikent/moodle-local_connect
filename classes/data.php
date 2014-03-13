@@ -55,22 +55,24 @@ abstract class data {
     /**
      * The name of our connect table.
      */
-    protected abstract function get_table();
+    protected abstract static function get_table();
 
 	/**
 	 * A list of valid fields for this data object.
 	 */
-	protected abstract function valid_fields();
+	protected abstract static function valid_fields();
 
     /**
      * A list of key fields for this data object.
      */
-    protected abstract function key_fields();
+    protected static function key_fields() {
+    	return array("id");
+    }
 
 	/**
 	 * A list of immutable fields for this data object.
 	 */
-	protected function immutable_fields() {
+	protected static function immutable_fields() {
 		return array();
 	}
 
@@ -125,7 +127,7 @@ abstract class data {
 			return;
 		}
 
-		$validation = "validate_" . $name;
+		$validation = "_validate_" . $name;
 		if (method_exists($this, $validation)) {
 			if (!$this->$validation($value)) {
 				throw new \moodle_exception("Invalid value for field '$name': $value!");
@@ -202,5 +204,19 @@ abstract class data {
 	 */
 	public function sync($dry = false) {
 		debugging("sync() has not been implemented for this!", DEBUG_DEVELOPER);
+	}
+
+	/**
+	 * Get an object by ID
+	 */
+	public static function get($id) {
+		global $DB;
+
+		$obj = new static();
+		$obj->set_class_data($DB->get_record(self::get_table(), array(
+			'id' => $id
+		)));
+
+		return $obj;
 	}
 }
