@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/connect/db" VERSION="20140312" COMMENT="XMLDB file for Connect module"
+<XMLDB PATH="local/connect/db" VERSION="20140313" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -162,6 +162,21 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="connect_course_links" COMMENT="A list of linked courses">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="parent" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="The &quot;master&quot; ID"/>
+        <FIELD NAME="child" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="A child of the parent"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="parent_child_key" TYPE="unique" FIELDS="parent, child"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="parent_idx" UNIQUE="false" FIELDS="parent"/>
+        <INDEX NAME="child_idx" UNIQUE="false" FIELDS="child"/>
       </INDEXES>
     </TABLE>
   </TABLES>

@@ -288,5 +288,31 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014031201, 'local', 'connect');
     }
 
+    if ($oldversion < 2014031300) {
+        // Define table connect_course_links to be created.
+        $table = new xmldb_table('connect_course_links');
+
+        // Adding fields to table connect_course_links.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('parent', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('child', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table connect_course_links.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('parent_child_key', XMLDB_KEY_UNIQUE, array('parent', 'child'));
+
+        // Adding indexes to table connect_course_links.
+        $table->add_index('parent_idx', XMLDB_INDEX_NOTUNIQUE, array('parent'));
+        $table->add_index('child_idx', XMLDB_INDEX_NOTUNIQUE, array('child'));
+
+        // Conditionally launch create table for connect_course_links.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014031300, 'local', 'connect');
+    }
+
     return true;
 }
