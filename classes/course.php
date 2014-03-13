@@ -134,6 +134,16 @@ class course extends data
     }
 
     /**
+     * Get the name of the campus.
+     */
+    public function __get_campus_name() {
+        global $DB;
+        return $DB->get_field('connect_role', 'name', array(
+            'id' => $this->campus
+        ));
+    }
+
+    /**
      * Get enrollments for this Course
      */
     public function _get_enrolments() {
@@ -223,7 +233,7 @@ class course extends data
 
     /**
      * Has this course changed at all?
-     * @return unknown
+     * @return boolean
      */
     public function has_changed() {
         global $DB;
@@ -240,25 +250,21 @@ class course extends data
 
         return  $course->shortname !== $this->shortname ||
                 $course->fullname !== $this->fullname ||
-                $course->category !== $this->category_id ||
+                $course->category !== $this->category ||
                 $course->summary !== $this->synopsis;
     }
 
     /**
      * Create this course in Moodle
-     * @param unknown $shortname_ext (optional)
-     * @return unknown
+     * @param string $shortname_ext (optional)
+     * @return boolean
      */
     public function create_in_moodle($shortname_ext = "") {
         global $DB;
 
-        if ($this->sink_deleted) {
-            return false;
-        }
-
         // Check we have a category.
-        if (!isset($this->category_id)) {
-            debugging("No category set for course: {$this->chksum}!\n", DEBUG_DEVELOPER);
+        if (empty($this->category)) {
+            debugging("No category set for course: {$this->id}!\n", DEBUG_DEVELOPER);
             return false;
         }
 
@@ -268,25 +274,16 @@ class course extends data
             $shortname = $this->append_date($this->module_code . " " . $shortname_ext);
         }
 
-        // Does this shortname exist?
-        $course = $DB->get_record('course', array('shortname' => $this->shortname));
-        if ($course) {
-            if ($this->link === 0) {
-                // Yes! Link them together.
-                $link_course = static::get_course($course->id);
-                if ($link_course) {
-                    $link_course->add_child($this);
-                }
-            }
-
-            $this->moodle_id = $course->id;
+        // Ensure the shortname is unique.
+        if (!$this->has_unique_shortname()) {
+            debugging("Shortname '$shortname' must be unique for course: '{$this->id}'", DEBUG_DEVELOPER);
             return false;
         }
 
         // Create the course.
         try {
             $obj = new \stdClass();
-            $obj->category = $this->category_id;
+            $obj->category = $this->category;
             $obj->shortname = $shortname;
             $obj->fullname = $this->fullname;
             $obj->summary = $this->synopsis;
@@ -297,53 +294,32 @@ class course extends data
             }
         } catch (\moodle_exception $e) {
             $msg = $e->getMessage();
-            print "Error processing $this->chksum: $msg\n";
+            debugging("Error processing '{$this->id}': $msg", DEBUG_DEVELOPER);
             return false;
         }
 
-        // Update connect's reference.
-        $this->_moodle_id = $course->id;
-        $this->moodle_id = $course->id;
-        $this->state = 8;
+        // Update our reference (TODO - handler in observer?).
+        $this->mid = $course->id;
 
         // Tell Connect about the new course.
         $this->save();
 
         // Add in sections.
         $DB->set_field('course_sections', 'name', $this->module_title, array (
-                'course' => $course->id,
-                'section' => 0
-            ));
+            'course' => $this->mid,
+            'section' => 0
+        ));
 
         // Add module extra details to the connect_course_dets table.
         $this->create_connect_extras();
 
         // Add the reading list module to our course if it is based in Canterbury.
-        if ($this->campus_desc === 'Canterbury') {
+        if ($this->campus_name === 'Canterbury') {
             $this->create_reading_list();
         }
 
         // Add a news forum to the course.
         $this->create_forum();
-
-        // Add to tracking table.
-        $tracker = $DB->get_record('connect_course_chksum', array(
-                'module_delivery_key' => $this->module_delivery_key,
-                'session_code' => $this->session_code
-            ));
-        if ($tracker) {
-            $DB->set_field('connect_course_chksum', 'chksum', $this->chksum, array (
-                    'module_delivery_key' => $this->module_delivery_key,
-                    'session_code' => $this->session_code
-                ));
-        } else {
-            $DB->insert_record_raw("connect_course_chksum", array(
-                    "courseid" => $this->moodle_id,
-                    "module_delivery_key" => $this->module_delivery_key,
-                    "session_code" => $this->session_code,
-                    "chksum" => $this->chksum
-                ));
-        }
 
         // Sync our enrolments.
         $this->sync_enrolments();
