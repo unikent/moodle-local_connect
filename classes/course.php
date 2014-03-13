@@ -437,20 +437,6 @@ class course extends data
     }
 
     /**
-     * Delete this course's enrolments.
-     */
-    public function delete_enrolments() {
-        $enrolments = $this->enrolments;
-        $group_enrolments = $this->group_enrolments;
-        $todo = array_merge($enrolments, $group_enrolments);
-        foreach ($todo as $enrolment) {
-            if ($todo->is_in_moodle()) {
-                $todo->delete();
-            }
-        }
-    }
-
-    /**
      * Delete this course
      * 
      * @return boolean
@@ -494,10 +480,23 @@ class course extends data
 
         $this->delete_enrolments();
 
-        // Delete link.
         $DB->delete_records('connect_course_links', array(
             'child' => $this->id
         ));
+    }
+
+    /**
+     * Delete this course's enrolments.
+     */
+    public function delete_enrolments() {
+        $enrolments = $this->enrolments;
+        $group_enrolments = $this->group_enrolments;
+        $todo = array_merge($enrolments, $group_enrolments);
+        foreach ($todo as $enrolment) {
+            if ($todo->is_in_moodle()) {
+                $todo->delete();
+            }
+        }
     }
 
     /**
@@ -540,6 +539,24 @@ class course extends data
         return !empty($this->module_title) ? $this->shortname : $this->id;
     }
 
+    /**
+     * Get a Connect Course by ID
+     * @param unknown $id
+     * @return unknown
+     */
+    public static function get($id) {
+        global $DB;
+
+        // Select a bunch of records
+        $data = $DB->get_record('connect_course', array('id' => $id));
+        if (!$data) {
+            return false;
+        }
+
+        $course = new course();
+        $course->set_class_data($data);
+        return $course;
+    }
 
     /**
      * Get a Connect Course by Moodle ID
