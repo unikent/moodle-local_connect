@@ -248,10 +248,7 @@ class course extends data
             'id' => $this->mid
         ), 'id, shortname, fullname, category, summary');
 
-        return  $course->shortname !== $this->shortname ||
-                $course->fullname !== $this->fullname ||
-                $course->category !== $this->category ||
-                $course->summary !== $this->synopsis;
+        return $course->fullname !== $this->fullname || $course->category !== $this->category || $course->summary !== $this->synopsis;
     }
 
     /**
@@ -409,26 +406,16 @@ class course extends data
         global $DB;
 
         $course = $DB->get_record('course', array(
-                'id' => $this->mid
-            ));
+            'id' => $this->mid
+        ));
 
-        $connect_data = $DB->get_record('connect_course_dets', array(
-                'course' => $this->mid
-            ));
-
-        // Set some special vars.
-        $uc = (object)array_merge((array)$course, (array)$this);
-        $uc->shortname = $course->shortname;
-        $uc->category = $this->category_id;
+        // Updates!
+        $course->fullname = $this->fullname;
+        $course->category = $this->category;
+        $course->summary = $this->synopsis;
 
         // Update this course in Moodle.
-        update_course($uc);
-
-        // Update chksum tracker.
-        $DB->set_field('connect_course_chksum', 'chksum', $this->chksum, array (
-            'module_delivery_key' => $this->module_delivery_key,
-            'session_code' => $this->session_code
-        ));
+        update_course($course);
     }
 
 
