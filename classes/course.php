@@ -36,17 +36,6 @@ require_once dirname(__FILE__) . '/../../../mod/forum/lib.php';
  */
 class course extends data
 {
-    /** Our possible states */
-    public static $states = array(
-        'unprocessed' => 1,
-        'scheduled' => 2,
-        'processing' => 4,
-        'created_in_moodle' => 8,
-        'failed_in_moodle' => 16,
-        'disengage' => 32,
-        'disengaged_from_moodle' => 65
-    );
-
     /**
      * The name of our connect table.
      */
@@ -58,7 +47,7 @@ class course extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "mid", "module_delivery_key", "session_code", "delivery_department", "campus", "module_version", "campus_desc", "module_week_beginning", "module_length", "module_title", "module_code", "chksum", "moodle_id", "sink_deleted", "state", "created_at", "updated_at", "synopsis", "week_beginning_date", "category_id", "parent_id", "student_count", "teacher_count", "convenor_count", "link", "json_cache", "primary_child", "id_chksum", "last_checked");
+        return array("id", "mid", "module_delivery_key", "session_code", "module_version", "campus", "module_week_beginning", "module_length", "week_beginning_date", "module_title", "module_code", "synopsis", "category");
     }
 
     /**
@@ -66,13 +55,6 @@ class course extends data
      */
     protected static function immutable_fields() {
         return array("id", "module_delivery_key", "session_code");
-    }
-
-    /**
-     * Validation for state.
-     */
-    public function _validate_state($value) {
-        return in_array($value, self::$states);
     }
 
     /**
@@ -86,7 +68,7 @@ class course extends data
                     $this->delete();
                 }
 
-                return "Deleting Course: $this->chksum";
+                return "Deleting Course: $this->id";
             }
 
             return null;
@@ -98,7 +80,7 @@ class course extends data
                 $this->create_in_moodle();
             }
 
-            return "Creating Course: $this->chksum";
+            return "Creating Course: $this->id";
         }
 
         // Have we changed at all?
@@ -107,7 +89,7 @@ class course extends data
                 $this->update_moodle();
             }
 
-            return "Updating Course: $this->chksum";
+            return "Updating Course: $this->id";
         }
     }
 
@@ -147,85 +129,8 @@ class course extends data
     /**
      * Returns the duration of this course in the format: "i - i"
      */
-    public function get_duration() {
+    public function _get_duration() {
         return $this->module_week_beginning . ' - ' . ($this->module_week_beginning + $this->module_length);
-    }
-
-    /**
-     * Update this course in Connect (alias for save)
-     * @return unknown
-     */
-    public function update() {
-        return $this->save();
-    }
-
-
-    /**
-     * Is this course unique?
-     * @return unknown
-     */
-    public function is_unique() {
-        global $CONNECTDB;
-
-        $sql = "SELECT COUNT(*) as count FROM courses
-                  WHERE session_code=?
-                    AND module_code=?
-                    AND chksum!=?
-                    AND (state & ?) <> 0";
-
-        $params = array(
-            $this->session_code,
-            $this->module_code,
-            $this->chksum,
-            self::$states['scheduled'] |
-            self::$states['processing'] |
-            self::$states['created_in_moodle']
-        );
-
-        return $CONNECTDB->count_records_sql($sql, $params) === 0;
-    }
-
-
-    /**
-     * Do we have children?
-     * @return unknown
-     */
-    public function has_children() {
-        return $this->link;
-    }
-
-
-    /**
-     * Has this course been scheduled for rollover?
-     * @return unknown
-     */
-    public function is_scheduled() {
-        return $this->state & self::$states['scheduled'];
-    }
-
-    /**
-     * Return the Moodle course for this.
-     */
-    public function _get_moodle_id() {
-        global $DB;
-
-        if ($this->_moodle_id === null) {
-            $obj = $DB->get_record('connect_course_chksum', array (
-                'module_delivery_key' => $this->module_delivery_key,
-                'session_code' => $this->session_code
-            ), 'courseid');
-            $this->_moodle_id = $obj ? $obj->courseid : false;
-        }
-
-        return $this->_moodle_id === false ? null : $this->_moodle_id;
-    }
-
-    /**
-     * There used to be a class var called 'category' which was changed to category_id
-     */
-    public function _get_category() {
-        debugging('local_connect::course->category is no longer valid! Use category_id instead!', DEBUG_DEVELOPER);
-        return $this->category_id;
     }
 
     /**
@@ -254,19 +159,44 @@ class course extends data
      * @return unknown
      */
     public function _get_children() {
-        global $CONNECTDB;
+        global $DB;
 
-        // Select a bunch of records
-        $data = $CONNECTDB->get_records('courses', array(
-            'parent_id' => $this->chksum
+        // Select a bunch of records.
+        $sql = 'SELECT cc.* FROM {connect_course_links} ccl
+            INNER JOIN {connect_course} cc
+                ON cc.id=ccl.child
+            WHERE ccl.parent = :parent';
+        $data = $DB->get_records_sql($sql, array(
+            'parent' => $this->id
         ));
 
         $courses = array();
         foreach ($data as $datum) {
-            $courses[] = new course($datum);
+            $course = new course();
+            $course->set_class_data($datum);
+            $courses[] = $course;
         }
 
         return $courses;
+    }
+
+    /**
+     * Is this course unique?
+     * @return boolean
+     */
+    public function is_unique() {
+        global $DB;
+        return $DB->count_records('connect_course', array('module_code' => $this->module_code)) === 1;
+    }
+
+
+    /**
+     * Do we have children?
+     * @return unknown
+     */
+    public function has_children() {
+        global $DB;
+        return $DB->count_records('connect_course_links', array('parent' => $this->id)) >= 1;
     }
 
     /**
