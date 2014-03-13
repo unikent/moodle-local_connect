@@ -536,32 +536,6 @@ class course extends data
         return $course;
     }
 
-
-    /**
-     * Is this user allowed to manage courses?
-     * @return boolean
-     */
-    public static function can_manage() {
-        global $DB;
-
-        if (has_capability('moodle/site:config', \context_system::instance())) {
-            return true;
-        }
-
-        $cats = $DB->get_records('course_categories');
-
-        // Check permissions
-        foreach ($cats as $cat) {
-            $context = \context_coursecat::instance($cat->id);
-
-            if (has_capability('moodle/category:manage', $context)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     /**
      * Returns an array of all courses in Connect.
      * This is a little complicated and is due to be simplified using magic methods and
