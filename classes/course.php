@@ -310,9 +310,6 @@ class course extends data
             'section' => 0
         ));
 
-        // Add module extra details to the connect_course_dets table.
-        $this->create_connect_extras();
-
         // Add the reading list module to our course if it is based in Canterbury.
         if ($this->campus_name === 'Canterbury') {
             $this->create_reading_list();
@@ -351,51 +348,6 @@ class course extends data
 
         $this->sync_enrolments();
     }
-
-
-    /**
-     * Returns connect_course_dets data.
-     * @return unknown
-     */
-    private function get_dets_data() {
-        global $CFG, $DB;
-
-        // Try to find an existing set of data.
-        $connect_data = $DB->get_record('connect_course_dets', array(
-            'course' => $this->moodle_id
-        ));
-
-        // Create a data container.
-        if (!$connect_data) {
-            $connect_data = new \stdClass();
-        }
-
-        // Update the container's data.
-        $connect_data->course = $this->moodle_id;
-        $connect_data->campus = isset($this->campus_desc) ? $this->campus_desc : '';
-        $connect_data->startdate = isset($this->startdate) ? $this->startdate : $CFG->kent->default_course_start_date;
-        $connect_data->enddate = isset($this->module_length) ? strtotime('+'. $this->module_length .' weeks', $connect_data->startdate) : $CFG->kent->default_course_end_date;
-        $connect_data->weeks = isset($this->module_length) ? $this->module_length : 0;
-
-        return $connect_data;
-    }
-
-
-    /**
-     * Add Connect extra details for this course
-     */
-    private function create_connect_extras() {
-        global $DB;
-
-        $connect_data = $this->get_dets_data();
-
-        if (!isset($connect_data->id)) {
-            $DB->insert_record('connect_course_dets', $connect_data);
-        } else {
-            $DB->update_record('connect_course_dets', $connect_data);
-        }
-    }
-
 
     /**
      * Add reading list module to this course
@@ -461,9 +413,6 @@ class course extends data
         $connect_data = $DB->get_record('connect_course_dets', array(
                 'course' => $this->moodle_id
             ));
-
-        // Update connect_course_dets.
-        $this->create_connect_extras();
 
         // Set some special vars.
         $uc = (object)array_merge((array)$course, (array)$this);
