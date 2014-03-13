@@ -155,7 +155,7 @@ abstract class data {
 	 * @return boolean
 	 */
 	public function save() {
-		global $CONNECTDB;
+		global $DB;
 
         $table = $this->get_table();
         if ($table === null) {
@@ -181,9 +181,9 @@ abstract class data {
 
         $idstr = implode(' AND ', $ids);
         $sets = implode(', ', $sets);
-        $sql = "UPDATE {$table} SET $sets WHERE $idstr";
+        $sql = "UPDATE {{$table}} SET {$sets} WHERE {$idstr}";
 
-		return $CONNECTDB->execute($sql, $params);
+		return $DB->execute($sql, $params);
 	}
 
 	/**

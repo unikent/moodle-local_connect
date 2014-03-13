@@ -30,10 +30,9 @@ class kent_user_tests extends local_connect\util\connect_testcase
 		$this->resetAfterTest();
 		$this->connect_cleanup();
 
-		$module_delivery_key = $this->generate_module_delivery_key();
-		$enrolment = $this->generate_enrolment($module_delivery_key, 'student');
+		$userid = $this->generate_user();
 
-		$user = \local_connect\user::get($enrolment["login"]);
+		$user = \local_connect\user::get($userid);
 		$this->assertTrue($user->is_in_moodle());
 		$user->create_in_moodle();
 		$this->assertTrue($user->is_in_moodle());
@@ -41,6 +40,47 @@ class kent_user_tests extends local_connect\util\connect_testcase
 		$this->assertFalse($user->is_in_moodle());
 		$user->create_in_moodle();
 		$this->assertTrue($user->is_in_moodle());
+
+		$this->connect_cleanup();
+	}
+
+	/**
+	 * Make sure we can get users by roles.
+	 */
+	public function test_user_get_by_role() {
+		global $CFG, $DB, $CONNECTDB;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		$this->assertEquals(0, count(\local_connect\user::get_by_role("student")));
+		$this->assertEquals(0, count(\local_connect\user::get_by_role("staff")));
+		$this->assertEquals(0, count(\local_connect\user::get_by_role("teacher")));
+		$this->assertEquals(0, count(\local_connect\user::get_by_role("convenor")));
+
+		{
+			$course = $this->generate_course();
+			$this->generate_enrolments(50, $course, 'student');
+			$this->generate_enrolments(2, $course, 'teacher');
+			$this->generate_enrolments(4, $course, 'convenor');
+		}
+
+		$this->assertEquals(50, count(\local_connect\user::get_by_role("student")));
+		$this->assertEquals(6, count(\local_connect\user::get_by_role("staff")));
+		$this->assertEquals(2, count(\local_connect\user::get_by_role("teacher")));
+		$this->assertEquals(4, count(\local_connect\user::get_by_role("convenor")));
+
+		{
+			$course = $this->generate_course();
+			$this->generate_enrolments(100, $course, 'student');
+			$this->generate_enrolments(4, $course, 'teacher');
+			$this->generate_enrolments(8, $course, 'convenor');
+		}
+
+		$this->assertEquals(150, count(\local_connect\user::get_by_role("student")));
+		$this->assertEquals(18, count(\local_connect\user::get_by_role("staff")));
+		$this->assertEquals(6, count(\local_connect\user::get_by_role("teacher")));
+		$this->assertEquals(12, count(\local_connect\user::get_by_role("convenor")));
 
 		$this->connect_cleanup();
 	}

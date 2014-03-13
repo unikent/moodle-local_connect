@@ -31,61 +31,40 @@ defined('MOODLE_INTERNAL') || die();
  */
 class user extends data
 {
-	/** Our Moodle ID (dont rely on this, use moodle_id) */
-	private $_moodle_id;
-
     /**
      * The name of our connect table.
      */
     protected function get_table() {
-        return null;
+        return "connect_user";
     }
 
     /**
      * A list of valid fields for this data object.
      */
     protected final function valid_fields() {
-        return array("uid", "username", "firstname", "lastname");
+        return array("id", "mid", "ukc", "login", "title", "initials", "family_name");
     }
 
     /**
      * A list of immutable fields for this data object.
      */
     protected function immutable_fields() {
-        return array("uid");
+        return array("id", "mid", "ukc");
     }
 
     /**
      * A list of key fields for this data object.
      */
     protected function key_fields() {
-        return array("username");
+        return array("id");
     }
-
-	/**
-	 * Returns the Moodle user ID (or null)
-	 */
-	public function _get_moodle_id() {
-		global $DB;
-
-		if (empty($this->_moodle_id)) {
-			$user = $DB->get_record('user', array(
-				'username' => $this->username
-			));
-
-			$this->_moodle_id = empty($user) ? null : $user->id;
-		}
-
-		return $this->_moodle_id;
-	}
 
 	/**
 	 * Is this user in Moodle?
 	 * @return boolean [description]
 	 */
 	public function is_in_moodle() {
-		$userid = $this->moodle_id;
-		return $userid !== null;
+		return !empty($this->mid);
 	}
 
 	/**
@@ -97,24 +76,25 @@ class user extends data
 		require_once ($CFG->dirroot . "/user/lib.php");
 
 		if ($this->is_in_moodle()) {
-			return $this->moodle_id;
+			return $this->mid;
 		}
 
-		if (empty($this->username) || empty($this->firstname) || empty($this->lastname)) {
+		if (empty($this->login) || empty($this->initials) || empty($this->family_name)) {
 			return null;
 		}
 
 		$user = new \stdClass();
-		$user->username = $this->username;
-		$user->firstname = $this->firstname;
-		$user->lastname = $this->lastname;
-		$user->email = $this->username . "@kent.ac.uk";
+		$user->username = $this->login;
+		$user->firstname = $this->initials;
+		$user->lastname = $this->family_name;
+		$user->email = $this->login . "@kent.ac.uk";
 		$user->auth = "kentsaml";
 		$user->password = "not cached";
 		$user->confirmed = 1;
 		$user->mnethostid = $CFG->mnet_localhost_id;
 
-		$this->_moodle_id = user_create_user($user, false);
+		$this->mid = user_create_user($user, false);
+		$this->save();
 	}
 
 	/**
@@ -122,22 +102,23 @@ class user extends data
 	 */
 	public function delete() {
 		$user = new \stdClass();
-		$user->id = $this->moodle_id;
-		$user->username = $this->username;
+		$user->id = $this->mid;
+		$user->username = $this->login;
 		delete_user($user);
 
-		$this->_moodle_id = null;
+		$this->mid = null;
+		$this->save();
 	}
 
 	/**
-	 * Get a user by Username
+	 * Get a user by ID
 	 */
-	public static function get($username) {
-		global $CONNECTDB;
+	public static function get($id) {
+		global $DB;
 
-		$user = $CONNECTDB->get_record('enrollments', array(
-			'login' => $username
-		), "ukc, initials as firstname, family_name as lastname, login as username", IGNORE_MULTIPLE);
+		$user = $DB->get_record("connect_user", array(
+			'id' => $id
+		));
 
 		$obj = new static();
 		$obj->set_class_data($user);
@@ -146,10 +127,26 @@ class user extends data
 	}
 
 	/**
-	 * Returns a list of all known students.
+	 * Get a user by Username
+	 */
+	public static function get_by_username($username) {
+		global $DB;
+
+		$user = $DB->get_record("connect_user", array(
+			'login' => $username
+		));
+
+		$obj = new static();
+		$obj->set_class_data($user);
+
+		return $obj;
+	}
+
+	/**
+	 * Returns a list of all known users in a given role.
 	 */
 	public static function get_by_role($role) {
-		global $CONNECTDB;
+		global $DB;
 
 		// Allow a special "staff" case that covers convenors and teachers.
 		$selector = '=';
@@ -158,23 +155,27 @@ class user extends data
 			$role = 'student';
 		}
 
-		$sql = "SELECT e.login as username, e.ukc as uid, e.initials as firstname, e.family_name as lastname
-			FROM {enrollments} e
-				WHERE e.role $selector :role
-			GROUP BY e.login";
-		$data = $CONNECTDB->get_records_sql($sql, array(
+		$sql = "SELECT cu.*
+			FROM {connect_user} cu
+			INNER JOIN (
+				SELECT cr.name as role, ce.user
+				FROM {connect_enrolments} ce
+				INNER JOIN {connect_role} cr ON cr.id=ce.role
+			) cre ON cre.user=cu.id
+			WHERE cre.role $selector :role";
+		$data = $DB->get_records_sql($sql, array(
 			"role" => $role
 		));
 
 		$result = array();
 		foreach ($data as $obj) {
-			if (isset($result[$obj->username]) || empty($obj->username)) {
+			if (isset($result[$obj->login]) || empty($obj->login)) {
 				continue;
 			}
 
 			$user = new static();
             $user->set_class_data($obj);
-            $result[$obj->username] = $user;
+            $result[$obj->login] = $user;
 		}
 
 		return $result;

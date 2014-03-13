@@ -64,10 +64,20 @@ abstract class connect_testcase extends \advanced_testcase
 		$CONNECTDB->execute("TRUNCATE TABLE {groups}");
 		$SHAREDB->execute("TRUNCATE TABLE {course_list}");
 
+		// Clear out the connect tables.
+		$DB->execute("TRUNCATE TABLE {connect_user}");
+		$DB->execute("TRUNCATE TABLE {connect_enrolments}");
+		$DB->execute("TRUNCATE TABLE {connect_role}");
+
 		// Delete the roles too.
 		$DB->delete_records('role', array('shortname' => 'sds_student'));
 		$DB->delete_records('role', array('shortname' => 'sds_teacher'));
 		$DB->delete_records('role', array('shortname' => 'convenor'));
+
+		// Create new role records.
+		$DB->insert_record("connect_role", array("mid" => 0, "name" => "student"));
+		$DB->insert_record("connect_role", array("mid" => 0, "name" => "teacher"));
+		$DB->insert_record("connect_role", array("mid" => 0, "name" => "convenor"));
 	}
 
 	/**
@@ -84,43 +94,57 @@ abstract class connect_testcase extends \advanced_testcase
 	}
 
 	/**
-	 * Returns a valid enrolment for testing.
+	 * Returns a valid user for testing.
 	 */
-	protected function generate_enrolment($module_delivery_key, $role = 'student') {
-		global $CFG;
+	protected function generate_user() {
+		global $DB;
 
-		static $uid = 10000000;
-
+		// Create at the moodle-level
 		$generator = \advanced_testcase::getDataGenerator();
 		$user = $generator->create_user();
 
-		$data = array(
-			"ukc" => $uid,
+		static $uid = 10000000;
+
+		return $DB->insert_record("connect_user", array(
+			"mid" => $user->id,
+			"ukc" => $uid++,
 			"login" => $user->username,
 			"title" => "Mx",
 			"initials" => $user->firstname,
-			"family_name" => $user->lastname,
-			"session_code" => $CFG->connect->session_code,
-			"module_delivery_key" => $module_delivery_key,
-			"role" => $role,
-			"chksum" => uniqid($uid),
-			"id_chksum" => uniqid($uid),
-			"state" => 1
-		);
+			"family_name" => $user->lastname
+		));
+	}
 
-		$this->insertDB('enrollments', $data);
+	/**
+	 * Returns a valid enrolment for testing.
+	 */
+	protected function generate_enrolment($course_id, $role = 1) {
+		global $DB;
 
-		$uid++;
+		if (is_string($role)) {
+			$role = $DB->get_field("connect_role", "id", array("name" => $role));
+		}
 
-		return $data;
+		return $DB->insert_record('connect_enrolments', array(
+			"mid" => 0,
+			"course" => $course_id,
+			"user" => $this->generate_user(),
+			"role" => $role
+		));
 	}
 
 	/**
 	 * Creates a bunch of enrolments.
 	 */
-	protected function generate_enrolments($count, $module_delivery_key, $role = 'student') {
+	protected function generate_enrolments($count, $course_id, $role = 1) {
+		global $DB;
+
+		if (is_string($role)) {
+			$role = (int)$DB->get_field("connect_role", "id", array("name" => $role));
+		}
+
 		for ($i = 0; $i < $count; $i++) {
-			$this->generate_enrolment($module_delivery_key, $role);
+			$this->generate_enrolment($course_id, $role);
 		}
 	}
 
@@ -220,39 +244,28 @@ abstract class connect_testcase extends \advanced_testcase
 
 	/**
 	 * Returns a valid course module key for testing against.
+	 * @todo Extend to support extra campuses and categories.
 	 */
 	protected function generate_course() {
-		global $CFG;
+		global $CFG, $DB;
 
 		static $delivery_key = 10000;
-		static $campuses = array("Canterbury", "Medway", "Rome");
+		$delivery_key++;
 
-		shuffle($campuses);
-
-		$data = array(
+		return $DB->insert_record('connect_course', array(
+			"mid" => 0,
 			"module_delivery_key" => $delivery_key,
 			"session_code" => $CFG->connect->session_code,
-			"delivery_department" => '01',
-			"campus" => 1,
 			"module_version" => 1,
-			"campus_desc" => $campuses[0],
+			"campus" => 1,
 			"module_week_beginning" => 1,
 			"module_length" => 12,
+			"week_beginning_date" => strftime('%Y-%m-%d %H:%M:%S'),
 			"module_title" => $this->generate_module_name(),
 			"module_code" => $this->generate_module_code(),
 			"synopsis" => 'A test course',
-			"chksum" => uniqid($delivery_key),
-			"id_chksum" => uniqid($delivery_key),
-			"category_id" => 1,
-			"state" => 1,
-			"link" => 0
-		);
-
-		$this->insertDB('courses', $data);
-
-		$delivery_key++;
-
-		return $data;
+			"category" => 1
+		));
 	}
 
 	/**
@@ -269,11 +282,13 @@ abstract class connect_testcase extends \advanced_testcase
 	 * a course that exists in Moodle.
 	 */
 	protected function generate_module_delivery_key() {
-		global $CFG;
+		global $CFG, $DB;
 
 		// Generate a course.
 		$course = $this->generate_course();
-		$module_delivery_key = $course['module_delivery_key'];
+		$module_delivery_key = $DB->get_field('connect_course', 'module_delivery_key', array(
+			"id" => $course
+		));
 
 		// Create in Moodle.
 		$course = \local_connect\course::get_course_by_uid($module_delivery_key, $CFG->connect->session_code);
