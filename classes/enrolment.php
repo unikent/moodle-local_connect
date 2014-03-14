@@ -194,33 +194,19 @@ class enrolment extends data
      * @return local_connect_enrolment Enrolment object
      */
     public static function get_for_course($course) {
-        global $CONNECTDB;
+        global $DB;
 
-        // If this course has children, get the enrolments for those instead.
-        if ($course->has_children()) {
-            $data = array();
-
-            foreach ($course->children as $child) {
-                if ($child != $course) {
-                    $data = array_merge($data, self::get_for_course($child));
-                }
-            }
-
-            return $data;
-        }
-
-        // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title, e.module_delivery_key
-                FROM {enrollments} e
-                    LEFT JOIN {courses} c
-                        ON c.module_delivery_key = e.module_delivery_key
-                WHERE c.module_delivery_key=:deliverykey AND c.session_code = :sessioncode";
-        $data = $CONNECTDB->get_records_sql($sql, array(
-            "deliverykey" => $course->module_delivery_key,
-            "sessioncode" => $course->session_code
+        $objs = $DB->get_records('connect_enrolments', array(
+            'course' => $course->id
         ));
 
-        return self::filter_sql_query_set($data);
+        foreach ($objs as &$obj) {
+            $enrolment = new enrolment();
+            $enrolment->set_class_data($obj);
+            $obj = $enrolment;
+        }
+
+        return $objs;
     }
 
     /**
