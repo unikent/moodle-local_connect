@@ -93,7 +93,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="mid" TYPE="int" LENGTH="11" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="group" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -101,7 +101,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
-        <INDEX NAME="index_group" UNIQUE="false" FIELDS="group"/>
+        <INDEX NAME="index_groupid" UNIQUE="false" FIELDS="groupid"/>
         <INDEX NAME="index_user" UNIQUE="false" FIELDS="user"/>
       </INDEXES>
     </TABLE>

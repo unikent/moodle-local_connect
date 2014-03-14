@@ -189,13 +189,13 @@ function xmldb_local_connect_upgrade($oldversion) {
             // Adding fields to table connect_group_enrolments.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
             $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, null, null, 0);
-            $table->add_field('group', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('groupid', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
 
             // Adding indexes to table connect_group_enrolments.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $table->add_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
-            $table->add_index('index_group', XMLDB_INDEX_NOTUNIQUE, array('group'));
+            $table->add_index('index_groupid', XMLDB_INDEX_NOTUNIQUE, array('groupid'));
             $table->add_index('index_user', XMLDB_INDEX_NOTUNIQUE, array('user'));
 
             // Conditionally launch create table.

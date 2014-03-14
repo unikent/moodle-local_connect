@@ -119,7 +119,7 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->generate_group_enrolments(2, $group, 'teacher');
 
 		// Get the group.
-		$obj = \local_connect\group::get($group['group_id']);
+		$obj = \local_connect\group::get($group);
 
 		$this->assertEquals(30, $obj->count_students());
 		$this->assertEquals(2, $obj->count_staff());

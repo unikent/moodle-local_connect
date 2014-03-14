@@ -160,18 +160,23 @@ abstract class connect_testcase extends \advanced_testcase
 	/**
 	 * Returns a valid group enrolment for testing.
 	 */
-	protected function generate_group_enrolment($group, $role = 'student') {
+	protected function generate_group_enrolment($groupid, $role = 'student') {
 		global $DB;
 
-		$id = $this->generate_enrolment($group['module_delivery_key'], $role);
-		$enrolment = $DB->get_record('connect_enrolments', array(
-			"id" => $id
+		$courseid = $DB->get_field('connect_group', 'course', array(
+			"id" => $groupid
+		));
+
+		$enrolmentid = $this->generate_enrolment($courseid, $role);
+
+		$userid = $DB->get_field('connect_enrolments', 'user', array(
+			"id" => $enrolmentid
 		));
 
 		return $DB->insert_record('connect_group_enrolments', array(
 			"mid" => 0,
-			"group" => $group,
-			"user" => $enrolment->user
+			"groupid" => $groupid,
+			"user" => $userid
 		));
 	}
 
