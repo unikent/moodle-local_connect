@@ -60,6 +60,27 @@ class enrolment extends data
     }
 
     /**
+     * Grab the connect user object
+     */
+    public function _get_user_obj() {
+        return user::get($this->user);
+    }
+
+    /**
+     * Grab the connect user object
+     */
+    public function _get_course_obj() {
+        return course::get($this->course);
+    }
+
+    /**
+     * Grab the connect role object
+     */
+    public function _get_role_obj() {
+        return role::get($this->role);
+    }
+
+    /**
      * Here is the big sync method.
      */
     public function sync($dry = false) {
@@ -97,25 +118,18 @@ class enrolment extends data
         $enrol = enrol_get_plugin('manual');
         $instances = $DB->get_records('enrol', array(
             'enrol' => 'manual',
-            'courseid' => $this->courseid,
+            'courseid' => $this->course_obj->mid,
             'status' => ENROL_INSTANCE_ENABLED
         ), 'sortorder, id ASC');
         $instance = reset($instances);
-        $enrol->unenrol_user($instance, $this->userid);
+        $enrol->unenrol_user($instance, $this->user_obj->mid);
     }
 
     /**
-     * Returns the ID of the Moodle user.
-     */
-    public function get_user_id() {
-        return $this->userid;
-    }
-
-    /**
-     * Returns true if this is a valid enrolment
+     * Returns true if this is a valid enrolment (i.e. we can create it in Moodle)
      */
     public function is_valid() {
-        return !empty($this->courseid) && !empty($this->roleid) && !empty($this->userid);
+        return $this->course_obj->is_in_moodle() && $this->user_obj->is_in_moodle() && $this->role_obj->is_in_moodle();
     }
 
     /**
@@ -126,24 +140,17 @@ class enrolment extends data
         require_once($CFG->libdir . "/accesslib.php");
 
         // Get course context.
-        $context = \context_course::instance($this->courseid, MUST_EXIST);
+        $context = \context_course::instance($this->course_obj->mid, MUST_EXIST);
 
         // Check enrolment status.
-        return is_enrolled($context, $this->userid);
+        return is_enrolled($context, $this->user_obj->mid);
     }
 
     /**
      * Create this enrolment in Moodle
      */
     public function create_in_moodle() {
-        return enrol_try_internal_enrol($this->courseid, $this->userid, $this->roleid);
-    }
-
-    /**
-     * Returns the module name
-     */
-    public function __toString() {
-        return $this->moduletitle;
+        return enrol_try_internal_enrol($this->course_obj->mid, $this->user_obj->mid, $this->role_obj->mid);
     }
 
     /**
