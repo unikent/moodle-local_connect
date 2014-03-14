@@ -142,7 +142,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding fields to table connect_enrolments.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, null, null, 0);
             $table->add_field('course', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('role', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, null);
@@ -166,7 +166,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding fields to table connect_group.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, null, null, 0);
             $table->add_field('course', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
 
@@ -188,7 +188,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding fields to table connect_group_enrolments.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, null, null, 0);
             $table->add_field('group', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
 
@@ -230,7 +230,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding fields to table connect_user.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, null, null, 0);
             $table->add_field('ukc', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
             $table->add_field('login', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
             $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
@@ -255,7 +255,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
             // Adding fields to table connect_course.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, null, null, 0);
             $table->add_field('module_delivery_key', XMLDB_TYPE_CHAR, '36', null, XMLDB_NOTNULL, null, null);
             $table->add_field('session_code', XMLDB_TYPE_CHAR, '4', null, XMLDB_NOTNULL, null, null);
             $table->add_field('module_version', XMLDB_TYPE_CHAR, '4', null, XMLDB_NOTNULL, null, null);
