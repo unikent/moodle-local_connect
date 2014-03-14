@@ -97,6 +97,11 @@ class group_enrolment extends data
             return false;
         }
 
+        $course = course::get($group->course);
+        if (!$course || !$course->is_in_moodle()) {
+            return false;
+        }
+
         $user = user::get($this->user);
         if (!$user || !$user->is_in_moodle()) {
             return false;
@@ -135,9 +140,22 @@ class group_enrolment extends data
             return false;
         }
 
+        $course = course::get($group->course);
+        if (!$course || !$course->is_in_moodle()) {
+            return false;
+        }
+
         $user = user::get($this->user);
         if (!$user || !$user->is_in_moodle()) {
             return false;
+        }
+
+        // Is the user enrolled?
+        $enrolment = enrolment::get_for_user_and_course($user, $course);
+        if (!$enrolment->is_in_moodle()) {
+            if (!$enrolment->create_in_moodle()) {
+                return false;
+            }
         }
 
         return groups_add_member($group->mid, $user->mid);
