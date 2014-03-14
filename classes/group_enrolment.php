@@ -92,7 +92,7 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_valid() {
-        $group = group::get($this->group);
+        $group = group::get($this->groupid);
         if (!$group || !$group->is_in_moodle()) {
             return false;
         }
@@ -111,7 +111,7 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_in_moodle() {
-        $group = group::get($this->group);
+        $group = group::get($this->groupid);
         if (!$group || !$group->is_in_moodle()) {
             return false;
         }
@@ -130,7 +130,7 @@ class group_enrolment extends data
      * @return unknown
      */
     public function create_in_moodle() {
-        $group = group::get($this->group);
+        $group = group::get($this->groupid);
         if (!$group || !$group->is_in_moodle()) {
             return false;
         }
@@ -149,7 +149,7 @@ class group_enrolment extends data
      * @return boolean
      */
     public function delete() {
-        $group = group::get($this->group);
+        $group = group::get($this->groupid);
         if (!$group || !$group->is_in_moodle()) {
             return false;
         }
@@ -189,14 +189,17 @@ class group_enrolment extends data
     public static function get_for_group($group) {
         global $DB;
 
-        $ge = $DB->get_record('connect_group_enrolments', array(
+        $set = $DB->get_records('connect_group_enrolments', array(
             'groupid' => $group->id
         ));
 
-        $obj = new group_enrolment();
-        $obj->set_class_data($ge);
+        foreach ($set as &$o) {
+            $obj = new group_enrolment();
+            $obj->set_class_data($o);
+            $o = $obj;
+        }
 
-        return $obj;
+        return $set;
     }
 
     /**
