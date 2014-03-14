@@ -183,47 +183,41 @@ class group extends data
     }
 
     /**
+     * Returns the number of people enrolled in this group.
+     */
+    public function count_all() {
+        global $DB;
+        return $DB->count_records("connect_group_enrolments", array(
+            "groupid" => $this->id
+        ));
+    }
+
+    /**
      * Returns the number of students enrolled in this group.
      */
     public function count_students() {
-        // First we need a list of all students.
-        $students = user::get_students();
+        global $DB;
 
-        // Now we need all enrolments.
-        $enrolments = group_enrolment::get_for_group($this);
+        $role = $DB->get_field('connect_role', 'id', array('name' => 'student'));
 
-        $result = 0;
+        $sql = "SELECT COUNT(cge.id) as count
+        FROM {connect_group_enrolments} cge
+        INNER JOIN {connect_enrolments} ce
+            ON ce.user=cge.user
+        WHERE cge.groupid=:id AND ce.course=:course AND ce.role=:role";
 
-        // Count the students out.
-        foreach ($enrolments as $enrolment) {
-            if (isset($students[$enrolment->login])) {
-                $result++;
-            }
-        }
-
-        return $result;
+        return $DB->count_records_sql($sql, array(
+            "id" => $this->id,
+            "course" => $this->course,
+            "role" => $role
+        ));
     }
 
     /**
      * Returns the number of staff enrolled in this group.
      */
     public function count_staff() {
-        // First we need a list of all staff.
-        $staff = user::get_staff();
-
-        // Now we need all enrolments.
-        $enrolments = group_enrolment::get_for_group($this);
-
-        $result = 0;
-
-        // Count the staff out.
-        foreach ($enrolments as $enrolment) {
-            if (isset($staff[$enrolment->login])) {
-                $result++;
-            }
-        }
-
-        return $result;
+        return $this->count_all() - $this->count_students();
     }
 
     /**
