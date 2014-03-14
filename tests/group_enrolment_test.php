@@ -134,11 +134,42 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 	}
 
 	/**
+	 * Make sure we can get course enrolments properly.
+	 */
+	public function test_group_enrolment_get_for_course() {
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		$course = $this->generate_course();
+		$courseobj = \local_connect\course::get($course);
+
+		$group = $this->generate_group($course);
+		$this->generate_group_enrolments(40, $group, 'student');
+
+		$this->assertEquals(40, count(\local_connect\group_enrolment::get_for_course($courseobj)));
+
+		$group = $this->generate_group($course);
+		$this->generate_group_enrolments(20, $group, 'student');
+
+		$this->assertEquals(60, count(\local_connect\group_enrolment::get_for_course($courseobj)));
+
+		$course2 = $this->generate_course();
+		$course2obj = \local_connect\course::get($course2);
+
+		$group = $this->generate_group($course2);
+
+		$this->generate_group_enrolments(20, $group, 'student');
+
+		$this->assertEquals(60, count(\local_connect\group_enrolment::get_for_course($courseobj)));
+		$this->assertEquals(20, count(\local_connect\group_enrolment::get_for_course($course2obj)));
+
+		$this->connect_cleanup();
+	}
+
+	/**
 	 * Make sure we can sync properly.
 	 */
 	public function test_group_enrolment_sync() {
-		global $DB;
-
 		$this->resetAfterTest();
 		$this->connect_cleanup();
 

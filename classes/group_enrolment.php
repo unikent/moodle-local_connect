@@ -234,7 +234,7 @@ class group_enrolment extends data
                 ON cg.id=cge.groupid
             WHERE cg.course=:course';
 
-        $set = $DB->get_record_sql($sql, array(
+        $set = $DB->get_records_sql($sql, array(
             'course' => $course->id
         ));
 
