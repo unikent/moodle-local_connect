@@ -57,16 +57,6 @@ $observers = array (
     array (
         'eventname' => '\core\event\group_deleted',
         'callback' => '\local_connect\observers::group_deleted',
-    ),
-
-    array (
-        'eventname' => '\core\event\group_member_added',
-        'callback' => '\local_connect\observers::group_member_added',
-    ),
-
-    array (
-        'eventname' => '\core\event\group_member_removed',
-        'callback' => '\local_connect\observers::group_member_removed',
     )
 
 );

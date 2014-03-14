@@ -271,36 +271,4 @@ class observers {
         return true;
     }
 
-    /**
-     * Triggered when 'group_member_added' event is triggered.
-     *
-     * @param \core\event\group_member_added $event
-     * @return unknown
-     */
-    public static function group_member_added(\core\event\group_member_added $event) {
-        global $DB;
-
-        if (!utils::enable_new_features()) {
-            return true;
-        }
-
-        return true;
-    }
-
-    /**
-     * Triggered when 'group_member_removed' event is triggered.
-     *
-     * @param \core\event\group_member_removed $event
-     * @return unknown
-     */
-    public static function group_member_removed(\core\event\group_member_removed $event) {
-        global $DB;
-
-        if (!utils::enable_new_features()) {
-            return true;
-        }
-
-        return true;
-    }
-
 }
