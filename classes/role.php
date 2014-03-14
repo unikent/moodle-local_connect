@@ -141,4 +141,27 @@ class role extends data
 			return delete_role($this->mid);
 		}
 	}
+
+	/**
+	 * Require a Moodle ID.
+	 */
+	public function get_or_create_mid() {
+		if (!$this->is_in_moodle()) {
+			$this->create_in_moodle();
+		}
+
+		return $this->mid;
+	}
+
+	/**
+	 * Get or create a role by id
+	 */
+	public static function get($id) {
+		global $DB;
+		$obj = new role();
+		$obj->set_class_data($DB->get_record('connect_role', array(
+			"id" => $id
+		)));
+		return $obj;
+	}
 }
