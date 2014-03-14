@@ -73,7 +73,7 @@ class role extends data
         	$data = $this->get_data_mapping();
 			$result[$this->id] = $DB->get_field('role', 'id', array(
 				'shortname' => $data['short']
-			));
+			), IGNORE_MISSING);
 		}
 
 		return $result[$this->id];
@@ -84,7 +84,7 @@ class role extends data
 	 * @return boolean
 	 */
 	public function is_in_moodle() {
-		return 0;
+		return $this->mid !== false;
 	}
 
 	/**
