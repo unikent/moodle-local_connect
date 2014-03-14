@@ -31,56 +31,32 @@ defined('MOODLE_INTERNAL') || die();
  */
 class enrolment extends data
 {
-    /** The Moodle ID of the user this relates to */
-    private $userid;
-
-    /** The Moodle ID of the course this relates to */
-    private $courseid;
-
-    /** The Moodle ID of the role this relates to */
-    private $roleid;
-
-    /** The module title of this enrolment */
-    private $moduletitle;
-
-    /**
-     * Our constructor
-     */
-    public function __construct($userid, $courseid, $roleid, $moduletitle) {
-        parent::__construct();
-
-        $this->userid = $userid;
-        $this->courseid = $courseid;
-        $this->roleid = $roleid;
-        $this->moduletitle = $moduletitle;
-    }
-
     /**
      * The name of our connect table.
      */
     protected static function get_table() {
-        return 'enrollments';
+        return 'connect_enrolments';
     }
 
     /**
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("ukc", "login", "title", "initials", "family_name", "session_code", "module_delivery_key", "role", "chksum", "moodle_id", "sink_deleted", "state", "created_at", "updated_at", "id_chksum", "last_checked");
+        return array("id", "mid", "user", "course", "role", "deleted");
     }
 
     /**
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
-        return array("ukc", "login", "module_delivery_key", "session_code", "role");
+        return array("id");
     }
 
     /**
      * A list of key fields for this data object.
      */
     protected static function key_fields() {
-        return array("login", "module_delivery_key", "session_code");
+        return array("id");
     }
 
     /**
@@ -88,13 +64,13 @@ class enrolment extends data
      */
     public function sync($dry = false) {
         // Should we be deleting this?
-        if ($this->sink_deleted) {
+        if ($this->deleted) {
             if ($this->is_in_moodle()) {
                 if (!$dry) {
                     $this->delete();
                 }
 
-                return "Deleting Enrolment: $this->chksum";
+                return "Deleting Enrolment: $this->id";
             }
 
             return null;
@@ -106,7 +82,7 @@ class enrolment extends data
                 $this->create_in_moodle();
             }
 
-            return "Creating Enrolment: $this->chksum";
+            return "Creating Enrolment: $this->id";
         }
     }
 
@@ -340,85 +316,5 @@ class enrolment extends data
 
         $array = self::filter_sql_query_set($data);
         return array_pop($array);
-    }
-
-    /**
-     * Translates a Connect role into Moodle role
-     * 
-     * @param  string $role A role grabbed out the connect database
-     * @return string The Moodle version of this role
-     */
-    private static function translate_role($role) {
-        switch ($role) {
-            case "student":
-            case "teacher":
-            return "sds_$role";
-
-            default:
-            return $role;
-        }
-    }
-
-    /**
-     * Returns the database object for a given role
-     * 
-     * @param string $shortname A shortname for a role
-     */
-    private static function get_role($shortname) {
-        global $DB;
-
-        $cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'local_connect', 'enrolment_roles');
-        if (!$role = $cache->get($shortname)) {
-            // Create the role if it doesnt exist.
-            self::create_role($shortname);
-
-            // Grab new data.
-            $role = $DB->get_record('role', array(
-                'shortname' => $shortname
-            ));
-
-            $cache->set($shortname, $role);
-        }
-
-        return $role;
-    }
-
-    /**
-     * Create the given role if it doesnt already exist.
-     */
-    private static function create_role($shortname) {
-        global $DB, $CFG;
-
-        static $data_map = array(
-            "sds_student" => array(
-                "Student (SDS)",
-                "sds_student",
-                "Students generally have fewer privileges within a course.",
-                "student"
-            ),
-            "sds_teacher" => array(
-                "Teacher (SDS)",
-                "sds_teacher",
-                "Teachers can do anything within a course, including changing the activities and grading students.",
-                "editingteacher"
-            ),
-            "convenor" => array(
-                "Convenor (SDS)",
-                "convenor",
-                "A Convenor has the same permissions as a teacher, but can manually enrol teachers.",
-                "editingteacher"
-            )
-        );
-
-        if (!isset($data_map[$shortname])) {
-            throw new \moodle_exception("Invalid Connect Role - $shortname!");
-        }
-
-        if (!$DB->record_exists('role', array('shortname' => $shortname))) {
-            require_once($CFG->libdir . "/accesslib.php");
-
-            // Create it!
-            call_user_func_array("create_role", $data_map[$shortname]);
-        }
     }
 }

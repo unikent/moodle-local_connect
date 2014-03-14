@@ -146,6 +146,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             $table->add_field('course', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('role', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, 0);
 
             // Adding indexes to table connect_enrolments.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -191,6 +192,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, null, null, 0);
             $table->add_field('groupid', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
             $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, 0);
 
             // Adding indexes to table connect_group_enrolments.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
