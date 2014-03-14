@@ -193,6 +193,44 @@ class kent_group_tests extends local_connect\util\connect_testcase
 
 		$this->connect_cleanup();
 	}
+
+	/**
+	 * Test group observers.
+	 */
+	public function test_group_observer() {
+		global $DB;
+
+		$this->resetAfterTest();
+		$this->connect_cleanup();
+
+		// Create course.
+		$course = \local_connect\course::get($this->generate_course());
+		$course->create_in_moodle();
+
+		$group = \local_connect\group::get($this->generate_group($course->id));
+
+		$this->assertFalse($group->is_in_moodle());
+		$group->create_in_moodle();
+		$this->assertTrue($group->is_in_moodle());
+
+		// Delete from Moodle.
+		groups_delete_group($group->mid);
+
+		$group = \local_connect\group::get($group->id);
+		$this->assertFalse($group->is_in_moodle());
+
+		// Recreate in Moodle.
+        $data = new \stdClass();
+        $data->name = $group->name;
+        $data->courseid = $course->mid;
+        $data->description = '';
+        groups_create_group($data);
+
+		$group = \local_connect\group::get($group->id);
+		$this->assertTrue($group->is_in_moodle());
+
+		$this->connect_cleanup();
+	}
 }
 
 

@@ -47,6 +47,26 @@ $observers = array (
     array (
         'eventname' => '\core\event\user_deleted',
         'callback' => '\local_connect\observers::user_deleted',
+    ),
+
+    array (
+        'eventname' => '\core\event\group_created',
+        'callback' => '\local_connect\observers::group_created',
+    ),
+
+    array (
+        'eventname' => '\core\event\group_deleted',
+        'callback' => '\local_connect\observers::group_deleted',
+    ),
+
+    array (
+        'eventname' => '\core\event\group_member_added',
+        'callback' => '\local_connect\observers::group_member_added',
+    ),
+
+    array (
+        'eventname' => '\core\event\group_member_removed',
+        'callback' => '\local_connect\observers::group_member_removed',
     )
 
 );

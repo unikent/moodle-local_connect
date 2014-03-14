@@ -136,8 +136,6 @@ class observers {
     /**
      * Triggered when 'user_created' event is triggered.
      *
-     * Sync the new user's enrolments
-     *
      * @param \core\event\user_created $event
      * @return unknown
      */
@@ -169,6 +167,8 @@ class observers {
                     $enrolment->create_in_moodle();
                 }
             }
+
+            // TODO - group enrolments
         }
 
         return true;
@@ -177,8 +177,6 @@ class observers {
 
     /**
      * Triggered when 'user_deleted' event is triggered.
-     *
-     * Sync the new user's enrolments
      *
      * @param \core\event\user_deleted $event
      * @return unknown
@@ -197,6 +195,109 @@ class observers {
                 $user->mid = 0;
                 $user->save();
             }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Triggered when 'group_created' event is triggered.
+     *
+     * @param \core\event\group_created $event
+     * @return unknown
+     */
+    public static function group_created(\core\event\group_created $event) {
+        global $DB;
+
+        if (!utils::enable_new_features()) {
+            return true;
+        }
+
+        $group = $event->get_record_snapshot('groups', $event->objectid);
+
+        $connect_course_id = $DB->get_field('connect_course', 'id', array(
+            'mid' => $group->courseid
+        ));
+
+        $connect_group_id = $DB->get_field('connect_group', 'id', array(
+            'course' => $connect_course_id,
+            'name' => $group->name
+        ));
+
+        // Reset mid.
+        if ($connect_group_id) {
+            $group = group::get($connect_group_id);
+            if ($group->mid !== $event->objectid) {
+                $group->mid = $event->objectid;
+                $group->save();
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Triggered when 'group_deleted' event is triggered.
+     *
+     * @param \core\event\group_deleted $event
+     * @return unknown
+     */
+    public static function group_deleted(\core\event\group_deleted $event) {
+        global $DB;
+
+        if (!utils::enable_new_features()) {
+            return true;
+        }
+
+        $group = $event->get_record_snapshot('groups', $event->objectid);
+
+        $connect_course_id = $DB->get_field('connect_course', 'id', array(
+            'mid' => $group->courseid
+        ));
+
+        $connect_group_id = $DB->get_field('connect_group', 'id', array(
+            'course' => $connect_course_id,
+            'name' => $group->name
+        ));
+
+        // Reset mid.
+        if ($connect_group_id) {
+            $group = group::get($connect_group_id);
+            $group->mid = 0;
+            $group->save();
+        }
+
+        return true;
+    }
+
+    /**
+     * Triggered when 'group_member_added' event is triggered.
+     *
+     * @param \core\event\group_member_added $event
+     * @return unknown
+     */
+    public static function group_member_added(\core\event\group_member_added $event) {
+        global $DB;
+
+        if (!utils::enable_new_features()) {
+            return true;
+        }
+
+        return true;
+    }
+
+    /**
+     * Triggered when 'group_member_removed' event is triggered.
+     *
+     * @param \core\event\group_member_removed $event
+     * @return unknown
+     */
+    public static function group_member_removed(\core\event\group_member_removed $event) {
+        global $DB;
+
+        if (!utils::enable_new_features()) {
+            return true;
         }
 
         return true;
