@@ -104,10 +104,10 @@ class cli {
 			}
 
 			// We have a valid course!
-			$enrolments = enrolment::get_for_course($connect_course);
+			$enrolments = $connect_course->enrolments;
 		} else {
 			mtrace("  Synchronizing enrolments...\n");
-			$enrolments = enrolment::get_all($CFG->connect->session_code);
+			$enrolments = enrolment::get_all();
 		}
 
 		foreach ($enrolments as $enrolment) {
@@ -141,7 +141,7 @@ class cli {
 			}
 
 			// We have a valid course!
-			$groups = group::get_for_course($connect_course);
+			$groups = $connect_course->groups;
 		} else {
 			mtrace("  Synchronizing groups...\n");
 			$groups = group::get_all();
@@ -178,10 +178,10 @@ class cli {
 			}
 
 			// We have a valid course!
-			$group_enrolments = group_enrolment::get_for_course($connect_course);
+			$group_enrolments = $connect_course->group_enrolments;
 		} else {
 			mtrace("  Synchronizing group enrolments...\n");
-			$group_enrolments = group_enrolment::get_all($CFG->connect->session_code);
+			$group_enrolments = group_enrolment::get_all();
 		}
 
 		foreach ($group_enrolments as $group_enrolment) {

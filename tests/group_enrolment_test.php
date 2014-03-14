@@ -41,7 +41,7 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 		$group2 = $this->generate_group($module_delivery_key2);
 
 		// Test the global count.
-		$enrolments = \local_connect\group_enrolment::get_all($CFG->connect->session_code);
+		$enrolments = \local_connect\group_enrolment::get_all();
 		$this->assertEquals(0, count($enrolments));
 
 		// Generate a few enrolments.
@@ -51,7 +51,7 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 		$this->generate_group_enrolments(1, $group2, 'teacher');
 
 		// Test the global count.
-		$enrolments = \local_connect\group_enrolment::get_all($CFG->connect->session_code);
+		$enrolments = \local_connect\group_enrolment::get_all();
 		$this->assertEquals(53, count($enrolments));
 
 		// Test the group counter.

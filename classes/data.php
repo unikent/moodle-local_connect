@@ -217,7 +217,7 @@ abstract class data {
 		global $DB;
 
 		$obj = new static();
-		$obj->set_class_data($DB->get_record(self::get_table(), array(
+		$obj->set_class_data($DB->get_record(static::get_table(), array(
 			'id' => $id
 		)));
 

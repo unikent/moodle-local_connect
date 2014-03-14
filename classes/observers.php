@@ -150,13 +150,9 @@ class observers {
                 "id" => $event->objectid
             ));
 
-            // Perhaps this is a new installation...
-            if ($record->id <= 1) {
-                return true;
-            }
-
             // Sync Enrollments
-            $enrolments = enrolment::get_for_user($record->username);
+            $user = user::get_by_username($record->username);
+            $enrolments = enrolment::get_for_user($user);
             foreach ($enrolments as $enrolment) {
                 if (!$enrolment->is_in_moodle()) {
                     $enrolment->create_in_moodle();

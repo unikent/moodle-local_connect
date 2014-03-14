@@ -129,6 +129,10 @@ class enrolment extends data
      * Returns true if this is a valid enrolment (i.e. we can create it in Moodle)
      */
     public function is_valid() {
+        if (!$this->course_obj || !$this->user_obj || !$this->role_obj) {
+            return false;
+        }
+
         return $this->course_obj->is_in_moodle() && $this->user_obj->is_in_moodle() && $this->role_obj->is_in_moodle();
     }
 
@@ -161,6 +165,10 @@ class enrolment extends data
      */
     public static function get_for_user($user) {
         global $DB;
+
+        if (!isset($user->id)) {
+            return array();
+        }
 
         $objs = $DB->get_records('connect_enrolments', array(
             'user' => $user->id
