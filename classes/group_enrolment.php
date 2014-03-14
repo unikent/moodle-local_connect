@@ -25,43 +25,39 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once $CFG->dirroot.'/group/lib.php';
+
 /**
  * Connect group enrolment container
  */
 class group_enrolment extends data
 {
-    /** Our Connect group - Dont rely on this being set! Use ->group */
-    private $_group;
-
-    /** Our Moodle user id - Dont rely on this being set! Use get_moodle_user_id() */
-    private $_moodle_user_id;
-
     /**
      * The name of our connect table.
      */
     protected static function get_table() {
-        return 'group_enrollments';
+        return 'connect_group_enrolments';
     }
 
     /**
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("group_id", "group_desc", "module_delivery_key", "ukc", "login", "session_code", "chksum", "sink_deleted", "moodle_id", "state", "created_at", "updated_at", "id_chksum", "last_checked");
+        return array("id", "mid", "groupid", "user", "deleted");
     }
 
     /**
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
-        return array("group_id", "module_delivery_key", "session_code", "login");
+        return array("id");
     }
 
     /**
      * A list of key fields for this data object.
      */
     protected static function key_fields() {
-        return array("group_id", "login");
+        return array("id");
     }
 
     /**
@@ -69,13 +65,13 @@ class group_enrolment extends data
      */
     public function sync($dry = false) {
         // Should we be deleting this?
-        if ($this->sink_deleted) {
+        if ($this->deleted) {
             if ($this->is_in_moodle()) {
                 if (!$dry) {
                     $this->delete();
                 }
 
-                return "Deleting Group Enrolment: $this->chksum";
+                return "Deleting Group Enrolment: $this->id";
             }
 
             return null;
@@ -87,47 +83,22 @@ class group_enrolment extends data
                 $this->create_in_moodle();
             }
 
-            return "Creating Group Enrolment: " . $this->chksum;
+            return "Creating Group Enrolment: " . $this->id;
         }
     }
-
-    /**
-     * Grab our Connect Group
-     * @return unknown
-     */
-    protected function _get_group() {
-        if (!isset($this->_group)) {
-            $this->_group = group::get($this->group_id);
-        }
-
-        return $this->_group;
-    }
-
-
-    /**
-     * Grab our Moodle User's ID
-     * @return unknown
-     */
-    private function get_moodle_user_id() {
-        $user = user::get($this->login);
-        $this->_moodle_user_id = $user->moodle_id;
-        return $this->_moodle_user_id;
-    }
-
 
     /**
      * Can this be added to Moodle yet?
      * @return unknown
      */
     public function is_valid() {
-        $group = $this->group;
-        $groupid = $group->moodle_id;
-        if (empty($groupid)) {
+        $group = group::get($this->group);
+        if (!$group || !$group->is_in_moodle()) {
             return false;
         }
 
-        $userid = $this->get_moodle_user_id();
-        if (empty($userid)) {
+        $user = user::get($this->user);
+        if (!$user || !$user->is_in_moodle()) {
             return false;
         }
 
@@ -140,16 +111,17 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_in_moodle() {
-        global $DB;
-
-        if (!$this->is_valid()) {
+        $group = group::get($this->group);
+        if (!$group || !$group->is_in_moodle()) {
             return false;
         }
 
-        $group = $this->group;
-        $userid = $this->get_moodle_user_id();
+        $user = user::get($this->user);
+        if (!$user || !$user->is_in_moodle()) {
+            return false;
+        }
 
-        return groups_is_member($group->moodle_id, $userid);
+        return groups_is_member($group->mid, $user->mid);
     }
 
 
@@ -158,17 +130,17 @@ class group_enrolment extends data
      * @return unknown
      */
     public function create_in_moodle() {
-        global $CFG;
-        require_once $CFG->dirroot.'/group/lib.php';
-
-        if (!$this->is_valid() || $this->sink_deleted) {
+        $group = group::get($this->group);
+        if (!$group || !$group->is_in_moodle()) {
             return false;
         }
 
-        $group = $this->group;
-        $userid = $this->get_moodle_user_id();
+        $user = user::get($this->user);
+        if (!$user || !$user->is_in_moodle()) {
+            return false;
+        }
 
-        return groups_add_member($group->moodle_id, $userid);
+        return groups_add_member($group->mid, $user->mid);
     }
 
     /**
@@ -177,31 +149,17 @@ class group_enrolment extends data
      * @return boolean
      */
     public function delete() {
-        global $CFG;
-        require_once $CFG->dirroot.'/group/lib.php';
-
-        if (!$this->is_valid()) {
+        $group = group::get($this->group);
+        if (!$group || !$group->is_in_moodle()) {
             return false;
         }
 
-        $group = $this->group;
-        $userid = $this->get_moodle_user_id();
-
-        groups_remove_member($group->moodle_id, $userid);
-    }
-
-    /**
-     * Filter an SQL Query Set into objects (to keep it DRY)
-     */
-    private static function filter_sql_query_set($data) {
-        foreach ($data as &$group_enrolment) {
-            $obj = new group_enrolment();
-            $obj->set_class_data($group_enrolment);
-
-            $group_enrolment = $obj;
+        $user = user::get($this->user);
+        if (!$user || !$user->is_in_moodle()) {
+            return false;
         }
 
-        return $data;
+        return groups_remove_member($group->mid, $user->mid);
     }
 
 
@@ -210,16 +168,15 @@ class group_enrolment extends data
      * @param unknown $group
      * @return unknown
      */
-    public static function get_by_uid($group_id, $username) {
-        global $CONNECTDB;
+    public static function get($id) {
+        global $DB;
 
-        $data = $CONNECTDB->get_record("group_enrollments", array(
-            "group_id" => $group_id,
-            "login" => $username
+        $ge = $DB->get_record('connect_group_enrolments', array(
+            'id' => $id
         ));
 
         $obj = new group_enrolment();
-        $obj->set_class_data($data);
+        $obj->set_class_data($ge);
 
         return $obj;
     }
@@ -230,14 +187,16 @@ class group_enrolment extends data
      * @return unknown
      */
     public static function get_for_group($group) {
-        global $CONNECTDB;
+        global $DB;
 
-        // Select all our groups.
-        $data = $CONNECTDB->get_records("group_enrollments", array(
-            "group_id" => $group->id
-        ), '', 'chksum, login, group_id, sink_deleted');
+        $ge = $DB->get_record('connect_group_enrolments', array(
+            'groupid' => $group->id
+        ));
 
-        return self::filter_sql_query_set($data);
+        $obj = new group_enrolment();
+        $obj->set_class_data($ge);
+
+        return $obj;
     }
 
     /**
@@ -247,32 +206,42 @@ class group_enrolment extends data
      * @return local_connect_enrolment Enrolment object
      */
     public static function get_for_course($course) {
-        global $CONNECTDB;
+        global $DB;
 
-        // Select all our group enrolments.
-        $data = $CONNECTDB->get_records("group_enrollments", array(
-            "module_delivery_key" => $course->module_delivery_key,
-            "session_code" => $course->session_code
-        ), '', 'chksum, login, group_id, sink_deleted');
+        $sql = 'SELECT cge.* FROM {connect_group_enrolments} cge
+            INNER JOIN {connect_group} cg
+                ON cg.id=cge.groupid
+            WHERE cg.course=:course';
 
-        return self::filter_sql_query_set($data);
+        $set = $DB->get_record_sql($sql, array(
+            'course' => $course->id
+        ));
+
+        foreach ($set as &$o) {
+            $obj = new group_enrolment();
+            $obj->set_class_data($o);
+            $o = $obj;
+        }
+
+        return $set;
     }
 
     /**
-     * Returns all known group enrolments for a given session code.
-     * @param unknown $session_code
+     * Returns all known group enrolments .
      * @return unknown
      */
-    public static function get_all($session_code) {
-        global $CONNECTDB;
+    public static function get_all() {
+        global $DB;
 
-        // Select all our groups.
-        $data = $CONNECTDB->get_records("group_enrollments", array(
-            "session_code" => $session_code
-        ), '', 'chksum, login, group_id, sink_deleted');
+        $set = $DB->get_records('connect_group_enrolments');
 
-        return self::filter_sql_query_set($data);
+        foreach ($set as &$o) {
+            $obj = new group_enrolment();
+            $obj->set_class_data($o);
+            $o = $obj;
+        }
+
+        return $set;
     }
-
 
 }
