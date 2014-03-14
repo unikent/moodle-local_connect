@@ -183,7 +183,8 @@ class enrolment extends data
      */
     public static function get_my_enrolments() {
         global $USER;
-        return self::get_for_user($USER->username);
+        $user = user::get_by_username($USER->username);
+        return self::get_for_user($user);
     }
 
     /**
