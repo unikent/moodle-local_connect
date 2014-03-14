@@ -154,87 +154,25 @@ class enrolment extends data
     }
 
     /**
-     * Filters a raw SQL set of enrolments
+     * Returns all enrolments for a given user
      * 
-     * @return array(local_connect_enrolment) Enrolment object
-     */
-    private static function filter_sql_query_set($data) {
-        global $DB;
-
-        $cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'local_connect', 'enrolment_uids');
-
-        // Translate each enrolment datum.
-        foreach ($data as &$enrolment) {
-            // Update the role.
-            $shortname = self::translate_role($enrolment->role);
-            $role = self::get_role($shortname);
-            $enrolment->roleid = $role->id;
-
-            // Map the username if needs be.
-            if (!isset($enrolment->userid)) {
-                if (!$uid = $cache->get($enrolment->username)) {
-                    $user = user::get($enrolment->username);
-                    if (!$user->is_in_moodle()) {
-                        $user->create_in_moodle();
-                    }
-
-                    $uid = $user->moodle_id;
-                    $cache->set($enrolment->username, $uid);
-                }
-
-                $enrolment->userid = $uid;
-            }
-
-            // Create an object for this enrolment.
-            $obj = new static(
-                $enrolment->userid,
-                $enrolment->courseid,
-                $enrolment->roleid,
-                $enrolment->module_title
-            );
-            $obj->set_class_data($enrolment);
-            $enrolment = $obj;
-        }
-
-        // Filter out invalid courses.
-        $data = array_filter($data, function($enrolment) {
-            return $enrolment->is_valid();
-        });
-
-        return $data;
-    }
-
-    /**
-     * Returns all enrolments a given user should have
-     * 
-     * @param  string $username A username
+     * @param  string $user A user
      * @return array(local_connect_enrolment) Enrolment objects
      */
-    public static function get_for_user($username) {
-        global $DB, $CONNECTDB;
+    public static function get_for_user($user) {
+        global $DB;
 
-        // Grab our user object early on.
-        $user = $DB->get_record('user', array('username' => $username));
-        if (!$user) {
-            return array();
-        }
-
-        // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title, e.module_delivery_key
-                FROM {enrollments} e
-                    LEFT JOIN {courses} c
-                        ON c.module_delivery_key = e.module_delivery_key
-                WHERE e.login=:username";
-        $data = $CONNECTDB->get_records_sql($sql, array(
-            "username" => $username
+        $objs = $DB->get_records('connect_enrolments', array(
+            'user' => $user->id
         ));
 
-        foreach ($data as &$enrolment) {
-            // Update the user.
-            $enrolment->userid = $user->id;
+        foreach ($objs as &$obj) {
+            $enrolment = new enrolment();
+            $enrolment->set_class_data($obj);
+            $obj = $enrolment;
         }
 
-        return self::filter_sql_query_set($data);
+        return $objs;
     }
 
     /**
