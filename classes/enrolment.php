@@ -235,6 +235,23 @@ class enrolment extends data
     }
 
     /**
+     * Returns an enrolment, given a user and a course
+     */
+    public static function get_for_user_and_course($user, $course) {
+        global $DB;
+
+        $obj = $DB->get_record('connect_enrolments', array(
+            "user" => $user->id,
+            "course" => $course->id
+        ));
+
+        $enrolment = new enrolment();
+        $enrolment->set_class_data($obj);
+
+        return $enrolment;
+    }
+
+    /**
      * Returns an enrolment, given an ID
      */
     public static function get($id) {
