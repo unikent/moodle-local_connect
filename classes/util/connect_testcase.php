@@ -56,12 +56,8 @@ abstract class connect_testcase extends \advanced_testcase
 	 * Clean up before/after a test
 	 */
 	protected function connect_cleanup() {
-		global $DB, $CONNECTDB, $SHAREDB;
+		global $DB, $SHAREDB;
 
-		$CONNECTDB->execute("TRUNCATE TABLE {group_enrollments}");
-		$CONNECTDB->execute("TRUNCATE TABLE {enrollments}");
-		$CONNECTDB->execute("TRUNCATE TABLE {courses}");
-		$CONNECTDB->execute("TRUNCATE TABLE {groups}");
 		$SHAREDB->execute("TRUNCATE TABLE {course_list}");
 
 		// Clear out the connect tables.
@@ -82,19 +78,6 @@ abstract class connect_testcase extends \advanced_testcase
 		$DB->insert_record("connect_role", array("mid" => 0, "name" => "student"));
 		$DB->insert_record("connect_role", array("mid" => 0, "name" => "teacher"));
 		$DB->insert_record("connect_role", array("mid" => 0, "name" => "convenor"));
-	}
-
-	/**
-	 * Insert a record into the Connect DB
-	 */
-	private function insertDB($table, $data) {
-		global $CONNECTDB;
-
-		$fields = implode(',', array_keys($data));
-		$qms    = array_fill(0, count($data), '?');
-		$qms    = implode(',', $qms);
-
-		$CONNECTDB->execute("INSERT INTO {$table} ($fields) VALUES($qms)", $data);
 	}
 
 	/**
@@ -178,35 +161,30 @@ abstract class connect_testcase extends \advanced_testcase
 	 * Returns a valid group enrolment for testing.
 	 */
 	protected function generate_group_enrolment($group, $role = 'student') {
-		global $CFG;
+		global $DB;
 
-		static $uid = 10000000;
+		$id = $this->generate_enrolment($group['module_delivery_key'], $role);
+		$enrolment = $DB->get_record('connect_enrolments', array(
+			"id" => $id
+		));
 
-		$enrolment = $this->generate_enrolment($group['module_delivery_key'], $role);
-
-		$data = array(
-			"group_id" => $group['group_id'],
-			"group_desc" => $group['group_desc'],
-			"session_code" => $CFG->connect->session_code,
-			"module_delivery_key" => $group['module_delivery_key'],
-			"chksum" => uniqid($uid),
-			"id_chksum" => uniqid($uid),
-			"ukc" => $enrolment['ukc'],
-			"login" => $enrolment['login'],
-			"state" => 1
-		);
-
-		$this->insertDB('group_enrollments', $data);
-
-		$uid++;
-
-		return $data;
+		return $DB->insert_record('connect_group_enrolments', array(
+			"mid" => 0,
+			"group" => $group,
+			"user" => $enrolment->user
+		));
 	}
 
 	/**
 	 * Creates a bunch of group enrolments.
 	 */
 	protected function generate_group_enrolments($count, $group, $role = 'student') {
+		global $DB;
+
+		if (is_string($role)) {
+			$role = (int)$DB->get_field("connect_role", "id", array("name" => $role));
+		}
+
 		for ($i = 0; $i < $count; $i++) {
 			$this->generate_group_enrolment($group, $role);
 		}
@@ -242,11 +220,10 @@ abstract class connect_testcase extends \advanced_testcase
 		global $CFG, $DB;
 
 		static $delivery_key = 10000;
-		$delivery_key++;
 
 		return $DB->insert_record('connect_course', array(
 			"mid" => 0,
-			"module_delivery_key" => $delivery_key,
+			"module_delivery_key" => $delivery_key++,
 			"session_code" => $CFG->connect->session_code,
 			"module_version" => 1,
 			"campus" => 1,
