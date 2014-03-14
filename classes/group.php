@@ -25,6 +25,8 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once $CFG->dirroot . '/group/lib.php';
+
 /**
  * Connect group container
  */
@@ -130,16 +132,12 @@ class group extends data
      * @return unknown
      */
     public function create_in_moodle() {
-        global $CFG;
-
         $course = course::get($this->course);
 
         if (!$course->is_in_moodle()) {
             debugging("Attempting to create group '{$this->id}' but course '{$this->course}' doesnt exist!", DEBUG_DEVELOPER);
             return false;
         }
-
-        require_once $CFG->dirroot . '/group/lib.php';
 
         $data = new \stdClass();
         $data->name = $this->name;
@@ -166,6 +164,17 @@ class group extends data
         $this->sync_group_enrolments();
 
         return true;
+    }
+
+    /**
+     * Delete this group.
+     */
+    public function delete() {
+        if ($this->is_in_moodle()) {
+            return groups_delete_group($this->mid);
+        }
+
+        return false;
     }
 
 
