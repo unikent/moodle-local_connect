@@ -150,8 +150,19 @@ class observers {
                 "id" => $event->objectid
             ));
 
-            // Sync Enrollments
+            // Grab Connect User
             $user = user::get_by_username($record->username);
+            if (!$user) {
+                return true;
+            }
+
+            // Set mid for the new user if necessary.
+            if ($user->mid !== $event->objectid) {
+                $user->mid = $event->objectid;
+                $user->save();
+            }
+
+            // Sync Enrollments
             $enrolments = enrolment::get_for_user($user);
             foreach ($enrolments as $enrolment) {
                 if (!$enrolment->is_in_moodle()) {

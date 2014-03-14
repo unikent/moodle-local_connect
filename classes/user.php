@@ -120,6 +120,10 @@ class user extends data
 			'login' => $username
 		));
 
+		if (!$user) {
+			return null;
+		}
+
 		$obj = new static();
 		$obj->set_class_data($user);
 
