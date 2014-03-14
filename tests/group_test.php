@@ -113,21 +113,34 @@ class kent_group_tests extends local_connect\util\connect_testcase
 
 		// Create a group.
 		$group = $this->generate_group($course->id);
+		$group = \local_connect\group::get($group);
 
-		// Set some enrolments.
-		$this->generate_group_enrolments(30, $group, 'student');
-		$this->generate_group_enrolments(2, $group, 'teacher');
+		// Set some enrolments and test.
+		$this->generate_group_enrolments(30, $group->id, 'student');
+		$this->generate_group_enrolments(2, $group->id, 'teacher');
 
-		// Get the group.
-		$obj = \local_connect\group::get($group);
+		$this->assertEquals(30, $group->count_students());
+		$this->assertEquals(2, $group->count_staff());
 
-		$this->assertEquals(30, $obj->count_students());
-		$this->assertEquals(2, $obj->count_staff());
+		$this->generate_group_enrolments(2, $group->id, 'teacher');
 
-		$this->generate_group_enrolments(2, $group, 'teacher');
+		$this->assertEquals(30, $group->count_students());
+		$this->assertEquals(4, $group->count_staff());
 
-		$this->assertEquals(30, $obj->count_students());
-		$this->assertEquals(4, $obj->count_staff());
+		// Add a different group.
+		$course2 = \local_connect\course::get($this->generate_course());
+		$course2->create_in_moodle();
+		$group2 = $this->generate_group($course2->id);
+		$group2 = \local_connect\group::get($group2);
+
+		// Set some enrolments and test.
+		$this->generate_group_enrolments(10, $group2->id, 'student');
+		$this->generate_group_enrolments(1, $group2->id, 'convenor');
+		$this->generate_group_enrolments(1, $group2->id, 'teacher');
+
+		$this->assertEquals(12, $group2->count_all());
+		$this->assertEquals(10, $group2->count_students());
+		$this->assertEquals(2, $group2->count_staff());
 
 		$this->connect_cleanup();
 	}
