@@ -3,7 +3,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 function xmldb_local_connect_upgrade($oldversion) {
-	global $CFG, $DB, $CONNECTDB;
+	global $CFG, $DB;
 
 	$dbman = $DB->get_manager();
 

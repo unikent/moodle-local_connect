@@ -25,7 +25,7 @@ class kent_group_tests extends local_connect\util\connect_testcase
 	 * Make sure we can grab a valid list of groups.
 	 */
 	public function test_groups_list() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG, $DB;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();
@@ -74,7 +74,7 @@ class kent_group_tests extends local_connect\util\connect_testcase
 	 * Make sure we can create groups in Moodle.
 	 */
 	public function test_groups_create() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG, $DB;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();
@@ -102,7 +102,7 @@ class kent_group_tests extends local_connect\util\connect_testcase
 	 * Test user counting for groups.
 	 */
 	public function test_groups_counts() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG, $DB;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();
@@ -149,7 +149,7 @@ class kent_group_tests extends local_connect\util\connect_testcase
 	 * Make sure we can sync groups in Moodle.
 	 */
 	public function test_groups_sync() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG, $DB;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();

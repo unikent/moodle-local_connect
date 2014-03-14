@@ -25,7 +25,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 	 * Make sure we can grab a valid list of enrolments.
 	 */
 	public function test_enrolment_list() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG, $DB;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();
@@ -62,7 +62,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 	 * Make sure we can grab a valid list of enrolments for a specific course.
 	 */
 	public function test_enrolment_course_list() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG, $DB;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();
@@ -100,7 +100,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 	 * Make sure we can grab a valid list of enrolments for a specific user.
 	 */
 	public function test_enrolment_user_list() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG, $DB;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();
@@ -138,7 +138,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 	 * Make sure we can create an enrolment.
 	 */
 	public function test_enrolment_creation() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG, $DB;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();
@@ -174,7 +174,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 	 * Test the observers.
 	 */
 	public function test_observer() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG, $DB;
 
 		require_once($CFG->dirroot.'/user/lib.php');
 
@@ -280,7 +280,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 	 * Make sure we can sync properly.
 	 */
 	public function test_enrolment_sync() {
-		global $CFG, $CONNECTDB;
+		global $CFG;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();

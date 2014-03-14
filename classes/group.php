@@ -280,11 +280,11 @@ class group extends data
      * @param unknown $session_code
      * @return unknown
      */
-    public static function get_all($sort = '', $limitfrom = 0, $limitnum = 0) {
+    public static function get_all() {
         global $DB;
 
         // Select all our groups.
-        $data = $DB->get_records('connect_group', array(), $sort, '*', $limitfrom, $limitnum);
+        $data = $DB->get_records('connect_group');
 
         // Map to objects.
         foreach ($data as &$group) {
@@ -296,6 +296,4 @@ class group extends data
 
         return $data;
     }
-
-
 }

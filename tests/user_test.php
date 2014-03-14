@@ -25,7 +25,7 @@ class kent_user_tests extends local_connect\util\connect_testcase
 	 * Make sure we can create a Moodle user.
 	 */
 	public function test_user_create() {
-		global $CFG, $DB, $CONNECTDB;
+		global $CFG, $DB;
 
 		$this->resetAfterTest();
 		$this->connect_cleanup();

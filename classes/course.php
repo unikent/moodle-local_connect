@@ -441,7 +441,7 @@ class course extends data
      * @return boolean
      */
     public function delete() {
-        global $DB, $CONNECTDB;
+        global $DB;
 
         $course = $DB->get_record('course', array(
             'id' => $this->mid
@@ -642,7 +642,6 @@ class course extends data
      * @return unknown
      */
     public static function disengage_all($data) {
-        global $CONNECTDB;
         $response = array();
 
         foreach ($data->courses as $course) {
@@ -679,7 +678,6 @@ class course extends data
      * @return unknown
      */
     public static function schedule_all($data) {
-        global $CONNECTDB;
         $response = array();
 
         foreach ($data->courses as $course) {
