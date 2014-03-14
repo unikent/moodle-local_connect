@@ -137,6 +137,8 @@ class role extends data
 	 * Delete this role from Moodle
 	 */
 	public function delete() {
-		return delete_role();
+		if ($this->is_in_moodle()) {
+			return delete_role($this->mid);
+		}
 	}
 }
