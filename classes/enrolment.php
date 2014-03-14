@@ -210,43 +210,35 @@ class enrolment extends data
     }
 
     /**
-     * Returns all enrolments for a given session code
+     * Returns all enrolments
      */
-    public static function get_all($session_code) {
-        global $CONNECTDB;
+    public static function get_all() {
+        global $DB;
 
-        // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title, e.module_delivery_key
-                FROM {enrollments} e
-                    LEFT JOIN {courses} c
-                        ON c.module_delivery_key = e.module_delivery_key
-                WHERE c.session_code = :sessioncode";
-        $data = $CONNECTDB->get_records_sql($sql, array(
-            "sessioncode" => $session_code
-        ));
+        $objs = $DB->get_records('connect_enrolments');
 
-        return self::filter_sql_query_set($data);
+        foreach ($objs as &$obj) {
+            $enrolment = new enrolment();
+            $enrolment->set_class_data($obj);
+            $obj = $enrolment;
+        }
+
+        return $objs;
     }
 
     /**
-     * Returns an enrolment, given a session code, module delivery key and login
+     * Returns an enrolment, given an ID
      */
-    public static function get_by_uid($module_delivery_key, $session_code, $login) {
-        global $CONNECTDB;
+    public static function get($id) {
+        global $DB;
 
-        // Select all our enrolments.
-        $sql = "SELECT e.chksum, e.login username, e.moodle_id enrolmentid, c.moodle_id courseid, e.role, c.module_title, e.module_delivery_key
-                FROM {enrollments} e
-                    LEFT JOIN {courses} c
-                        ON c.module_delivery_key = e.module_delivery_key
-                WHERE e.session_code = :sessioncode AND e.module_delivery_key = :module_delivery_key AND e.login = :login";
-        $data = $CONNECTDB->get_records_sql($sql, array(
-            "module_delivery_key" => $module_delivery_key,
-            "sessioncode" => $session_code,
-            "login" => $login
+        $obj = $DB->get_record('connect_enrolments', array(
+            "id" => $id
         ));
 
-        $array = self::filter_sql_query_set($data);
-        return array_pop($array);
+        $enrolment = new enrolment();
+        $enrolment->set_class_data($obj);
+
+        return $enrolment;
     }
 }
