@@ -175,4 +175,31 @@ class observers {
     }
 
 
+    /**
+     * Triggered when 'user_deleted' event is triggered.
+     *
+     * Sync the new user's enrolments
+     *
+     * @param \core\event\user_deleted $event
+     * @return unknown
+     */
+    public static function user_deleted(\core\event\user_deleted $event) {
+        global $DB;
+
+        if (utils::enable_new_features()) {
+            $record = $DB->get_record('connect_user', array(
+                'mid' => $event->objectid
+            ));
+
+            // Unset this user's mid.
+            if ($record) {
+                $user = user::get($record->id);
+                $user->mid = 0;
+                $user->save();
+            }
+        }
+
+        return true;
+    }
+
 }

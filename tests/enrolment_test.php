@@ -193,11 +193,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 			"id" => $enrolment->user_obj->mid
 		));
 
-		// Grab it (Bit crude, I know).
-		$enrolments = \local_connect\enrolment::get_all();
-		$this->assertEquals(1, count($enrolments));
-		$enrolment = array_pop($enrolments);
-
 		// Create the enrolment.
 		$this->assertFalse($enrolment->is_in_moodle());
 		$enrolment->create_in_moodle();
