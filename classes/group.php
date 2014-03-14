@@ -171,7 +171,10 @@ class group extends data
      */
     public function delete() {
         if ($this->is_in_moodle()) {
-            return groups_delete_group($this->mid);
+            if (groups_delete_group($this->mid)) {
+                $this->mid = 0;
+                $this->save();
+            }
         }
 
         return false;
