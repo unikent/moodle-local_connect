@@ -271,20 +271,46 @@ function xmldb_local_connect_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014031700) {
-        // Define table connect_course_chksum to be dropped.
-        $table = new xmldb_table('connect_course_chksum');
+        {
+            // Define table connect_course_chksum to be dropped.
+            $table = new xmldb_table('connect_course_chksum');
 
-        // Conditionally launch drop table for connect_course_chksum.
-        if ($dbman->table_exists($table)) {
-            $dbman->drop_table($table);
+            // Conditionally launch drop table for connect_course_chksum.
+            if ($dbman->table_exists($table)) {
+                $dbman->drop_table($table);
+            }
         }
 
-        // Define table connect_enrolment_chksum to be dropped.
-        $table = new xmldb_table('connect_enrolment_chksum');
+        {
+            // Define table connect_enrolment_chksum to be dropped.
+            $table = new xmldb_table('connect_enrolment_chksum');
 
-        // Conditionally launch drop table for connect_enrolment_chksum.
-        if ($dbman->table_exists($table)) {
-            $dbman->drop_table($table);
+            // Conditionally launch drop table for connect_enrolment_chksum.
+            if ($dbman->table_exists($table)) {
+                $dbman->drop_table($table);
+            }
+        }
+
+        {
+            // Define field mid to be dropped from connect_enrolments.
+            $table = new xmldb_table('connect_enrolments');
+            $field = new xmldb_field('mid');
+
+            // Conditionally launch drop field mid.
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        {
+            // Define field mid to be dropped from connect_group_enrolments.
+            $table = new xmldb_table('connect_group_enrolments');
+            $field = new xmldb_field('mid');
+
+            // Conditionally launch drop field mid.
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
         }
 
         // Connect savepoint reached.

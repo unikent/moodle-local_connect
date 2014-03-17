@@ -43,7 +43,7 @@ class group_enrolment extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "mid", "groupid", "user", "deleted");
+        return array("id", "groupid", "user", "deleted");
     }
 
     /**

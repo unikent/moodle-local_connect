@@ -42,7 +42,7 @@ class enrolment extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "mid", "user", "course", "role", "deleted");
+        return array("id", "user", "course", "role", "deleted");
     }
 
     /**
