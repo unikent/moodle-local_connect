@@ -586,6 +586,37 @@ class course extends data
     }
 
     /**
+     * Returns the number of people enrolled in this course.
+     */
+    public function count_all() {
+        global $DB;
+
+        return $DB->count_records("connect_enrolments", array(
+            'course' => $this->id
+        ));
+    }
+
+    /**
+     * Returns the number of students enrolled in this course.
+     */
+    public function count_students() {
+        global $DB;
+
+        $role = $DB->get_field('connect_role', 'id', array('name' => 'student'));
+        return $DB->count_records('connect_enrolments', array(
+            'course' => $this->id,
+            'role' => $role
+        ));
+    }
+
+    /**
+     * Returns the number of staff enrolled in this course.
+     */
+    public function count_staff() {
+        return $this->count_all() - $this->count_students();
+    }
+
+    /**
      * To String override
      * @return unknown
      */
