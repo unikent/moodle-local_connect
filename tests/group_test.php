@@ -28,7 +28,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		global $CFG, $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// Create course.
 		$course = \local_connect\course::get($this->generate_course());
@@ -67,7 +66,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$groups = \local_connect\group::get_for_course($course2);
 		$this->assertEquals(20, count($groups));
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -77,7 +75,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		global $CFG, $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// First, create a course.
 		$course = \local_connect\course::get($this->generate_course());
@@ -95,7 +92,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->assertTrue($group->create_in_moodle());
 		$this->assertTrue($group->is_in_moodle());
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -105,7 +101,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		global $CFG, $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// First, create a course.
 		$course = \local_connect\course::get($this->generate_course());
@@ -142,7 +137,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->assertEquals(10, $group2->count_students());
 		$this->assertEquals(2, $group2->count_staff());
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -152,7 +146,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		global $CFG, $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// First, create a course.
 		$course = \local_connect\course::get($this->generate_course());
@@ -191,7 +184,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
         ));
         $this->assertEquals($mgroup->name, $group->name);
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -201,7 +193,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		global $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// Create course.
 		$course = \local_connect\course::get($this->generate_course());
@@ -229,7 +220,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$group = \local_connect\group::get($group->id);
 		$this->assertTrue($group->is_in_moodle());
 
-		$this->connect_cleanup();
 	}
 }
 

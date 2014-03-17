@@ -28,14 +28,23 @@ abstract class connect_testcase extends \advanced_testcase
      * This method is called before a test is executed.
      */
     protected function setUp() {
-    	global $CFG;
-        $this->resetAfterTest();
+    	global $CFG, $DB;
+
     	$CFG->local_connect_enable = true;
     	$CFG->local_connect_enable_new_features = true;
     	$CFG->local_connect_enable_observers = true;
     	$CFG->local_connect_enable_sharedb = true;
     	$CFG->local_connect_enable_cron = true;
     	$CFG->local_connect_enable_rollover = true;
+
+		// Create new campus records.
+		$DB->insert_record("connect_campus", array("name" => "Canterbury"));
+		$DB->insert_record("connect_campus", array("name" => "Medway"));
+
+		// Create new role records.
+		$DB->insert_record("connect_role", array("mid" => 0, "name" => "student"));
+		$DB->insert_record("connect_role", array("mid" => 0, "name" => "teacher"));
+		$DB->insert_record("connect_role", array("mid" => 0, "name" => "convenor"));
     }
 
     /**
@@ -43,20 +52,14 @@ abstract class connect_testcase extends \advanced_testcase
      * This method is called after a test is executed.
      */
     protected function tearDown() {
-    	global $CFG;
+    	global $CFG, $DB, $SHAREDB;
+
     	unset($CFG->local_connect_enable);
     	unset($CFG->local_connect_enable_new_features);
     	unset($CFG->local_connect_enable_observers);
     	unset($CFG->local_connect_enable_sharedb);
     	unset($CFG->local_connect_enable_cron);
     	unset($CFG->local_connect_enable_rollover);
-    }
-
-	/**
-	 * Clean up before/after a test
-	 */
-	protected function connect_cleanup() {
-		global $DB, $SHAREDB;
 
 		$SHAREDB->execute("TRUNCATE TABLE {course_list}");
 
@@ -74,16 +77,7 @@ abstract class connect_testcase extends \advanced_testcase
 		$DB->delete_records('role', array('shortname' => 'sds_student'));
 		$DB->delete_records('role', array('shortname' => 'sds_teacher'));
 		$DB->delete_records('role', array('shortname' => 'convenor'));
-
-		// Create new campus records.
-		$DB->insert_record("connect_campus", array("name" => "Canterbury"));
-		$DB->insert_record("connect_campus", array("name" => "Medway"));
-
-		// Create new role records.
-		$DB->insert_record("connect_role", array("mid" => 0, "name" => "student"));
-		$DB->insert_record("connect_role", array("mid" => 0, "name" => "teacher"));
-		$DB->insert_record("connect_role", array("mid" => 0, "name" => "convenor"));
-	}
+    }
 
 	/**
 	 * Returns a valid user for testing.

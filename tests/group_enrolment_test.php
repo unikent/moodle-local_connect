@@ -28,7 +28,6 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 		global $CFG;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// Grab some delivery keys.
 		$course = $this->generate_course();
@@ -60,7 +59,6 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 		$enrolments = \local_connect\group_enrolment::get_for_group(\local_connect\group::get($group2));
 		$this->assertEquals(21, count($enrolments));
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -70,7 +68,6 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 		global $CFG;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		$course = $this->generate_course();
 
@@ -95,7 +92,6 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 		$this->assertTrue($obj->create_in_moodle());
 		$this->assertTrue($obj->is_in_moodle());
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -103,7 +99,6 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 	 */
 	public function test_group_enrolment_delete() {
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		$course = $this->generate_course();
 
@@ -130,7 +125,6 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 		$obj->delete();
 		$this->assertFalse($obj->is_in_moodle());
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -138,7 +132,6 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 	 */
 	public function test_group_enrolment_get_for_course() {
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		$course = $this->generate_course();
 		$courseobj = \local_connect\course::get($course);
@@ -163,7 +156,6 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 		$this->assertEquals(60, count(\local_connect\group_enrolment::get_for_course($courseobj)));
 		$this->assertEquals(20, count(\local_connect\group_enrolment::get_for_course($course2obj)));
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -171,7 +163,6 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 	 */
 	public function test_group_enrolment_sync() {
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		$course = $this->generate_course();
 
@@ -202,6 +193,5 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 		$this->assertEquals("Deleting Group Enrolment: {$obj->id}", $obj->sync());
 		$this->assertFalse($obj->is_in_moodle());
 
-		$this->connect_cleanup();
 	}
 }

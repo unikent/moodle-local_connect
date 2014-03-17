@@ -29,13 +29,9 @@ class kent_course_tests extends local_connect\util\connect_testcase
      */
     public function test_course_generator() {
         $this->resetAfterTest();
-        $this->connect_cleanup();
 
         $this->generate_courses(20);
-
         $this->assertEquals(20, count(\local_connect\course::get_all()));
-
-        $this->connect_cleanup();
     }
 
     /**
@@ -45,7 +41,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
         global $DB;
 
         $this->resetAfterTest();
-        $this->connect_cleanup();
 
         $id = $this->generate_course();
         $course = \local_connect\course::get($id);
@@ -63,8 +58,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
             "id" => $course->mid
         ), 'id,fullname');
         $this->assertEquals($course->fullname, $mcourse->fullname);
-
-        $this->connect_cleanup();
     }
 
     /**
@@ -72,7 +65,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
      */
     public function test_course_shortname_check() {
         $this->resetAfterTest();
-        $this->connect_cleanup();
 
         $courseid = $this->generate_course();
         $course = \local_connect\course::get($courseid);
@@ -84,8 +76,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $this->assertTrue($course2->is_unique_shortname($course2->shortname));
         $course2->module_code = $course->module_code;
         $this->assertFalse($course2->is_unique_shortname($course2->shortname));
-
-        $this->connect_cleanup();
     }
 
     /**
@@ -93,7 +83,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
      */
     public function test_linked_course() {
         $this->resetAfterTest();
-        $this->connect_cleanup();
 
         // Create two courses.
         $course1 = \local_connect\course::get($this->generate_course());
@@ -114,8 +103,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $this->assertTrue($lc->is_parent());
         $this->assertTrue($course1->is_child());
         $this->assertTrue($course2->is_child());
-
-        $this->connect_cleanup();
     }
 
     /**
@@ -125,7 +112,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
         global $DB;
 
         $this->resetAfterTest();
-        $this->connect_cleanup();
 
         // Create two courses.
         $course1 = \local_connect\course::get($this->generate_course());
@@ -152,8 +138,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $this->assertTrue($course2->is_child());
 
         // TODO - test more stuff, enrolments etc
-
-        $this->connect_cleanup();
     }
 
     /**
@@ -163,7 +147,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
         global $DB;
 
         $this->resetAfterTest();
-        $this->connect_cleanup();
 
         $course1 = \local_connect\course::get($this->generate_course());
         $this->generate_enrolments(100, $course1->id, 'student');
@@ -193,8 +176,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $this->assertEquals(2, $course2->count_staff());
         $this->assertEquals(103, $course1->count_all());
         $this->assertEquals(72, $course2->count_all());
-
-        $this->connect_cleanup();
     }
 
     /**
@@ -202,11 +183,8 @@ class kent_course_tests extends local_connect\util\connect_testcase
      */
     public function test_campus_name() {
         $this->resetAfterTest();
-        $this->connect_cleanup();
 
         $course = \local_connect\course::get($this->generate_course());
         $this->assertTrue(in_array($course->campus_name, array("Canterbury", "Medway")), $course->campus_name);
-
-        $this->connect_cleanup();
     }
 }

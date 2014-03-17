@@ -28,7 +28,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		global $CFG, $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// First, create a course.
 		$course = $this->generate_course();
@@ -55,7 +54,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$enrolments = \local_connect\enrolment::get_all();
 		$this->assertEquals(63, count($enrolments));
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -65,7 +63,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		global $CFG, $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// First, create a course.
 		$course = $this->generate_course();
@@ -93,7 +90,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$enrolments = \local_connect\enrolment::get_for_course($course2);
 		$this->assertEquals(1, count($enrolments));
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -103,7 +99,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		global $CFG, $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// First, create a course.
 		$course = $this->generate_course();
@@ -131,7 +126,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$enrolments = \local_connect\enrolment::get_for_user($user);
 		$this->assertEquals(1, count($enrolments));
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -141,7 +135,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		global $CFG, $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// First, create a course.
 		$course = $this->generate_course();
@@ -159,15 +152,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$this->assertFalse($enrolment->is_in_moodle());
 		$this->assertTrue($enrolment->create_in_moodle());
 		$this->assertTrue($enrolment->is_in_moodle());
-
-		$this->connect_cleanup();
-	}
-
-	/**
-	 * Test enrolment validity check.
-	 */
-	public function test_enrolment_validity() {
-		// TODO
 	}
 
 	/**
@@ -179,7 +163,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		require_once($CFG->dirroot.'/user/lib.php');
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// First, create a course.
 		$course = $this->generate_course();
@@ -224,7 +207,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		// Did the enrolment get created?
 		$this->assertTrue($enrolment->is_in_moodle());
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -234,7 +216,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		global $CFG;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// First, create a course.
 		$course = $this->generate_course();
@@ -259,7 +240,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$enrolments = \local_connect\enrolment::get_all();
 		$this->assertEquals(10, count($enrolments));
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -269,11 +249,9 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		global $CFG;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		$this->assertEquals(0, count(\local_connect\enrolment::get_for_user(null)));
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -283,7 +261,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		global $CFG;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		// First, create a course.
 		$course = $this->generate_course();
@@ -302,6 +279,5 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$this->assertEquals("Creating Enrolment: {$enrolment->id}", $enrolment->sync());
 		$this->assertTrue($enrolment->is_in_moodle());
 
-		$this->connect_cleanup();
 	}
 }

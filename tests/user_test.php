@@ -28,7 +28,6 @@ class kent_user_tests extends local_connect\util\connect_testcase
 		global $CFG, $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		$userid = $this->generate_user();
 
@@ -41,7 +40,6 @@ class kent_user_tests extends local_connect\util\connect_testcase
 		$user->create_in_moodle();
 		$this->assertTrue($user->is_in_moodle());
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -49,7 +47,6 @@ class kent_user_tests extends local_connect\util\connect_testcase
 	 */
 	public function test_user_get_by_role() {
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		$this->assertEquals(0, count(\local_connect\user::get_by_role("student")));
 		$this->assertEquals(0, count(\local_connect\user::get_by_role("staff")));
@@ -80,7 +77,6 @@ class kent_user_tests extends local_connect\util\connect_testcase
 		$this->assertEquals(6, count(\local_connect\user::get_by_role("teacher")));
 		$this->assertEquals(12, count(\local_connect\user::get_by_role("convenor")));
 
-		$this->connect_cleanup();
 	}
 
 	/**
@@ -90,7 +86,6 @@ class kent_user_tests extends local_connect\util\connect_testcase
 		global $DB;
 
 		$this->resetAfterTest();
-		$this->connect_cleanup();
 
 		$user = $this->generate_user();
 		$user = \local_connect\user::get($user);
@@ -123,6 +118,5 @@ class kent_user_tests extends local_connect\util\connect_testcase
 		$user = \local_connect\user::get($user->id);
 		$this->assertTrue($user->is_in_moodle());
 
-		$this->connect_cleanup();
 	}
 }
