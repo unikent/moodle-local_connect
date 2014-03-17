@@ -60,11 +60,11 @@
     <TABLE NAME="connect_enrolments" COMMENT="Connect Enrolments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mid" TYPE="int" LENGTH="11" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="course" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="role" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="deleted" TYPE="int" LENGTH="1" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -78,7 +78,7 @@
     <TABLE NAME="connect_group" COMMENT="Connect Groups">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mid" TYPE="int" LENGTH="11" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="course" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -93,10 +93,10 @@
     <TABLE NAME="connect_group_enrolments" COMMENT="Connect Group Enrolments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mid" TYPE="int" LENGTH="11" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="groupid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="deleted" TYPE="int" LENGTH="1" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -110,7 +110,7 @@
     <TABLE NAME="connect_course" COMMENT="Connect Courses">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mid" TYPE="int" LENGTH="11" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="module_delivery_key" TYPE="char" LENGTH="36" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="session_code" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="module_version" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
@@ -137,7 +137,7 @@
     <TABLE NAME="connect_role" COMMENT="A list of roles known to connect">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mid" TYPE="int" LENGTH="11" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -151,7 +151,7 @@
     <TABLE NAME="connect_user" COMMENT="Connect Users">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mid" TYPE="int" LENGTH="11" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="ukc" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="login" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
