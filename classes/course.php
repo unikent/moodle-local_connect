@@ -273,6 +273,48 @@ class course extends data
     }
 
     /**
+     * Returns connect_course_dets data.
+     * @return unknown
+     */
+    private function get_dets_data() {
+        global $CFG, $DB;
+
+        // Try to find an existing set of data.
+        $connect_data = $DB->get_record('connect_course_dets', array(
+            'course' => $this->mid
+        ));
+
+        // Create a data container.
+        if (!$connect_data) {
+            $connect_data = new \stdClass();
+        }
+
+        // Update the container's data.
+        $connect_data->course = $this->mid;
+        $connect_data->campus = $this->campus_name;
+        $connect_data->startdate = $this->week_beginning_date;
+        $connect_data->enddate = $this->week_ending_date;
+        $connect_data->weeks = $this->module_length;
+
+        return $connect_data;
+    }
+
+    /**
+     * Add Connect extra details for this course
+     */
+    private function create_connect_extras() {
+        global $DB;
+
+        $connect_data = $this->get_dets_data();
+
+        if (!isset($connect_data->id)) {
+            $DB->insert_record('connect_course_dets', $connect_data);
+        } else {
+            $DB->update_record('connect_course_dets', $connect_data);
+        }
+    }
+
+    /**
      * Create this course in Moodle
      * @param string $shortname_ext (optional)
      * @return boolean
@@ -327,6 +369,9 @@ class course extends data
             'course' => $this->mid,
             'section' => 0
         ));
+
+        // Add module extra details to the connect_course_dets table.
+        $this->create_connect_extras();
 
         // Add the reading list module to our course if it is based in Canterbury.
         if ($this->campus_name === 'Canterbury') {
@@ -440,6 +485,9 @@ class course extends data
 
         // Update this course in Moodle.
         update_course($course);
+
+        // Add module extra details to the connect_course_dets table.
+        $this->create_connect_extras();
     }
 
     /**
