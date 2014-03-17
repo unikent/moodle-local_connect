@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/connect/db" VERSION="20140313" COMMENT="XMLDB file for Connect module"
+<XMLDB PATH="local/connect/db" VERSION="20140317" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -22,30 +22,6 @@
       <INDEXES>
         <INDEX NAME="course" UNIQUE="true" FIELDS="course"/>
       </INDEXES>
-    </TABLE>
-    <TABLE NAME="connect_course_chksum" COMMENT="Checksums for Moodle to SDS course sync">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle Course ID"/>
-        <FIELD NAME="module_delivery_key" TYPE="char" LENGTH="36" NOTNULL="true" SEQUENCE="false" COMMENT="SDS module_delivery_key"/>
-        <FIELD NAME="session_code" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="SDS session_code"/>
-        <FIELD NAME="chksum" TYPE="char" LENGTH="36" NOTNULL="false" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="course_unique" TYPE="unique" FIELDS="courseid"/>
-        <KEY NAME="sdsuid_unique" TYPE="unique" FIELDS="module_delivery_key, session_code"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="connect_enrolment_chksum" COMMENT="Checksums for Moodle to SDS enrolment sync">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="moodleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle Enrolment ID"/>
-        <FIELD NAME="chksum" TYPE="char" LENGTH="36" NOTNULL="false" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
     </TABLE>
     <TABLE NAME="connect_campus" COMMENT="Connect Campuses">
       <FIELDS>
