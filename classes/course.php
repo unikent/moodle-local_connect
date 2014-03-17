@@ -131,6 +131,13 @@ class course extends data
     }
 
     /**
+     * Week ending date
+     */
+    public function _get_week_end_date() {
+        return strtotime('+' . $this->module_length . ' weeks', strtotime($this->week_beginning_date));
+    }
+
+    /**
      * Get enrollments for this Course
      */
     public function _get_enrolments() {
