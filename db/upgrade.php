@@ -294,8 +294,14 @@ function xmldb_local_connect_upgrade($oldversion) {
         {
             // Define field mid to be dropped from connect_enrolments.
             $table = new xmldb_table('connect_enrolments');
-            $field = new xmldb_field('mid');
 
+            $index = new xmldb_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
+            // Conditionally launch drop index index_mid.
+            if ($dbman->index_exists($table, $index)) {
+                $dbman->drop_index($table, $index);
+            }
+
+            $field = new xmldb_field('mid');
             // Conditionally launch drop field mid.
             if ($dbman->field_exists($table, $field)) {
                 $dbman->drop_field($table, $field);
@@ -305,8 +311,14 @@ function xmldb_local_connect_upgrade($oldversion) {
         {
             // Define field mid to be dropped from connect_group_enrolments.
             $table = new xmldb_table('connect_group_enrolments');
-            $field = new xmldb_field('mid');
 
+            $index = new xmldb_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
+            // Conditionally launch drop index index_mid.
+            if ($dbman->index_exists($table, $index)) {
+                $dbman->drop_index($table, $index);
+            }
+
+            $field = new xmldb_field('mid');
             // Conditionally launch drop field mid.
             if ($dbman->field_exists($table, $field)) {
                 $dbman->drop_field($table, $field);

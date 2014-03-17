@@ -36,7 +36,6 @@
     <TABLE NAME="connect_enrolments" COMMENT="Connect Enrolments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="course" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="role" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
@@ -46,7 +45,6 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
         <INDEX NAME="index_course" UNIQUE="false" FIELDS="course"/>
         <INDEX NAME="index_user" UNIQUE="false" FIELDS="user"/>
       </INDEXES>
@@ -69,7 +67,6 @@
     <TABLE NAME="connect_group_enrolments" COMMENT="Connect Group Enrolments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="groupid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
@@ -78,7 +75,6 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
         <INDEX NAME="index_groupid" UNIQUE="false" FIELDS="groupid"/>
         <INDEX NAME="index_user" UNIQUE="false" FIELDS="user"/>
       </INDEXES>
