@@ -155,4 +155,45 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $this->connect_cleanup();
     }
+
+    /**
+     * Test course counting methods.
+     */
+    public function test_course_counts() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->connect_cleanup();
+
+        $course1 = \local_connect\course::get($this->generate_course());
+        $this->generate_enrolments(100, $course1->id, 'student');
+        $this->generate_enrolments(1, $course1->id, 'convenor');
+        $this->generate_enrolments(2, $course1->id, 'teacher');
+        $this->assertEquals(103, $course1->count_all());
+        $this->assertEquals(100, $course1->count_students());
+        $this->assertEquals(3, $course1->count_staff());
+
+        $course2 = \local_connect\course::get($this->generate_course());
+        $this->generate_enrolments(70, $course2->id, 'student');
+        $this->generate_enrolments(1, $course2->id, 'convenor');
+        $this->generate_enrolments(1, $course2->id, 'teacher');
+        $this->assertEquals(72, $course2->count_all());
+        $this->assertEquals(70, $course2->count_students());
+        $this->assertEquals(2, $course2->count_staff());
+
+        $course3 = \local_connect\course::get($this->generate_course());
+        $this->generate_enrolments(700, $course3->id, 'student');
+        $this->generate_enrolments(10, $course3->id, 'convenor');
+        $this->generate_enrolments(10, $course3->id, 'teacher');
+
+        // And all together.
+        $this->assertEquals(100, $course1->count_students());
+        $this->assertEquals(70, $course2->count_students());
+        $this->assertEquals(3, $course1->count_staff());
+        $this->assertEquals(2, $course2->count_staff());
+        $this->assertEquals(103, $course1->count_all());
+        $this->assertEquals(72, $course2->count_all());
+
+        $this->connect_cleanup();
+    }
 }
