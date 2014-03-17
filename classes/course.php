@@ -131,10 +131,18 @@ class course extends data
     }
 
     /**
+     * Week beginning date
+     */
+    public function _get_week_beginning_date() {
+        $data = $this->get_data();
+        return strtotime($data->week_beginning_date);
+    }
+
+    /**
      * Week ending date
      */
     public function _get_week_ending_date() {
-        return strtotime('+' . $this->module_length . ' weeks', strtotime($this->week_beginning_date));
+        return strtotime('+' . $this->module_length . ' weeks', $this->week_beginning_date);
     }
 
     /**
