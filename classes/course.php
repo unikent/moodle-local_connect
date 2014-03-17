@@ -125,7 +125,7 @@ class course extends data
      */
     public function _get_campus_name() {
         global $DB;
-        return $DB->get_field('connect_role', 'name', array(
+        return $DB->get_field('connect_campus', 'name', array(
             'id' => $this->campus
         ));
     }

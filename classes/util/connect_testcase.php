@@ -61,6 +61,7 @@ abstract class connect_testcase extends \advanced_testcase
 		$SHAREDB->execute("TRUNCATE TABLE {course_list}");
 
 		// Clear out the connect tables.
+		$DB->execute("TRUNCATE TABLE {connect_campus}");
 		$DB->execute("TRUNCATE TABLE {connect_user}");
 		$DB->execute("TRUNCATE TABLE {connect_enrolments}");
 		$DB->execute("TRUNCATE TABLE {connect_group_enrolments}");
@@ -73,6 +74,10 @@ abstract class connect_testcase extends \advanced_testcase
 		$DB->delete_records('role', array('shortname' => 'sds_student'));
 		$DB->delete_records('role', array('shortname' => 'sds_teacher'));
 		$DB->delete_records('role', array('shortname' => 'convenor'));
+
+		// Create new campus records.
+		$DB->insert_record("connect_campus", array("name" => "Canterbury"));
+		$DB->insert_record("connect_campus", array("name" => "Medway"));
 
 		// Create new role records.
 		$DB->insert_record("connect_role", array("mid" => 0, "name" => "student"));

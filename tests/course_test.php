@@ -196,4 +196,17 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $this->connect_cleanup();
     }
+
+    /**
+     * Test campus_name.
+     */
+    public function test_campus_name() {
+        $this->resetAfterTest();
+        $this->connect_cleanup();
+
+        $course = \local_connect\course::get($this->generate_course());
+        $this->assertTrue(in_array($course->campus_name, array("Canterbury", "Medway")), $course->campus_name);
+
+        $this->connect_cleanup();
+    }
 }
