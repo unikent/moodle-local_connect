@@ -168,7 +168,13 @@ class observers {
                 }
             }
 
-            // TODO - group enrolments
+            // Sync Group Enrollments
+            $group_enrolments = group_enrolment::get_for_user($user);
+            foreach ($group_enrolments as $group_enrolment) {
+                if (!$group_enrolment->is_in_moodle()) {
+                    $group_enrolment->create_in_moodle();
+                }
+            }
         }
 
         return true;
