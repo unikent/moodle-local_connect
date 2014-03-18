@@ -71,18 +71,11 @@ class group_enrolment extends data
      * Grab the connect course object
      */
     public function _get_course_obj() {
-        if (!$this->group_obj) {
+        if (!$this->group) {
             return null;
         }
 
-        return $this->group_obj->course_obj;
-    }
-
-    /**
-     * Grab the connect group object
-     */
-    public function _get_group_obj() {
-        return group::get($this->groupid);
+        return $this->group->course_obj;
     }
 
     /**
@@ -117,11 +110,11 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_valid() {
-        if (!$this->course_obj || !$this->user_obj|| !$this->group_obj) {
+        if (!$this->course_obj || !$this->user_obj|| !$this->group) {
             return false;
         }
 
-        return $this->course_obj->is_in_moodle() && $this->user_obj->is_in_moodle() && $this->group_obj->is_in_moodle();
+        return $this->course_obj->is_in_moodle() && $this->user_obj->is_in_moodle() && $this->group->is_in_moodle();
     }
 
 
@@ -134,7 +127,7 @@ class group_enrolment extends data
             return false;
         }
 
-        return groups_is_member($this->group_obj->mid, $this->user_obj->mid);
+        return groups_is_member($this->group->mid, $this->user_obj->mid);
     }
 
 
@@ -155,7 +148,7 @@ class group_enrolment extends data
             }
         }
 
-        return groups_add_member($this->group_obj->mid, $this->user_obj->mid);
+        return groups_add_member($this->group->mid, $this->user_obj->mid);
     }
 
     /**

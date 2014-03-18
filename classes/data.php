@@ -96,14 +96,19 @@ abstract class data {
 			return $this->$additional();
 		}
 
-		if (!in_array($name, $this->valid_fields())) {
-			debugging("Invalid field: $name!");
-			return null;
-		}
-
 		if (isset($this->_data[$name])) {
 			return $this->_data[$name];
 		}
+
+		// Are we trying to get the object for an id column?
+		if (isset($this->_data[$name . "id"])) {
+			$class = "\\local_connect\\" . $name;
+			if (class_exists($class)) {
+				return $class::get($this->_data[$name . "id"]);
+			}
+		}
+
+		debugging("Invalid field: $name!");
 
 		return null;
 	}
