@@ -154,6 +154,10 @@ class enrolment extends data
      * Create this enrolment in Moodle
      */
     public function create_in_moodle() {
+        if (!$this->is_valid()) {
+            return false;
+        }
+
         return enrol_try_internal_enrol($this->course_obj->mid, $this->user_obj->mid, $this->role_obj->mid);
     }
 
