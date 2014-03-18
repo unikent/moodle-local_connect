@@ -73,16 +73,16 @@ class observers {
     public static function course_updated(\core\event\course_updated $event) {
         global $CFG, $DB, $SHAREDB;
 
+        if ($event->objectid == 1) {
+            return true;
+        }
+
         // Update ShareDB if it is enabled.
         if (utils::enable_sharedb()) {
             // Update course listings DB
             $moodle = $DB->get_record('course', array(
                 "id" => $event->objectid
             ));
-
-            if ($moodle->id == 1) {
-                return true;
-            }
 
             $record = $SHAREDB->get_record('course_list', array(
                 "moodle_id" => $moodle->id,
@@ -111,16 +111,16 @@ class observers {
     public static function course_deleted(\core\event\course_deleted $event) {
         global $CFG, $DB, $SHAREDB;
 
+        if ($event->objectid == 1) {
+            return true;
+        }
+
         // Update ShareDB if it is enabled.
         if (utils::enable_sharedb()) {
             // Update course listings DB
             $moodle = $DB->get_record('course', array(
                 "id" => $event->objectid
             ));
-
-            if ($moodle->id == 1) {
-                return true;
-            }
 
             $SHAREDB->delete_records("course_list", array(
                 "moodle_id" => $moodle->id,

@@ -75,6 +75,8 @@ class group_enrolment extends data
      * Sync method
      */
     public function sync($dry = false) {
+        $this->reset_object_cache();
+
         // Should we be deleting this?
         if ($this->deleted) {
             if ($this->is_in_moodle()) {
@@ -103,6 +105,8 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_valid() {
+        $this->reset_object_cache();
+
         if (!$this->course || !$this->user|| !$this->group) {
             return false;
         }
@@ -116,6 +120,8 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_in_moodle() {
+        $this->reset_object_cache();
+
         if (!$this->is_valid()) {
             return false;
         }
@@ -129,6 +135,8 @@ class group_enrolment extends data
      * @return unknown
      */
     public function create_in_moodle() {
+        $this->reset_object_cache();
+
         if (!$this->is_valid()) {
             return false;
         }
@@ -150,6 +158,8 @@ class group_enrolment extends data
      * @return boolean
      */
     public function delete() {
+        $this->reset_object_cache();
+
         if (!$this->group || !$this->group->is_in_moodle()) {
             return false;
         }

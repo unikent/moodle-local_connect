@@ -33,8 +33,12 @@ abstract class data {
 	/** Stores all our data */
 	private $_data;
 
+	/** Stores all our objects */
+	private $_objects;
+
 	public function __construct() {
 		$this->_data = array();
+		$this->_objects = array();
 	}
 
     /**
@@ -88,6 +92,13 @@ abstract class data {
 	}
 
 	/**
+	 * Reset object cache.
+	 */
+	protected function reset_object_cache() {
+		$this->_objects = array();
+	}
+
+	/**
 	 * Magic method!
 	 */
 	public function __get($name) {
@@ -102,9 +113,15 @@ abstract class data {
 
 		// Are we trying to get the object for an id column?
 		if (isset($this->_data[$name . "id"])) {
+			$id = $this->_data[$name . "id"];
 			$class = "\\local_connect\\" . $name;
 			if (class_exists($class)) {
-				return $class::get($this->_data[$name . "id"]);
+				$obj_key = $class . "\\" . $id;
+				if (!isset($this->_objects[$obj_key])) {
+					$this->_objects[$obj_key] = $class::get($id);
+				}
+
+				return $this->_objects[$obj_key];
 			}
 		}
 

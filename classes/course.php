@@ -61,6 +61,8 @@ class course extends data
      * Here is the big sync method.
      */
     public function sync($dry = false) {
+        $this->reset_object_cache();
+
         // Should we be creating this?
         if (!$this->is_in_moodle() && $this->is_unique_shortname($this->shortname)) {
             if (!$dry) {

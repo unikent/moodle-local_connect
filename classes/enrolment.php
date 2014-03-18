@@ -63,6 +63,8 @@ class enrolment extends data
      * Here is the big sync method.
      */
     public function sync($dry = false) {
+        $this->reset_object_cache();
+
         // Should we be deleting this?
         if ($this->deleted) {
             if ($this->is_in_moodle()) {
@@ -93,6 +95,7 @@ class enrolment extends data
      */
     public function delete() {
         global $DB;
+        $this->reset_object_cache();
 
         $enrol = enrol_get_plugin('manual');
         $instances = $DB->get_records('enrol', array(
@@ -108,6 +111,8 @@ class enrolment extends data
      * Returns true if this is a valid enrolment (i.e. we can create it in Moodle)
      */
     public function is_valid() {
+        $this->reset_object_cache();
+
         if (!$this->course || !$this->user || !$this->role) {
             return false;
         }
@@ -122,6 +127,8 @@ class enrolment extends data
         global $CFG;
         require_once($CFG->libdir . "/accesslib.php");
 
+        $this->reset_object_cache();
+
         // Get course context.
         $context = \context_course::instance($this->course->mid, MUST_EXIST);
 
@@ -133,6 +140,8 @@ class enrolment extends data
      * Create this enrolment in Moodle
      */
     public function create_in_moodle() {
+        $this->reset_object_cache();
+
         // Create the role.
         if ($this->role && !$this->role->is_in_moodle()) {
             $this->role->create_in_moodle();

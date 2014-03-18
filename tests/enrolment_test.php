@@ -206,7 +206,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 
 		// Did the enrolment get created?
 		$this->assertTrue($enrolment->is_in_moodle());
-
 	}
 
 	/**
