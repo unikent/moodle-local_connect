@@ -633,25 +633,6 @@ class course extends data
     }
 
     /**
-     * Get a Connect Course by ID
-     * @param unknown $id
-     * @return unknown
-     */
-    public static function get($id) {
-        global $DB;
-
-        // Select a bunch of records
-        $data = $DB->get_record('connect_course', array('id' => $id));
-        if (!$data) {
-            return false;
-        }
-
-        $course = new course();
-        $course->set_class_data($data);
-        return $course;
-    }
-
-    /**
      * Get a Connect Course by Moodle ID
      * @param unknown $id
      * @return unknown

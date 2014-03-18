@@ -61,6 +61,13 @@ class group extends data
     }
 
     /**
+     * Grab the connect course object
+     */
+    public function _get_course_obj() {
+        return course::get($this->course);
+    }
+
+    /**
      * The big sync method.
      */
     public function sync($dry = false) {
@@ -230,24 +237,6 @@ class group extends data
      */
     public function count_staff() {
         return $this->count_all() - $this->count_students();
-    }
-
-    /**
-     * Returns a group specified by ID
-     * @param unknown $id
-     * @return unknown
-     */
-    public static function get($id) {
-        global $DB;
-
-        $group = $DB->get_record('connect_group', array(
-            'id' => $id
-        ));
-
-        $obj = new group();
-        $obj->set_class_data($group);
-
-        return $obj;
     }
 
 

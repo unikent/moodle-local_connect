@@ -154,6 +154,16 @@ class enrolment extends data
      * Create this enrolment in Moodle
      */
     public function create_in_moodle() {
+        // Create the role.
+        if ($this->role_obj && !$this->role_obj->is_in_moodle()) {
+            $this->role_obj->create_in_moodle();
+        }
+
+        // Create the user.
+        if ($this->user_obj && !$this->user_obj->is_in_moodle()) {
+            $this->user_obj->create_in_moodle();
+        }
+
         if (!$this->is_valid()) {
             return false;
         }
@@ -247,22 +257,6 @@ class enrolment extends data
         $obj = $DB->get_record('connect_enrolments', array(
             "user" => $user->id,
             "course" => $course->id
-        ));
-
-        $enrolment = new enrolment();
-        $enrolment->set_class_data($obj);
-
-        return $enrolment;
-    }
-
-    /**
-     * Returns an enrolment, given an ID
-     */
-    public static function get($id) {
-        global $DB;
-
-        $obj = $DB->get_record('connect_enrolments', array(
-            "id" => $id
         ));
 
         $enrolment = new enrolment();

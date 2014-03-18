@@ -216,10 +216,16 @@ abstract class data {
 	public static function get($id) {
 		global $DB;
 
-		$obj = new static();
-		$obj->set_class_data($DB->get_record(static::get_table(), array(
+		$data = $DB->get_record(static::get_table(), array(
 			'id' => $id
-		)));
+		));
+
+        if (!$data) {
+            return null;
+        }
+
+		$obj = new static();
+		$obj->set_class_data($data);
 
 		return $obj;
 	}

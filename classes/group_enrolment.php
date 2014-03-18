@@ -61,6 +61,31 @@ class group_enrolment extends data
     }
 
     /**
+     * Grab the connect user object
+     */
+    public function _get_user_obj() {
+        return user::get($this->user);
+    }
+
+    /**
+     * Grab the connect course object
+     */
+    public function _get_course_obj() {
+        if (!$this->group_obj) {
+            return null;
+        }
+
+        return $this->group_obj->course_obj;
+    }
+
+    /**
+     * Grab the connect group object
+     */
+    public function _get_group_obj() {
+        return group::get($this->groupid);
+    }
+
+    /**
      * Sync method
      */
     public function sync($dry = false) {
@@ -92,22 +117,11 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_valid() {
-        $group = group::get($this->groupid);
-        if (!$group || !$group->is_in_moodle()) {
+        if (!$this->course_obj || !$this->user_obj|| !$this->group_obj) {
             return false;
         }
 
-        $course = course::get($group->course);
-        if (!$course || !$course->is_in_moodle()) {
-            return false;
-        }
-
-        $user = user::get($this->user);
-        if (!$user || !$user->is_in_moodle()) {
-            return false;
-        }
-
-        return true;
+        return $this->course_obj->is_in_moodle() && $this->user_obj->is_in_moodle() && $this->group_obj->is_in_moodle();
     }
 
 
@@ -116,17 +130,11 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_in_moodle() {
-        $group = group::get($this->groupid);
-        if (!$group || !$group->is_in_moodle()) {
+        if (!$this->is_valid()) {
             return false;
         }
 
-        $user = user::get($this->user);
-        if (!$user || !$user->is_in_moodle()) {
-            return false;
-        }
-
-        return groups_is_member($group->mid, $user->mid);
+        return groups_is_member($this->group_obj->mid, $this->user_obj->mid);
     }
 
 
@@ -135,30 +143,19 @@ class group_enrolment extends data
      * @return unknown
      */
     public function create_in_moodle() {
-        $group = group::get($this->groupid);
-        if (!$group || !$group->is_in_moodle()) {
-            return false;
-        }
-
-        $course = course::get($group->course);
-        if (!$course || !$course->is_in_moodle()) {
-            return false;
-        }
-
-        $user = user::get($this->user);
-        if (!$user || !$user->is_in_moodle()) {
+        if (!$this->is_valid()) {
             return false;
         }
 
         // Is the user enrolled?
-        $enrolment = enrolment::get_for_user_and_course($user, $course);
+        $enrolment = enrolment::get_for_user_and_course($this->user_obj, $this->course_obj);
         if (!$enrolment->is_in_moodle()) {
             if (!$enrolment->create_in_moodle()) {
                 return false;
             }
         }
 
-        return groups_add_member($group->mid, $user->mid);
+        return groups_add_member($this->group_obj->mid, $this->user_obj->mid);
     }
 
     /**
@@ -178,25 +175,6 @@ class group_enrolment extends data
         }
 
         return groups_remove_member($group->mid, $user->mid);
-    }
-
-
-    /**
-     * Returns a group enrolment, given a group ID and a username.
-     * @param unknown $group
-     * @return unknown
-     */
-    public static function get($id) {
-        global $DB;
-
-        $ge = $DB->get_record('connect_group_enrolments', array(
-            'id' => $id
-        ));
-
-        $obj = new group_enrolment();
-        $obj->set_class_data($ge);
-
-        return $obj;
     }
 
     /**

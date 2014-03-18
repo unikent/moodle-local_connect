@@ -33,6 +33,9 @@ require_once($CFG->libdir . "/accesslib.php");
  */
 class role extends data
 {
+    /** Our mid (TODO - store in DB) */
+    private $_mid;
+
     /**
      * The name of our connect table.
      */
@@ -67,16 +70,15 @@ class role extends data
 	 */
 	public function _get_mid() {
 		global $DB;
-		static $result = array();
 
-		if (!isset($result[$this->id])) {
+		if (!isset($this->_mid)) {
         	$data = $this->get_data_mapping();
-			$result[$this->id] = $DB->get_field('role', 'id', array(
+			$this->_mid = $DB->get_field('role', 'id', array(
 				'shortname' => $data['short']
 			), IGNORE_MISSING);
 		}
 
-		return $result[$this->id];
+		return $this->_mid;
 	}
 
 	/**
@@ -129,8 +131,11 @@ class role extends data
 
         // Create it if it doesnt already exist.
         if (!$DB->record_exists('role', array('shortname' => $data['short']))) {
-            call_user_func_array("create_role", array_values($data));
+            $this->_mid = create_role($data['name'], $data['short'], $data['desc'], $data['archetype']);
+            return true;
         }
+
+        return false;
 	}
 
 	/**
@@ -151,17 +156,5 @@ class role extends data
 		}
 
 		return $this->mid;
-	}
-
-	/**
-	 * Get or create a role by id
-	 */
-	public static function get($id) {
-		global $DB;
-		$obj = new role();
-		$obj->set_class_data($DB->get_record('connect_role', array(
-			"id" => $id
-		)));
-		return $obj;
 	}
 }
