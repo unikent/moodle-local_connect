@@ -329,5 +329,78 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014031700, 'local', 'connect');
     }
 
+    if ($oldversion < 2014031800) {
+        $remaps = array(
+            "connect_enrolments" => array(
+                "course" => new xmldb_field('course', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null, 'id'),
+                "user" => new xmldb_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null, 'courseid'),
+                "role" => new xmldb_field('role', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, null, 'userid')
+            ),
+            "connect_group" => array(
+                "course" => new xmldb_field('course', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null, 'mid')
+            ),
+            "connect_group_enrolments" => array(
+                "user" => new xmldb_field('user', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null, 'groupid')
+            ),
+            "connect_course" => array(
+                "campus" => new xmldb_field('campus', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, null, 'module_version')
+            ),
+        );
+
+        foreach ($remaps as $table => $cols) {
+            $table = new xmldb_table($table);
+            foreach ($cols as $col => $col_obj) {
+                // If there is an index, drop it.
+                $index = new xmldb_index('index_' . $col, XMLDB_INDEX_NOTUNIQUE, array($col));
+                $index_exists = $dbman->index_exists($table, $index);
+                if ($index_exists) {
+                    $dbman->drop_index($table, $index);
+                }
+
+                // Rename the field.
+                $field = $col_obj;
+                if ($dbman->field_exists($table, $field)) {
+                    $dbman->rename_field($table, $field, $col . 'id');
+                }
+
+                // Create a new index.
+                if ($index_exists) {
+                    $index = new xmldb_index('index_' . $col . 'id', XMLDB_INDEX_NOTUNIQUE, array($col . 'id'));
+                    if (!$dbman->index_exists($table, $index)) {
+                        $dbman->add_index($table, $index);
+                    }
+                }
+            }
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014031800, 'local', 'connect');
+    }
+
+    if ($oldversion < 2014031801) {
+        $table = new xmldb_table("connect_role");
+
+        {
+            $field = new xmldb_field('mid', XMLDB_TYPE_INTEGER, '11', null, null, null, '0', 'id');
+
+            // Conditionally launch add field mid.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        {
+            $index = new xmldb_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
+
+            // Conditionally launch add index index_mid.
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014031801, 'local', 'connect');
+    }
+
     return true;
 }
