@@ -159,11 +159,6 @@ class enrolment extends data
             $this->role_obj->create_in_moodle();
         }
 
-        // Create the user.
-        if ($this->user_obj && !$this->user_obj->is_in_moodle()) {
-            $this->user_obj->create_in_moodle();
-        }
-
         if (!$this->is_valid()) {
             return false;
         }
