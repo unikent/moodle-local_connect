@@ -248,6 +248,25 @@ class group_enrolment extends data
     }
 
     /**
+     * Returns all group enrolments for a given user.
+     */
+    public static function get_for_user($user) {
+        global $DB;
+
+        $set = $DB->get_records('connect_group_enrolments', array(
+            'user' => $user->id
+        ));
+
+        foreach ($set as &$o) {
+            $obj = new group_enrolment();
+            $obj->set_class_data($o);
+            $o = $obj;
+        }
+
+        return $set;
+    }
+
+    /**
      * Returns all known group enrolments .
      * @return unknown
      */
