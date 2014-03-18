@@ -149,10 +149,10 @@ class user extends data
 
 		$sql = "SELECT cu.*
 			FROM {connect_user} cu
-			INNER JOIN {connect_enrolments} ce ON ce.user=cu.id
-			WHERE ce.role $selector :role";
+			INNER JOIN {connect_enrolments} ce ON ce.userid=cu.id
+			WHERE ce.roleid $selector :roleid";
 		$data = $DB->get_records_sql($sql, array(
-			"role" => $roleid
+			"roleid" => $roleid
 		));
 
 		$result = array();

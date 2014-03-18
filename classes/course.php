@@ -47,7 +47,7 @@ class course extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "mid", "module_delivery_key", "session_code", "module_version", "campus", "module_week_beginning", "module_length", "week_beginning_date", "module_title", "module_code", "synopsis", "category");
+        return array("id", "mid", "module_delivery_key", "session_code", "module_version", "campusid", "module_week_beginning", "module_length", "week_beginning_date", "module_title", "module_code", "synopsis", "category");
     }
 
     /**
@@ -126,7 +126,7 @@ class course extends data
     public function _get_campus_name() {
         global $DB;
         return $DB->get_field('connect_campus', 'name', array(
-            'id' => $this->campus
+            'id' => $this->campusid
         ));
     }
 
@@ -600,7 +600,7 @@ class course extends data
         global $DB;
 
         return $DB->count_records("connect_enrolments", array(
-            'course' => $this->id
+            'courseid' => $this->id
         ));
     }
 
@@ -612,8 +612,8 @@ class course extends data
 
         $role = $DB->get_field('connect_role', 'id', array('name' => 'student'));
         return $DB->count_records('connect_enrolments', array(
-            'course' => $this->id,
-            'role' => $role
+            'courseid' => $this->id,
+            'roleid' => $role
         ));
     }
 

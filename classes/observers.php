@@ -227,7 +227,7 @@ class observers {
         ));
 
         $connect_group_id = $DB->get_field('connect_group', 'id', array(
-            'course' => $connect_course_id,
+            'courseid' => $connect_course_id,
             'name' => $group->name
         ));
 
@@ -263,7 +263,7 @@ class observers {
         ));
 
         $connect_group_id = $DB->get_field('connect_group', 'id', array(
-            'course' => $connect_course_id,
+            'courseid' => $connect_course_id,
             'name' => $group->name
         ));
 

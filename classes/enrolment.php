@@ -42,7 +42,7 @@ class enrolment extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "user", "course", "role", "deleted");
+        return array("id", "userid", "courseid", "roleid", "deleted");
     }
 
     /**
@@ -57,27 +57,6 @@ class enrolment extends data
      */
     protected static function key_fields() {
         return array("id");
-    }
-
-    /**
-     * Grab the connect user object
-     */
-    public function _get_user_obj() {
-        return user::get($this->user);
-    }
-
-    /**
-     * Grab the connect user object
-     */
-    public function _get_course_obj() {
-        return course::get($this->course);
-    }
-
-    /**
-     * Grab the connect role object
-     */
-    public function _get_role_obj() {
-        return role::get($this->role);
     }
 
     /**
@@ -118,22 +97,22 @@ class enrolment extends data
         $enrol = enrol_get_plugin('manual');
         $instances = $DB->get_records('enrol', array(
             'enrol' => 'manual',
-            'courseid' => $this->course_obj->mid,
+            'courseid' => $this->course->mid,
             'status' => ENROL_INSTANCE_ENABLED
         ), 'sortorder, id ASC');
         $instance = reset($instances);
-        $enrol->unenrol_user($instance, $this->user_obj->mid);
+        $enrol->unenrol_user($instance, $this->user->mid);
     }
 
     /**
      * Returns true if this is a valid enrolment (i.e. we can create it in Moodle)
      */
     public function is_valid() {
-        if (!$this->course_obj || !$this->user_obj || !$this->role_obj) {
+        if (!$this->course || !$this->user || !$this->role) {
             return false;
         }
 
-        return $this->course_obj->is_in_moodle() && $this->user_obj->is_in_moodle() && $this->role_obj->is_in_moodle();
+        return $this->course->is_in_moodle() && $this->user->is_in_moodle() && $this->role->is_in_moodle();
     }
 
     /**
@@ -144,10 +123,10 @@ class enrolment extends data
         require_once($CFG->libdir . "/accesslib.php");
 
         // Get course context.
-        $context = \context_course::instance($this->course_obj->mid, MUST_EXIST);
+        $context = \context_course::instance($this->course->mid, MUST_EXIST);
 
         // Check enrolment status.
-        return is_enrolled($context, $this->user_obj->mid);
+        return is_enrolled($context, $this->user->mid);
     }
 
     /**
@@ -155,15 +134,15 @@ class enrolment extends data
      */
     public function create_in_moodle() {
         // Create the role.
-        if ($this->role_obj && !$this->role_obj->is_in_moodle()) {
-            $this->role_obj->create_in_moodle();
+        if ($this->role && !$this->role->is_in_moodle()) {
+            $this->role->create_in_moodle();
         }
 
         if (!$this->is_valid()) {
             return false;
         }
 
-        return enrol_try_internal_enrol($this->course_obj->mid, $this->user_obj->mid, $this->role_obj->mid);
+        return enrol_try_internal_enrol($this->course->mid, $this->user->mid, $this->role->mid);
     }
 
     /**
@@ -180,7 +159,7 @@ class enrolment extends data
         }
 
         $objs = $DB->get_records('connect_enrolments', array(
-            'user' => $user->id
+            'userid' => $user->id
         ));
 
         foreach ($objs as &$obj) {
@@ -214,7 +193,7 @@ class enrolment extends data
         global $DB;
 
         $objs = $DB->get_records('connect_enrolments', array(
-            'course' => $course->id
+            'courseid' => $course->id
         ));
 
         foreach ($objs as &$obj) {
@@ -250,8 +229,8 @@ class enrolment extends data
         global $DB;
 
         $obj = $DB->get_record('connect_enrolments', array(
-            "user" => $user->id,
-            "course" => $course->id
+            "userid" => $user->id,
+            "courseid" => $course->id
         ));
 
         $enrolment = new enrolment();

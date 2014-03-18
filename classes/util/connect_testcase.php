@@ -113,9 +113,9 @@ abstract class connect_testcase extends \advanced_testcase
 
 		return $DB->insert_record('connect_enrolments', array(
 			"mid" => 0,
-			"course" => $course_id,
-			"user" => $this->generate_user(),
-			"role" => $role
+			"courseid" => $course_id,
+			"userid" => $this->generate_user(),
+			"roleid" => $role
 		));
 	}
 
@@ -142,7 +142,7 @@ abstract class connect_testcase extends \advanced_testcase
 		static $uid = 100000;
 		return $DB->insert_record('connect_group', array(
 			"mid" => 0,
-			"course" => $courseid,
+			"courseid" => $courseid,
 			"name" => "Test Group: " . $uid++
 		));
 	}
@@ -162,20 +162,20 @@ abstract class connect_testcase extends \advanced_testcase
 	protected function generate_group_enrolment($groupid, $role = 'student') {
 		global $DB;
 
-		$courseid = $DB->get_field('connect_group', 'course', array(
+		$courseid = $DB->get_field('connect_group', 'courseid', array(
 			"id" => $groupid
 		));
 
 		$enrolmentid = $this->generate_enrolment($courseid, $role);
 
-		$userid = $DB->get_field('connect_enrolments', 'user', array(
+		$userid = $DB->get_field('connect_enrolments', 'userid', array(
 			"id" => $enrolmentid
 		));
 
 		return $DB->insert_record('connect_group_enrolments', array(
 			"mid" => 0,
 			"groupid" => $groupid,
-			"user" => $userid
+			"userid" => $userid
 		));
 	}
 
@@ -230,7 +230,7 @@ abstract class connect_testcase extends \advanced_testcase
 			"module_delivery_key" => $delivery_key++,
 			"session_code" => $CFG->connect->session_code,
 			"module_version" => 1,
-			"campus" => 1,
+			"campusid" => 1,
 			"module_week_beginning" => 1,
 			"module_length" => 12,
 			"week_beginning_date" => strftime('%Y-%m-%d %H:%M:%S'),

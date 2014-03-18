@@ -43,7 +43,7 @@ class group extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "mid", "course", "name");
+        return array("id", "mid", "courseid", "name");
     }
 
     /**
@@ -58,13 +58,6 @@ class group extends data
      */
     protected static function key_fields() {
         return array("id");
-    }
-
-    /**
-     * Grab the connect course object
-     */
-    public function _get_course_obj() {
-        return course::get($this->course);
     }
 
     /**
@@ -105,8 +98,6 @@ class group extends data
     private function get_or_create_grouping() {
         global $DB;
 
-        $course = course::get($this->course);
-
         $grouping = $DB->get_record('groupings', array(
             'name' => 'Seminar groups',
             'courseid' => $this->mid
@@ -116,7 +107,7 @@ class group extends data
         if (!$grouping) {
             $data = new \stdClass();
             $data->name = "Seminar groups";
-            $data->courseid = $course->mid;
+            $data->courseid = $this->course->mid;
             $data->description = '';
             return groups_create_grouping($data);
         }
@@ -139,16 +130,14 @@ class group extends data
      * @return unknown
      */
     public function create_in_moodle() {
-        $course = course::get($this->course);
-
-        if (!$course->is_in_moodle()) {
-            debugging("Attempting to create group '{$this->id}' but course '{$this->course}' doesnt exist!", DEBUG_DEVELOPER);
+        if (!$this->course->is_in_moodle()) {
+            debugging("Attempting to create group '{$this->id}' but course '{$this->courseid}' doesnt exist!", DEBUG_DEVELOPER);
             return false;
         }
 
         $data = new \stdClass();
         $data->name = $this->name;
-        $data->courseid = $course->mid;
+        $data->courseid = $this->course->mid;
         $data->description = '';
 
         // Grab a Moodle ID.
@@ -222,13 +211,13 @@ class group extends data
         $sql = "SELECT COUNT(cge.id) as count
         FROM {connect_group_enrolments} cge
         INNER JOIN {connect_enrolments} ce
-            ON ce.user=cge.user
-        WHERE cge.groupid=:id AND ce.course=:course AND ce.role=:role";
+            ON ce.userid=cge.userid
+        WHERE cge.groupid=:id AND ce.courseid=:courseid AND ce.roleid=:roleid";
 
         return $DB->count_records_sql($sql, array(
             "id" => $this->id,
-            "course" => $this->course,
-            "role" => $role
+            "courseid" => $this->courseid,
+            "roleid" => $role
         ));
     }
 
@@ -250,7 +239,7 @@ class group extends data
 
         // Select all our groups.
         $data = $DB->get_records('connect_group', array(
-            'course' => $course->id
+            'courseid' => $course->id
         ));
 
         // Map to objects.

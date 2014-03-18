@@ -108,7 +108,9 @@ abstract class data {
 			}
 		}
 
-		debugging("Invalid field: $name!");
+		if (!in_array($name, $this->valid_fields())) {
+			debugging("Invalid field: $name!");
+		}
 
 		return null;
 	}

@@ -43,7 +43,7 @@ class group_enrolment extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "groupid", "user", "deleted");
+        return array("id", "groupid", "userid", "deleted");
     }
 
     /**
@@ -61,21 +61,14 @@ class group_enrolment extends data
     }
 
     /**
-     * Grab the connect user object
-     */
-    public function _get_user_obj() {
-        return user::get($this->user);
-    }
-
-    /**
      * Grab the connect course object
      */
-    public function _get_course_obj() {
+    public function _get_course() {
         if (!$this->group) {
             return null;
         }
 
-        return $this->group->course_obj;
+        return $this->group->course;
     }
 
     /**
@@ -110,11 +103,11 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_valid() {
-        if (!$this->course_obj || !$this->user_obj|| !$this->group) {
+        if (!$this->course || !$this->user|| !$this->group) {
             return false;
         }
 
-        return $this->course_obj->is_in_moodle() && $this->user_obj->is_in_moodle() && $this->group->is_in_moodle();
+        return $this->course->is_in_moodle() && $this->user->is_in_moodle() && $this->group->is_in_moodle();
     }
 
 
@@ -127,7 +120,7 @@ class group_enrolment extends data
             return false;
         }
 
-        return groups_is_member($this->group->mid, $this->user_obj->mid);
+        return groups_is_member($this->group->mid, $this->user->mid);
     }
 
 
@@ -141,14 +134,14 @@ class group_enrolment extends data
         }
 
         // Is the user enrolled?
-        $enrolment = enrolment::get_for_user_and_course($this->user_obj, $this->course_obj);
+        $enrolment = enrolment::get_for_user_and_course($this->user, $this->course);
         if (!$enrolment->is_in_moodle()) {
             if (!$enrolment->create_in_moodle()) {
                 return false;
             }
         }
 
-        return groups_add_member($this->group->mid, $this->user_obj->mid);
+        return groups_add_member($this->group->mid, $this->user->mid);
     }
 
     /**
@@ -157,17 +150,15 @@ class group_enrolment extends data
      * @return boolean
      */
     public function delete() {
-        $group = group::get($this->groupid);
-        if (!$group || !$group->is_in_moodle()) {
+        if (!$this->group || !$this->group->is_in_moodle()) {
             return false;
         }
 
-        $user = user::get($this->user);
-        if (!$user || !$user->is_in_moodle()) {
+        if (!$this->user || !$this->user->is_in_moodle()) {
             return false;
         }
 
-        return groups_remove_member($group->mid, $user->mid);
+        return groups_remove_member($this->group->mid, $this->user->mid);
     }
 
     /**
@@ -203,10 +194,10 @@ class group_enrolment extends data
         $sql = 'SELECT cge.* FROM {connect_group_enrolments} cge
             INNER JOIN {connect_group} cg
                 ON cg.id=cge.groupid
-            WHERE cg.course=:course';
+            WHERE cg.courseid=:courseid';
 
         $set = $DB->get_records_sql($sql, array(
-            'course' => $course->id
+            'courseid' => $course->id
         ));
 
         foreach ($set as &$o) {
@@ -225,7 +216,7 @@ class group_enrolment extends data
         global $DB;
 
         $set = $DB->get_records('connect_group_enrolments', array(
-            'user' => $user->id
+            'userid' => $user->id
         ));
 
         foreach ($set as &$o) {

@@ -122,7 +122,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$enrolment = array_pop($enrolments);
 
 		// Make sure it worked.
-		$user = \local_connect\user::get($enrolment->user);
+		$user = $enrolment->user;
 		$enrolments = \local_connect\enrolment::get_for_user($user);
 		$this->assertEquals(1, count($enrolments));
 
@@ -173,7 +173,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$enrolment = $this->generate_enrolment($course, 'student');
 		$enrolment = \local_connect\enrolment::get($enrolment);
 		$user = $DB->get_record('user', array(
-			"id" => $enrolment->user_obj->mid
+			"id" => $enrolment->user->mid
 		));
 
 		// Create the enrolment.
