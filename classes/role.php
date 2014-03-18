@@ -33,9 +33,6 @@ require_once($CFG->libdir . "/accesslib.php");
  */
 class role extends data
 {
-    /** Our mid (TODO - store in DB) */
-    private $_mid;
-
     /**
      * The name of our connect table.
      */
@@ -47,7 +44,7 @@ class role extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "name");
+        return array("id", "mid", "name");
     }
 
     /**
@@ -65,28 +62,11 @@ class role extends data
     }
 
 	/**
-	 * Returns the moodle ID
-	 * @return boolean
-	 */
-	public function _get_mid() {
-		global $DB;
-
-		if (!isset($this->_mid)) {
-        	$data = $this->get_data_mapping();
-			$this->_mid = $DB->get_field('role', 'id', array(
-				'shortname' => $data['short']
-			), IGNORE_MISSING);
-		}
-
-		return $this->_mid;
-	}
-
-	/**
 	 * Is this role in Moodle?
 	 * @return boolean
 	 */
 	public function is_in_moodle() {
-		return $this->mid !== false;
+		return !empty($this->mid);
 	}
 
 	/**
@@ -131,7 +111,8 @@ class role extends data
 
         // Create it if it doesnt already exist.
         if (!$DB->record_exists('role', array('shortname' => $data['short']))) {
-            $this->_mid = create_role($data['name'], $data['short'], $data['desc'], $data['archetype']);
+            $this->mid = create_role($data['name'], $data['short'], $data['desc'], $data['archetype']);
+            $this->save();
             return true;
         }
 
