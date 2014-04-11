@@ -68,6 +68,16 @@ class group extends data
 
         $this->reset_object_cache();
 
+        // Is our course in Moodle?
+        if (!$this->course->is_in_moodle()) {
+            if (!empty($this->mid)) {
+                $this->mid = 0;
+                $this->save();
+            }
+
+            return;
+        }
+
         // The easiest path!
         if (!$this->is_in_moodle()) {
             if (!$dry) {

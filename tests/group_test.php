@@ -221,6 +221,38 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->assertTrue($group->is_in_moodle());
 
 	}
+
+	/**
+	 * Make sure we dont try to sync a group when the course doesnt exist.
+	 */
+	public function test_group_cannot_create_without_course() {
+		global $DB;
+
+		$this->resetAfterTest();
+
+		$course = \local_connect\course::get($this->generate_course());
+		$group = \local_connect\group::get($this->generate_group($course->id));
+
+		// Sanity checks.
+		$this->assertFalse($group->is_in_moodle());
+        $this->assertEquals(0, $group->mid);
+
+        // Try to sync, see what happens.
+		$this->assertEquals(null, $group->sync());
+        $this->assertEquals(0, $group->mid);
+
+        // Force-set the mid, and ensure sync cleans up.
+        $group->mid = 100;
+        $this->assertEquals(100, $group->mid);
+		$this->assertEquals(null, $group->sync());
+        $this->assertEquals(0, $group->mid);
+
+		$group = \local_connect\group::get($group->id);
+
+		// Sanity checks.
+		$this->assertFalse($group->is_in_moodle());
+        $this->assertEquals(0, $group->mid);
+	}
 }
 
 
