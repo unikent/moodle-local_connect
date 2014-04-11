@@ -47,7 +47,7 @@ foreach ($c_roles as $c_role) {
 	if ($m_role_id !== false) {
 		$c_role->mid = $m_role_id;
 		if (!$dry) {
-			$DB->update_record($c_role);
+			$DB->update_record('connect_role', $c_role);
 		}
 
 		print "Mapped {$c_role->name} to {$c_role->mid}.\n";
