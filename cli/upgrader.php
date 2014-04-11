@@ -75,7 +75,7 @@ foreach ($c_users as $c_user) {
 $c_courses = $DB->get_records('connect_course', array("mid" => 0));
 foreach ($c_courses as $c_course) {
 	// Match a course on shortname
-	$m_matches = $DB->get_records_sql("SELECT * FROM {course} WHERE shortname LIKE :shortname", array(
+	$m_matches = $DB->get_records_sql("SELECT id FROM {course} WHERE shortname LIKE :shortname", array(
 		"shortname" => "%" . $c_course->module_code . "%"
 	));
 	if (count($m_matches) == 1) {
@@ -85,7 +85,7 @@ foreach ($c_courses as $c_course) {
 			$DB->update_record('connect_course', $c_course);
 		}
 
-		print "Mapped course {$c_course->shortname} to {$c_course->mid}.\n";
+		print "Mapped course {$c_course->module_code} to {$c_course->mid}.\n";
 
 		// Also, grab groups for this course and try some matching.
 		$c_groups = $DB->get_records('connect_group', array(
