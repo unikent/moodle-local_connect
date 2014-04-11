@@ -75,7 +75,7 @@ foreach ($c_users as $c_user) {
 $c_courses = $DB->get_records('connect_course', array("mid" => 0));
 foreach ($c_courses as $c_course) {
 	// Match a course on shortname
-	$m_matches = $DB->get_records_sql("SELECT id FROM {course} WHERE shortname LIKE :shortname", array(
+	$m_matches = $DB->get_records_sql("SELECT * FROM {course} WHERE shortname LIKE :shortname", array(
 		"shortname" => "%" . $c_course->module_code . "%"
 	));
 	if (count($m_matches) == 1) {
