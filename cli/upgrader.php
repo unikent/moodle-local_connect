@@ -55,6 +55,21 @@ foreach ($c_roles as $c_role) {
 }
 
 // Users
+$c_users = $DB->get_records('connect_user', array("mid" => 0));
+foreach ($c_users as $c_user) {
+	// Try to find a matching user.
+	$m_user_id = $DB->get_field('user', 'id', array(
+		'username' => $c_user->login
+	));
+	if ($m_user_id !== false) {
+		$c_user->mid = $m_user_id;
+		if (!$dry) {
+			$DB->update_record('connect_user', $c_user);
+		}
+
+		print "Mapped {$c_user->login} to {$c_user->mid}.\n";
+	}
+}
 
 // Find all created Moodle courses that look like a connect course
 // Set the mid
