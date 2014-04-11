@@ -36,6 +36,9 @@ require_once dirname(__FILE__) . '/../../../mod/forum/lib.php';
  */
 class course extends data
 {
+    /** Have we been locked? */
+    private $_locked;
+
     /**
      * The name of our connect table.
      */
@@ -238,19 +241,19 @@ class course extends data
     public function is_locked() {
         global $DB;
 
-        if (!isset($this->locked)) {
-            $this->locked = true;
+        if (!isset($this->_locked)) {
+            $this->_locked = true;
 
             $conditions = array(
                 "course" => $this->mid
             );
 
             if ($DB->record_exists('connect_course_dets', $conditions)) {
-                $this->locked = $DB->get_field('connect_course_dets', 'unlocked', $conditions) == 0;
+                $this->_locked = $DB->get_field('connect_course_dets', 'unlocked', $conditions) == 0;
             }
         }
 
-        return $this->locked;
+        return $this->_locked;
     }
 
     /**
