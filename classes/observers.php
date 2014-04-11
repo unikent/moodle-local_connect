@@ -222,21 +222,23 @@ class observers {
 
         $group = $event->get_record_snapshot('groups', $event->objectid);
 
-        $connect_course_id = $DB->get_field('connect_course', 'id', array(
+        $connect_courses = $DB->get_records('connect_course', array(
             'mid' => $group->courseid
         ));
 
-        $connect_group_id = $DB->get_field('connect_group', 'id', array(
-            'courseid' => $connect_course_id,
-            'name' => $group->name
-        ));
+        foreach ($connect_courses as $connect_course) {
+            $connect_group_id = $DB->get_field('connect_group', 'id', array(
+                'courseid' => $connect_course->id,
+                'name' => $group->name
+            ));
 
-        // Reset mid.
-        if ($connect_group_id) {
-            $group = group::get($connect_group_id);
-            if ($group->mid !== $event->objectid) {
-                $group->mid = $event->objectid;
-                $group->save();
+            // Reset mid.
+            if ($connect_group_id) {
+                $group = group::get($connect_group_id);
+                if ($group->mid !== $event->objectid) {
+                    $group->mid = $event->objectid;
+                    $group->save();
+                }
             }
         }
 
@@ -256,23 +258,9 @@ class observers {
             return true;
         }
 
-        $group = $event->get_record_snapshot('groups', $event->objectid);
-
-        $connect_course_id = $DB->get_field('connect_course', 'id', array(
-            'mid' => $group->courseid
+        $DB->set_field('connect_group', 'mid', 0, array(
+            'mid' => $event->objectid
         ));
-
-        $connect_group_id = $DB->get_field('connect_group', 'id', array(
-            'courseid' => $connect_course_id,
-            'name' => $group->name
-        ));
-
-        // Reset mid.
-        if ($connect_group_id) {
-            $group = group::get($connect_group_id);
-            $group->mid = 0;
-            $group->save();
-        }
 
         return true;
     }
