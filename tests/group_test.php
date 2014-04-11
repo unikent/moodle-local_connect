@@ -235,23 +235,23 @@ class kent_group_tests extends local_connect\util\connect_testcase
 
 		// Sanity checks.
 		$this->assertFalse($group->is_in_moodle());
-        $this->assertEquals(0, $group->mid);
+		$this->assertEquals(0, $group->mid);
 
-        // Try to sync, see what happens.
+		// Try to sync, see what happens.
 		$this->assertEquals(null, $group->sync());
-        $this->assertEquals(0, $group->mid);
+		$this->assertEquals(0, $group->mid);
 
-        // Force-set the mid, and ensure sync cleans up.
-        $group->mid = 100;
-        $this->assertEquals(100, $group->mid);
+		// Force-set the mid, and ensure sync cleans up.
+		$group->mid = 100;
+		$this->assertEquals(100, $group->mid);
 		$this->assertEquals(null, $group->sync());
-        $this->assertEquals(0, $group->mid);
+		$this->assertEquals(0, $group->mid);
 
 		$group = \local_connect\group::get($group->id);
 
 		// Sanity checks.
 		$this->assertFalse($group->is_in_moodle());
-        $this->assertEquals(0, $group->mid);
+		$this->assertEquals(0, $group->mid);
 	}
 }
 
