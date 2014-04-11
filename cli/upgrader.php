@@ -50,7 +50,7 @@ foreach ($c_roles as $c_role) {
 			$DB->update_record('connect_role', $c_role);
 		}
 
-		print "Mapped {$c_role->name} to {$c_role->mid}.\n";
+		print "Mapped role {$c_role->name} to {$c_role->mid}.\n";
 	}
 }
 
@@ -67,10 +67,43 @@ foreach ($c_users as $c_user) {
 			$DB->update_record('connect_user', $c_user);
 		}
 
-		print "Mapped {$c_user->login} to {$c_user->mid}.\n";
+		print "Mapped user {$c_user->login} to {$c_user->mid}.\n";
 	}
 }
 
 // Find all created Moodle courses that look like a connect course
-// Set the mid
-// Also groups
+$c_courses = $DB->get_records('connect_course', array("mid" => 0));
+foreach ($c_courses as $c_course) {
+	// Match a course on shortname
+	$m_matches = $DB->get_records_sql("SELECT id FROM {course} WHERE shortname LIKE :shortname", array(
+		"shortname" => "%" . $c_course->module_code . "%"
+	));
+	if (count($m_matches) == 1) {
+		$m_course = array_pop($m_matches);
+		$c_course->mid = $m_course->id;
+		if (!$dry) {
+			$DB->update_record('connect_course', $c_course);
+		}
+
+		print "Mapped course {$c_course->shortname} to {$c_course->mid}.\n";
+
+		// Also, grab groups for this course and try some matching.
+		$c_groups = $DB->get_records('connect_group', array(
+			'mid' => 0,
+			'courseid' => $c_course->id
+		));
+		foreach ($c_groups as $c_group) {
+			// Try to match.
+			$m_matches = $DB->get_records('groups', array('name' => $c_group->name));
+			if (count($m_matches) == 1) {
+				$m_group = array_pop($m_matches);
+				$c_group->mid = $m_group->id;
+				if (!$dry) {
+					$DB->update_record('connect_group', $c_group);
+				}
+
+				print "Mapped group {$c_group->id} to {$c_group->mid}.\n";
+			}
+		}
+	}
+}
