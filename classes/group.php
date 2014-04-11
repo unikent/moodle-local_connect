@@ -113,7 +113,7 @@ class group extends data
         $grouping = $DB->get_record('groupings', array(
             'name' => 'Seminar groups',
             'courseid' => $this->mid
-        ));
+        ), 'id', IGNORE_MULTIPLE);
 
         // Create?
         if (!$grouping) {

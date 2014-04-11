@@ -227,17 +227,19 @@ class observers {
         ));
 
         foreach ($connect_courses as $connect_course) {
-            $connect_group_id = $DB->get_field('connect_group', 'id', array(
+            $connect_groups = $DB->get_records('connect_group', array(
                 'courseid' => $connect_course->id,
                 'name' => $group->name
             ));
 
-            // Reset mid.
-            if ($connect_group_id) {
-                $group = group::get($connect_group_id);
-                if ($group->mid !== $event->objectid) {
-                    $group->mid = $event->objectid;
-                    $group->save();
+            foreach ($connect_groups as $connect_group) {
+                // Reset mid.
+                if ($connect_group->id) {
+                    $group = group::get($connect_group->id);
+                    if ($group->mid !== $event->objectid) {
+                        $group->mid = $event->objectid;
+                        $group->save();
+                    }
                 }
             }
         }
