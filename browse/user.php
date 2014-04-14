@@ -53,7 +53,7 @@ if (!has_capability('moodle/site:config', context_system::instance())) {
  * And, the actual page.
  */
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('connectbrowse_user', 'local_connect') . "TODO");
+echo $OUTPUT->heading(get_string('connectbrowse_user', 'local_connect') . $user->login);
 
 // The Groups Table
 {
