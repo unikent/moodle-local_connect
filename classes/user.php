@@ -59,6 +59,25 @@ class user extends data
         return array("id");
     }
 
+    /**
+     * Returns all enrolments for this user.
+     */
+    public function _get_enrolments() {
+        return enrolment::get_for_user($this);
+    }
+
+    /**
+     * Returns the Moodle URL for this user.
+     */
+    public function get_moodle_url() {
+        if (empty($this->mid)) {
+            return "";
+        }
+
+        $url = new \moodle_url("/user/view.php", array("id" => $this->mid));
+        return $url->out(false);
+    }
+
 	/**
 	 * Is this user in Moodle?
 	 * @return boolean [description]
