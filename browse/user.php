@@ -86,8 +86,8 @@ echo $OUTPUT->heading(get_string('connectbrowse_user', 'local_connect') . $user-
 	echo $OUTPUT->heading("Enrolments", 2);
 
 	$table = new flexible_table('user-enrolments');
-	$table->define_columns(array('course', 'role', 'in_moodle'));
-	$table->define_headers(array("Course", "Role", "In Moodle?"));
+	$table->define_columns(array('course', 'role', 'in_moodle', 'action'));
+	$table->define_headers(array("Course", "Role", "In Moodle?", "Action"));
 	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/user.php');
 	$table->setup();
 
@@ -95,8 +95,16 @@ echo $OUTPUT->heading(get_string('connectbrowse_user', 'local_connect') . $user-
 		$url = new \moodle_url("/local/connect/browse/course.php", array("id" => $enrolment->courseid));
 		$course = \html_writer::link($url->out(true), $enrolment->course->module_code);
 
-		$table->add_data(array($course, $enrolment->role->name, $enrolment->is_in_moodle() ? "Yes" : "No"));
+		$push_url = new \moodle_url("/local/connect/browse/sync/enrolment.php", array("id" => $enrolment->id));
+		$push_link = \html_writer::link($push_url->out(false), "Push");
+
+		$in_moodle = $enrolment->is_in_moodle();
+		$table->add_data(array($course, $enrolment->role->name, $in_moodle ? "Yes" : "No", $in_moodle ? '' : $push_link));
 	}
+
+	$push_url = new \moodle_url("/local/connect/browse/sync/user.php", array("id" => $user->id));
+	$push_link = \html_writer::link($push_url->out(false), "Push All");
+	$table->add_data(array('', '', '', $push_link));
 
 	$table->print_html();
 }
