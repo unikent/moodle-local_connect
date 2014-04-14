@@ -93,4 +93,40 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 	$table->print_html();
 }
 
+// The Enrolments Table
+{
+	echo $OUTPUT->heading("Enrolments", 2);
+
+	$table = new flexible_table('course-enrolments');
+	$table->define_columns(array('username', 'role', 'in_moodle'));
+	$table->define_headers(array("Username", "Role", "In Moodle?"));
+	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/course.php');
+	$table->setup();
+
+	foreach ($course->enrolments as $enrolment) {
+		$table->add_data(array($enrolment->user->login, $enrolment->role->name, $enrolment->is_in_moodle() ? "Yes" : "No"));
+	}
+
+	$table->print_html();
+}
+
+// The Groups Table
+{
+	echo $OUTPUT->heading("Groups", 2);
+
+	$table = new flexible_table('course-groups');
+	$table->define_columns(array('name', 'members', 'in_moodle'));
+	$table->define_headers(array("Name", "Number of users", "In Moodle?"));
+	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/course.php');
+	$table->setup();
+
+	foreach ($course->groups as $group) {
+		$url = new \moodle_url("/local/connect/browse/group.php", array("id" => $group->id));
+		$name = \html_writer::link($url->out(true), $group->name);
+		$table->add_data(array($name, $group->count_all(), $group->is_in_moodle() ? "Yes" : "No"));
+	}
+
+	$table->print_html();
+}
+
 echo $OUTPUT->footer();
