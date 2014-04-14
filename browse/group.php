@@ -36,10 +36,6 @@ $PAGE->set_url('/local/connect/browse/group.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse_group', 'local_connect'));
 
-if ($group === null) {
-	print_error("Group does not exist!");
-}
-
 $PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/index.php'));
 $PAGE->navbar->add("Connect Course", new moodle_url('/local/connect/browse/course.php', array("id" => $group->courseid)));
 $PAGE->navbar->add("Connect Group");
@@ -52,6 +48,11 @@ require_capability("local/helpdesk:access", context_system::instance());
 /**
  * And, the actual page.
  */
+
+if ($group === null) {
+	print_error("Group does not exist!");
+}
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('connectbrowse_group', 'local_connect') . $group->name);
 

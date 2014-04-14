@@ -35,13 +35,6 @@ $PAGE->set_title(get_string('connectbrowse', 'local_connect'));
 $PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/'));
 $PAGE->navbar->add("User View");
 
-$userid = required_param("id", PARAM_INT);
-$user = \local_connect\user::get($userid);
-
-if ($user === null) {
-	print_error("User does not exist!");
-}
-
 /**
  * Check capabilities.
  */
@@ -50,6 +43,14 @@ require_capability("local/helpdesk:access", context_system::instance());
 /**
  * And, the actual page.
  */
+
+$userid = required_param("id", PARAM_INT);
+$user = \local_connect\user::get($userid);
+
+if ($user === null) {
+	print_error("User does not exist!");
+}
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('connectbrowse_user', 'local_connect') . $user->login);
 
