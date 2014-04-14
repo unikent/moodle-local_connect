@@ -39,7 +39,7 @@ $PAGE->navbar->add("Connect Browser");
 $PAGE->requires->jquery();
 $PAGE->requires->jquery_plugin('migrate');
 $PAGE->requires->js('/local/connect/scripts/jstree.min.js');
-$PAGE->requires->js('/local/connect/scripts/browse0.js');
+$PAGE->requires->js('/local/connect/scripts/browse.js');
 $PAGE->requires->css('/local/connect/styles/jtree.css');
 
 /**
