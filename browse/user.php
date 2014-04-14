@@ -34,6 +34,13 @@ $PAGE->set_title(get_string('connectbrowse', 'local_connect'));
 $PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/'));
 $PAGE->navbar->add("User View");
 
+$userid = required_param("id", PARAM_INT);
+$user = \local_connect\user::get($userid);
+
+if ($user === null) {
+	print_error("User does not exist!");
+}
+
 /**
  * Check capabilities.
  */
@@ -46,4 +53,48 @@ if (!has_capability('moodle/site:config', context_system::instance())) {
  */
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('connectbrowse_user', 'local_connect') . "TODO");
+
+// The Groups Table
+{
+	echo $OUTPUT->heading("User Information", 2);
+
+	$table = new flexible_table('group-info');
+	$table->define_columns(array('variable', 'value'));
+	$table->define_headers(array("Variable", "Value"));
+	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/user.php');
+	$table->setup();
+
+	$mid = "-";
+	if (!empty($user->mid)) {
+		$mid = \html_writer::link($user->get_moodle_url(), $user->mid);
+	}
+
+	$table->add_data(array("id", $user->id));
+	$table->add_data(array("mid", $mid));
+	$table->add_data(array("ukc", $user->ukc));
+	$table->add_data(array("login", $user->login));
+	$table->add_data(array("title", $user->title));
+	$table->add_data(array("initials", $user->initials));
+	$table->add_data(array("family_name", $user->family_name));
+
+	$table->print_html();
+}
+
+// The Enrolments Table
+{
+	echo $OUTPUT->heading("Enrolments", 2);
+
+	$table = new flexible_table('user-enrolments');
+	$table->define_columns(array('course', 'role', 'in_moodle'));
+	$table->define_headers(array("Username", "Role", "In Moodle?"));
+	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/user.php');
+	$table->setup();
+
+	foreach ($user->enrolments as $enrolment) {
+		$table->add_data(array($enrolment->user->login, $enrolment->role->name, $enrolment->is_in_moodle() ? "Yes" : "No"));
+	}
+
+	$table->print_html();
+}
+
 echo $OUTPUT->footer();

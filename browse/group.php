@@ -67,7 +67,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_group', 'local_connect') . $grou
 	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/group.php');
 	$table->setup();
 
-	$mid = $group->mid;
+	$mid = "-";
 	if (!empty($group->mid)) {
 		$mid = \html_writer::link($group->get_moodle_url(), $group->mid);
 	}

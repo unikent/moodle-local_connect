@@ -67,7 +67,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/course.php');
 	$table->setup();
 
-	$mid = $course->mid;
+	$mid = "-";
 	if (!empty($course->mid)) {
 		$mid = \html_writer::link($course->get_moodle_url(), $course->mid);
 	}
