@@ -14,4 +14,11 @@ $capabilities = array(
             'manager' => CAP_PREVENT
         )
     ),
+    'local/helpdesk:access' => array(
+        'riskbitmask' => RISK_PERSONAL & RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+        )
+    )
 );

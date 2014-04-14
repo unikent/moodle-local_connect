@@ -35,6 +35,8 @@ $PAGE->set_url('/local/connect/browse/sync/group_enrolment.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse_push', 'local_connect'));
 
+require_capability("local/helpdesk:access", context_system::instance());
+
 if ($ge === null) {
 	print_error("Group Enrolment does not exist!");
 }

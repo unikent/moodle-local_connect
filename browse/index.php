@@ -45,9 +45,7 @@ $PAGE->requires->css('/local/connect/styles/jtree.css');
 /**
  * Check capabilities.
  */
-if (!has_capability('moodle/site:config', context_system::instance())) {
-    print_error('accessdenied', 'admin');
-}
+require_capability("local/helpdesk:access", context_system::instance());
 
 /**
  * And, the actual page.
