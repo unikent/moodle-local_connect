@@ -78,6 +78,31 @@ if ($node == 'users') {
 
 if ($node == 'courses') {
 	// Grab the courses.
+	$courses = $DB->get_records_sql('SELECT LEFT(module_code, 2) as mc FROM {connect_course} GROUP BY mc');
+	foreach ($courses as $course) {
+		$out[] = array(
+			"id" => "course_" . $course->mc,
+			"parent" => $node,
+			"text" => $course->mc . "...",
+			"icon" => "course",
+			"children" => true
+		);
+	}
+}
+
+if (strpos($node, "course_") !== false) {
+	$module_prefix = substr($node, 7);
+	$courses = $DB->get_records_sql('SELECT id, module_code FROM {connect_course} WHERE module_code LIKE :mc', array(
+		"mc" => "{$module_prefix}%"
+	));
+	foreach ($courses as $course) {
+		$out[] = array(
+			"id" => $course->module_code,
+			"parent" => $node,
+			"text" => $course->module_code,
+			"icon" => "course"
+		);
+	}
 }
 
 if ($node == 'teachers' || $node == 'convenors' || $node == 'students') {
