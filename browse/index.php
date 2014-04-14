@@ -31,6 +31,7 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/browse/index.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse', 'local_connect'));
+$PAGE->navbar->add("Connect Browser");
 
 /**
  * Check capabilities.

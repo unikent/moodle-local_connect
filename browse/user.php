@@ -31,6 +31,8 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/browse/user.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse', 'local_connect'));
+$PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/'));
+$PAGE->navbar->add("User View");
 
 /**
  * Check capabilities.
