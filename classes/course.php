@@ -36,6 +36,9 @@ require_once dirname(__FILE__) . '/../../../mod/forum/lib.php';
  */
 class course extends data
 {
+    /** Have we been locked? */
+    private $_locked;
+
     /**
      * The name of our connect table.
      */
@@ -73,7 +76,7 @@ class course extends data
         }
 
         // Have we changed at all?
-        if ($this->has_changed()) {
+        if ($this->is_locked() && $this->has_changed()) {
             if (!$dry) {
                 $this->update_moodle();
             }
@@ -229,6 +232,28 @@ class course extends data
     public function is_parent() {
         global $DB;
         return $DB->count_records('connect_course_links', array('parent' => $this->id)) >= 1;
+    }
+
+    /**
+     * Is this course locked?
+     * If it is still locked, it means we can update it at will.
+     */
+    public function is_locked() {
+        global $DB;
+
+        if (!isset($this->_locked)) {
+            $this->_locked = true;
+
+            $conditions = array(
+                "course" => $this->mid
+            );
+
+            if ($DB->record_exists('connect_course_dets', $conditions)) {
+                $this->_locked = $DB->get_field('connect_course_dets', 'unlocked', $conditions) == 0;
+            }
+        }
+
+        return $this->_locked;
     }
 
     /**
