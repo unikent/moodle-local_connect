@@ -114,6 +114,8 @@ class user extends data
 
 		$this->mid = user_create_user($user, false);
 		$this->save();
+
+		return true;
 	}
 
 	/**
