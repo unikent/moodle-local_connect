@@ -23,6 +23,7 @@
  */
 
 require (dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->libdir . '/tablelib.php');
 
 /**
  * Page setup.
@@ -42,8 +43,46 @@ if (!has_capability('moodle/site:config', context_system::instance())) {
 }
 
 /**
+ * Check course.
+ */
+$id = required_param("id", PARAM_INT);
+$course = \local_connect\course::get($id);
+if ($course === null) {
+	print_error('Invalid Course!');
+}
+
+/**
  * And, the actual page.
  */
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . "TODO");
+echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $course->module_code);
+
+$table = new flexible_table('course-info');
+$table->define_columns(array('variable', 'value'));
+$table->define_headers(array("", ""));
+$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/course.php');
+$table->setup();
+
+$mid = $course->mid;
+if (!empty($course->mid)) {
+	$mid = \html_writer::link($course->get_moodle_url(), $course->mid);
+}
+
+$table->add_data(array("id", $course->id));
+$table->add_data(array("mid", $mid));
+$table->add_data(array("module_delivery_key", $course->module_delivery_key));
+$table->add_data(array("session_code", $course->session_code));
+$table->add_data(array("module_version", $course->module_version));
+$table->add_data(array("campus", $course->campus));
+$table->add_data(array("module_week_beginning", $course->module_week_beginning));
+$table->add_data(array("module_length", $course->module_length));
+$table->add_data(array("week_beginning_date", $course->week_beginning_date));
+$table->add_data(array("module_title", $course->module_title));
+$table->add_data(array("module_code", $course->module_code));
+$table->add_data(array("synopsis", $course->synopsis));
+$table->add_data(array("category", $course->category));
+
+
+$table->print_html();
+
 echo $OUTPUT->footer();
