@@ -92,16 +92,20 @@ echo $OUTPUT->heading(get_string('connectbrowse_group', 'local_connect') . $grou
 	echo $OUTPUT->heading("Enrolments", 2);
 
 	$table = new flexible_table('group-enrolments');
-	$table->define_columns(array('username', 'in_moodle'));
-	$table->define_headers(array("Username", "In Moodle?"));
+	$table->define_columns(array('username', 'in_moodle', 'action'));
+	$table->define_headers(array("Username", "In Moodle?", "Action"));
 	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/group.php');
 	$table->setup();
 
 	foreach ($group->enrolments as $enrolment) {
-		$userurl = new \moodle_url("/local/connect/browse/user.php", array("id" => $enrolment->userid));
-		$userlink = \html_writer::link($userurl->out(false), $enrolment->user->login);
+		$user_url = new \moodle_url("/local/connect/browse/user.php", array("id" => $enrolment->userid));
+		$user_link = \html_writer::link($user_url->out(false), $enrolment->user->login);
 
-		$table->add_data(array($userlink, $enrolment->is_in_moodle() ? "Yes" : "No"));
+		$push_url = new \moodle_url("/local/connect/browse/sync/group_enrolment.php", array("id" => $enrolment->id));
+		$push_link = \html_writer::link($push_url->out(false), "Push");
+
+		$in_moodle = $enrolment->is_in_moodle();
+		$table->add_data(array($user_link, $in_moodle ? "Yes" : "No", $in_moodle ? "-" : $push_link));
 	}
 
 	$table->print_html();
