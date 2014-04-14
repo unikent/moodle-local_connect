@@ -31,9 +31,7 @@ global $PAGE, $OUTPUT, $USER;
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/ajax/tree_data.php');
 
-if (!has_capability('moodle/site:config', context_system::instance())) {
-    throw new moodleexception('accessdenied', 'admin');
-}
+require_capability("local/helpdesk:access", context_system::instance());
 
 $node = optional_param('id', '#', PARAM_RAW_TRIMMED);
 $node = empty($node) ? '#' : $node;

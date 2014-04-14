@@ -16,7 +16,11 @@ $(function() {
         },
         "search" : {
             "show_only_matches" : true,
-            "fuzzy" : false
+            "fuzzy" : false,
+            "ajax" : {
+                'url' : M.cfg.wwwroot + "/local/connect/ajax/tree_search.php",
+                'dataType' : 'json'
+            }
         },
         "plugins" : [
             "search"
