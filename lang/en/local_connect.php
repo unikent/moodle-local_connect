@@ -29,3 +29,7 @@ $string['cron_toggle'] = 'Enable Connect Cron';
 $string['cron_toggle_desc'] = 'Warning: This is not a good idea!';
 
 $string['sharedreport'] = 'Moodle Shared Data';
+
+$string['connectbrowse'] = 'Connect Data Browser';
+$string['connectbrowse_user'] = 'Connect Data Browser User - ';
+$string['connectbrowse_course'] = 'Connect Data Browser Course - ';
