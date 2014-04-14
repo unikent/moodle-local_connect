@@ -23,6 +23,7 @@
  */
 
 require (dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->libdir . '/tablelib.php');
 
 /**
  * Page setup.
@@ -86,12 +87,15 @@ echo $OUTPUT->heading(get_string('connectbrowse_user', 'local_connect') . "TODO"
 
 	$table = new flexible_table('user-enrolments');
 	$table->define_columns(array('course', 'role', 'in_moodle'));
-	$table->define_headers(array("Username", "Role", "In Moodle?"));
+	$table->define_headers(array("Course", "Role", "In Moodle?"));
 	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/user.php');
 	$table->setup();
 
 	foreach ($user->enrolments as $enrolment) {
-		$table->add_data(array($enrolment->user->login, $enrolment->role->name, $enrolment->is_in_moodle() ? "Yes" : "No"));
+		$url = new \moodle_url("/local/connect/browse/course.php", array("id" => $enrolment->courseid));
+		$course = \html_writer::link($url->out(true), $enrolment->course->module_code);
+
+		$table->add_data(array($course, $enrolment->role->name, $enrolment->is_in_moodle() ? "Yes" : "No"));
 	}
 
 	$table->print_html();

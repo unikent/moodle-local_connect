@@ -98,7 +98,10 @@ echo $OUTPUT->heading(get_string('connectbrowse_group', 'local_connect') . $grou
 	$table->setup();
 
 	foreach ($group->enrolments as $enrolment) {
-		$table->add_data(array($enrolment->user->login, $enrolment->is_in_moodle() ? "Yes" : "No"));
+		$userurl = new \moodle_url("/local/connect/browse/user.php", array("id" => $enrolment->userid));
+		$userlink = \html_writer::link($userurl->out(false), $enrolment->user->login);
+
+		$table->add_data(array($userlink, $enrolment->is_in_moodle() ? "Yes" : "No"));
 	}
 
 	$table->print_html();

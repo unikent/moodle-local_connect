@@ -104,7 +104,10 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 	$table->setup();
 
 	foreach ($course->enrolments as $enrolment) {
-		$table->add_data(array($enrolment->user->login, $enrolment->role->name, $enrolment->is_in_moodle() ? "Yes" : "No"));
+		$userurl = new \moodle_url("/local/connect/browse/user.php", array("id" => $enrolment->userid));
+		$userlink = \html_writer::link($userurl->out(false), $enrolment->user->login);
+
+		$table->add_data(array($userlink, $enrolment->role->name, $enrolment->is_in_moodle() ? "Yes" : "No"));
 	}
 
 	$table->print_html();
@@ -123,6 +126,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 	foreach ($course->groups as $group) {
 		$url = new \moodle_url("/local/connect/browse/group.php", array("id" => $group->id));
 		$name = \html_writer::link($url->out(true), $group->name);
+
 		$table->add_data(array($name, $group->count_all(), $group->is_in_moodle() ? "Yes" : "No"));
 	}
 
