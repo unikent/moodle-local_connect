@@ -274,7 +274,7 @@ class course extends data
         }
 
         $url = new \moodle_url("/course/view.php", array("id" => $this->mid));
-        return $url->out(true);
+        return $url->out(false);
     }
 
     /**
