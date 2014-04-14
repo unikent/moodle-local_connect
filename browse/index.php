@@ -34,6 +34,15 @@ $PAGE->set_title(get_string('connectbrowse', 'local_connect'));
 $PAGE->navbar->add("Connect Browser");
 
 /**
+ * Script setup.
+ */
+$PAGE->requires->jquery();
+$PAGE->requires->jquery_plugin('migrate');
+$PAGE->requires->js('/local/connect/scripts/jstree.min.js');
+$PAGE->requires->js('/local/connect/scripts/browse0.js');
+$PAGE->requires->css('/local/connect/styles/jtree.css');
+
+/**
  * Check capabilities.
  */
 if (!has_capability('moodle/site:config', context_system::instance())) {
@@ -45,4 +54,8 @@ if (!has_capability('moodle/site:config', context_system::instance())) {
  */
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('connectbrowse', 'local_connect'));
+
+echo '<input type="text" value="" placeholder="Search" id="cb_search">';
+echo '<div id="connect_browser"></div>';
+
 echo $OUTPUT->footer();
