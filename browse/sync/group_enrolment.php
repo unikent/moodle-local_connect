@@ -28,8 +28,6 @@ require_once($CFG->libdir . '/tablelib.php');
 $geid = required_param("id", PARAM_INT);
 $ge = \local_connect\group_enrolment::get($geid);
 
-$return = optional_param("return", null, PARAM_URL);
-
 /**
  * Page setup.
  */
@@ -76,10 +74,15 @@ if (!$ge->user->is_in_moodle()) {
 	}
 }
 
-if ($ge->create_in_moodle()) {
-	echo "Enrolling user in group... done!<br />";
-} else {
-	print_error("Error creating group enrolment!");
+// Create it in Moodle!
+if (!$ge->is_in_moodle()) {
+	if ($ge->create_in_moodle()) {
+		echo "Enrolling user in group... done!<br />";
+	} else {
+		print_error("Error creating group enrolment!");
+	}
 }
+
+echo "Done!<br/>";
 
 echo $OUTPUT->footer();

@@ -108,6 +108,10 @@ echo $OUTPUT->heading(get_string('connectbrowse_group', 'local_connect') . $grou
 		$table->add_data(array($user_link, $in_moodle ? "Yes" : "No", $in_moodle ? "-" : $push_link));
 	}
 
+	$push_url = new \moodle_url("/local/connect/browse/sync/group.php", array("id" => $enrolment->groupid));
+	$push_link = \html_writer::link($push_url->out(false), "Push All");
+	$table->add_data(array("", "", $push_link));
+
 	$table->print_html();
 }
 
