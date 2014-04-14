@@ -14,11 +14,20 @@ $(function() {
                 'dataType' : 'json'
             }
         },
+        "search" : {
+            "show_only_matches" : true,
+            "fuzzy" : false
+        },
         "plugins" : [
             "search"
         ]
     });
 
+    $('#connect_browser').on("changed.jstree", function (e, data) {
+        if (data.node.a_attr.href != "#") {
+            window.location = data.node.a_attr.href;
+        }
+    });
 
     var to = false;
     $('#cb_search').keyup(function () {
