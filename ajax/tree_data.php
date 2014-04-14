@@ -76,78 +76,95 @@ if ($node == 'users') {
 	);
 }
 
-if ($node == 'courses') {
-	// Grab the courses.
-	$courses = $DB->get_records_sql('SELECT LEFT(module_code, 2) as mc FROM {connect_course} GROUP BY mc');
-	foreach ($courses as $course) {
+/**
+ * Returns a set of data for tree view display
+ */
+function grab_set($node, $raw_node_data, $table, $column, $prefix, $left = 1, $data = null) {
+	global $DB;
+
+	if (empty($data)) {
+		$data = $DB->get_records_sql("SELECT id, $column as c FROM {{$table}} WHERE $column LIKE :col", array(
+			"col" => $raw_node_data . "%"
+		));
+	}
+
+	if (count($data) > 20) {
+		return grab_left_set($node, $table, $column, $prefix, $left + 1, "WHERE $column LIKE :col", array(
+			"col" => $raw_node_data . "%"
+		));
+	}
+
+	$out = array();
+	foreach ($data as $datum) {
 		$out[] = array(
-			"id" => "course_" . $course->mc,
+			"id" => "{$prefix}_{$datum->c}",
 			"parent" => $node,
-			"text" => $course->mc . "...",
-			"icon" => "course",
+			"text" => $datum->c,
+			"icon" => "datum"
+		);
+	}
+
+	return $out;
+}
+
+/**
+ * Returns a set of LEFTed data for tree view display
+ */
+function grab_left_set($node, $table, $column, $prefix, $left = 1, $where = '', $params = array()) {
+	global $DB;
+	$data = $DB->get_records_sql("SELECT LEFT(t.$column, $left) as c FROM {{$table}} t $where GROUP BY c", $params);
+
+	$out = array();
+	foreach ($data as $datum) {
+		$out[] = array(
+			"id" => "{$prefix}_{$datum->c}",
+			"parent" => $node,
+			"text" => $datum->c . "...",
+			"icon" => "datum",
 			"children" => true
 		);
 	}
+
+	return $out;
 }
 
-if (strpos($node, "course_") !== false) {
-	$module_prefix = substr($node, 7);
-	$courses = $DB->get_records_sql('SELECT id, module_code FROM {connect_course} WHERE module_code LIKE :mc', array(
-		"mc" => "{$module_prefix}%"
-	));
-	foreach ($courses as $course) {
-		$out[] = array(
-			"id" => $course->module_code,
-			"parent" => $node,
-			"text" => $course->module_code,
-			"icon" => "course"
-		);
-	}
+if ($node == 'courses') {
+	// Grab the courses.
+	$out = grab_left_set($node, "connect_course", "module_code", "c", 2);
+}
+
+if (strpos($node, "c_") === 0) {
+	// Grab a set, see how many there are and decide what to do.
+	$raw_node_data = substr($node, 2);
+	$out = grab_set($node, $raw_node_data, "connect_course", "module_code", "c", 2);
 }
 
 if ($node == 'teachers' || $node == 'convenors' || $node == 'students') {
 	// Basically the alphabet...
-	$users = $DB->get_records_sql('SELECT LEFT(login, 1) as ch FROM {connect_user} GROUP BY ch');
-	foreach ($users as $user) {
-		$out[] = array(
-			"id" => "user_" . $user->ch,
-			"parent" => $node,
-			"text" => $user->ch . "...",
-			"icon" => "user",
-			"children" => true
-		);
-	}
+	$role = substr($node, 0, -1);
+	$roleid = $DB->get_field('connect_role', 'id', array(
+		'name' => $role
+	));
+	$extra_sql = 'INNER JOIN {connect_enrolments} ce ON ce.userid=t.id WHERE ce.roleid = :roleid';
+	$out = grab_left_set($node, "connect_user", "login", "u_$role", 1, $extra_sql, array(
+		"roleid" => $roleid
+	));
 }
 
-if (strpos($node, "user_") !== false) {
-	$username = substr($node, 5);
+if (strpos($node, "u_") === 0) {
+	$raw_type_data = substr($node, strpos($node, '_') + 1, strrpos($node, '_') - 2);
+	$roleid = $DB->get_field('connect_role', 'id', array(
+		'name' => $raw_type_data
+	));
 
-	if (strlen($username) === 1) {
-		$users = $DB->get_records_sql('SELECT LEFT(login, 2) as ch FROM {connect_user} WHERE login LIKE :username GROUP BY ch', array(
-			"username" => "{$username}%"
-		));
-		foreach ($users as $user) {
-			$out[] = array(
-				"id" => "user_" . $user->ch,
-				"parent" => $node,
-				"text" => $user->ch . "...",
-				"icon" => "user",
-				"children" => true
-			);
-		}
-	} else {
-		$users = $DB->get_records_sql('SELECT id, login FROM {connect_user} WHERE login LIKE :username', array(
-			"username" => "{$username}%"
-		));
-		foreach ($users as $user) {
-			$out[] = array(
-				"id" => $user->login,
-				"parent" => $node,
-				"text" => $user->login,
-				"icon" => "user"
-			);
-		}
-	}
+	$raw_node_data = substr($node, strrpos($node, '_') + 1);
+
+	$data = $DB->get_records_sql("SELECT u.id, u.login as c FROM {connect_user} u INNER JOIN {connect_enrolments} ce ON ce.userid=u.id WHERE u.login LIKE :col AND ce.roleid = :roleid", array(
+		"col" => $raw_node_data . "%",
+		"roleid" => $roleid
+	));
+
+	$out = grab_set($node, $raw_node_data, "connect_user", "login", substr($node, 0, strrpos($node, '_') - 2), strlen($raw_node_data), $data);
 }
 
 echo $OUTPUT->header();
