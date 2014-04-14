@@ -40,7 +40,7 @@ if ($group === null) {
 	print_error("Group does not exist!");
 }
 
-$PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/group.php'));
+$PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/index.php'));
 $PAGE->navbar->add("Connect Course", new moodle_url('/local/connect/browse/course.php', array("id" => $group->courseid)));
 $PAGE->navbar->add("Connect Group");
 

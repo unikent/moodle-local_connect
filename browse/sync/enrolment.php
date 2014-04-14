@@ -40,7 +40,7 @@ if ($enrolment === null) {
 	print_error("Enrolment does not exist!");
 }
 
-$PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/group.php'));
+$PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/index.php'));
 $PAGE->navbar->add("Connect User", new moodle_url('/local/connect/browse/user.php', array("id" => $enrolment->userid)));
 $PAGE->navbar->add("Connect Course", new moodle_url('/local/connect/browse/course.php', array("id" => $enrolment->courseid)));
 $PAGE->navbar->add("Pushing...");
