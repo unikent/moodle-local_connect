@@ -24,8 +24,8 @@
 
 require (dirname(__FILE__) . '/../../../../config.php');
 
-$uid = required_param("id", PARAM_INT);
-$user = \local_connect\user::get($uid);
+$userid = required_param("id", PARAM_INT);
+$user = \local_connect\user::get($userid);
 
 /**
  * Page setup.

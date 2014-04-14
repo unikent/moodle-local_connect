@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Creates a given group enrolment
+ * Creates a given course's enrolments
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
@@ -31,7 +31,7 @@ $course = \local_connect\course::get($courseid);
  * Page setup.
  */
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/connect/browse/sync/group_enrolment.php');
+$PAGE->set_url('/local/connect/browse/sync/course.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse_push', 'local_connect'));
 
@@ -56,19 +56,22 @@ if (!$course->is_in_moodle()) {
 foreach ($course->enrolments as $enrolment) {
 	// Can also create the user.
 	if (!$enrolment->user->is_in_moodle()) {
+		echo "Creating user {$enrolment->user->login}...";
 		if ($enrolment->user->create_in_moodle()) {
-			echo "Creating user... done!<br />";
+			echo "done!<br />";
 		} else {
-			echo "Error creating user {$enrolment->user->login}!<br />";
+			echo "error!<br />";
+			continue;
 		}
 	}
 
 	// Enrol.
 	if (!$enrolment->is_in_moodle()) {
+		echo "Enrolling user {$enrolment->user->login}...";
 		if ($enrolment->create_in_moodle()) {
-			echo "Enrolling user... done!<br />";
+			echo "done!<br />";
 		} else {
-			echo "Error enrolling user {$enrolment->user->login}!<br />";
+			echo "error!<br />";
 		}
 	}
 }

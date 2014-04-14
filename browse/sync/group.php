@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Creates a given group enrolment
+ * Creates a given group's enrolments
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
@@ -23,16 +23,15 @@
  */
 
 require (dirname(__FILE__) . '/../../../../config.php');
-require_once($CFG->libdir . '/tablelib.php');
 
-$gid = required_param("id", PARAM_INT);
-$group = \local_connect\group::get($gid);
+$groupid = required_param("id", PARAM_INT);
+$group = \local_connect\group::get($groupid);
 
 /**
  * Page setup.
  */
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/connect/browse/sync/group_enrolment.php');
+$PAGE->set_url('/local/connect/browse/sync/group.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse_push', 'local_connect'));
 
@@ -69,20 +68,22 @@ if (!$group->is_in_moodle()) {
 foreach ($group->enrolments as $ge) {
 	// Can also create the user.
 	if (!$ge->user->is_in_moodle()) {
+		echo "Creating user {$ge->user->login}...";
 		if ($ge->user->create_in_moodle()) {
-			echo "Creating user... done!<br />";
+			echo "done!<br />";
 		} else {
-			echo "Error creating user {$ge->user->login}!<br />";
+			echo "error!<br />";
 			continue;
 		}
 	}
 
 	// Create it in Moodle!
 	if (!$ge->is_in_moodle()) {
+		echo "Enrolling user {$ge->user->login} in group...";
 		if ($ge->create_in_moodle()) {
-			echo "Enrolling user in group... done!<br />";
+			echo "done!<br />";
 		} else {
-			echo "Error creating group enrolment for {$ge->user->login}!br />";
+			echo "error!<br />";
 		}
 	}
 }

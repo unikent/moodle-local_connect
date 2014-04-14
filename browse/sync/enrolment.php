@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Creates a given group enrolment
+ * Creates a given enrolment
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
@@ -23,7 +23,6 @@
  */
 
 require (dirname(__FILE__) . '/../../../../config.php');
-require_once($CFG->libdir . '/tablelib.php');
 
 $enrolmentid = required_param("id", PARAM_INT);
 $enrolment = \local_connect\enrolment::get($enrolmentid);
@@ -32,7 +31,7 @@ $enrolment = \local_connect\enrolment::get($enrolmentid);
  * Page setup.
  */
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/connect/browse/sync/group_enrolment.php');
+$PAGE->set_url('/local/connect/browse/sync/enrolment.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse_push', 'local_connect'));
 

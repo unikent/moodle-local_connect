@@ -23,7 +23,6 @@
  */
 
 require (dirname(__FILE__) . '/../../../../config.php');
-require_once($CFG->libdir . '/tablelib.php');
 
 $geid = required_param("id", PARAM_INT);
 $ge = \local_connect\group_enrolment::get($geid);
