@@ -98,19 +98,25 @@ class user extends data
 			return true;
 		}
 
-		if (empty($this->login) || empty($this->initials) || empty($this->family_name)) {
+		if (empty($this->login)) {
 			return false;
 		}
 
 		$user = new \stdClass();
 		$user->username = $this->login;
-		$user->firstname = $this->initials;
-		$user->lastname = $this->family_name;
 		$user->email = $this->login . "@kent.ac.uk";
 		$user->auth = "kentsaml";
 		$user->password = "not cached";
 		$user->confirmed = 1;
 		$user->mnethostid = $CFG->mnet_localhost_id;
+
+		if (!empty($this->initials)) {
+			$user->firstname = $this->initials;
+		}
+
+		if (!empty($this->family_name)) {
+			$user->lastname = $this->family_name;
+		}
 
 		$this->mid = user_create_user($user, false);
 		$this->save();
