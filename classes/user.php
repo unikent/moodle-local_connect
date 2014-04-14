@@ -95,11 +95,11 @@ class user extends data
 		require_once ($CFG->dirroot . "/user/lib.php");
 
 		if ($this->is_in_moodle()) {
-			return $this->mid;
+			return true;
 		}
 
 		if (empty($this->login) || empty($this->initials) || empty($this->family_name)) {
-			return null;
+			return false;
 		}
 
 		$user = new \stdClass();
