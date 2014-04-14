@@ -56,24 +56,15 @@ if ($node == '#') {
 }
 
 if ($node == 'users') {
-	$out[] = array(
-		"id" => "teachers",
-		"parent" => "users",
-		"text" => "Teachers",
-		"children" => true
-	);
-	$out[] = array(
-		"id" => "convenors",
-		"parent" => "users",
-		"text" => "Convenors",
-		"children" => true
-	);
-	$out[] = array(
-		"id" => "students",
-		"parent" => "users",
-		"text" => "Students",
-		"children" => true
-	);
+    $roles = $DB->get_records('connect_role');
+    foreach ($roles as $role) {
+		$out[] = array(
+			"id" => $role->name . "s",
+			"parent" => "users",
+			"text" => ucfirst($role->name . "s"),
+			"children" => true
+		);
+    }
 }
 
 /**
