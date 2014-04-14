@@ -266,6 +266,18 @@ class course extends data
     }
 
     /**
+     * Returns the Moodle URL for this object.
+     */
+    public function get_moodle_url() {
+        if (empty($this->mid)) {
+            return "";
+        }
+
+        $url = new \moodle_url("/course/view.php", array("id" => $this->mid));
+        return $url->out(true);
+    }
+
+    /**
      * Has this course been created in Moodle?
      * @return boolean
      */
