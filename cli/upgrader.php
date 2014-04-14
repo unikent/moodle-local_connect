@@ -15,7 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This synchronises Moodle with Connect
+ * This synchronises Moodle with Connect.
+ * 
+ * Note: Not to be used in production!
+ * This uses a flawed course matching algorithm.
+ * There is no reliable way of determining which
+ * courses should be linked to which SDS modules.
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
