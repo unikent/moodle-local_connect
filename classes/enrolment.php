@@ -130,7 +130,10 @@ class enrolment extends data
         $this->reset_object_cache();
 
         // Get course context.
-        $context = \context_course::instance($this->course->mid, MUST_EXIST);
+        $context = \context_course::instance($this->course->mid, IGNORE_MISSING);
+        if ($context === false) {
+            return false;
+        }
 
         // Check enrolment status.
         return is_enrolled($context, $this->user->mid);
