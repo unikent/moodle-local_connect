@@ -61,6 +61,13 @@ class group extends data
     }
 
     /**
+     * Get enrollments for this Group
+     */
+    public function _get_enrolments() {
+        return group_enrolment::get_for_group($this);
+    }
+
+    /**
      * The big sync method.
      */
     public function sync($dry = false) {
@@ -136,6 +143,17 @@ class group extends data
         return !empty($this->mid);
     }
 
+    /**
+     * Returns the Moodle URL of this group
+     */
+    public function get_moodle_url() {
+        if (empty($this->mid)) {
+            return "";
+        }
+
+        $url = new \moodle_url("/group/index.php", array("id" => $this->courseid, "group" => $this->mid));
+        return $url->out(false);
+    }
 
     /**
      * Create this group in Moodle
@@ -194,8 +212,7 @@ class group extends data
      * @todo Updates/Deletions
      */
     public function sync_group_enrolments() {
-        $enrolments = group_enrolment::get_for_group($this);
-        foreach ($enrolments as $enrolment) {
+        foreach ($this->enrolments as $enrolment) {
             if (!$enrolment->is_in_moodle()) {
                 $enrolment->create_in_moodle();
             }
