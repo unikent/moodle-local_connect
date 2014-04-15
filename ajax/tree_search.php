@@ -33,7 +33,7 @@ $PAGE->set_url('/local/connect/ajax/tree_search.php');
 
 require_capability("local/helpdesk:access", context_system::instance());
 
-$query = required_param('str', PARAM_RAW_TRIMMED);
+$query = required_param('str', PARAM_ALPHANUMEXT);
 
 $out = array();
 $out[] = "courses";
