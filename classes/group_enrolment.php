@@ -163,7 +163,7 @@ class group_enrolment extends data
                 'groupid' => $this->groupid
             )
         );
-        $event = \local_connect\event\enrolment_created::create($params);
+        $event = \local_connect\event\group_enrolment_created::create($params);
         $event->add_record_snapshot('connect_group_enrolments', $this);
         $event->trigger();
 
