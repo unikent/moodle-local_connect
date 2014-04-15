@@ -14,7 +14,7 @@ if (!\local_connect\utils::enable_new_features()) {
 }
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/util/ajax-enrolment.php');
+$PAGE->set_url('/local/connect/ajax/fix-enrolment.php');
 
 require_login();
 

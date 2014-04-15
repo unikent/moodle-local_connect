@@ -7,7 +7,7 @@ M.local_enrolment = {
     init : function(Y) {
         var infobox = Y.one(".box.enrolmentbox");
         
-        Y.io(M.cfg.wwwroot + "/local/connect/ajax-enrolment.php", {
+        Y.io(M.cfg.wwwroot + "/local/connect/ajax/fix-enrolment.php", {
             timeout: 32000,
             method: "GET",
             on: {
