@@ -55,6 +55,7 @@
         <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="group_uid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -62,6 +63,7 @@
       <INDEXES>
         <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
         <INDEX NAME="index_courseid" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="index_group_uid" UNIQUE="true" FIELDS="group_uid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="connect_group_enrolments" COMMENT="Connect Group Enrolments">
