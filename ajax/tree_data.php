@@ -66,6 +66,14 @@ if ($node == 'users') {
 }
 
 /**
+ * Filter out an ID
+ */
+function filter_course_id($id) {
+	$parts = explode(' ', $id);
+	return reset($parts);
+}
+
+/**
  * Returns a set of data for tree view display
  */
 function grab_set($file, $node, $raw_node_data, $table, $column, $prefix, $left = 1, $data = null) {
@@ -86,8 +94,9 @@ function grab_set($file, $node, $raw_node_data, $table, $column, $prefix, $left 
 	$out = array();
 	foreach ($data as $datum) {
 		$url = new \moodle_url("/local/connect/browse/" . $file . ".php", array("id" => $datum->id));
+		$course = filter_course_id($datum->c);
 		$out[] = array(
-			"id" => "{$prefix}_{$datum->c}",
+			"id" => "{$prefix}_{$course}",
 			"parent" => $node,
 			"text" => $datum->c,
 			"icon" => false,
@@ -107,8 +116,9 @@ function grab_left_set($node, $table, $column, $prefix, $left = 1, $where = '', 
 
 	$out = array();
 	foreach ($data as $datum) {
+		$course = filter_course_id($datum->c);
 		$out[] = array(
-			"id" => "{$prefix}_{$datum->c}",
+			"id" => "{$prefix}_{$course}",
 			"parent" => $node,
 			"text" => $datum->c . "...",
 			"children" => true
