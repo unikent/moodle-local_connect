@@ -160,7 +160,22 @@ class enrolment extends data
             return false;
         }
 
-        return enrol_try_internal_enrol($this->course->mid, $this->user->mid, $this->role->mid);
+        if (!enrol_try_internal_enrol($this->course->mid, $this->user->mid, $this->role->mid)) {
+            return false;
+        }
+
+        // Fire the event.
+        $params = array(
+            'objectid' => $this->id,
+            'relateduserid' => $this->user->mid,
+            'courseid' => $this->course->mid,
+            'context' => context_course::instance($this->course->mid)
+        );
+        $event = \local_connect\event\enrolment_created::create($params);
+        $event->add_record_snapshot('connect_enrolment', $this);
+        $event->trigger();
+
+        return true;
     }
 
     /**

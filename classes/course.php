@@ -405,7 +405,7 @@ class course extends data
             return false;
         }
 
-        // Update our reference (TODO - handler in observer?).
+        // Update our reference.
         $this->mid = $course->id;
 
         // Tell Connect about the new course.
@@ -427,6 +427,16 @@ class course extends data
 
         // Add a news forum to the course.
         $this->create_forum();
+
+        // Fire the event.
+        $params = array(
+            'objectid' => $this->id,
+            'courseid' => $this->mid,
+            'context' => context_course::instance($this->mid)
+        );
+        $event = \local_connect\event\course_created::create($params);
+        $event->add_record_snapshot('connect_course', $this);
+        $event->trigger();
 
         // Sync our enrolments.
         $this->sync_enrolments();

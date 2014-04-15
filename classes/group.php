@@ -186,6 +186,16 @@ class group extends data
         // And add this group to the grouping.
         groups_assign_grouping($grouping_id, $this->mid);
 
+        // Fire the event.
+        $params = array(
+            'objectid' => $this->id,
+            'courseid' => $this->course->mid,
+            'context' => context_course::instance($this->course->mid)
+        );
+        $event = \local_connect\event\group_created::create($params);
+        $event->add_record_snapshot('connect_group', $this);
+        $event->trigger();
+
         // Sync enrolments.
         $this->sync_group_enrolments();
 

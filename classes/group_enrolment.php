@@ -149,7 +149,25 @@ class group_enrolment extends data
             }
         }
 
-        return groups_add_member($this->group->mid, $this->user->mid);
+        if (!groups_add_member($this->group->mid, $this->user->mid)) {
+            return false;
+        }
+
+        // Fire the event.
+        $params = array(
+            'objectid' => $this->id,
+            'relateduserid' => $this->user->mid,
+            'courseid' => $this->group->course->mid,
+            'context' => context_course::instance($this->group->course->mid),
+            'other' => array(
+                'groupid' => $this->groupid
+            )
+        );
+        $event = \local_connect\event\enrolment_created::create($params);
+        $event->add_record_snapshot('connect_group_enrolment', $this);
+        $event->trigger();
+
+        return true;
     }
 
     /**
