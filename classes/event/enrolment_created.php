@@ -56,16 +56,16 @@ class enrolment_created extends \core\event\base
 	 * @return \moodle_url
 	 */
 	public function get_url() {
-		return new \moodle_url('/local/connect/browse/course.php', array('id' => $this->courseid));
+		return new \moodle_url('/local/connect/browse/user.php', array('id' => $this->other['userid']));
 	}
 
 	/**
 	 * Return the legacy event log data.
-	 * 
+	 * add_to_log
 	 * @return array
 	 */
 	protected function get_legacy_logdata() {
-		return array($this->courseid, 'connect', 'add', 'course.php?id=' . $this->courseid);
+		return array($this->courseid, 'user', 'enrol user', 'view.php?id=' . $this->relateduserid, $this->objectid);
 	}
 
 	/**
@@ -79,6 +79,14 @@ class enrolment_created extends \core\event\base
 
 		if (!isset($this->courseid)) {
 			throw new \coding_exception('The \'courseid\' must be set.');
+		}
+
+		if (!isset($this->relateduserid)) {
+			throw new \coding_exception('The \'relateduserid\' must be set.');
+		}
+
+		if (!isset($this->other['userid'])) {
+			throw new \coding_exception('The \'userid\' must be set.');
 		}
 	}
 }

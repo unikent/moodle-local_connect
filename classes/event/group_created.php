@@ -65,7 +65,7 @@ class group_created extends \core\event\base
 	 * @return array
 	 */
 	protected function get_legacy_logdata() {
-		return array($this->courseid, 'connect', 'add', 'group.php?id=' . $this->objectid);
+		return array($this->courseid, 'course', 'add group', 'view.php?id=' . $this->courseid, $this->objectid);
 	}
 
 	/**

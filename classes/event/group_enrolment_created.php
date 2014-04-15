@@ -65,7 +65,7 @@ class group_enrolment_created extends \core\event\base
 	 * @return array
 	 */
 	protected function get_legacy_logdata() {
-		return array($this->courseid, 'connect', 'add', 'group.php?id=' . $this->other['groupid']);
+		return array($this->courseid, 'course', 'group enrol user', 'view.php?id=' . $this->courseid, $this->objectid);
 	}
 
 	/**

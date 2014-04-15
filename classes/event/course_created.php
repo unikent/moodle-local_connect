@@ -65,6 +65,20 @@ class course_created extends \core\event\base
 	 * @return array
 	 */
 	protected function get_legacy_logdata() {
-		return array($this->objectid, 'connect', 'add', 'course.php?id=' . $this->objectid);
+		return array($this->objectid, 'course', 'add course', 'view.php?id=' . $this->courseid, $this->objectid);
+	}
+
+	/**
+	 * Custom validation.
+	 *
+	 * @throws \coding_exception
+	 * @return void
+	 */
+	protected function validate_data() {
+		parent::validate_data();
+
+		if (!isset($this->courseid)) {
+			throw new \coding_exception('The \'courseid\' must be set.');
+		}
 	}
 }
