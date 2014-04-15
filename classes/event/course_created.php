@@ -47,7 +47,7 @@ class course_created extends \core\event\base
 	 * @return string
 	 */
 	public function get_description() {
-		return 'The connect course with an ID of ' . $this->objectid . ' was pushed to Moodle.';
+		return 'The Connect course with an ID of ' . $this->objectid . ' was pushed to Moodle.';
 	}
 
 	/**
