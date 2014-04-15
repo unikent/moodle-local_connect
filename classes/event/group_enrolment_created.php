@@ -56,7 +56,7 @@ class group_enrolment_created extends \core\event\base
 	 * @return \moodle_url
 	 */
 	public function get_url() {
-		return new \moodle_url('/local/connect/browse/group.php', array('id' => $this->groupid));
+		return new \moodle_url('/local/connect/browse/group.php', array('id' => $this->other['groupid']));
 	}
 
 	/**
@@ -65,7 +65,7 @@ class group_enrolment_created extends \core\event\base
 	 * @return array
 	 */
 	protected function get_legacy_logdata() {
-		return array($this->courseid, 'connect', 'add', 'group.php?id=' . $this->groupid);
+		return array($this->courseid, 'connect', 'add', 'group.php?id=' . $this->other['groupid']);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class group_enrolment_created extends \core\event\base
 			throw new \coding_exception('The \'courseid\' must be set.');
 		}
 
-		if (!isset($this->groupid)) {
+		if (!isset($this->other['groupid'])) {
 			throw new \coding_exception('The \'groupid\' must be set.');
 		}
 	}
