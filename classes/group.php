@@ -43,14 +43,14 @@ class group extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "mid", "courseid", "name");
+        return array("id", "mid", "courseid", "name", "group_uid");
     }
 
     /**
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
-        return array("id");
+        return array("id", "group_uid");
     }
 
     /**
