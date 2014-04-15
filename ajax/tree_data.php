@@ -136,7 +136,7 @@ if ($node == 'courses') {
 if (strpos($node, "c_") === 0) {
 	// Grab a set, see how many there are and decide what to do.
 	$raw_node_data = substr($node, 2);
-	$out = grab_set("course", $node, $raw_node_data, "connect_course", "module_code", "c", 2);
+	$out = grab_set("course", $node, $raw_node_data, "connect_course", "module_code", "c", strlen($raw_node_data));
 }
 
 if ($node == 'teachers' || $node == 'convenors' || $node == 'students') {
