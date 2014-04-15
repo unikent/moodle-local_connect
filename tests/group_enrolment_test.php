@@ -192,6 +192,34 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 		$this->assertTrue($obj->is_in_moodle());
 		$this->assertEquals("Deleting Group Enrolment: {$obj->id}", $obj->sync());
 		$this->assertFalse($obj->is_in_moodle());
-
 	}
+
+    /**
+     * Test group_enrolment_created event
+     */
+    public function test_group_enrolment_created_event() {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $params = array(
+            'objectid' => 1,
+            'relateduserid' => 2,
+            'courseid' => $course->id,
+            'context' => \context_course::instance($course->id),
+            'other' => array(
+                'groupid' => 2
+            )
+        );
+        $event = \local_connect\event\group_enrolment_created::create($params);
+
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $event->trigger();
+        $events = $sink->get_events();
+        $event = reset($events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\local_connect\event\group_enrolment_created', $event);
+    }
 }

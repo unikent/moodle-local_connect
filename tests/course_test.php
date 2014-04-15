@@ -187,4 +187,31 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $course = \local_connect\course::get($this->generate_course());
         $this->assertTrue(in_array($course->campus_name, array("Canterbury", "Medway")), $course->campus_name);
     }
+
+    /**
+     * Test course_created event
+     */
+    public function test_course_created_event() {
+        $this->resetAfterTest();
+
+        $course = \local_connect\course::get($this->generate_course());
+        $this->assertTrue($course->create_in_moodle());
+
+        $params = array(
+            'objectid' => $course->id,
+            'courseid' => $course->mid,
+            'context' => \context_course::instance($course->mid)
+        );
+        $event = \local_connect\event\course_created::create($params);
+        $event->add_record_snapshot('connect_course', $course);
+
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $event->trigger();
+        $events = $sink->get_events();
+        $event = reset($events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\local_connect\event\course_created', $event);
+    }
 }

@@ -277,6 +277,40 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$this->assertFalse($enrolment->is_in_moodle());
 		$this->assertEquals("Creating Enrolment: {$enrolment->id}", $enrolment->sync());
 		$this->assertTrue($enrolment->is_in_moodle());
-
 	}
+
+    /**
+     * Test enrolment_created event
+     */
+    public function test_enrolment_created_event() {
+        $this->resetAfterTest();
+
+        $course = \local_connect\course::get($this->generate_course());
+        $this->assertTrue($course->create_in_moodle());
+
+		$enrolment = $this->generate_enrolment($course->id, 'student');
+		$enrolment = \local_connect\enrolment::get($enrolment);
+		$enrolment->create_in_moodle();
+
+        $params = array(
+            'objectid' => $enrolment->id,
+            'relateduserid' => $enrolment->user->mid,
+            'courseid' => $enrolment->course->mid,
+            'context' => \context_course::instance($enrolment->course->mid),
+            'other' => array(
+                'userid' => $enrolment->userid
+            )
+        );
+        $event = \local_connect\event\enrolment_created::create($params);
+        $event->add_record_snapshot('connect_enrolments', $enrolment);
+
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $event->trigger();
+        $events = $sink->get_events();
+        $event = reset($events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\local_connect\event\enrolment_created', $event);
+    }
 }
