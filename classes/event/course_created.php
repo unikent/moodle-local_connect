@@ -49,4 +49,22 @@ class course_created extends \core\event\base
 	public function get_description() {
 		return 'The connect course with an ID of ' . $this->objectid . ' was pushed to Moodle.';
 	}
+
+	/**
+	 * Returns relevant URL.
+	 * 
+	 * @return \moodle_url
+	 */
+	public function get_url() {
+		return new \moodle_url('/local/connect/browse/course.php', array('id' => $this->objectid));
+	}
+
+	/**
+	 * Return the legacy event log data.
+	 * 
+	 * @return array
+	 */
+	protected function get_legacy_logdata() {
+		return array($this->objectid, 'connect', 'add', 'course.php?id=' . $this->objectid);
+	}
 }
