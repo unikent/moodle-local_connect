@@ -158,13 +158,13 @@ class group_enrolment extends data
             'objectid' => $this->id,
             'relateduserid' => $this->user->mid,
             'courseid' => $this->group->course->mid,
-            'context' => context_course::instance($this->group->course->mid),
+            'context' => \context_course::instance($this->group->course->mid),
             'other' => array(
                 'groupid' => $this->groupid
             )
         );
         $event = \local_connect\event\enrolment_created::create($params);
-        $event->add_record_snapshot('connect_group_enrolment', $this);
+        $event->add_record_snapshot('connect_group_enrolments', $this);
         $event->trigger();
 
         return true;

@@ -432,7 +432,7 @@ class course extends data
         $params = array(
             'objectid' => $this->id,
             'courseid' => $this->mid,
-            'context' => context_course::instance($this->mid)
+            'context' => \context_course::instance($this->mid)
         );
         $event = \local_connect\event\course_created::create($params);
         $event->add_record_snapshot('connect_course', $this);

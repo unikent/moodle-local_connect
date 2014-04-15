@@ -190,7 +190,7 @@ class group extends data
         $params = array(
             'objectid' => $this->id,
             'courseid' => $this->course->mid,
-            'context' => context_course::instance($this->course->mid)
+            'context' => \context_course::instance($this->course->mid)
         );
         $event = \local_connect\event\group_created::create($params);
         $event->add_record_snapshot('connect_group', $this);

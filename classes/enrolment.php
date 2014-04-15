@@ -169,10 +169,10 @@ class enrolment extends data
             'objectid' => $this->id,
             'relateduserid' => $this->user->mid,
             'courseid' => $this->course->mid,
-            'context' => context_course::instance($this->course->mid)
+            'context' => \context_course::instance($this->course->mid)
         );
         $event = \local_connect\event\enrolment_created::create($params);
-        $event->add_record_snapshot('connect_enrolment', $this);
+        $event->add_record_snapshot('connect_enrolments', $this);
         $event->trigger();
 
         return true;
