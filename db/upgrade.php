@@ -402,30 +402,5 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014031801, 'local', 'connect');
     }
 
-    if ($oldversion < 2014041500) {
-        $table = new xmldb_table("connect_group");
-
-        {
-            $field = new xmldb_field('group_uid', XMLDB_TYPE_INTEGER, '18', null, null, null, '0', 'name');
-
-            // Conditionally launch add field mid.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
-        }
-
-        {
-            $index = new xmldb_index('index_group_uid', XMLDB_INDEX_UNIQUE, array('group_uid'));
-
-            // Conditionally launch add index index_mid.
-            if (!$dbman->index_exists($table, $index)) {
-                $dbman->add_index($table, $index);
-            }
-        }
-
-        // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2014041500, 'local', 'connect');
-    }
-
     return true;
 }
