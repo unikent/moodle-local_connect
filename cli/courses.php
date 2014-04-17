@@ -48,22 +48,8 @@ $res = array();
 foreach (json_decode(file_get_contents('php://stdin')) as $c) {
     $tr = array();
     try {
-        if (empty($c->idnumber)) {
-            throw new moodle_exception('empty idnumber');
-        }
-
         if (empty($c->module_delivery_key)) {
             throw new moodle_exception('Incompatible Connect Version Detected');
-        }
-
-        // force 2012/2013 on shortnames and titles for everything
-        $prev_year = date('Y', strtotime('1-1-' . $c->session_code . ' -1 year'));
-        if (preg_match('/\(\d+\/\d+\)/is', $c->shortname) === 0) {
-            $c->shortname .= " ($prev_year/$c->session_code)";
-        }
-
-        if (preg_match('/\(\d+\/\d+\)/is', $c->fullname) === 0) {
-            $c->fullname .= " ($prev_year/$c->session_code)";
         }
 
         // Always invisible by default.
