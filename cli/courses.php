@@ -99,18 +99,8 @@ foreach (json_decode(file_get_contents('php://stdin')) as $c) {
 
             $tr = array( 'result' => 'ok', 'moodle_course_id' => $c->moodle_id, 'unlocked' => $connect_data->unlocked, 'in' => $c );
         } else if ($c->isa == 'DELETE') {
-            $r = $DB->get_record('course', array('idnumber' => $c->idnumber));
-            if (!$r) {
-                throw new moodle_exception('module doesnt exist');
-            }
+            $course->delete();
 
-            $category = \local_catman\core::get_category();
-            $r->category = $category->id;
-
-            //Update the shortcode before moving into the removed category
-            $r->shortname = date("dmY-His") . "-" . $r->shortname;
-            $r->idnumber = date("dmY-His") . "-" . $r->idnumber;
-            update_course($r);
             $tr = array( 'result' => 'ok', 'in' => $c );
         } else {
             throw new moodle_exception('dont understand '.$c->isa);
