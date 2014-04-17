@@ -102,8 +102,7 @@ class group extends data
         // Does our data match up?
         if ($group->name !== $this->name) {
             if (!$dry) {
-                $group->name = $this->name;
-                groups_update_group($group);
+                $this->update_in_moodle();
             }
 
             return 'Updating group: ' . $this->id;
@@ -198,6 +197,26 @@ class group extends data
 
         // Sync enrolments.
         $this->sync_group_enrolments();
+
+        return true;
+    }
+
+    /**
+     * Update this group in Moodle
+     * @return unknown
+     */
+    public function update_in_moodle() {
+        global $DB;
+
+        $group = $DB->get_record('groups', array(
+            'id' => $this->mid
+        ), 'id,courseid,name');
+
+        // Does our data match up?
+        if ($group->name !== $this->name) {
+            $group->name = $this->name;
+            return groups_update_group($group);
+        }
 
         return true;
     }
