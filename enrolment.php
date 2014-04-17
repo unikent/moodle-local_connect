@@ -10,7 +10,7 @@ require_once('locallib.php');
 global $PAGE, $OUTPUT;
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/util/enrolment.php');
+$PAGE->set_url('/local/connect/enrolment.php');
 
 $PAGE->set_title("Enrolment");
 $PAGE->set_heading("Enrolment");
