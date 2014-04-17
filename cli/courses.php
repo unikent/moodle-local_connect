@@ -8,25 +8,6 @@ require(dirname(dirname(dirname(dirname(__FILE__)))).'/course/edit_form.php');
 require(dirname(dirname(dirname(dirname(__FILE__)))).'/mod/aspirelists/lib.php');
 require(dirname(dirname(__FILE__)).'/locallib.php');
 
-function kent_connect_fetch_or_create_removed_category_id() {
-  global $DB, $CFG;
-  $category = $DB->get_record('course_categories', array('idnumber' => 'kent_connect_removed'));
-
-  if(!$category) {
-    $category = new stdClass();
-    $category->name = 'Removed';
-    $category->idnumber = 'kent_connect_removed';
-    $category->description_editor = $data->description_editor;
-    $category->parent = 0;
-    $category->description = 'Holding place for removed modules';
-    $category->sortorder = 999;
-    $category->visible = false;
-    $category->id = $DB->insert_record('course_categories', $category);
-  }
-
-  return $category->id;
-}
-
 $res = array();
 
 /*
@@ -179,7 +160,9 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
       if(!$r) {
         throw new moodle_exception('module doesnt exist');
       }
-      $r->category = kent_connect_fetch_or_create_removed_category_id();
+
+      $category = \local_catman\core::get_category();
+      $r->category = $category->id;
 
       //Update the shortcode before moving into the removed category
       $r->shortname = date("dmY-His") . "-" . $r->shortname;
