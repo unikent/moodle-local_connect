@@ -531,6 +531,10 @@ class course extends data
     public function update_moodle() {
         global $DB;
 
+        if (!$this->is_locked()) {
+            return false;
+        }
+
         $course = $DB->get_record('course', array(
             'id' => $this->mid
         ));
@@ -545,6 +549,8 @@ class course extends data
 
         // Add module extra details to the connect_course_dets table.
         $this->create_connect_extras();
+
+        return true;
     }
 
     /**
