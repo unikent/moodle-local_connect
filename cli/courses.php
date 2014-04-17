@@ -174,7 +174,8 @@ foreach (json_decode(file_get_contents('php://stdin')) as $c) {
         $tr = array(
             'result' => 'error',
             'in' => $c,
-            'exception' => $e->getMessage() );
+            'exception' => $e->getMessage()
+        );
     }
 
     $res [] = $tr;
