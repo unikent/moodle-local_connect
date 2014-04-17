@@ -27,9 +27,7 @@ $res = array();
  */
 
 foreach (json_decode(file_get_contents('php://stdin')) as $c) {
-    global $DB;
     $tr = array();
-    $group = (object) array();
     try {
 
         // Try and find the course.

@@ -26,33 +26,52 @@ $res = array();
  * ]
  */
 
-foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
-    global $DB;
+foreach (json_decode(file_get_contents('php://stdin')) as $c) {
     $tr = array();
-    $group = (object) array();
     try {
+        // Try and find the course.
+        $mdl_connect_course = $DB->get_record('connect_course', array(
+            "mid" => $c->moodle_course_id
+        ));
 
-        if($c->isa == 'NEW') {
+        if ($mdl_connect_course === false) {
+            throw new moodle_exception("Course does not exist!");
+        }
 
-            $data = (object) array( 'name' => $c->group_desc, 'courseid' => $c->moodle_course_id );
-            $group = groups_create_group($data);
-            $c->moodle_group_id = $group;
-            if(! ($grouping = $DB->get_record('groupings',array('name'=>'Delivery groups','courseid'=>$c->moodle_course_id))) ) {
-                $data->name = "Delivery groups";
-                $grouping = groups_create_grouping($data);
-            } else {
-                $grouping = $grouping->id;
-            }
-            if(!($g = $DB->get_record('groupings_groups',array('groupid'=>$group,'groupingid'=>$grouping))) ) {
-                groups_assign_grouping($grouping, $group);
+        // Try and find the group.
+        $mdl_connect_group_id = $DB->get_field('connect_group', 'id', array(
+            "name" => $c->group_desc,
+            "courseid" => $mdl_connect_course->id
+        ));
+
+        // Grab the ID of our new Connect's version of the course.
+        if ($mdl_connect_group_id === false) {
+            // Create it!
+            $data = array(
+                "courseid" => $mdl_connect_course->id,
+                "name" => $c->group_desc
+            );
+
+            if (!empty($c->moodle_group_id)) {
+                $data["mid"] = $c->moodle_group_id;
             }
 
-        } else if($c->isa == 'DELETE') {
-            if( !groups_delete_group($c->moodle_group_id) ) {
-                throw new moodle_exception('groups_delete_group failed');
-            }
-        } else {
-            throw new moodle_exception('dont understand ' + $c->isa);
+            $mdl_connect_group_id = $DB->insert_record('connect_group', $data);
+        }
+
+        $group = \local_connect\group::get($mdl_connect_group_id);
+
+        switch ($c->isa) {
+            case "NEW":
+                $group->create_in_moodle("Delivery groups");
+            break;
+
+            case "DELETE":
+                $group->delete();
+            break;
+
+            default:
+            throw new moodle_exception('Dont understand: ' . $c->isa);
         }
 
         $tr = array( 'result' => 'ok', 'moodle_group_id' => $group->id, 'in' => $c );
@@ -63,7 +82,7 @@ foreach( json_decode(file_get_contents('php://stdin')) as $c ) {
             'exception' => $e
         );
     }
-    $res []= $tr;
+    $res[] = $tr;
 }
 
 echo json_encode($res);
