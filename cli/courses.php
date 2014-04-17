@@ -66,18 +66,20 @@ foreach (json_decode(file_get_contents('php://stdin')) as $c) {
             $c->fullname .= " ($prev_year/$c->session_code)";
         }
 
+        // Always invisible by default.
         $c->visible = 0;
+
+        // Do we have a record in the Moodle data clone?
+        $mdl_connect_course = $DB->get_record('connect_course', array(
+            "module_delivery_key" => $c->module_delivery_key,
+            "session_code" => $c->session_code,
+            "module_version" => $c->module_version
+        ));
+
+        // Grab the ID of our new Connect's version of the course.
+        $id = ($r === false) ? $DB->insert_record('connect_course', $c) : $mdl_connect_course->id;
+
         if ($c->isa == 'NEW') {
-            // Do we have a record in the Moodle data clone?
-            $mdl_connect_course = $DB->get_record('connect_course', array(
-                "module_delivery_key" => $c->module_delivery_key,
-                "session_code" => $c->session_code,
-                "module_version" => $c->module_version
-            ));
-
-            // Grab the ID of our new Connect's version of the course.
-            $id = ($r === false) ? $DB->insert_record('connect_course', $c) : $mdl_connect_course->id;
-
             $course = \local_connect\course::get($id);
             if (!$course->is_in_moodle()) {
                 $course->create_in_moodle();
@@ -85,34 +87,15 @@ foreach (json_decode(file_get_contents('php://stdin')) as $c) {
 
             $tr = array( 'result' => 'ok', 'moodle_course_id' => $course->mid, 'in' => $c );
         } else if ($c->isa == 'UPDATE') {
-            $r = $DB->get_record('course', array('id' => $c->moodle_id));
-            if (!$r) {
-                throw new moodle_exception('module doesnt exist');
-            }
+            $course->synopsis = $c->synopsis;
+            $course->category = $c->category;
+            $course->module_week_beginning = $c->module_week_beginning;
+            $course->week_beginning_date = $c->startdate;
+            $course->module_title = $c->module_title;
+            $course->module_code = $c->module_code;
 
-            // update module extra details too
-            $connect_data = $DB->get_record('connect_course_dets', array('course' => $r->id));
-            if (!$connect_data) {
-                $connect_data = new stdClass;
-                $connect_data->course = $r->id;
-                $connect_data->campus = isset($c->campus_desc) ? $c->campus_desc : '';
-                $connect_data->startdate = isset($c->startdate) ? $c->startdate : '';
-                $connect_data->enddate = isset($c->module_length) ? strtotime('+'. $c->module_length .' weeks', $c->startdate) : $CFG->default_course_end_date;
-                $connect_data->weeks = isset($c->module_length) ? $c->module_length : 0;
-                $DB->insert_record('connect_course_dets', $connect_data);
-                $c->visible = $r->visible;
-                $uc = (object)array_merge((array)$r,(array)$c );
-                update_course( $uc );
-            } else if (!$connect_data->unlocked) {
-                $connect_data->campus = isset($c->campus_desc) ? $c->campus_desc : '';
-                $connect_data->startdate = isset($c->startdate) ? $c->startdate : '';
-                $connect_data->enddate = isset($c->module_length) ? strtotime('+'. $c->module_length .' weeks', $c->startdate) : $CFG->default_course_end_date;
-                $connect_data->weeks = isset($c->module_length) ? $c->module_length : 0;
-                $DB->update_record('connect_course_dets', $connect_data);
-                $c->visible = $r->visible;
-                $uc = (object)array_merge((array)$r,(array)$c );
-                update_course( $uc );
-            }
+            $course->save();
+            $course->update_moodle();
 
             $tr = array( 'result' => 'ok', 'moodle_course_id' => $c->moodle_id, 'unlocked' => $connect_data->unlocked, 'in' => $c );
         } else if ($c->isa == 'DELETE') {
