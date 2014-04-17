@@ -63,7 +63,7 @@ foreach (json_decode(file_get_contents('php://stdin')) as $c) {
         ));
 
         // Grab the ID of our new Connect's version of the course.
-        $id = ($r === false) ? $DB->insert_record('connect_course', $c) : $mdl_connect_course->id;
+        $id = ($mdl_connect_course === false) ? $DB->insert_record('connect_course', $c) : $mdl_connect_course->id;
 
         if ($c->isa == 'NEW') {
             $course = \local_connect\course::get($id);
