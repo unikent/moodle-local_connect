@@ -95,9 +95,11 @@ foreach (json_decode(file_get_contents('php://stdin')) as $c) {
             $course->module_code = $c->module_code;
 
             $course->save();
-            $course->update_moodle();
+            if ($course->is_locked()) {
+                $course->update_moodle();
+            }
 
-            $tr = array( 'result' => 'ok', 'moodle_course_id' => $c->moodle_id, 'unlocked' => $connect_data->unlocked, 'in' => $c );
+            $tr = array( 'result' => 'ok', 'moodle_course_id' => $course->mid, 'unlocked' => !$course->is_locked(), 'in' => $c );
         } else if ($c->isa == 'DELETE') {
             $course->delete();
 
