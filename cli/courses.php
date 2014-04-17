@@ -45,7 +45,6 @@ foreach (json_decode(file_get_contents('php://stdin')) as $c) {
 
         $c->visible = 0;
         if ($c->isa == 'NEW') {
-            global $DB;
             $r = $DB->get_record('course', array('idnumber' => $c->idnumber));
             if ($r) {
                 throw new moodle_exception('non unique idnumber');
@@ -121,7 +120,6 @@ foreach (json_decode(file_get_contents('php://stdin')) as $c) {
 
             $tr = array( 'result' => 'ok', 'moodle_course_id' => $cr->id, 'in' => $c );
         } else if ($c->isa == 'UPDATE') {
-            global $DB;
             $r = $DB->get_record('course', array('id' => $c->moodle_id));
             if (!$r) {
                 throw new moodle_exception('module doesnt exist');
@@ -153,7 +151,6 @@ foreach (json_decode(file_get_contents('php://stdin')) as $c) {
 
             $tr = array( 'result' => 'ok', 'moodle_course_id' => $c->moodle_id, 'unlocked' => $connect_data->unlocked, 'in' => $c );
         } else if ($c->isa == 'DELETE') {
-            global $DB;
             $r = $DB->get_record('course', array('idnumber' => $c->idnumber));
             if (!$r) {
                 throw new moodle_exception('module doesnt exist');
