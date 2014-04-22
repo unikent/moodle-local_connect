@@ -175,7 +175,6 @@ class enrolment extends data
             )
         );
         $event = \local_connect\event\enrolment_created::create($params);
-        $event->add_record_snapshot('connect_enrolments', $this);
         $event->trigger();
 
         return true;

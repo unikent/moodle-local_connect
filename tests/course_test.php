@@ -203,7 +203,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
             'context' => \context_course::instance($course->mid)
         );
         $event = \local_connect\event\course_created::create($params);
-        $event->add_record_snapshot('connect_course', $course);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();

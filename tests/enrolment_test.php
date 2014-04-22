@@ -302,7 +302,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
             )
         );
         $event = \local_connect\event\enrolment_created::create($params);
-        $event->add_record_snapshot('connect_enrolments', $enrolment);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();

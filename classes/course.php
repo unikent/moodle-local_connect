@@ -435,7 +435,6 @@ class course extends data
             'context' => \context_course::instance($this->mid)
         );
         $event = \local_connect\event\course_created::create($params);
-        $event->add_record_snapshot('connect_course', $this);
         $event->trigger();
 
         // Sync our enrolments.
