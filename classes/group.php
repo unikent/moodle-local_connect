@@ -102,8 +102,7 @@ class group extends data
         // Does our data match up?
         if ($group->name !== $this->name) {
             if (!$dry) {
-                $group->name = $this->name;
-                groups_update_group($group);
+                $this->update_in_moodle();
             }
 
             return 'Updating group: ' . $this->id;
@@ -114,18 +113,18 @@ class group extends data
      * Grab (or create) our grouping ID
      * @return unknown
      */
-    private function get_or_create_grouping() {
+    public function get_or_create_grouping($name = 'Seminar groups') {
         global $DB;
 
         $grouping = $DB->get_record('groupings', array(
-            'name' => 'Seminar groups',
+            'name' => $name,
             'courseid' => $this->mid
         ), 'id', IGNORE_MULTIPLE);
 
         // Create?
         if (!$grouping) {
             $data = new \stdClass();
-            $data->name = "Seminar groups";
+            $data->name = $name;
             $data->courseid = $this->course->mid;
             $data->description = '';
             return groups_create_grouping($data);
@@ -159,7 +158,7 @@ class group extends data
      * Create this group in Moodle
      * @return unknown
      */
-    public function create_in_moodle() {
+    public function create_in_moodle($grouping_name = 'Seminar groups') {
         if (!$this->course->is_in_moodle()) {
             debugging("Attempting to create group '{$this->id}' but course '{$this->courseid}' doesnt exist!", DEBUG_DEVELOPER);
             return false;
@@ -181,7 +180,7 @@ class group extends data
         $this->save();
 
         // Grab our grouping.
-        $grouping_id = $this->get_or_create_grouping();
+        $grouping_id = $this->get_or_create_grouping($grouping_name);
 
         // And add this group to the grouping.
         groups_assign_grouping($grouping_id, $this->mid);
@@ -198,6 +197,26 @@ class group extends data
 
         // Sync enrolments.
         $this->sync_group_enrolments();
+
+        return true;
+    }
+
+    /**
+     * Update this group in Moodle
+     * @return unknown
+     */
+    public function update_in_moodle() {
+        global $DB;
+
+        $group = $DB->get_record('groups', array(
+            'id' => $this->mid
+        ), 'id,courseid,name');
+
+        // Does our data match up?
+        if ($group->name !== $this->name) {
+            $group->name = $this->name;
+            return groups_update_group($group);
+        }
 
         return true;
     }
