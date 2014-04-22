@@ -31,10 +31,28 @@ defined('MOODLE_INTERNAL') || die();
  */
 class migrate {
 	/**
+	 * Run all of them.
+	 */
+	public static function all() {
+		self::new_users();
+		self::new_campus();
+		self::updated_courses();
+		self::new_courses();
+		self::updated_groups();
+		self::new_groups();
+		self::updated_enrolments();
+		self::new_enrolments();
+		self::updated_group_enrolments();
+		self::new_group_enrolments();
+	}
+
+	/**
 	 * New Users
 	 */
 	public static function new_users() {
 		global $DB;
+
+		echo "Migrating new users\n";
 
 		$sql = "REPLACE INTO {connect_user} (ukc, login, title, initials, family_name) (
 			SELECT e.ukc, e.login, e.title, e.initials, e.family_name
@@ -54,6 +72,8 @@ class migrate {
 	public static function new_campus() {
 		global $DB;
 
+		echo "Migrating new campus\n";
+
 		$sql = "REPLACE INTO {connect_campus} (`id`, `name`) (
 			SELECT c.campus, c.campus_desc
 			FROM `connect_2013`.`courses` c
@@ -72,6 +92,8 @@ class migrate {
 	public static function updated_courses() {
 		global $DB;
 
+		echo "Migrating updated courses\n";
+
 		$sql = "REPLACE INTO {connect_course} (id,module_delivery_key,session_code,module_version,campusid,module_week_beginning,module_length,week_beginning_date,module_title,module_code,synopsis,category, mid) (
 			SELECT cc.id, c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,c.module_title,c.module_code,COALESCE(c.synopsis, ''),c.category_id,cc.mid
 			FROM `connect_development`.`courses` c
@@ -89,6 +111,8 @@ class migrate {
 	public static function new_courses() {
 		global $DB;
 
+		echo "Migrating new courses\n";
+
 		$sql = "REPLACE INTO {connect_course} (module_delivery_key,session_code,module_version,campusid,module_week_beginning,module_length,week_beginning_date,module_title,module_code,synopsis,category, mid) (
 			SELECT c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,c.module_title,c.module_code,COALESCE(c.synopsis, ''),c.category_id,c.moodle_id as mid
 			FROM `connect_2013`.`courses` c
@@ -105,6 +129,8 @@ class migrate {
 	 */
 	public static function updated_groups() {
 		global $DB;
+
+		echo "Migrating updated groups\n";
 
 		$sql = "REPLACE INTO {connect_group} (`id`, `courseid`, `name`, `mid`) (
 			SELECT g.group_id, c.id, g.group_desc, cg.mid
@@ -124,6 +150,8 @@ class migrate {
 	public static function new_groups() {
 		global $DB;
 
+		echo "Migrating new groups\n";
+
 		$sql = "REPLACE INTO {connect_group} (`id`, `courseid`, `name`, `mid`) (
 			SELECT g.group_id, c.id, g.group_desc, g.moodle_id
 			FROM `connect_2013`.`groups` g
@@ -141,6 +169,8 @@ class migrate {
 	 */
 	public static function updated_enrolments() {
 		global $DB;
+
+		echo "Migrating updated enrolments\n";
 
 		$sql = "REPLACE INTO {connect_enrolments} (`id`, `courseid`, `userid`, `roleid`,`deleted`) (
 			SELECT ce.id, c.id, u.id, r.id, e.sink_deleted
@@ -162,6 +192,8 @@ class migrate {
 	public static function new_enrolments() {
 		global $DB;
 
+		echo "Migrating new enrolments\n";
+
 		$sql = "REPLACE INTO {connect_enrolments} (`courseid`, `userid`, `roleid`,`deleted`) (
 			SELECT c.id, u.id, r.id, e.sink_deleted
 			FROM `connect_2013`.`enrollments` e
@@ -181,6 +213,8 @@ class migrate {
 	public static function updated_group_enrolments() {
 		global $DB;
 
+		echo "Migrating updated group enrolments\n";
+
 		$sql = "REPLACE INTO {connect_group_enrolments} (`id`, `groupid`, `userid`,`deleted`) (
 			SELECT cge.id, ge.group_id, u.id, ge.sink_deleted
 			FROM `connect_2013`.`group_enrollments` ge
@@ -198,6 +232,8 @@ class migrate {
 	 */
 	public static function new_group_enrolments() {
 		global $DB;
+
+		echo "Migrating new group enrolments\n";
 
 		$sql = "REPLACE INTO {connect_group_enrolments} (`groupid`, `userid`,`deleted`) (
 			SELECT ge.group_id, u.id, ge.sink_deleted
