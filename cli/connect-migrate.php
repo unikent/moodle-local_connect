@@ -27,4 +27,29 @@ define('CLI_SCRIPT', true);
 require (dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
-\local_connect\migrate::all();
+list($options, $unrecognized) = cli_get_params(
+    array(
+        'clean' => false,
+        'update' => false,
+        'new' => false,
+        'all' => false
+    )
+);
+
+if ($options['clean']) {
+	\local_connect\migrate::empty_all();
+}
+
+if ($options['update']) {
+	\local_connect\migrate::all_updated();
+	die;
+}
+
+if ($options['new']) {
+	\local_connect\migrate::all_create();
+	die;
+}
+
+if ($options['all']) {
+	\local_connect\migrate::all();
+}
