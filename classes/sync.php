@@ -54,11 +54,8 @@ class sync
                                         FROM {connect_enrolments} ce
                                             INNER JOIN {connect_user} cu ON ce.userid=cu.id
                                             INNER JOIN {connect_course} cc ON ce.courseid=cc.id
-                                            INNER JOIN (
-                                                SELECT ue.userid, e.courseid
-                                                FROM {user_enrolments} ue
-                                                INNER JOIN {enrol} e ON e.id=ue.enrolid
-                                            ) tt ON tt.userid=cu.mid AND tt.courseid=cc.mid
+											INNER JOIN {user_enrolments} ue ON ue.userid=cu.mid
+											INNER JOIN {enrol} e ON e.id=ue.enrolid AND e.courseid=cc.mid
                                         WHERE ce.deleted=1");
 
         return self::map_set($data);
