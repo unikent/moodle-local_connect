@@ -14,10 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-global $CONNECTDB, $SHAREDB;
-
-require_once(dirname(__FILE__) . "/classes/dbprovider.php");
-$CONNECTDB = new \local_connect\dbprovider();
+global $SHAREDB;
 
 require_once(dirname(__FILE__) . "/classes/sharedbprovider.php");
 $SHAREDB = new \local_connect\sharedbprovider();
