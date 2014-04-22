@@ -32,7 +32,9 @@ list($options, $unrecognized) = cli_get_params(
         'clean' => false,
         'update' => false,
         'new' => false,
-        'all' => false
+        'all' => false,
+        'map-roles' => false,
+        'map-users' => false
     )
 );
 
@@ -52,4 +54,12 @@ if ($options['new']) {
 
 if ($options['all']) {
 	\local_connect\migrate::all();
+}
+
+if ($options['map-roles']) {
+	\local_connect\map_roles::all();
+}
+
+if ($options['map-users']) {
+	\local_connect\map_users::all();
 }

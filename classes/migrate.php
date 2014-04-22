@@ -304,4 +304,49 @@ class migrate
 
 		return $DB->execute($sql);
 	}
+
+	/**
+	 * Map old roles to connect
+	 */
+	public static function map_roles($dry = false) {
+		$c_roles = $DB->get_records('connect_role', array("mid" => 0));
+		foreach ($c_roles as $c_role) {
+			$c_role_obj = role::get($c_role->id);
+			$c_data = $c_role_obj->get_data_mapping();
+
+			// Try to find a matching role.
+			$m_role_id = $DB->get_field('role', 'id', array(
+				'shortname' => $c_data['short']
+			));
+			if ($m_role_id !== false) {
+				$c_role->mid = $m_role_id;
+				if (!$dry) {
+					$DB->update_record('connect_role', $c_role);
+				}
+
+				print "Mapped role {$c_role->name} to {$c_role->mid}.\n";
+			}
+		}
+	}
+
+	/**
+	 * Map old users to connect
+	 */
+	public static function map_users($dry = false) {
+		$c_users = $DB->get_records('connect_user', array("mid" => 0));
+		foreach ($c_users as $c_user) {
+			// Try to find a matching user.
+			$m_user_id = $DB->get_field('user', 'id', array(
+				'username' => $c_user->login
+			));
+			if ($m_user_id !== false) {
+				$c_user->mid = $m_user_id;
+				if (!$dry) {
+					$DB->update_record('connect_user', $c_user);
+				}
+
+				print "Mapped user {$c_user->login} to {$c_user->mid}.\n";
+			}
+		}
+	}
 }
