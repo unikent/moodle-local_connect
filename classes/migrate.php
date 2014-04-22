@@ -36,6 +36,9 @@ class migrate
 	 */
 	public static function empty_all() {
 		global $DB;
+
+		echo "Truncating tables...\n";
+
 		$DB->execute('TRUNCATE {connect_campus}');
 		$DB->execute('TRUNCATE {connect_course}');
 		$DB->execute('TRUNCATE {connect_enrolments}');
@@ -118,7 +121,7 @@ class migrate
 		echo "Migrating new users\n";
 
 		$sql = "REPLACE INTO {connect_user} (ukc, login, title, initials, family_name) (
-			SELECT e.ukc, e.login, e.title, e.initials, e.family_name
+			SELECT e.ukc, e.login, COALESCE(e.title, ''), COALESCE(e.initials, ''), COALESCE(e.family_name, '')
 			FROM `$connect_db`.`enrollments` e
 			LEFT OUTER JOIN {connect_user} u
 				ON u.login=e.login
