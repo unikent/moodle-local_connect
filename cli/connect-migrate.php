@@ -57,9 +57,9 @@ if ($options['all']) {
 }
 
 if ($options['map-roles']) {
-	\local_connect\map_roles::all();
+	\local_connect\migrate::map_roles();
 }
 
 if ($options['map-users']) {
-	\local_connect\map_users::all();
+	\local_connect\migrate::map_users();
 }
