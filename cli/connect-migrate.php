@@ -44,12 +44,10 @@ if ($options['clean']) {
 
 if ($options['update']) {
 	\local_connect\migrate::all_updated();
-	die;
 }
 
 if ($options['new']) {
 	\local_connect\migrate::all_create();
-	die;
 }
 
 if ($options['all']) {
