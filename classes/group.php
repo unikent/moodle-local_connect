@@ -192,7 +192,6 @@ class group extends data
             'context' => \context_course::instance($this->course->mid)
         );
         $event = \local_connect\event\group_created::create($params);
-        $event->add_record_snapshot('connect_group', $this);
         $event->trigger();
 
         // Sync enrolments.

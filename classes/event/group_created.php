@@ -27,9 +27,11 @@ class group_created extends \core\event\base
 	 * Init method.
 	 */
 	protected function init() {
+		global $CFG;
+
 		$this->data['objecttable'] = 'connect_group';
 		$this->data['crud'] = 'c';
-		$this->data['level'] = self::LEVEL_TEACHING;
+		$this->data[(floatval($CFG->release) <= 2.6) ? 'level' : 'edulevel'] = self::LEVEL_TEACHING;
 	}
 
 	/**
