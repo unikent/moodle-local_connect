@@ -29,11 +29,27 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Connect migration scripts
  */
-class migrate {
+class migrate
+{
+	/**
+	 * Run truncates
+	 */
+	public static function empty_all() {
+		global $DB;
+		$DB->execute('TRUNCATE {connect_campus}');
+		$DB->execute('TRUNCATE {connect_course}');
+		$DB->execute('TRUNCATE {connect_enrolments}');
+		$DB->execute('TRUNCATE {connect_group}');
+		$DB->execute('TRUNCATE {connect_group_enrolments}');
+		$DB->execute('TRUNCATE {connect_role}');
+		$DB->execute('TRUNCATE {connect_user}');
+	}
+
 	/**
 	 * Run all of them.
 	 */
 	public static function all() {
+		self::new_roles();
 		self::new_users();
 		self::new_campus();
 		self::updated_courses();
@@ -44,6 +60,49 @@ class migrate {
 		self::new_enrolments();
 		self::updated_group_enrolments();
 		self::new_group_enrolments();
+	}
+
+	/**
+	 * Run all of the creates.
+	 */
+	public static function all_create() {
+		self::new_roles();
+		self::new_users();
+		self::new_campus();
+		self::new_courses();
+		self::new_groups();
+		self::new_enrolments();
+		self::new_group_enrolments();
+	}
+
+	/**
+	 * Run all of the updates.
+	 */
+	public static function all_updated() {
+		self::updated_courses();
+		self::updated_groups();
+		self::updated_enrolments();
+		self::updated_group_enrolments();
+	}
+
+	/**
+	 * New Roles
+	 */
+	public static function new_roles() {
+		global $DB;
+
+		echo "Migrating new roles\n";
+
+		$sql = "REPLACE INTO {connect_role} (name) (
+			SELECT e.role
+			FROM `connect_2013`.`enrollments` e
+			LEFT OUTER JOIN {connect_role} cr
+				ON cr.name=e.role
+			WHERE cr.id IS NULL
+			GROUP BY e.role
+		);";
+
+		return $DB->execute($sql);
 	}
 
 	/**
