@@ -133,6 +133,7 @@ class sync
 
     /**
      * Grab a list of enrolments that have changed role.
+     * There isnt much we do about this.. and it shouldnt really happen.
      */
     public static function get_changed_enrolments() {
         $data = self::get_moodle_enrolments();
