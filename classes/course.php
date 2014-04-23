@@ -395,20 +395,21 @@ class course extends data
             $obj->fullname = $this->fullname;
             $obj->summary = $this->synopsis;
             $obj->visible = 0;
+
             $course = create_course($obj);
             if (!$course) {
                 throw new \moodle_exception("Unknown");
             }
+
+            // Update our reference.
+            $this->mid = $course->id;
         } catch (\moodle_exception $e) {
             $msg = $e->getMessage();
             debugging("Error processing '{$this->id}': $msg", DEBUG_DEVELOPER);
             return false;
         }
 
-        // Update our reference.
-        $this->mid = $course->id;
-
-        // Tell Connect about the new course.
+        // Save our new mid.
         $this->save();
 
         // Add in sections.

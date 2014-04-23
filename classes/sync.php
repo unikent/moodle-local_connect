@@ -52,10 +52,10 @@ class sync
 
         $data = $DB->get_records_sql("SELECT ce.id, cu.mid as userid, cc.mid as courseid, cr.mid as roleid
     									FROM {connect_enrolments} ce
-										INNER JOIN {connect_user} cu ON cu.id=ce.userid
-										INNER JOIN {connect_course} cc ON cc.id=ce.courseid
-										INNER JOIN {connect_role} cr ON cr.id=ce.roleid
-										WHERE ce.deleted=0");
+										INNER JOIN {connect_user} cu ON cu.id = ce.userid
+										INNER JOIN {connect_course} cc ON cc.id = ce.courseid
+										INNER JOIN {connect_role} cr ON cr.id = ce.roleid
+										WHERE cc.mid != 0 AND ce.deleted = 0");
 
         return $data;
     }
@@ -75,7 +75,7 @@ class sync
                                         INNER JOIN {course} c ON c.id = e.courseid
                                         INNER JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
                                         INNER JOIN {role_assignments} ra ON ra.userid = u.id AND ra.contextid = ctx.id
-                                        INNER JOIN {role} r ON r.id=ra.roleid AND r.shortname IN ('sds_student', 'sds_teacher', 'convenor')");
+                                        INNER JOIN {role} r ON r.id = ra.roleid AND r.shortname IN ('sds_student', 'sds_teacher', 'convenor')");
 
         foreach ($data as $row) {
         	if (!isset($enrolments[$row->userid])) {
