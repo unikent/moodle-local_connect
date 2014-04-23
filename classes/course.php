@@ -371,7 +371,7 @@ class course extends data
 
         // Check we have a category.
         if (empty($this->category)) {
-            \local_hipchat\Message::send("No category set for course: '{$this->id}'!", "red", false, "text", "Connect");
+            utils::error("No category set for course: '{$this->id}'!");
             return false;
         }
 
@@ -383,7 +383,7 @@ class course extends data
 
         // Ensure the shortname is unique.
         if (!$this->is_unique_shortname($shortname)) {
-            \local_hipchat\Message::send("'{$USER->username}' just tried to push course '{$this->id}' to Moodle. It failed becuase the shortname was not unique :(", "red", false, "text", "Connect");
+            utils::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle. It failed becuase the shortname was not unique :(");
             return false;
         }
 
@@ -401,7 +401,7 @@ class course extends data
             }
         } catch (\moodle_exception $e) {
             $msg = $e->getMessage();
-            \local_hipchat\Message::send("'{$USER->username}' just tried to push course '{$this->id}' to Moodle. Something went really wrong: {$msg}", "red", false, "html", "Connect");
+            utils::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle. Something went really wrong: {$msg}");
             return false;
         }
 
