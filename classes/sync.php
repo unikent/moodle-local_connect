@@ -220,7 +220,23 @@ class sync
                                         INNER JOIN {connect_group} cg ON cg.id = cge.groupid
                                         INNER JOIN {connect_user} cu ON cu.id = cge.userid
                                         LEFT OUTER JOIN {groups_members} gm ON gm.groupid = cg.mid AND gm.userid = cu.mid
-                                        WHERE gm.id IS NULL");
+                                        WHERE gm.id IS NULL AND cg.mid != 0 AND cge.deleted = 0");
+
+        return self::map_set($data);
+    }
+
+    /**
+     * Returns a list of group enrolments to be deleted.
+     */
+    public static function get_deleted_group_enrolments() {
+        global $DB;
+
+        $data = $DB->get_records_sql("SELECT cge.id
+                                        FROM {connect_group_enrolments} cge
+                                        INNER JOIN {connect_group} cg ON cg.id = cge.groupid
+                                        INNER JOIN {connect_user} cu ON cu.id = cge.userid
+                                        LEFT OUTER JOIN {groups_members} gm ON gm.groupid = cg.mid AND gm.userid = cu.mid
+                                        WHERE gm.id IS NOT NULL AND cg.mid != 0 AND cge.deleted = 1");
 
         return self::map_set($data);
     }
