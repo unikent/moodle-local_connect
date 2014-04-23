@@ -43,4 +43,11 @@ if ($hassiteconfig) {
 		"Warning: Rollover may not work after checking this! SHAREDB must be enabled for this to have any hope of working.",
 		0
 	));
+
+	$settings->add(new admin_setting_configcheckbox(
+		'local_connect/enable_hipchat',
+		'Enable hipchat notifications',
+		'Note: Spams the developers when things go wrong.',
+		0
+	));
 }

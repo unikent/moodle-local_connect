@@ -106,7 +106,8 @@ class role extends data
 
         $data = $this->get_data_mapping();
         if ($data === false) {
-            throw new \moodle_exception("No data mapping for role - {$this->name}!");
+            utils::error("No role mapping for: '{$this->name}'!");
+            return false;
         }
 
         // Create it if it doesnt already exist.

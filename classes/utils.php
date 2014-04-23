@@ -32,6 +32,17 @@ defined('MOODLE_INTERNAL') || die();
 class utils {
 
 	/**
+	 * Decide what to do with an error.
+	 */
+	public static function error($message) {
+		if (get_config("local_connect", "enable_hipchat")) {
+			\local_hipchat\Message::send($message, "red", false, "text", "Connect");
+		} else {
+			debugging($message, DEBUG_DEVELOPER);
+		}
+	}
+
+	/**
 	 * Is connect configured properly?
 	 */
 	public static function is_enabled() {
