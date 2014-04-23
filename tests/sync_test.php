@@ -22,6 +22,37 @@ defined('MOODLE_INTERNAL') || die();
 class kent_sync_tests extends local_connect\util\connect_testcase
 {
 	/**
+	 * Make sure we can grab a valid list of enrolments to be created.
+	 */
+	public function test_enrolment_creates() {
+		global $CFG, $DB;
+
+		$this->resetAfterTest();
+
+		$course = $this->generate_course();
+		$course_obj = \local_connect\course::get($course);
+		$course_obj->create_in_moodle();
+
+		$this->assertEquals(array(), \local_connect\sync::get_deleted_enrolments());
+
+		// Create some fake enrolments.
+		$this->generate_enrolments(30, $course, 'student');
+		$this->generate_enrolments(2, $course, 'convenor');
+		$this->generate_enrolments(1, $course, 'teacher');
+
+		$this->assertEquals(33, count(\local_connect\sync::get_connect_enrolments()));
+		$this->assertEquals(0, count(\local_connect\sync::get_moodle_enrolments()));
+		$this->assertEquals(33, count(\local_connect\sync::get_new_enrolments()));
+
+		$enrolments = \local_connect\enrolment::get_all();
+		foreach ($enrolments as $enrolment) {
+			$enrolment->create_in_moodle();
+		}
+
+		$this->assertEquals(0, count(\local_connect\sync::get_new_enrolments()));
+	}
+
+	/**
 	 * Make sure we can grab a valid list of enrolments to be deleted.
 	 */
 	public function test_enrolment_deletes() {
