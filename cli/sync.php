@@ -54,6 +54,8 @@ foreach ($creates as $create) {
 	}
 }
 
+unset($creates);
+
 /*
  * --------------------------------------------------------
  * Enrolments
@@ -74,6 +76,8 @@ foreach ($deletes as $delete) {
 	}
 }
 
+unset($deletes);
+
 // Then, odd changes.
 $changes = \local_connect\sync::get_changed_enrolments();
 $count = count($changes);
@@ -89,6 +93,8 @@ foreach ($changes as $change) {
 	}
 }
 
+unset($changes);
+
 // Then, creates.
 $creates = \local_connect\sync::get_new_enrolments();
 $count = count($creates);
@@ -102,6 +108,8 @@ foreach ($creates as $create) {
 		$obj->create_in_moodle();
 	}
 }
+
+unset($creates);
 
 /*
  * --------------------------------------------------------
@@ -123,6 +131,8 @@ foreach ($deletes as $delete) {
 	}
 }
 
+unset($deletes);
+
 // Then, creates.
 $creates = \local_connect\sync::get_new_group_enrolments();
 $count = count($creates);
@@ -136,3 +146,5 @@ foreach ($creates as $create) {
 		$obj->create_in_moodle();
 	}
 }
+
+unset($creates);
