@@ -113,11 +113,11 @@ class enrolment extends data
     public function is_valid() {
         $this->reset_object_cache();
 
-        if (!$this->course || !$this->user || !$this->role) {
+        if (!$this->course) {
             return false;
         }
 
-        return $this->course->is_in_moodle() && $this->user->is_in_moodle() && $this->role->is_in_moodle();
+        return $this->course->is_in_moodle();
     }
 
     /**
@@ -150,6 +150,11 @@ class enrolment extends data
      */
     public function create_in_moodle() {
         $this->reset_object_cache();
+
+        // Create the user.
+        if ($this->user && !$this->user->is_in_moodle()) {
+            $this->user->create_in_moodle();
+        }
 
         // Create the role.
         if ($this->role && !$this->role->is_in_moodle()) {
