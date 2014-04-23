@@ -111,15 +111,55 @@ class kent_sync_tests extends local_connect\util\connect_testcase
 		}
 
 		$this->assertEquals(array(), \local_connect\sync::get_new_enrolments());
-
+		$this->assertEquals(array(), \local_connect\sync::get_changed_enrolments());
 		$this->assertEquals(array(), \local_connect\sync::get_deleted_enrolments());
 
 		// Now change the teacher enrolment to a student.
 		$teacher_obj->roleid = $role = $DB->get_field("connect_role", "id", array("name" => "student"));
 		$teacher_obj->save();
 
-		$this->assertEquals(array(), \local_connect\sync::get_new_enrolments());
+		// Technically, this is also new enrolment.
+		$this->assertEquals(array($teacher), \local_connect\sync::get_new_enrolments());
 		$this->assertEquals(array($teacher), \local_connect\sync::get_changed_enrolments());
 		$this->assertEquals(array(), \local_connect\sync::get_deleted_enrolments());
+	}
+
+	/**
+	 * Make sure we can grab a valid list of extra enrolments (in Moodle, but not SDS).
+	 */
+	public function test_enrolment_extras() {
+		global $CFG, $DB;
+
+		$this->resetAfterTest();
+
+		$course = $this->generate_course();
+		$course_obj = \local_connect\course::get($course);
+		$course_obj->create_in_moodle();
+
+		// Create some fake enrolments.
+		$this->generate_enrolments(30, $course, 'student');
+		$this->generate_enrolments(2, $course, 'convenor');
+		$teacher = $this->generate_enrolment($course, 'teacher');
+
+		$enrolments = \local_connect\enrolment::get_all();
+		foreach ($enrolments as $enrolment) {
+			$enrolment->create_in_moodle();
+		}
+
+		$this->assertEquals(array(), \local_connect\sync::get_new_enrolments());
+		$this->assertEquals(array(), \local_connect\sync::get_deleted_enrolments());
+		$this->assertEquals(array(), \local_connect\sync::get_changed_enrolments());
+		$this->assertEquals(array(), \local_connect\sync::get_extra_enrolments());
+
+		// Now delete the teacher.
+		$DB->delete_records('connect_enrolments', array(
+			"id" => $teacher
+		));
+
+		// Assert!
+		$this->assertEquals(array(), \local_connect\sync::get_new_enrolments());
+		$this->assertEquals(array(), \local_connect\sync::get_changed_enrolments());
+		$this->assertEquals(array(), \local_connect\sync::get_deleted_enrolments());
+		$this->assertEquals(1, count(\local_connect\sync::get_extra_enrolments()));
 	}
 }

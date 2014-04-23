@@ -66,7 +66,7 @@ class sync
     public static function get_moodle_enrolments() {
         global $DB;
 
-        $data = $DB->get_records_sql("SELECT ue.userid, e.courseid, r.id as roleid
+        $data = $DB->get_records_sql("SELECT ue.id, ue.userid, e.courseid, r.id as roleid
                                         FROM {user_enrolments} ue
                                         INNER JOIN {user} u on u.id = ue.userid
                                         INNER JOIN {enrol} e ON e.id = ue.enrolid
@@ -79,30 +79,33 @@ class sync
     }
 
     /**
+     * Map a list of userid => courseid => roleid
+     */
+    private static function map_structure($data) {
+        $ret = array();
+
+        foreach ($data as $row) {
+            if (!isset($ret[$row->userid])) {
+                $ret[$row->userid] = array();
+            }
+
+            $ret[$row->userid][$row->courseid] = $row->roleid;
+        }
+
+        return $ret;
+    }
+
+    /**
      * Grab a list of enrolments due to be created.
      * This is not just one SQL statement because custard sucks at temporary tables.
      *
      * @param boolean $role_only Only check if roleid matches 
      */
-    private static function compare_enrolments($role_only = false) {
-        // Grab a list of Moodle enrolments, then map them up in a
-        // data structure we can easily query.
-        $data = self::get_moodle_enrolments();
-        $moodle = array();
-        foreach ($data as $row) {
-            if (!isset($moodle[$row->userid])) {
-                $moodle[$row->userid] = array();
-            }
-
-            $moodle[$row->userid][$row->courseid] = $row->roleid;
-        }
-
-        $connect = self::get_connect_enrolments();
-
+    private static function compare_enrolments($structure, $data, $role_only = false) {
         $ids = array();
 
-        foreach ($connect as $enrolment) {
-            if (!isset($moodle[$enrolment->userid]) || !isset($moodle[$enrolment->userid][$enrolment->courseid])) {
+        foreach ($data as $enrolment) {
+            if (!isset($structure[$enrolment->userid]) || !isset($structure[$enrolment->userid][$enrolment->courseid])) {
                 if (!$role_only) {
                     $ids[] = $enrolment->id;
                 }
@@ -110,7 +113,7 @@ class sync
                 continue;
             }
 
-            if ($role_only && $moodle[$enrolment->userid][$enrolment->courseid] != $enrolment->roleid) {
+            if ($structure[$enrolment->userid][$enrolment->courseid] != $enrolment->roleid) {
                 $ids[] = $enrolment->id;
             }
         }
@@ -122,14 +125,20 @@ class sync
      * Grab a list of enrolments due to be created.
      */
     public static function get_new_enrolments() {
-        return self::compare_enrolments(false);
+        $data = self::get_moodle_enrolments();
+        $moodle = self::map_structure($data);
+        $connect = self::get_connect_enrolments();
+        return self::compare_enrolments($moodle, $connect, false);
     }
 
     /**
      * Grab a list of enrolments that have changed role.
      */
     public static function get_changed_enrolments() {
-        return self::compare_enrolments(true);
+        $data = self::get_moodle_enrolments();
+        $moodle = self::map_structure($data);
+        $connect = self::get_connect_enrolments();
+        return self::compare_enrolments($moodle, $connect, true);
     }
 
     /**
@@ -158,5 +167,29 @@ class sync
      * the past, which used to happen a lot with the Ruby version.
      */
     public static function get_extra_enrolments() {
+        /*
+         * Note: if custard didnt suck, we could do this:
+         *
+         * SELECT ue.userid, e.courseid, r.id as roleid
+         * FROM moodle_2013.mdl_user_enrolments ue
+         * INNER JOIN moodle_2013.mdl_user u on u.id = ue.userid
+         * INNER JOIN moodle_2013.mdl_enrol e ON e.id = ue.enrolid
+         * INNER JOIN moodle_2013.mdl_course c ON c.id = e.courseid
+         * INNER JOIN moodle_2013.mdl_context ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
+         * INNER JOIN moodle_2013.mdl_role_assignments ra ON ra.userid = u.id AND ra.contextid = ctx.id
+         * INNER JOIN moodle_2013.mdl_role r ON r.id = ra.roleid AND r.shortname IN ('sds_student', 'sds_teacher', 'convenor')
+         * LEFT OUTER JOIN (
+         *     SELECT mce.id, mcu.mid userid, mcc.mid courseid
+         *     FROM moodle_2013.mdl_connect_enrolments mce
+         *     INNER JOIN moodle_2013.mdl_connect_course mcc ON mcc.id=mce.courseid
+         *     INNER JOIN moodle_2013.mdl_connect_user mcu ON mcu.id=mce.userid
+         * ) ce ON ce.courseid = e.courseid AND ce.userid = ue.userid
+         * WHERE ce.id IS NULL
+         */
+
+        $moodle = self::get_moodle_enrolments();
+        $data = self::get_connect_enrolments();
+        $connect = self::map_structure($data);
+        return self::compare_enrolments($connect, $moodle, false);
     }
 }
