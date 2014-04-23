@@ -43,7 +43,11 @@ echo "   Creating ($count) groups...\n";
 
 foreach ($creates as $create) {
 	$obj = \local_connect\group::get($create);
-	$obj->create_in_moodle();
+	echo "      -> {$obj->name}";
+
+	if (!$options['dry']) {
+		$obj->create_in_moodle();
+	}
 }
 
 /*
@@ -59,7 +63,11 @@ echo "   Deleting ($count) enrolments...\n";
 
 foreach ($deletes as $delete) {
 	$obj = \local_connect\enrolment::get($delete);
-	$obj->delete();
+	echo "      -> {$obj->userid} on course {$obj->courseid} (was {$obj->roleid})";
+
+	if (!$options['dry']) {
+		$obj->delete();
+	}
 }
 
 // Then, odd changes.
@@ -69,8 +77,12 @@ echo "   Changing ($count) enrolments...\n";
 
 foreach ($changes as $change) {
 	$obj = \local_connect\enrolment::get($change);
-	$obj->delete();
-	$obj->create_in_moodle();
+	echo "      -> {$obj->userid} on course {$obj->courseid} as {$obj->roleid}";
+
+	if (!$options['dry']) {
+		$obj->delete();
+		$obj->create_in_moodle();
+	}
 }
 
 // Then, creates.
@@ -80,5 +92,9 @@ echo "   Creating ($count) enrolments...\n";
 
 foreach ($creates as $create) {
 	$obj = \local_connect\enrolment::get($create);
-	$obj->create_in_moodle();
+	echo "      -> {$obj->userid} on course {$obj->courseid} as {$obj->roleid}";
+
+	if (!$options['dry']) {
+		$obj->create_in_moodle();
+	}
 }
