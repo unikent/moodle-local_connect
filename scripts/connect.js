@@ -26,7 +26,7 @@ var Connect = (function() {
     var existing_courses = _.map(
         _.filter( this.json,
           function(e) {
-            return e.state[0] == "created_in_moodle";
+            return e.mid != null;
           } ),
         function(e) {
           return e.module_code.replace(/(.*)\s.*/,'$1');
@@ -34,11 +34,11 @@ var Connect = (function() {
 
 		// Taking json and mapping into usable data
 		this.tabledata = _.map(this.json, function(val) {
-			var state_zero = (val.state && _.first(val.state)) || '';
+			var state_zero = val.mid != null && val.mid != 0  ? 'created_in_moodle' : 'unprocessed';
 			var end = parseInt(val.module_week_beginning, 10) + parseInt(val.module_length, 10) - 1;
 			var duration = val.module_week_beginning + '-' + end;
 			var name = state_zero.split('_').join(' ');
-			var sink_deleted = val.sink_deleted;
+			var sink_deleted = val.deleted;
 			var toolbar = ' ';
 			var same_module_code_created = false;
 
@@ -56,7 +56,7 @@ var Connect = (function() {
 
 				toolbar += '<div class="unlink_row toolbar_link"></div>'
 				//toolbar += '<div class="edit_row toolbar_link"></div>'
-				toolbar += '<a href=" '+ window.coursepageUrl + '/course/view.php?id='+ val.moodle_id +'" target="_blank" class="created_link toolbar_link"></a>';
+				toolbar += '<a href=" '+ window.coursepageUrl + '/course/view.php?id='+ val.mid +'" target="_blank" class="created_link toolbar_link"></a>';
 				
 			} else {
 				same_module_code_created = _.find( existing_courses, function(e) { return e == val.module_code; } ) != undefined;
@@ -64,14 +64,8 @@ var Connect = (function() {
 
 			var state = '<div class="status_'+state_zero+' '+(sink_deleted?'sink_deleted':'')+' '+(same_module_code_created?'same_module_code_created':'')+'">'+name+'</div>';
 
-			return [val.chksum, state, val.module_code, val.module_title, val.campus_desc, 
-					duration, val.student_count, val.module_version, val.delivery_department, toolbar, val.module_delivery_key, val.session_code];
-
-
-			// prepending status box to the dom and hiding it ready for use
-			this.element.prepend('<div id="statusbox"></div>');
-			this.element.hide();	
-
+			return [val.id, state, val.module_code, val.module_title, val.campusid, 
+					duration, 0, val.module_version, '', toolbar, val.module_delivery_key, val.session_code];
 		});
 
 		//Initiate the datatable 
@@ -218,16 +212,16 @@ var Connect = (function() {
 		});
 
 		this.buttons.edit.live('click', function() {
-			var chksum = $(this).closest('tr').attr('ident');
+			var id = $(this).closest('tr').attr('ident');
 
-			_this.edit_row(chksum, _this.json, null);
+			_this.edit_row(id, _this.json, null);
 		});
 
 		this.buttons.child.live('click', function() {
-			var chksum = $(this).closest('tr').attr('ident');
+			var id = $(this).closest('tr').attr('ident');
 
 			var row = _.filter(_this.json, function (r) { 
-				return r.chksum === chksum;
+				return r.id === id;
 			});
 
 			var nTr = $(this).parents('tr')[0];
@@ -237,7 +231,7 @@ var Connect = (function() {
 				_this.oTable.fnClose(nTr);
 			} else {
 				$(this).removeClass('open').addClass('close');
-				_this.oTable.fnOpen(nTr, _this.fnFormatDetails(row[0], chksum), 'merged' );
+				_this.oTable.fnOpen(nTr, _this.fnFormatDetails(row[0], id), 'merged' );
 				_this.buttons.unlinkChild = $(_this.buttons.unlinkChildSel);
 			}
 		});
@@ -291,7 +285,7 @@ var Connect = (function() {
 	        	}
 				var end = parseInt(child.module_week_beginning, 10) + parseInt(child.module_length, 10) - 1;
 				var duration = child.module_week_beginning + ( isNaN(end) ? '' : '-' + end );
-				sOut += '<tr ident="'+ child.chksum +'">';
+				sOut += '<tr ident="'+ child.id +'">';
 				sOut += '<td class="code"><div class="'
 									+ (child.sink_deleted ? 'sink_deleted' : '' )
 									+ '">' + child.module_code
@@ -477,7 +471,7 @@ var Connect = (function() {
 				button.disable(_this.buttons.pushBtn);
 
 				var pushees = _.filter(_this.json, function (row) { 
-					if(_.indexOf(_this.selectedDeliveries, row.chksum) !== -1){
+					if(_.indexOf(_this.selectedDeliveries, row.id) !== -1){
 						return row;
 					}
 				});
@@ -493,7 +487,7 @@ var Connect = (function() {
 					var synopsis = $.trim(pushees[i].synopsis);
 
 					var obj = {
-						id: pushees[i].chksum,
+						id: pushees[i].id,
 						module_delivery_key: pushees[i].module_delivery_key,
 						session_code: pushees[i].session_code,
 						code: pushees[i].module_code + ' ' + date,
@@ -599,12 +593,12 @@ var Connect = (function() {
 		}
 	};
 
-	Connect.prototype.edit_row = function(chksum) {
+	Connect.prototype.edit_row = function(id) {
 		
 		var _this = this;
 
 		var row = _.filter(this.json, function (r) { 
-				return r.chksum === chksum;
+				return r.id === id;
 		});
 		if(row[0].state[0] === 'unprocessed') {
 			var row_unprocessed = true;
@@ -676,7 +670,7 @@ var Connect = (function() {
 					}
 
 					var data = [{
-						id: row[0].chksum,
+						id: row[0].id,
 						module_delivery_key: row[0].module_delivery_key,
 						session_code: row[0].session_code,
 						code: shortname,
@@ -796,7 +790,7 @@ var Connect = (function() {
 
 		//Gets the data objects for all of the selected rows
 		var mergers = _.chain(this.json).filter(function (row) { 
-			if(_.indexOf(_this.selectedDeliveries, row.chksum) !== -1){
+			if(_.indexOf(_this.selectedDeliveries, row.id) !== -1){
 				return row;
 			}
 		}).sortBy(function(row) {
@@ -818,7 +812,7 @@ var Connect = (function() {
 			} else {
 				synopsis = mergers[mergers_count].synopsis;
 				var mod_code = mergers[mergers_count].module_code;
-				primary_child = mergers[mergers_count].chksum;
+				primary_child = mergers[mergers_count].id;
 				mergers_count ++;
 			}
 		}
@@ -1017,14 +1011,9 @@ var Connect = (function() {
 		
 		var _this = this;
 
-		var chksum = $(el).closest('tr').attr('ident');
-		var module_delivery_key = $(el).closest('tr').attr('deliverykey');
-		var session_code = $(el).closest('tr').attr('sessioncode');
+		var id = $(el).closest('tr').attr('ident');
 
-		var course_data = [ chksum ];
-		if (window.enableConnectAdvanced) {
-			course_data = [ module_delivery_key, session_code ];
-		}
+		var course_data = [ id ];
 
 		var row = $(el).closest('tr');
 		$(el).removeClass('unlink_row').addClass('ajax_loading');
@@ -1067,14 +1056,14 @@ var Connect = (function() {
 	Connect.prototype.unlink_child = function(el) {
 		
 		var _this = this;
-		var chksum = $(el).closest('tr').attr('ident');
+		var id = $(el).closest('tr').attr('ident');
 		var par_chksm = $(el).closest('table').attr('par_ident');
 		var row_data = _.filter(_this.json, function (r) {
-			return r.chksum === par_chksm;
+			return r.id === par_chksm;
 		});
 
 		$.each(row_data[0].children, function(i, c) {
-			if(c.chksum === chksum) {
+			if(c.id === id) {
 				row_data[0].children.splice(i,1);
 				return false;
 			}
@@ -1090,23 +1079,23 @@ var Connect = (function() {
 			url: window.dapageUrl + '/courses/unlink/',
 			dataType: 'json',
 			contentType: 'json',
-			data: JSON.stringify({ 'courses' : [ chksum ] }),
+			data: JSON.stringify({ 'courses' : [ id ] }),
 			success: function () {
 
 				var data = [
-					chksum,
+					id,
 					'<div class="status_scheduled">scheduled</div>',
-					$(children).find('tr[ident='+chksum+'] .code').text(),
-					$(children).find('tr[ident='+chksum+'] .name').text(),
-					$(children).find('tr[ident='+chksum+'] .campus').text(),
-					$(children).find('tr[ident='+chksum+'] .duration').text(),
-					$(children).find('tr[ident='+chksum+'] .students').text(),
-					$(children).find('tr[ident='+chksum+'] .version').text(),
-					$(children).find('tr[ident='+chksum+'] .department').text(),
+					$(children).find('tr[ident='+id+'] .code').text(),
+					$(children).find('tr[ident='+id+'] .name').text(),
+					$(children).find('tr[ident='+id+'] .campus').text(),
+					$(children).find('tr[ident='+id+'] .duration').text(),
+					$(children).find('tr[ident='+id+'] .students').text(),
+					$(children).find('tr[ident='+id+'] .version').text(),
+					$(children).find('tr[ident='+id+'] .department').text(),
 					' '
 				];
 				_this.oTable.fnAddData(data);
-				$(children).find('tr[ident='+chksum+']').remove();
+				$(children).find('tr[ident='+id+']').remove();
 				var count = $('tr', children).length;
 
 				if(count === 2) {

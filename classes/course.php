@@ -454,22 +454,12 @@ class course extends data
      * @return unknown
      */
     private function add_child($target) {
-        global $DB;
-
-        $data = array(
-            'parent' => $this->id,
-            'child' => $target->id
-        );
-
-        if ($DB->record_exists('connect_course_links', $data)) {
-            return false;
-        }
-
         // Add a link.
-        $DB->insert_record('connect_course_links', $data);
-        $this->sync_enrolments();
+        $target->mid = $this->mid;
+        $target->save();
 
-        return true;
+        // Sync enrolments.
+        $target->sync_enrolments();
     }
 
     /**
@@ -566,7 +556,9 @@ class course extends data
         ));
 
         // Step 0 - If this is a linked course, kill our children (bit mean really).
-        $DB->delete_records('connect_course_links', 'parent', $this->id);
+        $DB->delete_records('connect_course_links', array(
+            'parent' => $this->id
+        ));
 
         // Step 1 - Move to the 'removed category'.
         $category = \local_catman\core::get_category();
@@ -597,9 +589,8 @@ class course extends data
 
         $this->delete_enrolments();
 
-        $DB->delete_records('connect_course_links', array(
-            'child' => $this->id
-        ));
+        $this->mid = 0;
+        $this->save();
     }
 
     /**
@@ -610,7 +601,7 @@ class course extends data
         $group_enrolments = $this->group_enrolments;
         $todo = array_merge($enrolments, $group_enrolments);
         foreach ($todo as $enrolment) {
-            if ($todo->is_in_moodle()) {
+            if ($todo && $todo->is_in_moodle()) {
                 $todo->delete();
             }
         }
@@ -782,7 +773,7 @@ class course extends data
 
         foreach ($data->courses as $course) {
             // Try to find the Connect version of the course.
-            $connect_course = self::get_by_uid($course->module_delivery_key, $course->session_code);
+            $connect_course = self::get($course);
             if (!$connect_course) {
                 $response[] = array(
                     'error_code' => 'does_not_exist',
@@ -792,7 +783,7 @@ class course extends data
             }
 
             // Make sure this was in Moodle.
-            if (!$course->is_in_moodle()) {
+            if (!$connect_course->is_in_moodle()) {
                 $response[] = array(
                     'error_code' => 'not_created_in_moodle',
                     'id' => $course
