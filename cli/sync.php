@@ -33,6 +33,8 @@ list($options, $unrecognized) = cli_get_params(
     )
 );
 
+echo "Beginning Connect Sync...\n";
+
 /**
  * Create missing groups.
  */
@@ -53,8 +55,6 @@ foreach ($creates as $create) {
 /*
  * Enrolments! Yay.
  */
-
-echo "Beginning Connect Sync...\n";
 
 // First, deletes.
 $deletes = \local_connect\sync::get_deleted_enrolments();
