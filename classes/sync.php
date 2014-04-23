@@ -66,8 +66,6 @@ class sync
     public static function get_moodle_enrolments() {
         global $DB;
 
-        $enrolments = array();
-
         $data = $DB->get_records_sql("SELECT ue.userid, e.courseid, r.id as roleid
                                         FROM {user_enrolments} ue
                                         INNER JOIN {user} u on u.id = ue.userid
@@ -77,15 +75,7 @@ class sync
                                         INNER JOIN {role_assignments} ra ON ra.userid = u.id AND ra.contextid = ctx.id
                                         INNER JOIN {role} r ON r.id = ra.roleid AND r.shortname IN ('sds_student', 'sds_teacher', 'convenor')");
 
-        foreach ($data as $row) {
-            if (!isset($enrolments[$row->userid])) {
-                $enrolments[$row->userid] = array();
-            }
-
-            $enrolments[$row->userid][$row->courseid] = $row->roleid;
-        }
-
-        return $enrolments;
+        return $data;
     }
 
     /**
@@ -95,7 +85,18 @@ class sync
      * @param boolean $role_only Only check if roleid matches 
      */
     private static function compare_enrolments($role_only = false) {
-        $moodle = self::get_moodle_enrolments();
+        // Grab a list of Moodle enrolments, then map them up in a
+        // data structure we can easily query.
+        $data = self::get_moodle_enrolments();
+        $moodle = array();
+        foreach ($data as $row) {
+            if (!isset($moodle[$row->userid])) {
+                $moodle[$row->userid] = array();
+            }
+
+            $moodle[$row->userid][$row->courseid] = $row->roleid;
+        }
+
         $connect = self::get_connect_enrolments();
 
         $ids = array();
@@ -146,5 +147,16 @@ class sync
                                         WHERE ce.deleted=1");
 
         return self::map_set($data);
+    }
+
+    /**
+     * Grab a list of enrolments that exist in Moodle in one of the SDS formats,
+     * but that dont exist in SDS.
+     *
+     * I *suppose* there are valid reasons for people doing this, but we dont allow
+     * the assignment of these roles so we have to assume Connect has screwed up in
+     * the past, which used to happen a lot with the Ruby version.
+     */
+    public static function get_extra_enrolments() {
     }
 }
