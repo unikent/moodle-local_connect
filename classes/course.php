@@ -689,6 +689,7 @@ class course extends data
 
     /**
      * Get a Connect Course by Moodle ID
+     * 
      * @param unknown $id
      * @return unknown
      */
@@ -696,14 +697,19 @@ class course extends data
         global $DB;
 
         // Select a bunch of records
-        $data = $DB->get_record('connect_course', array('mid' => $id));
-        if (!$data) {
-            return false;
+        $result = $DB->get_records('connect_course', array('mid' => $id));
+        if (!$result) {
+            return array();
         }
 
-        $course = new course();
-        $course->set_class_data($data);
-        return $course;
+        // Decode various elements.
+        foreach ($result as &$datum) {
+            $obj = new course();
+            $obj->set_class_data($datum);
+            $datum = $obj;
+        }
+
+        return $result;
     }
 
 

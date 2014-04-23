@@ -34,35 +34,29 @@ class cli {
 	/**
 	 * Run the course sync cron
 	 */
-	public static function course_sync($dry_run = false, $course_id = null, $create = false) {
+	public static function course_sync($dry_run = false, $moodle_id = null) {
 		$courses = array();
 
 		// What are we syncing, one or all?
-		if (isset($course_id)) {
-			mtrace("  Synchronizing course: '{$course_id}'...\n");
+		if (isset($moodle_id)) {
+			mtrace("  Synchronizing course: '{$moodle_id}'...\n");
 
 			// Get the connect version of the course.
-			$connect_course = course::get_by_moodle_id($course_id);
+			$courses = course::get_by_moodle_id($moodle_id);
 
 			// Validate the course.
-			if (!$connect_course) {
-				mtrace("  Invalid course: '{$course_id}'");
+			if (empty($courses)) {
+				mtrace("  Invalid course: '{$moodle_id}'");
 				return false;
 			}
 
 			// Are we in Moodle?
-			if (!$connect_course->is_in_moodle()) {
-				if (!$create) {
-					mtrace("  Course '{$course_id}' does not exist in Moodle (pass --create to create it).");
+			foreach ($courses as $connect_course) {
+				if (!$connect_course->is_in_moodle()) {
+					mtrace("  Connect Course '{$connect_course->id}' does not exist in Moodle (but it has an mid set).");
 					return false;
 				}
-
-				$connect_course->create_in_moodle();
-				mtrace("  Created course!\n");
-				return;
 			}
-
-			$courses = array($connect_course);
 		} else {
 			mtrace("  Synchronizing courses...\n");
 			$courses = course::get_all(array(), true);
@@ -86,25 +80,29 @@ class cli {
 	/**
 	 * Run the enrolment sync cron
 	 */
-	public static function enrolment_sync($dry_run = false, $course_id = null) {
+	public static function enrolment_sync($dry_run = false, $moodle_id = null) {
 		global $CFG;
 
 		$enrolments = array();
 
-		if (isset($course_id)) {
-			mtrace("  Synchronizing enrolments for course: '{$course_id}'...\n");
+		if (isset($moodle_id)) {
+			mtrace("  Synchronizing enrolments for course: '{$moodle_id}'...\n");
 
 			// Get the connect version of the course.
-			$connect_course = course::get_by_moodle_id($course_id);
+			$courses = course::get_by_moodle_id($moodle_id);
 
 			// Validate the course.
-			if (!$connect_course || !$connect_course->is_in_moodle()) {
-				mtrace("  Invalid course ID: $course_id");
+			if (empty($courses)) {
+				mtrace("  Invalid course ID: $moodle_id");
 				return false;
 			}
 
-			// We have a valid course!
-			$enrolments = $connect_course->enrolments;
+			// We have a valid course(s)!
+			foreach ($courses as $connect_course) {
+				if ($connect_course->is_in_moodle()) {
+					$enrolments = array_merge($connect_course->enrolments, $enrolments);
+				}
+			}
 		} else {
 			mtrace("  Synchronizing enrolments...\n");
 			$enrolments = enrolment::get_all();
@@ -123,25 +121,29 @@ class cli {
 	/**
 	 * Run the group sync cron
 	 */
-	public static function group_sync($dry_run = false, $course_id = null) {
+	public static function group_sync($dry_run = false, $moodle_id = null) {
 		global $CFG;
 
 		$groups = array();
 
-		if (isset($course_id)) {
-			mtrace("  Synchronizing groups for course: '{$course_id}'...\n");
+		if (isset($moodle_id)) {
+			mtrace("  Synchronizing groups for course: '{$moodle_id}'...\n");
 
 			// Get the connect version of the course.
-			$connect_course = course::get_by_moodle_id($course_id);
+			$courses = course::get_by_moodle_id($moodle_id);
 
 			// Validate the course.
-			if (!$connect_course || !$connect_course->is_in_moodle()) {
-				mtrace("  Invalid course ID: $course_id");
+			if (empty($courses)) {
+				mtrace("  Invalid course ID: $moodle_id");
 				return false;
 			}
 
-			// We have a valid course!
-			$groups = $connect_course->groups;
+			// We have a valid course(s)!
+			foreach ($courses as $connect_course) {
+				if ($connect_course->is_in_moodle()) {
+					$groups = array_merge($connect_course->groups, $groups);
+				}
+			}
 		} else {
 			mtrace("  Synchronizing groups...\n");
 			$groups = group::get_all();
@@ -160,25 +162,29 @@ class cli {
 	/**
 	 * Run the group enrolment sync cron
 	 */
-	public static function group_enrolment_sync($dry_run = false, $course_id = null) {
+	public static function group_enrolment_sync($dry_run = false, $moodle_id = null) {
 		global $CFG;
 
 		$group_enrolments = array();
 
-		if (isset($course_id)) {
-			mtrace("  Synchronizing group enrolments for course: '{$course_id}'...\n");
+		if (isset($moodle_id)) {
+			mtrace("  Synchronizing group enrolments for course: '{$moodle_id}'...\n");
 
 			// Get the connect version of the course.
-			$connect_course = course::get_by_moodle_id($course_id);
+			$courses = course::get_by_moodle_id($moodle_id);
 
 			// Validate the course.
-			if (!$connect_course || !$connect_course->is_in_moodle()) {
-				mtrace("  Invalid course ID: $course_id");
+			if (empty($courses)) {
+				mtrace("  Invalid course ID: $moodle_id");
 				return false;
 			}
 
 			// We have a valid course!
-			$group_enrolments = $connect_course->group_enrolments;
+			foreach ($courses as $connect_course) {
+				if ($connect_course->is_in_moodle()) {
+					$group_enrolments = array_merge($connect_course->group_enrolments, $group_enrolments);
+				}
+			}
 		} else {
 			mtrace("  Synchronizing group enrolments...\n");
 			$group_enrolments = group_enrolment::get_all();
