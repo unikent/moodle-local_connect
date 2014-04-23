@@ -106,6 +106,8 @@ class role extends data
 
         $data = $this->get_data_mapping();
         if ($data === false) {
+            \local_hipchat\Message::send("No role mapping for: '{$this->name}'!", "red", false, "text", "Connect");
+
             throw new \moodle_exception("No data mapping for role - {$this->name}!");
         }
 
