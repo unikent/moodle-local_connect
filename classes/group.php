@@ -160,7 +160,7 @@ class group extends data
      */
     public function create_in_moodle($grouping_name = 'Seminar groups') {
         if (!$this->course->is_in_moodle()) {
-            debugging("Attempting to create group '{$this->id}' but course '{$this->courseid}' doesnt exist!", DEBUG_DEVELOPER);
+            utils::error("Attempting to create group '{$this->id}' but course '{$this->courseid}' doesnt exist!");
             return false;
         }
 
@@ -172,7 +172,7 @@ class group extends data
         // Grab a Moodle ID.
         $this->mid = groups_create_group($data);
         if ($this->mid === false) {
-            debugging("Failed attempting to create group '{$this->id}'!", DEBUG_DEVELOPER);
+            utils::error("Failed attempting to create group '{$this->id}'. I don't know why :'(");
             return false;
         }
 

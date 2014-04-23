@@ -367,11 +367,11 @@ class course extends data
      * @return boolean
      */
     public function create_in_moodle($shortname_ext = "") {
-        global $DB;
+        global $DB, $USER;
 
         // Check we have a category.
         if (empty($this->category)) {
-            debugging("No category set for course: {$this->id}!\n", DEBUG_DEVELOPER);
+            utils::error("No category set for course: '{$this->id}'!");
             return false;
         }
 
@@ -383,7 +383,7 @@ class course extends data
 
         // Ensure the shortname is unique.
         if (!$this->is_unique_shortname($shortname)) {
-            debugging("Shortname '$shortname' must be unique for course: '{$this->id}'", DEBUG_DEVELOPER);
+            utils::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle. It failed becuase the shortname was not unique :(");
             return false;
         }
 
@@ -405,7 +405,7 @@ class course extends data
             $this->mid = $course->id;
         } catch (\moodle_exception $e) {
             $msg = $e->getMessage();
-            debugging("Error processing '{$this->id}': $msg", DEBUG_DEVELOPER);
+            utils::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle. Something went really wrong: {$msg}");
             return false;
         }
 
