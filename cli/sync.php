@@ -33,8 +33,21 @@ list($options, $unrecognized) = cli_get_params(
     )
 );
 
+/**
+ * Create missing groups.
+ */
+
+$creates = \local_connect\sync::get_new_groups();
+$count = count($creates);
+echo "   Creating ($count) groups...\n";
+
+foreach ($creates as $create) {
+	$obj = \local_connect\group::get($create);
+	$obj->create_in_moodle();
+}
+
 /*
- * Lets start off with enrolments!
+ * Enrolments! Yay.
  */
 
 echo "Beginning Connect Sync...\n";

@@ -193,4 +193,17 @@ class sync
         $connect = self::map_structure($data);
         return self::compare_enrolments($connect, $moodle, false);
     }
+
+    /**
+     * Grab a list of groups that need to be created.
+     */
+    public static function get_new_groups() {
+        global $DB;
+
+        return $DB->get_records_sql("SELECT cg.id
+                                        FROM {connect_group} cg
+                                        INNER JOIN {connect_course} cc ON cc.id=cg.courseid
+                                        LEFT OUTER JOIN {groups} g ON g.courseid=cc.mid AND g.name=cg.name
+                                        WHERE g.id IS NULL AND cc.mid != 0");
+    }
 }

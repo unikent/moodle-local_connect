@@ -162,4 +162,29 @@ class kent_sync_tests extends local_connect\util\connect_testcase
 		$this->assertEquals(array(), \local_connect\sync::get_deleted_enrolments());
 		$this->assertEquals(1, count(\local_connect\sync::get_extra_enrolments()));
 	}
+
+	/**
+	 * Test group creates.
+	 */
+	public function test_group_creates() {
+		global $CFG, $DB;
+
+		$this->resetAfterTest();
+
+		$this->assertEquals(array(), \local_connect\sync::get_new_groups());
+
+		$course = $this->generate_course();
+		$course_obj = \local_connect\course::get($course);
+		$course_obj->create_in_moodle();
+
+		$this->generate_groups(20, $course);
+
+		$this->assertEquals(20, count(\local_connect\sync::get_new_groups()));
+
+		foreach (\local_connect\group::get_all() as $group) {
+			$group->create_in_moodle();
+		}
+
+		$this->assertEquals(array(), \local_connect\sync::get_new_groups());
+	}
 }
