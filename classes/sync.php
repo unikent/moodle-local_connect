@@ -51,11 +51,11 @@ class sync
         global $DB;
 
         $data = $DB->get_records_sql("SELECT ce.id, cu.mid as userid, cc.mid as courseid, cr.mid as roleid
-    									FROM {connect_enrolments} ce
-										INNER JOIN {connect_user} cu ON cu.id = ce.userid
-										INNER JOIN {connect_course} cc ON cc.id = ce.courseid
-										INNER JOIN {connect_role} cr ON cr.id = ce.roleid
-										WHERE cc.mid != 0 AND ce.deleted = 0");
+                                        FROM {connect_enrolments} ce
+                                        INNER JOIN {connect_user} cu ON cu.id = ce.userid
+                                        INNER JOIN {connect_course} cc ON cc.id = ce.courseid
+                                        INNER JOIN {connect_role} cr ON cr.id = ce.roleid
+                                        WHERE cc.mid != 0 AND ce.deleted = 0");
 
         return $data;
     }
@@ -78,11 +78,11 @@ class sync
                                         INNER JOIN {role} r ON r.id = ra.roleid AND r.shortname IN ('sds_student', 'sds_teacher', 'convenor')");
 
         foreach ($data as $row) {
-        	if (!isset($enrolments[$row->userid])) {
-        		$enrolments[$row->userid] = array();
-        	}
+            if (!isset($enrolments[$row->userid])) {
+                $enrolments[$row->userid] = array();
+            }
 
-        	$enrolments[$row->userid][$row->courseid] = $row->roleid;
+            $enrolments[$row->userid][$row->courseid] = $row->roleid;
         }
 
         return $enrolments;
@@ -91,21 +91,44 @@ class sync
     /**
      * Grab a list of enrolments due to be created.
      * This is not just one SQL statement because custard sucks at temporary tables.
+     *
+     * @param boolean $role_only Only check if roleid matches 
+     */
+    private static function compare_enrolments($role_only = false) {
+        $moodle = self::get_moodle_enrolments();
+        $connect = self::get_connect_enrolments();
+
+        $ids = array();
+
+        foreach ($connect as $enrolment) {
+            if (!isset($moodle[$enrolment->userid]) || !isset($moodle[$enrolment->userid][$enrolment->courseid])) {
+                if (!$role_only) {
+                    $ids[] = $enrolment->id;
+                }
+
+                continue;
+            }
+
+            if ($role_only && $moodle[$enrolment->userid][$enrolment->courseid] != $enrolment->roleid) {
+                $ids[] = $enrolment->id;
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Grab a list of enrolments due to be created.
      */
     public static function get_new_enrolments() {
-    	$moodle = self::get_moodle_enrolments();
-    	$connect = self::get_connect_enrolments();
+        return self::compare_enrolments(false);
+    }
 
-    	$ids = array();
-
-    	foreach ($connect as $enrolment) {
-    		if (!isset($moodle[$enrolment->userid]) || !isset($moodle[$enrolment->userid][$enrolment->courseid])) {
-    			$ids[] = $enrolment->id;
-    			continue;
-    		}
-    	}
-
-    	return $ids;
+    /**
+     * Grab a list of enrolments that have changed role.
+     */
+    public static function get_changed_enrolments() {
+        return self::compare_enrolments(true);
     }
 
     /**

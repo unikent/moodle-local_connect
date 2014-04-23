@@ -38,7 +38,8 @@ class kent_sync_tests extends local_connect\util\connect_testcase
 		// Create some fake enrolments.
 		$this->generate_enrolments(30, $course, 'student');
 		$this->generate_enrolments(2, $course, 'convenor');
-		$this->generate_enrolments(1, $course, 'teacher');
+		$teacher = $this->generate_enrolment($course, 'teacher');
+		$teacher_obj = \local_connect\enrolment::get($teacher);
 
 		$this->assertEquals(33, count(\local_connect\sync::get_connect_enrolments()));
 		$this->assertEquals(0, count(\local_connect\sync::get_moodle_enrolments()));
@@ -84,5 +85,41 @@ class kent_sync_tests extends local_connect\util\connect_testcase
 		$DB->update_record('connect_enrolments', $teacher);
 
 		$this->assertEquals(array($teacher->id), \local_connect\sync::get_deleted_enrolments());
+	}
+
+	/**
+	 * Make sure we can grab a valid list of enrolments to be created when they have changed role.
+	 */
+	public function test_enrolment_changes() {
+		global $CFG, $DB;
+
+		$this->resetAfterTest();
+
+		$course = $this->generate_course();
+		$course_obj = \local_connect\course::get($course);
+		$course_obj->create_in_moodle();
+
+		// Create some fake enrolments.
+		$this->generate_enrolments(30, $course, 'student');
+		$this->generate_enrolments(2, $course, 'convenor');
+		$teacher = $this->generate_enrolment($course, 'teacher');
+		$teacher_obj = \local_connect\enrolment::get($teacher);
+
+		$enrolments = \local_connect\enrolment::get_all();
+		foreach ($enrolments as $enrolment) {
+			$enrolment->create_in_moodle();
+		}
+
+		$this->assertEquals(array(), \local_connect\sync::get_new_enrolments());
+
+		$this->assertEquals(array(), \local_connect\sync::get_deleted_enrolments());
+
+		// Now change the teacher enrolment to a student.
+		$teacher_obj->roleid = $role = $DB->get_field("connect_role", "id", array("name" => "student"));
+		$teacher_obj->save();
+
+		$this->assertEquals(array(), \local_connect\sync::get_new_enrolments());
+		$this->assertEquals(array($teacher), \local_connect\sync::get_changed_enrolments());
+		$this->assertEquals(array(), \local_connect\sync::get_deleted_enrolments());
 	}
 }
