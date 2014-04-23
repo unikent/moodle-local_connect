@@ -38,7 +38,7 @@ class utils {
 		if (get_config("local_connect", "enable_hipchat")) {
 			\local_hipchat\Message::send($message, "red", false, "text", "Connect");
 		} else {
-			debugging($message);
+			debugging($message, DEBUG_DEVELOPER);
 		}
 	}
 

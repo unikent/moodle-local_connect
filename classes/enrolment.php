@@ -161,6 +161,7 @@ class enrolment extends data
         }
 
         if (!enrol_try_internal_enrol($this->course->mid, $this->user->mid, $this->role->mid)) {
+            utils::error("I tried to enrol '{$this->user->mid}' on '{$this->course->mid}' as a '{$this->role->name}' but I failed :'(");
             return false;
         }
 

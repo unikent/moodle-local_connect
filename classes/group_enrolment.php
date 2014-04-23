@@ -150,6 +150,7 @@ class group_enrolment extends data
         }
 
         if (!groups_add_member($this->group->mid, $this->user->mid)) {
+            utils::error("Failed to enrol '{$this->user->mid}' in '{$this->group->mid}'. Sorry :(((");
             return false;
         }
 
