@@ -216,10 +216,10 @@ class sync
         global $DB;
 
         $data = $DB->get_records_sql("SELECT cge.id
-                                        FROM moodle_2013.mdl_connect_group_enrolments cge
-                                        INNER JOIN moodle_2013.mdl_connect_group cg ON cg.id = cge.groupid
-                                        INNER JOIN moodle_2013.mdl_connect_user cu ON cu.id = cge.userid
-                                        LEFT OUTER JOIN moodle_2013.mdl_groups_members gm ON gm.groupid = cg.mid AND gm.userid = cu.mid
+                                        FROM {connect_group_enrolments} cge
+                                        INNER JOIN {connect_group} cg ON cg.id = cge.groupid
+                                        INNER JOIN {connect_user} cu ON cu.id = cge.userid
+                                        LEFT OUTER JOIN {groups_members} gm ON gm.groupid = cg.mid AND gm.userid = cu.mid
                                         WHERE gm.id IS NULL");
 
         return self::map_set($data);
