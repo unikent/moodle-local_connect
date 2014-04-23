@@ -30,13 +30,8 @@ require_once($CFG->libdir . '/clilib.php');
 list($options, $unrecognized) = cli_get_params(
     array(
         'dry' => false,
-        'course' => null,
-        'create' => false
+        'moodle_id' => null
     )
 );
 
-if ($options['create'] && !isset($options['course'])) {
-	die("'--create' was passed, but no connect course ID was specified.");
-}
-
-\local_connect\cli::course_sync($options['dry'], $options['course'], $options['create']);
+\local_connect\cli::course_sync($options['dry'], $options['moodle_id']);
