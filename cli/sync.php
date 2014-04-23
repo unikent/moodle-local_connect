@@ -35,8 +35,10 @@ list($options, $unrecognized) = cli_get_params(
 
 echo "Beginning Connect Sync...\n";
 
-/**
- * Create missing groups.
+/*
+ * --------------------------------------------------------
+ * Create missing groups
+ * --------------------------------------------------------
  */
 
 $creates = \local_connect\sync::get_new_groups();
@@ -53,7 +55,9 @@ foreach ($creates as $create) {
 }
 
 /*
- * Enrolments! Yay.
+ * --------------------------------------------------------
+ * Enrolments
+ * --------------------------------------------------------
  */
 
 // First, deletes.
@@ -93,6 +97,40 @@ echo "   Creating ($count) enrolments...\n";
 foreach ($creates as $create) {
 	$obj = \local_connect\enrolment::get($create);
 	echo "      -> {$obj->userid} on course {$obj->courseid} as {$obj->roleid}";
+
+	if (!$options['dry']) {
+		$obj->create_in_moodle();
+	}
+}
+
+/*
+ * --------------------------------------------------------
+ * Group enrolments!
+ * --------------------------------------------------------
+ */
+
+// First, deletes.
+$deletes = \local_connect\sync::get_deleted_group_enrolments();
+$count = count($deletes);
+echo "   Deleting ($count) group enrolments...\n";
+
+foreach ($deletes as $delete) {
+	$obj = \local_connect\group_enrolment::get($delete);
+	echo "      -> {$obj->userid} in group {$obj->groupid}";
+
+	if (!$options['dry']) {
+		$obj->delete();
+	}
+}
+
+// Then, creates.
+$creates = \local_connect\sync::get_new_group_enrolments();
+$count = count($creates);
+echo "   Creating ($count) group enrolments...\n";
+
+foreach ($creates as $create) {
+	$obj = \local_connect\group_enrolment::get($create);
+	echo "      -> {$obj->userid} in group {$obj->groupid}";
 
 	if (!$options['dry']) {
 		$obj->create_in_moodle();
