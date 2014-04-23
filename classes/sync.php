@@ -200,10 +200,28 @@ class sync
     public static function get_new_groups() {
         global $DB;
 
-        return $DB->get_records_sql("SELECT cg.id
+        $data = $DB->get_records_sql("SELECT cg.id
                                         FROM {connect_group} cg
                                         INNER JOIN {connect_course} cc ON cc.id=cg.courseid
                                         LEFT OUTER JOIN {groups} g ON g.courseid=cc.mid AND g.name=cg.name
                                         WHERE g.id IS NULL AND cc.mid != 0");
+
+        return self::map_set($data);
+    }
+
+    /**
+     * Returns a list of group enrolments to be created.
+     */
+    public static function get_new_group_enrolments() {
+        global $DB;
+
+        $data = $DB->get_records_sql("SELECT cge.id
+                                        FROM moodle_2013.mdl_connect_group_enrolments cge
+                                        INNER JOIN moodle_2013.mdl_connect_group cg ON cg.id = cge.groupid
+                                        INNER JOIN moodle_2013.mdl_connect_user cu ON cu.id = cge.userid
+                                        LEFT OUTER JOIN moodle_2013.mdl_groups_members gm ON gm.groupid = cg.mid AND gm.userid = cu.mid
+                                        WHERE gm.id IS NULL");
+
+        return self::map_set($data);
     }
 }
