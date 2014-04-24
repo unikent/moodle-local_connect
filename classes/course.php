@@ -674,19 +674,15 @@ class course extends data
      * @param boolean $obj_form (optional)
      * @return array
      */
-    public static function get_all($category_restrictions = array(), $obj_form = true) {
+    public static function get_by_category($categories, $obj_form = true) {
         global $DB;
 
-        $params = array();
-        if (!empty($category_restrictions)) {
-            $params['category'] = $category_restrictions;
-        }
-
-        $result = $DB->get_records('connect_course', $params);
+        list($sql, $params) = $DB->get_in_or_equal($categories);
+        $result = $DB->get_records_sql('SELECT * FROM {connect_course} WHERE category ' . $sql, $params);
 
         // Decode various elements.
-        foreach ($result as &$datum) {
-            if ($obj_form) {
+        if ($obj_form) {
+            foreach ($result as &$datum) {
                 $obj = new course();
                 $obj->set_class_data($datum);
                 $datum = $obj;
