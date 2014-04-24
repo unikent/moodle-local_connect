@@ -482,12 +482,6 @@ var Connect = (function() {
 
 					var obj = {
 						id: pushees[i].id,
-						module_delivery_key: pushees[i].module_delivery_key,
-						session_code: pushees[i].session_code,
-						code: pushees[i].module_code + ' ' + date,
-						title: pushees[i].module_title + ' ' + date,
-						synopsis: synopsis,// + '  <a href="http://www.kent.ac.uk/courses/modulecatalogue/modules/'+ pushees[i].module_code +'">More</a>',
-						category: '1'
 					}
 
 					data.push(obj);
@@ -664,13 +658,7 @@ var Connect = (function() {
 					}
 
 					var data = [{
-						id: row[0].id,
-						module_delivery_key: row[0].module_delivery_key,
-						session_code: row[0].session_code,
-						code: shortname,
-						title: _this.formEl.fullName.val(),
-						synopsis: synopsis,
-						category: _this.formEl.cat.val()
+						id: row[0].id
 					}];
 
 					_this.push_selected(data, ui_sub, true, function() {
