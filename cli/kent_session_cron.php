@@ -19,6 +19,8 @@
  * This removes all old sessions from Memcached.
  * It is run separately from the Moodle cron, one per night.
  *
+ * TODO - find a better place for this that is still in Git.
+ *
  * @package    core
  * @subpackage cli
  * @copyright  2013 Skylar Kelty <S.Kelty@kent.ac.uk>
@@ -111,6 +113,12 @@ foreach ($allSlabs as $server => $slabs) {
 }
 
 // Halve count (locks + data)
-$count = $count / 2;
+if ($count > 0) {
+    $count = min($count / 2, 1);
 
-print "Cleaned up $count sessions.\n";
+    print "Cleaned up $count sessions.\n";
+
+    if (get_config("local_connect", "enable_hipchat")) {
+        \local_hipchat\Message::send("Cleaned up $count Memcached sessions.", "purple", false, "text", "Moodle");
+    }
+}
