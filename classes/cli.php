@@ -85,34 +85,38 @@ class cli {
 
 		$enrolments = array();
 
-		if (isset($moodle_id)) {
-			mtrace("  Synchronizing enrolments for course: '{$moodle_id}'...\n");
-
-			// Get the connect version of the course.
-			$courses = course::get_by_moodle_id($moodle_id);
-
-			// Validate the course.
-			if (empty($courses)) {
-				mtrace("  Invalid course ID: $moodle_id");
-				return false;
-			}
-
-			// We have a valid course(s)!
-			foreach ($courses as $connect_course) {
-				if ($connect_course->is_in_moodle()) {
-					$enrolments = array_merge($connect_course->enrolments, $enrolments);
-				}
-			}
-		} else {
+		if (!isset($moodle_id)) {
 			mtrace("  Synchronizing enrolments...\n");
-			$enrolments = enrolment::get_all();
+
+			// Just run a batch_all on the set.
+			enrolment::batch_all(function ($obj) use($dry_run) {
+		    	$result = $obj->sync($dry_run);
+		    	if ($result !== null) {
+		    		mtrace("    " . $result);
+		    	}
+			});
+
+			mtrace("  done.\n");
+
+			return;
 		}
 
-		foreach ($enrolments as $enrolment) {
-	    	$result = $enrolment->sync($dry_run);
-	    	if ($result !== null) {
-	    		mtrace("    " . $result);
-	    	}
+		mtrace("  Synchronizing enrolments for course: '{$moodle_id}'...\n");
+
+		// Get the connect version of the course.
+		$courses = course::get_by_moodle_id($moodle_id);
+
+		// Validate the course.
+		if (empty($courses)) {
+			mtrace("  Invalid course ID: $moodle_id");
+			return false;
+		}
+
+		// We have a valid course(s)!
+		foreach ($courses as $connect_course) {
+			if ($connect_course->is_in_moodle()) {
+				$enrolments = array_merge($connect_course->enrolments, $enrolments);
+			}
 		}
 
 		mtrace("  done.\n");
