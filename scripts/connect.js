@@ -1014,7 +1014,7 @@ var Connect = (function() {
 				row.removeClass('row_selected');
 				var aPos = _this.oTable.fnGetPosition(row[0]);
 				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-				_this.oTable.fnUpdate('', row[0], 8, false)
+				_this.oTable.fnUpdate('', row[0], 6, false)
 
 				_this.oTable.fnDraw();
 
