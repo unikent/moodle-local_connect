@@ -67,6 +67,13 @@ class user extends data
     }
 
     /**
+     * Returns all group enrolments for this user.
+     */
+    public function _get_group_enrolments() {
+        return group_enrolment::get_for_user($this);
+    }
+
+    /**
      * Returns the Moodle URL for this user.
      */
     public function get_moodle_url() {
@@ -90,7 +97,7 @@ class user extends data
 	 * Create this user in Moodle.
 	 */
 	public function create_in_moodle() {
-		global $CFG;
+		global $CFG, $DB;
 
 		require_once ($CFG->dirroot . "/user/lib.php");
 
@@ -100,6 +107,14 @@ class user extends data
 
 		if (empty($this->login)) {
 			return false;
+		}
+
+		// Try to link up if there is already a matching user.
+		if ($obj = $DB->get_record('user', array('username' => $this->login))) {
+			$this->mid = $obj->id;
+			$this->save();
+
+			return true;
 		}
 
 		$user = new \stdClass();
