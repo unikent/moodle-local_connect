@@ -98,7 +98,7 @@ class cli {
 
 			mtrace("  done.\n");
 
-			return;
+			return true;
 		}
 
 		mtrace("  Synchronizing enrolments for course: '{$moodle_id}'...\n");
@@ -108,18 +108,20 @@ class cli {
 
 		// Validate the course.
 		if (empty($courses)) {
-			mtrace("  Invalid course ID: $moodle_id");
+			mtrace("  Course does not exist in Moodle: $moodle_id\n");
 			return false;
 		}
 
 		// We have a valid course(s)!
 		foreach ($courses as $connect_course) {
 			if ($connect_course->is_in_moodle()) {
-				$enrolments = array_merge($connect_course->enrolments, $enrolments);
+				$connect_course->sync_enrolments();
 			}
 		}
 
 		mtrace("  done.\n");
+
+		return true;
 	}
 
 	/**

@@ -279,10 +279,10 @@ abstract class data {
      * Run a given method against all objects in a memory-efficient way.
      * The method will be provided with a single argument (object).
      */
-    public static function batch_all($func) {
+    public static function batch_all($func, $conditions = array()) {
         global $DB;
 
-        $rs = $DB->get_recordset(static::get_table());
+        $rs = $DB->get_recordset(static::get_table(), $conditions);
 
         // Go through each record, create an object and call the function.
         foreach ($rs as $record) {
