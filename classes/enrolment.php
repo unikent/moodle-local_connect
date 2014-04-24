@@ -79,7 +79,7 @@ class enrolment extends data
         }
 
         // Or creating it?
-        if (!$this->is_in_moodle()) {
+        if (!$this->is_in_moodle() && $this->course->is_in_moodle()) {
             if (!$dry) {
                 $this->create_in_moodle();
             }
