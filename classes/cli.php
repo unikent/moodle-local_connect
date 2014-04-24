@@ -81,10 +81,7 @@ class cli {
 	 * Run the enrolment sync cron
 	 */
 	public static function enrolment_sync($dry_run = false, $moodle_id = null) {
-		global $CFG;
-
-		$enrolments = array();
-
+		// If we dont
 		if (!isset($moodle_id)) {
 			mtrace("  Synchronizing enrolments...\n");
 
@@ -128,41 +125,42 @@ class cli {
 	 * Run the group sync cron
 	 */
 	public static function group_sync($dry_run = false, $moodle_id = null) {
-		global $CFG;
-
-		$groups = array();
-
-		if (isset($moodle_id)) {
-			mtrace("  Synchronizing groups for course: '{$moodle_id}'...\n");
-
-			// Get the connect version of the course.
-			$courses = course::get_by_moodle_id($moodle_id);
-
-			// Validate the course.
-			if (empty($courses)) {
-				mtrace("  Invalid course ID: $moodle_id");
-				return false;
-			}
-
-			// We have a valid course(s)!
-			foreach ($courses as $connect_course) {
-				if ($connect_course->is_in_moodle()) {
-					$groups = array_merge($connect_course->groups, $groups);
-				}
-			}
-		} else {
+		// If we dont have a moodle id limiting us, batch it all.
+		if (!isset($moodle_id)) {
 			mtrace("  Synchronizing groups...\n");
-			$groups = group::get_all();
+
+			// Just run a batch_all on the set.
+			group::batch_all(function ($obj) use($dry_run) {
+		    	$result = $obj->sync($dry_run);
+		    	if ($result !== null) {
+		    		mtrace("    " . $result);
+		    	}
+			});
+
+			mtrace("  done.\n");
+
+			return true;
 		}
 
-		foreach ($groups as $group) {
-	    	$result = $group->sync($dry_run);
-	    	if ($result !== null) {
-	    		mtrace("    " . $result);
-	    	}
+		mtrace("  Synchronizing groups for course: '{$moodle_id}'...\n");
+
+		// Get the connect version of the course.
+		$courses = course::get_by_moodle_id($moodle_id);
+
+		// Validate the course.
+		if (empty($courses)) {
+			mtrace("  Course does not exist in Moodle: {$moodle_id}\n");
+			return false;
 		}
 
-		mtrace("  done.\n");
+		// We have a valid course(s)!
+		foreach ($courses as $connect_course) {
+			if ($connect_course->is_in_moodle()) {
+				$connect_course->sync_groups();
+			}
+		}
+
+		mtrace("  done!\n");
 	}
 
 	/**
@@ -181,7 +179,7 @@ class cli {
 
 			// Validate the course.
 			if (empty($courses)) {
-				mtrace("  Invalid course ID: $moodle_id");
+				mtrace("  Course does not exist in Moodle: {$moodle_id}\n");
 				return false;
 			}
 
