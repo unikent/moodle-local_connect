@@ -256,16 +256,20 @@ abstract class data {
 
     /**
      * Returns all known objects.
+     *
+     * @param bool raw Return raw (stdClass) objects?
      */
-    public static function get_all() {
+    public static function get_all($raw = false) {
         global $DB;
 
         $set = $DB->get_records(static::get_table());
 
-        foreach ($set as &$o) {
-            $obj = new static();
-            $obj->set_class_data($o);
-            $o = $obj;
+        if (!$raw) {
+	        foreach ($set as &$o) {
+	            $obj = new static();
+	            $obj->set_class_data($o);
+	            $o = $obj;
+	        }
         }
 
         return $set;

@@ -59,7 +59,7 @@ class cli {
 			}
 		} else {
 			mtrace("  Synchronizing courses...\n");
-			$courses = course::get_all(array(), true);
+			$courses = course::get_all();
 		}
 
 		foreach ($courses as $course) {

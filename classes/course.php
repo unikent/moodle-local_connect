@@ -669,19 +669,17 @@ class course extends data
      * other such things.
      *
      * @param array category_restrictions A list of categories we dont want
-     * @param boolean obj_form Should all objects be of this class type?
-     * @param array $category_restrictions (optional)
-     * @param boolean $obj_form (optional)
+     * @param boolean raw Should all objects be stdClass?
      * @return array
      */
-    public static function get_by_category($categories, $obj_form = true) {
+    public static function get_by_category($categories, $raw = false) {
         global $DB;
 
         list($sql, $params) = $DB->get_in_or_equal($categories);
         $result = $DB->get_records_sql('SELECT * FROM {connect_course} WHERE category ' . $sql, $params);
 
         // Decode various elements.
-        if ($obj_form) {
+        if (!$raw) {
             foreach ($result as &$datum) {
                 $obj = new course();
                 $obj->set_class_data($datum);

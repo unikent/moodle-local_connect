@@ -82,7 +82,7 @@ switch ($_SERVER['PATH_INFO']) {
     case '/courses/':
         header('Content-type: application/json');
         $category_restrictions = isset($_GET['category_restrictions']) ? json_decode(urldecode($_GET['category_restrictions'])) : array();
-        $courses = \local_connect\course::get_by_category($category_restrictions, false);
+        $courses = \local_connect\course::get_by_category($category_restrictions, true);
 
         // Map campus IDs.
         $campusids = array();
