@@ -560,6 +560,22 @@ class course extends data
     }
 
     /**
+     * Syncs group enrollments for this Course
+     * @todo Updates/Deletions
+     */
+    public function sync_group_enrolments() {
+        if (!$this->is_in_moodle()) {
+            return;
+        }
+
+        foreach ($this->group_enrolments as $enrolment) {
+            if (!$enrolment->is_in_moodle()) {
+                $enrolment->create_in_moodle();
+            }
+        }
+    }
+
+    /**
      * Syncs groups for this Course
      * @todo Updates/Deletions
      */
