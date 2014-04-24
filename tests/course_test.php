@@ -89,10 +89,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $course2 = \local_connect\course::get($this->generate_course());
         $this->assertEquals(2, count(\local_connect\course::get_all()));
 
-        $this->assertFalse($course1->is_child());
-        $this->assertFalse($course2->is_child());
-
-        $lc = \local_connect\course::process_merge((object)array(
+        $result = \local_connect\course::process_merge((object)array(
             'code' => "TST",
             'title' => "TEST MERGE",
             'synopsis' => "This is a test",
@@ -100,9 +97,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
             'link_courses' => array($course1->id, $course2->id)
         ));
 
-        $this->assertTrue($lc->is_parent());
-        $this->assertTrue($course1->is_child());
-        $this->assertTrue($course2->is_child());
+        $this->assertEquals(array(), $result);
     }
 
     /**
@@ -118,7 +113,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $course2 = \local_connect\course::get($this->generate_course());
         $this->assertEquals(2, count(\local_connect\course::get_all()));
 
-        $lc = \local_connect\course::process_merge((object)array(
+        $result = \local_connect\course::process_merge((object)array(
             'code' => "TST",
             'title' => "TEST MERGE",
             'synopsis' => "This is a test",
@@ -126,16 +121,10 @@ class kent_course_tests extends local_connect\util\connect_testcase
             'link_courses' => array($course1->id, $course2->id)
         ));
 
-        $this->assertTrue($lc->is_parent());
-        $this->assertTrue($course1->is_child());
-        $this->assertTrue($course2->is_child());
+        $this->assertEquals(array(), $result);
 
         // Unlink!
-        $course1->unlink();
-
-        $this->assertTrue($lc->is_parent());
-        $this->assertFalse($course1->is_child());
-        $this->assertTrue($course2->is_child());
+        $this->assertTrue($course1->unlink());
 
         // TODO - test more stuff, enrolments etc
     }

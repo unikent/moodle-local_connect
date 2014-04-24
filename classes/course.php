@@ -172,66 +172,12 @@ class course extends data
     }
 
     /**
-     * Get children of this course.
-     * @return unknown
-     */
-    public function _get_children() {
-        global $DB;
-
-        // Select a bunch of records.
-        $sql = 'SELECT cc.* FROM {connect_course_links} ccl
-            INNER JOIN {connect_course} cc
-                ON cc.id=ccl.child
-            WHERE ccl.parent = :parent';
-        $data = $DB->get_records_sql($sql, array(
-            'parent' => $this->id
-        ));
-
-        $courses = array();
-        foreach ($data as $datum) {
-            $course = new course();
-            $course->set_class_data($datum);
-            $courses[] = $course;
-        }
-
-        return $courses;
-    }
-
-    /**
-     * Get parent of this course.
-     * @return unknown
-     */
-    public function _get_parent() {
-        global $DB;
-        $id = $DB->get_field('connect_course_links', 'parent', array('child' => $this->id));
-        return self::get($id);
-    }
-
-    /**
      * Is this course unique?
      * @return boolean
      */
     public function is_unique() {
         global $DB;
         return $DB->count_records('connect_course', array('module_code' => $this->module_code)) === 1;
-    }
-
-    /**
-     * Is this a child?
-     * @return boolean
-     */
-    public function is_child() {
-        global $DB;
-        return $DB->count_records('connect_course_links', array('child' => $this->id)) >= 1;
-    }
-
-    /**
-     * Is this a parent?
-     * @return boolean
-     */
-    public function is_parent() {
-        global $DB;
-        return $DB->count_records('connect_course_links', array('parent' => $this->id)) >= 1;
     }
 
     /**
@@ -254,15 +200,6 @@ class course extends data
         }
 
         return $this->_locked;
-    }
-
-    /**
-     * Do we have children?
-     * @return boolean
-     */
-    public function has_children() {
-        global $DB;
-        return $DB->count_records('connect_course_links', array('parent' => $this->id)) >= 1;
     }
 
     /**
@@ -557,11 +494,6 @@ class course extends data
             'id' => $this->mid
         ));
 
-        // Step 0 - If this is a linked course, kill our children (bit mean really).
-        $DB->delete_records('connect_course_links', array(
-            'parent' => $this->id
-        ));
-
         // Step 1 - Move to the 'removed category'.
         $category = \local_catman\core::get_category();
         $course->category = $category->id;
@@ -593,6 +525,8 @@ class course extends data
 
         $this->mid = 0;
         $this->save();
+
+        return true;
     }
 
     /**
@@ -894,7 +828,7 @@ class course extends data
             }
         }
 
-        return $link_course;
+        return array();
     }
 
     /**
