@@ -56,7 +56,10 @@ class observers {
             $record->moodle_env = $CFG->kent->environment;
             $record->moodle_dist = $CFG->kent->distribution;
 
-            $SHAREDB->insert_record("course_list", $record);
+            // Is there one of these already?
+            if (!$SHAREDB->record_exists("course_list", (array)$record)) {
+                $SHAREDB->insert_record("course_list", $record);
+            }
         }
 
         return true;
