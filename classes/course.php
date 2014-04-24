@@ -601,8 +601,8 @@ class course extends data
         $group_enrolments = $this->group_enrolments;
         $todo = array_merge($enrolments, $group_enrolments);
         foreach ($todo as $enrolment) {
-            if ($todo && $todo->is_in_moodle()) {
-                $todo->delete();
+            if ($enrolment->is_in_moodle()) {
+                $enrolment->delete();
             }
         }
     }
