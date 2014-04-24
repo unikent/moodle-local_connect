@@ -85,6 +85,24 @@ class group extends data
             return;
         }
 
+        // On sync we can be a bit slower... check the mid is valid.
+        if ($this->is_in_moodle()) {
+            $data = new \stdClass();
+            $data->name = $this->name;
+            $data->courseid = $this->course->mid;
+
+            // Do we already *actually* exist?
+            if ($group = $DB->get_record('groups', (array)$data)) {
+                if ($this->mid !== $group->id) {
+                    $this->mid = $group->id;
+                    $this->save();
+                }
+            } else {
+                $this->mid = 0;
+                $this->save();
+            }
+        }
+
         // The easiest path!
         if (!$this->is_in_moodle()) {
             if (!$dry) {
