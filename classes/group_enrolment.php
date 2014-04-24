@@ -91,7 +91,7 @@ class group_enrolment extends data
         }
 
         // Easy option.
-        if (!$this->is_in_moodle()) {
+        if (!$this->is_in_moodle() && $this->group->is_in_moodle()) {
             if (!$dry) {
                 $this->create_in_moodle();
             }
