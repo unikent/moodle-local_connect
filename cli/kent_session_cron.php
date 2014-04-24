@@ -27,9 +27,9 @@
 
 define('CLI_SCRIPT', true);
 
-require(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once($CFG->libdir.'/clilib.php');
-require_once($CFG->libdir.'/cronlib.php');
+require(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require_once($CFG->libdir . '/clilib.php');
+require_once($CFG->libdir . '/cronlib.php');
 
 // Do we have anything to do?
 if (!isset($CFG->session_handler_class) || $CFG->session_handler_class !== '\core\session\memcached') {
@@ -66,6 +66,7 @@ $rs = $DB->get_recordset_sql($sql);
 foreach ($rs as $session) {
     $valid_sessions[$session->sid] = true;
 }
+
 $session_count = count($valid_sessions);
 print "Currently $session_count active sessions.\n";
 
@@ -73,15 +74,16 @@ print "Currently $session_count active sessions.\n";
 $count = 0;
 $allSlabs = $memcache->getExtendedStats('slabs');
 $items = $memcache->getExtendedStats('items');
-foreach($allSlabs as $server => $slabs) {
-    foreach($slabs AS $slabId => $slabMeta) {
+foreach ($allSlabs as $server => $slabs) {
+    foreach ($slabs as $slabId => $slabMeta) {
         if (!is_int($slabId)) {
             continue;
         }
+
         $cdump = $memcache->getExtendedStats('cachedump', (int) $slabId, 100000000);
-        foreach($cdump AS $server => $entries) {
+        foreach ($cdump as $server => $entries) {
             if ($entries) {
-                foreach($entries AS $eName => $eData) {
+                foreach ($entries as $eName => $eData) {
                     // Is this a session key?
                     if (strpos($eName, $CFG->session_memcached_prefix) !== 0) {
                         continue;
