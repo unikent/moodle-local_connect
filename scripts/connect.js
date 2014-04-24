@@ -600,7 +600,7 @@ var Connect = (function() {
 		var row = _.filter(this.json, function (r) { 
 				return r.id === id;
 		});
-		if(row[0].state[0] === 'unprocessed') {
+		if(row[0].mid === 0 || row[0].mid === null) {
 			var row_unprocessed = true;
 			var date = '(' + Date.parse(row[0].session_code).previous().year().toString('yyyy');
 			date += '/' + Date.parse(row[0].session_code).toString('yyyy') + ')';
@@ -611,7 +611,7 @@ var Connect = (function() {
 			var tempshortname = "";
 
 			if(_.find(_this.json, function (r){ 
-				if(r.state[0] === 'processing' || r.state[0] === 'scheduled' || r.state[0] === 'created_in_moodle') {
+				if(row[0].mid > 0) {
 					tempshortname = r.module_code + (r.module_code.indexOf(date) > 0 ? '' : ' ' + date);
 					return tempshortname === shortname;
 				}

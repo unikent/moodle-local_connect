@@ -861,6 +861,11 @@ class course extends data
         }
 
         $primary_child = $courses[0];
+        foreach ($courses as $course) {
+            if ($course->is_in_moodle()) {
+                $primary_child = $course;
+            }
+        }
 
         $link_course = new course();
         $link_course->set_class_data($primary_child->get_data());
@@ -874,14 +879,16 @@ class course extends data
         // Create the linked course if it doesnt exist.
         if (!$link_course->is_in_moodle()) {
             if (!$link_course->create_in_moodle()) {
-                debugging("Could not create linked course: $link_course");
+                util::error("Could not create linked course: $link_course");
             }
+        } else {
+            $link_course->update_moodle();
         }
 
         // Add children.
         foreach ($courses as $child) {
             if (!$link_course->add_child($child)) {
-                debugging("Could not add child '$child' to course: $link_course");
+                util::error("Could not add child '$child' to course: $link_course");
             }
         }
 
@@ -898,7 +905,7 @@ class course extends data
             $course = self::get($c);
             // All good!
             if (!$course->unlink()) {
-                debugging("Could not remove child '$course'!");
+                util::error("Could not remove child '$course'!");
             }
         }
 
