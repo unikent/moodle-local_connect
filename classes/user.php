@@ -94,6 +94,22 @@ class user extends data
 	}
 
 	/**
+	 * Sync all my enrolments
+	 */
+	public function sync_enrolments() {
+		if (empty($this->mid)) {
+			return false;
+		}
+
+		$enrolments = array_merge($this->enrolments, $this->group_enrolments);
+		foreach ($enrolments as $enrolment) {
+			if (!$enrolment->is_in_moodle()) {
+				$enrolment->create_in_moodle();
+			}
+		}
+	}
+
+	/**
 	 * Create this user in Moodle.
 	 */
 	public function create_in_moodle() {
@@ -112,7 +128,9 @@ class user extends data
 		// Try to link up if there is already a matching user.
 		if ($obj = $DB->get_record('user', array('username' => $this->login))) {
 			$this->mid = $obj->id;
-			$this->save();
+			if ($this->save()) {
+				$this->sync_enrolments();
+			}
 
 			return true;
 		}
@@ -134,7 +152,9 @@ class user extends data
 		}
 
 		$this->mid = user_create_user($user, false);
-		$this->save();
+		if ($this->save()) {
+			$this->sync_enrolments();
+		}
 
 		return true;
 	}
