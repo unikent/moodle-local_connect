@@ -150,7 +150,7 @@ class group extends data
             return "";
         }
 
-        $url = new \moodle_url("/group/index.php", array("id" => $this->courseid, "group" => $this->mid));
+        $url = new \moodle_url("/group/index.php", array("id" => $this->course->mid, "group" => $this->mid));
         return $url->out(false);
     }
 
