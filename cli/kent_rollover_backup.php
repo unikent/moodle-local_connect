@@ -1,7 +1,7 @@
 <?php
 //Required elements
 define('CLI_SCRIPT', 1);
-require_once(dirname(__FILE__)."/../../config.php");
+require_once(dirname(__FILE__)."/../../../config.php");
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
 class kent_backup_plan extends backup_plan implements loggable {
