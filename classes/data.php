@@ -274,4 +274,24 @@ abstract class data {
 
         return $set;
     }
+
+    /**
+     * Run a given method against all objects in a memory-efficient way.
+     * The method will be provided with a single argument (object).
+     */
+    public static function batch_all($func) {
+        global $DB;
+
+        $rs = $DB->get_recordset(static::get_table());
+
+        // Go through each record, create an object and call the function.
+        foreach ($rs as $record) {
+            $obj = new static();
+            $obj->set_class_data($record);
+
+            $func($obj);
+        }
+
+        $rs->close();
+    }
 }
