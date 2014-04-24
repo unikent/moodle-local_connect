@@ -35,53 +35,31 @@ class cli {
 	 * Run the course sync cron
 	 */
 	public static function course_sync($dry_run = false, $moodle_id = null) {
-		// What are we syncing, one or all?
-		if (!isset($moodle_id)) {
+		$conditions = array();
+
+		if (isset($moodle_id)) {
+			$conditions['mid'] = $moodle_id;
+			mtrace("  Synchronizing course: '{$moodle_id}'...\n");
+		} else {
 			mtrace("  Synchronizing courses...\n");
-
-			// Just run a batch_all on the set.
-			course::batch_all(function ($obj) use($dry_run) {
-				try {
-			    	$result = $obj->sync($dry_run);
-			    	if ($result !== null) {
-			    		mtrace("    " . $result);
-			    	}
-				} catch (Excepton $e) {
-					$msg = $e->getMessage();
-					mtrace("    Error: {$msg}\n");
-				}
-			});
-
-			mtrace("  done.\n");
-
-			return true;
 		}
 
-		mtrace("  Synchronizing course: '{$moodle_id}'...\n");
-
-		// Get the connect version of the course.
-		$courses = course::get_by_moodle_id($moodle_id);
-
-		// Validate the course.
-		if (empty($courses)) {
-			mtrace("  Course does not exist in Moodle: {$moodle_id}\n");
-			return false;
-		}
-
-		// Are we in Moodle?
-		foreach ($courses as $connect_course) {
+		// Just run a batch_all on the set.
+		course::batch_all(function ($obj) use($dry_run) {
 			try {
-				$result = $connect_course->sync($dry_run);
+		    	$result = $obj->sync($dry_run);
 		    	if ($result !== null) {
 		    		mtrace("    " . $result);
 		    	}
 			} catch (Excepton $e) {
 				$msg = $e->getMessage();
-				mtrace("    Error: $msg\n");
+				mtrace("    Error: {$msg}\n");
 			}
-		}
+		}, $conditions);
 
 		mtrace("  done.\n");
+
+		return true;
 	}
 
 	/**
