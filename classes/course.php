@@ -560,6 +560,22 @@ class course extends data
     }
 
     /**
+     * Syncs group enrollments for this Course
+     * @todo Updates/Deletions
+     */
+    public function sync_group_enrolments() {
+        if (!$this->is_in_moodle()) {
+            return;
+        }
+
+        foreach ($this->group_enrolments as $enrolment) {
+            if (!$enrolment->is_in_moodle()) {
+                $enrolment->create_in_moodle();
+            }
+        }
+    }
+
+    /**
      * Syncs groups for this Course
      * @todo Updates/Deletions
      */
@@ -669,24 +685,18 @@ class course extends data
      * other such things.
      *
      * @param array category_restrictions A list of categories we dont want
-     * @param boolean obj_form Should all objects be of this class type?
-     * @param array $category_restrictions (optional)
-     * @param boolean $obj_form (optional)
+     * @param boolean raw Should all objects be stdClass?
      * @return array
      */
-    public static function get_all($category_restrictions = array(), $obj_form = true) {
+    public static function get_by_category($categories, $raw = false) {
         global $DB;
 
-        $params = array();
-        if (!empty($category_restrictions)) {
-            $params['category'] = $category_restrictions;
-        }
-
-        $result = $DB->get_records('connect_course', $params);
+        list($sql, $params) = $DB->get_in_or_equal($categories);
+        $result = $DB->get_records_sql('SELECT * FROM {connect_course} WHERE category ' . $sql, $params);
 
         // Decode various elements.
-        foreach ($result as &$datum) {
-            if ($obj_form) {
+        if (!$raw) {
+            foreach ($result as &$datum) {
                 $obj = new course();
                 $obj->set_class_data($datum);
                 $datum = $obj;

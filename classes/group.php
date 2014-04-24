@@ -325,27 +325,4 @@ class group extends data
 
         return $data;
     }
-
-
-    /**
-     * Returns all known groups for a given session code.
-     * @param unknown $session_code
-     * @return unknown
-     */
-    public static function get_all() {
-        global $DB;
-
-        // Select all our groups.
-        $data = $DB->get_records('connect_group');
-
-        // Map to objects.
-        foreach ($data as &$group) {
-            $obj = new group();
-            $obj->set_class_data($group);
-
-            $group = $obj;
-        }
-
-        return $data;
-    }
 }
