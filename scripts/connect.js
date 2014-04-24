@@ -64,8 +64,8 @@ var Connect = (function() {
 
 			var state = '<div class="status_'+state_zero+' '+(sink_deleted?'sink_deleted':'')+' '+(same_module_code_created?'same_module_code_created':'')+'">'+name+'</div>';
 
-			return [val.id, state, val.module_code, val.module_title, val.campusid, 
-					duration, 0, val.module_version, '', toolbar, val.module_delivery_key, val.session_code];
+			return [val.id, state, val.module_code, val.module_title, val.campus, 
+					duration, val.module_version, toolbar, val.module_delivery_key, val.session_code];
 		});
 
 		//Initiate the datatable 
@@ -89,9 +89,7 @@ var Connect = (function() {
 				{'sClass': 'name', "sWidth": "20%"},
 				{'sClass': 'campus', "sWidth": "20%"},
 				{'sClass': 'duration'},
-				{'sClass': 'students'},
 				{'sClass': 'version'},
-				{'sClass': 'department'},
 				{'sClass': 'toolbar'}
 
 			],
@@ -134,8 +132,6 @@ var Connect = (function() {
 					type: 'checkbox',
 					values: [ 'unprocessed', 'created_in_moodle', 'failed_in_moodle', 'scheduled', 'processing' ]
 				},
-				{},
-				{},
 				{},
 				{},
 				{},
@@ -272,7 +268,6 @@ var Connect = (function() {
 			sOut += '<th>Name</th>';
 			sOut += '<th>Campus</th>';
 			sOut += '<th>Duration</th>';
-			sOut += '<th>Students</th>';
 			sOut += '<th>Version</th>';
 			sOut += '<th>Department</th>';
 			sOut += '<th></th>';
@@ -293,7 +288,6 @@ var Connect = (function() {
 				sOut += '<td class="name">'+ child.module_title +'</td>';
 				sOut += '<td class="campus">' + child.campus_desc +'</td>';
 				sOut += '<td class="duration">'+ duration +'</td>';
-				sOut += '<td class="students">'+ child.student_count +'</td>';
 				sOut += '<td class="version">'+ child.module_version +'</td>';
 				sOut += '<td class="department">'+ child.delivery_department +'</td>';
 				if(row.children.length > 1) {
@@ -488,12 +482,6 @@ var Connect = (function() {
 
 					var obj = {
 						id: pushees[i].id,
-						module_delivery_key: pushees[i].module_delivery_key,
-						session_code: pushees[i].session_code,
-						code: pushees[i].module_code + ' ' + date,
-						title: pushees[i].module_title + ' ' + date,
-						synopsis: synopsis,// + '  <a href="http://www.kent.ac.uk/courses/modulecatalogue/modules/'+ pushees[i].module_code +'">More</a>',
-						category: '1'
 					}
 
 					data.push(obj);
@@ -600,7 +588,7 @@ var Connect = (function() {
 		var row = _.filter(this.json, function (r) { 
 				return r.id === id;
 		});
-		if(row[0].state[0] === 'unprocessed') {
+		if(row[0].mid === 0 || row[0].mid === null) {
 			var row_unprocessed = true;
 			var date = '(' + Date.parse(row[0].session_code).previous().year().toString('yyyy');
 			date += '/' + Date.parse(row[0].session_code).toString('yyyy') + ')';
@@ -611,7 +599,7 @@ var Connect = (function() {
 			var tempshortname = "";
 
 			if(_.find(_this.json, function (r){ 
-				if(r.state[0] === 'processing' || r.state[0] === 'scheduled' || r.state[0] === 'created_in_moodle') {
+				if(row[0].mid > 0) {
 					tempshortname = r.module_code + (r.module_code.indexOf(date) > 0 ? '' : ' ' + date);
 					return tempshortname === shortname;
 				}
@@ -670,13 +658,7 @@ var Connect = (function() {
 					}
 
 					var data = [{
-						id: row[0].id,
-						module_delivery_key: row[0].module_delivery_key,
-						session_code: row[0].session_code,
-						code: shortname,
-						title: _this.formEl.fullName.val(),
-						synopsis: synopsis,
-						category: _this.formEl.cat.val()
+						id: row[0].id
 					}];
 
 					_this.push_selected(data, ui_sub, true, function() {
@@ -1032,7 +1014,7 @@ var Connect = (function() {
 				row.removeClass('row_selected');
 				var aPos = _this.oTable.fnGetPosition(row[0]);
 				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-				_this.oTable.fnUpdate('', row[0], 8, false)
+				_this.oTable.fnUpdate('', row[0], 6, false)
 
 				_this.oTable.fnDraw();
 
@@ -1089,7 +1071,6 @@ var Connect = (function() {
 					$(children).find('tr[ident='+id+'] .name').text(),
 					$(children).find('tr[ident='+id+'] .campus').text(),
 					$(children).find('tr[ident='+id+'] .duration').text(),
-					$(children).find('tr[ident='+id+'] .students').text(),
 					$(children).find('tr[ident='+id+'] .version').text(),
 					$(children).find('tr[ident='+id+'] .department').text(),
 					' '
