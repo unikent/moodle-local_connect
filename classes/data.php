@@ -253,4 +253,21 @@ abstract class data {
 
 		return $obj;
 	}
+
+    /**
+     * Returns all known objects.
+     */
+    public static function get_all() {
+        global $DB;
+
+        $set = $DB->get_records(static::get_table());
+
+        foreach ($set as &$o) {
+            $obj = new static();
+            $obj->set_class_data($o);
+            $o = $obj;
+        }
+
+        return $set;
+    }
 }

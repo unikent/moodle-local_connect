@@ -247,23 +247,6 @@ class enrolment extends data
     }
 
     /**
-     * Returns all enrolments
-     */
-    public static function get_all() {
-        global $DB;
-
-        $objs = $DB->get_records('connect_enrolments');
-
-        foreach ($objs as &$obj) {
-            $enrolment = new enrolment();
-            $enrolment->set_class_data($obj);
-            $obj = $enrolment;
-        }
-
-        return $objs;
-    }
-
-    /**
      * Returns an enrolment, given a user and a course
      */
     public static function get_for_user_and_course($user, $course) {
