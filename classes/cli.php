@@ -35,36 +35,43 @@ class cli {
 	 * Run the course sync cron
 	 */
 	public static function course_sync($dry_run = false, $moodle_id = null) {
-		$courses = array();
-
 		// What are we syncing, one or all?
-		if (isset($moodle_id)) {
-			mtrace("  Synchronizing course: '{$moodle_id}'...\n");
-
-			// Get the connect version of the course.
-			$courses = course::get_by_moodle_id($moodle_id);
-
-			// Validate the course.
-			if (empty($courses)) {
-				mtrace("  Invalid course: '{$moodle_id}'");
-				return false;
-			}
-
-			// Are we in Moodle?
-			foreach ($courses as $connect_course) {
-				if (!$connect_course->is_in_moodle()) {
-					mtrace("  Connect Course '{$connect_course->id}' does not exist in Moodle (but it has an mid set).");
-					return false;
-				}
-			}
-		} else {
+		if (!isset($moodle_id)) {
 			mtrace("  Synchronizing courses...\n");
-			$courses = course::get_all();
+
+			// Just run a batch_all on the set.
+			course::batch_all(function ($obj) use($dry_run) {
+				try {
+			    	$result = $obj->sync($dry_run);
+			    	if ($result !== null) {
+			    		mtrace("    " . $result);
+			    	}
+				} catch (Excepton $e) {
+					$msg = $e->getMessage();
+					mtrace("    Error: {$msg}\n");
+				}
+			});
+
+			mtrace("  done.\n");
+
+			return true;
 		}
 
-		foreach ($courses as $course) {
+		mtrace("  Synchronizing course: '{$moodle_id}'...\n");
+
+		// Get the connect version of the course.
+		$courses = course::get_by_moodle_id($moodle_id);
+
+		// Validate the course.
+		if (empty($courses)) {
+			mtrace("  Course does not exist in Moodle: {$moodle_id}\n");
+			return false;
+		}
+
+		// Are we in Moodle?
+		foreach ($courses as $connect_course) {
 			try {
-				$result = $course->sync($dry_run);
+				$result = $connect_course->sync($dry_run);
 		    	if ($result !== null) {
 		    		mtrace("    " . $result);
 		    	}
@@ -105,7 +112,7 @@ class cli {
 
 		// Validate the course.
 		if (empty($courses)) {
-			mtrace("  Course does not exist in Moodle: $moodle_id\n");
+			mtrace("  Course does not exist in Moodle: {$moodle_id}\n");
 			return false;
 		}
 
