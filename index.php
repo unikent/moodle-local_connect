@@ -111,17 +111,13 @@ echo <<< HEREDOC
 					<th>Name</th>
 					<th>Campus</th>
 					<th>Duration</th>
-					<th>Students</th>
 					<th>Version</th>
-					<th>Department</th>
-					<th></th>
+					<th>Options</th>
 				</tr>
 			</thead>
 			<tfoot>
 					<th></th>
 					<th id="filter-status"></th>
-					<th></th>
-					<th></th>
 					<th></th>
 					<th></th>
 					<th></th>
