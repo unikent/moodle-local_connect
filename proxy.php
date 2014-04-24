@@ -83,6 +83,20 @@ switch ($_SERVER['PATH_INFO']) {
         header('Content-type: application/json');
         $category_restrictions = isset($_GET['category_restrictions']) ? json_decode(urldecode($_GET['category_restrictions'])) : array();
         $courses = \local_connect\course::get_all($category_restrictions, false);
+
+        // Map campus IDs.
+        $campusids = array();
+        $campuses = $DB->get_records('connect_campus');
+        foreach ($campuses as $campus) {
+            $campusids[$campus->id] = $campus->name;
+        }
+
+        foreach ($courses as &$course) {
+            if (isset($campusids[$course->campusid])) {
+                $course->campus = $campusids[$course->campusid];
+            }
+        }
+
         echo json_encode($courses);
         die;
     default:
