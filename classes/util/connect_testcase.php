@@ -71,7 +71,6 @@ abstract class connect_testcase extends \advanced_testcase
 		$DB->execute("TRUNCATE TABLE {connect_group}");
 		$DB->execute("TRUNCATE TABLE {connect_role}");
 		$DB->execute("TRUNCATE TABLE {connect_course}");
-		$DB->execute("TRUNCATE TABLE {connect_course_links}");
 
 		// Delete the roles too.
 		$DB->delete_records('role', array('shortname' => 'sds_student'));

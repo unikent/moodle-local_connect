@@ -67,6 +67,13 @@ class user extends data
     }
 
     /**
+     * Returns all group enrolments for this user.
+     */
+    public function _get_group_enrolments() {
+        return group_enrolment::get_for_user($this);
+    }
+
+    /**
      * Returns the Moodle URL for this user.
      */
     public function get_moodle_url() {
@@ -87,10 +94,26 @@ class user extends data
 	}
 
 	/**
+	 * Sync all my enrolments
+	 */
+	public function sync_enrolments() {
+		if (empty($this->mid)) {
+			return false;
+		}
+
+		$enrolments = array_merge($this->enrolments, $this->group_enrolments);
+		foreach ($enrolments as $enrolment) {
+			if (!$enrolment->is_in_moodle()) {
+				$enrolment->create_in_moodle();
+			}
+		}
+	}
+
+	/**
 	 * Create this user in Moodle.
 	 */
 	public function create_in_moodle() {
-		global $CFG;
+		global $CFG, $DB;
 
 		require_once ($CFG->dirroot . "/user/lib.php");
 
@@ -100,6 +123,16 @@ class user extends data
 
 		if (empty($this->login)) {
 			return false;
+		}
+
+		// Try to link up if there is already a matching user.
+		if ($obj = $DB->get_record('user', array('username' => $this->login))) {
+			$this->mid = $obj->id;
+			if ($this->save()) {
+				$this->sync_enrolments();
+			}
+
+			return true;
 		}
 
 		$user = new \stdClass();
@@ -119,7 +152,9 @@ class user extends data
 		}
 
 		$this->mid = user_create_user($user, false);
-		$this->save();
+		if ($this->save()) {
+			$this->sync_enrolments();
+		}
 
 		return true;
 	}
