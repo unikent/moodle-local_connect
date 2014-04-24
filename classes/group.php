@@ -159,6 +159,12 @@ class group extends data
      * @return unknown
      */
     public function create_in_moodle($grouping_name = 'Seminar groups') {
+        global $DB;
+
+        if (isset($this->mid)) {
+            return false;
+        }
+
         if (!$this->course->is_in_moodle()) {
             utils::error("Attempting to create group '{$this->id}' but course '{$this->courseid}' doesnt exist!");
             return false;
@@ -168,6 +174,17 @@ class group extends data
         $data->name = $this->name;
         $data->courseid = $this->course->mid;
         $data->description = '';
+
+        // Do we already *actually* exist?
+        if ($group = $DB->get_record('groups', (array)$data)) {
+            // Yep, link up.
+            $this->mid = $group->id;
+            $this->save();
+
+            $this->sync_group_enrolments();
+
+            return true;
+        }
 
         // Grab a Moodle ID.
         $this->mid = groups_create_group($data);
