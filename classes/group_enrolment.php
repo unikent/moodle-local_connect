@@ -255,23 +255,4 @@ class group_enrolment extends data
 
         return $set;
     }
-
-    /**
-     * Returns all known group enrolments .
-     * @return unknown
-     */
-    public static function get_all() {
-        global $DB;
-
-        $set = $DB->get_records('connect_group_enrolments');
-
-        foreach ($set as &$o) {
-            $obj = new group_enrolment();
-            $obj->set_class_data($o);
-            $o = $obj;
-        }
-
-        return $set;
-    }
-
 }

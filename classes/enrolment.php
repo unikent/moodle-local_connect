@@ -79,7 +79,7 @@ class enrolment extends data
         }
 
         // Or creating it?
-        if (!$this->is_in_moodle()) {
+        if (!$this->is_in_moodle() && $this->course->is_in_moodle()) {
             if (!$dry) {
                 $this->create_in_moodle();
             }
@@ -236,23 +236,6 @@ class enrolment extends data
         $objs = $DB->get_records('connect_enrolments', array(
             'courseid' => $course->id
         ));
-
-        foreach ($objs as &$obj) {
-            $enrolment = new enrolment();
-            $enrolment->set_class_data($obj);
-            $obj = $enrolment;
-        }
-
-        return $objs;
-    }
-
-    /**
-     * Returns all enrolments
-     */
-    public static function get_all() {
-        global $DB;
-
-        $objs = $DB->get_records('connect_enrolments');
 
         foreach ($objs as &$obj) {
             $enrolment = new enrolment();
