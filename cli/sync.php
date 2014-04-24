@@ -47,7 +47,7 @@ echo "   Creating ($count) groups...\n";
 
 foreach ($creates as $create) {
 	$obj = \local_connect\group::get($create);
-	echo "      -> {$obj->name}";
+	echo "      -> {$obj->id} ({$obj->name})\n";
 
 	if (!$options['dry']) {
 		$obj->create_in_moodle();
@@ -69,7 +69,7 @@ echo "   Deleting ($count) enrolments...\n";
 
 foreach ($deletes as $delete) {
 	$obj = \local_connect\enrolment::get($delete);
-	echo "      -> {$obj->userid} on course {$obj->courseid} (was {$obj->roleid})";
+	echo "      -> {$obj->userid} on course {$obj->courseid} (was {$obj->roleid})\n";
 
 	if (!$options['dry']) {
 		$obj->delete();
@@ -85,7 +85,7 @@ echo "   Changing ($count) enrolments...\n";
 
 foreach ($changes as $change) {
 	$obj = \local_connect\enrolment::get($change);
-	echo "      -> {$obj->userid} on course {$obj->courseid} as {$obj->roleid}";
+	echo "      -> {$obj->userid} on course {$obj->courseid} as {$obj->roleid}\n";
 
 	if (!$options['dry']) {
 		$obj->delete();
@@ -102,7 +102,7 @@ echo "   Creating ($count) enrolments...\n";
 
 foreach ($creates as $create) {
 	$obj = \local_connect\enrolment::get($create);
-	echo "      -> {$obj->userid} on course {$obj->courseid} as {$obj->roleid}";
+	echo "      -> {$obj->userid} on course {$obj->courseid} as {$obj->roleid}\n";
 
 	if (!$options['dry']) {
 		$obj->create_in_moodle();
@@ -124,7 +124,7 @@ echo "   Deleting ($count) group enrolments...\n";
 
 foreach ($deletes as $delete) {
 	$obj = \local_connect\group_enrolment::get($delete);
-	echo "      -> {$obj->userid} in group {$obj->groupid}";
+	echo "      -> {$obj->userid} in group {$obj->groupid}\n";
 
 	if (!$options['dry']) {
 		$obj->delete();
@@ -140,7 +140,7 @@ echo "   Creating ($count) group enrolments...\n";
 
 foreach ($creates as $create) {
 	$obj = \local_connect\group_enrolment::get($create);
-	echo "      -> {$obj->userid} in group {$obj->groupid}";
+	echo "      -> {$obj->userid} in group {$obj->groupid}\n";
 
 	if (!$options['dry']) {
 		$obj->create_in_moodle();

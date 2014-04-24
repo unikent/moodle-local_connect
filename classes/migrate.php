@@ -165,7 +165,7 @@ class migrate
 		echo "Migrating updated courses\n";
 
 		$sql = "REPLACE INTO {connect_course} (id,module_delivery_key,session_code,module_version,campusid,module_week_beginning,module_length,week_beginning_date,module_title,module_code,synopsis,category, mid) (
-			SELECT cc.id, c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,c.module_title,c.module_code,COALESCE(c.synopsis, ''),c.category_id,cc.mid
+			SELECT cc.id, c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,c.module_title,c.module_code,COALESCE(c.synopsis, ''),c.category_id,COALESCE(cc.mid,0)
 			FROM `connect_development`.`courses` c
 			INNER JOIN {connect_course} cc ON cc.module_delivery_key=c.module_delivery_key AND cc.session_code=c.session_code
 			WHERE c.module_title <> cc.module_title OR c.module_code <> cc.module_code OR c.synopsis <> cc.synopsis OR c.category_id <> cc.category
@@ -186,7 +186,7 @@ class migrate
 		echo "Migrating new courses\n";
 
 		$sql = "REPLACE INTO {connect_course} (module_delivery_key,session_code,module_version,campusid,module_week_beginning,module_length,week_beginning_date,module_title,module_code,synopsis,category, mid) (
-			SELECT c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,c.module_title,c.module_code,COALESCE(c.synopsis, ''),c.category_id,c.moodle_id as mid
+			SELECT c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,c.module_title,c.module_code,COALESCE(c.synopsis, ''),c.category_id,COALESCE(c.moodle_id, 0)
 			FROM `$connect_db`.`courses` c
 			LEFT OUTER JOIN {connect_course} cc ON cc.module_delivery_key=c.module_delivery_key AND cc.session_code=c.session_code
 			WHERE cc.id IS NULL

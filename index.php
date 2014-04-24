@@ -197,13 +197,11 @@ HEREDOC;
 
 echo '<div id="dialog_error">'.get_string('connect_error', 'local_connect').'</div>';
 
-$enableAdvanced = \local_connect\utils::enable_new_features() ? 'true' : 'false';
-
 echo <<<HERE
        <script type="text/javascript">
                window.dapageUrl = '$CFG->wwwroot/local/connect/proxy.php';
                window.coursepageUrl = '$CFG->wwwroot';
-               window.enableConnectAdvanced = $enableAdvanced;
+               window.enableConnectAdvanced = true;
        </script>
 HERE;
 
