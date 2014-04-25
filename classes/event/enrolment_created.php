@@ -23,72 +23,72 @@ defined('MOODLE_INTERNAL') || die();
  */
 class enrolment_created extends \core\event\base
 {
-	/**
-	 * Init method.
-	 */
-	protected function init() {
-		global $CFG;
+    /**
+     * Init method.
+     */
+    protected function init() {
+        global $CFG;
 
-		$this->data['objecttable'] = 'connect_enrolments';
-		$this->data['crud'] = 'c';
-		$this->data[(floatval($CFG->release) <= 2.6) ? 'level' : 'edulevel'] = self::LEVEL_TEACHING;
-	}
+        $this->data['objecttable'] = 'connect_enrolments';
+        $this->data['crud'] = 'c';
+        $this->data[(floatval($CFG->release) <= 2.6) ? 'level' : 'edulevel'] = self::LEVEL_TEACHING;
+    }
 
-	/**
-	 * Returns localised general event name.
-	 * 
-	 * @return string
-	 */
-	public static function get_name() {
-		return "Connect Enrolment Pushed";
-	}
+    /**
+     * Returns localised general event name.
+     * 
+     * @return string
+     */
+    public static function get_name() {
+        return "Connect Enrolment Pushed";
+    }
 
-	/**
-	 * Returns description of what happened.
-	 *
-	 * @return string
-	 */
-	public function get_description() {
-		return 'The Connect enrolment with an ID of ' . $this->objectid . ' was pushed to Moodle.';
-	}
+    /**
+     * Returns description of what happened.
+     *
+     * @return string
+     */
+    public function get_description() {
+        return 'The Connect enrolment with an ID of ' . $this->objectid . ' was pushed to Moodle.';
+    }
 
-	/**
-	 * Returns relevant URL.
-	 * 
-	 * @return \moodle_url
-	 */
-	public function get_url() {
-		return new \moodle_url('/local/connect/browse/user.php', array('id' => $this->other['userid']));
-	}
+    /**
+     * Returns relevant URL.
+     * 
+     * @return \moodle_url
+     */
+    public function get_url() {
+        return new \moodle_url('/local/connect/browse/user.php', array('id' => $this->other['userid']));
+    }
 
-	/**
-	 * Return the legacy event log data.
-	 * add_to_log
-	 * @return array
-	 */
-	protected function get_legacy_logdata() {
-		return array($this->courseid, 'user', 'enrol user', 'view.php?id=' . $this->relateduserid, $this->objectid);
-	}
+    /**
+     * Return the legacy event log data.
+     * add_to_log
+     * @return array
+     */
+    protected function get_legacy_logdata() {
+        return array($this->courseid, 'user', 'enrol user', 'view.php?id=' . $this->relateduserid, $this->objectid);
+    }
 
-	/**
-	 * Custom validation.
-	 *
-	 * @throws \coding_exception
-	 * @return void
-	 */
-	protected function validate_data() {
-		parent::validate_data();
+    /**
+     * Custom validation.
+     *
+     * @throws \coding_exception
+     * @return void
+     */
+    protected function validate_data() {
+        parent::validate_data();
 
-		if (!isset($this->courseid)) {
-			throw new \coding_exception('The \'courseid\' must be set.');
-		}
+        if (!isset($this->courseid)) {
+            throw new \coding_exception('The \'courseid\' must be set.');
+        }
 
-		if (!isset($this->relateduserid)) {
-			throw new \coding_exception('The \'relateduserid\' must be set.');
-		}
+        if (!isset($this->relateduserid)) {
+            throw new \coding_exception('The \'relateduserid\' must be set.');
+        }
 
-		if (!isset($this->other['userid'])) {
-			throw new \coding_exception('The \'userid\' must be set.');
-		}
-	}
+        if (!isset($this->other['userid'])) {
+            throw new \coding_exception('The \'userid\' must be set.');
+        }
+    }
 }

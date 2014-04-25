@@ -25,9 +25,9 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once dirname(__FILE__) . '/../../../course/lib.php';
-require_once dirname(__FILE__) . '/../../../mod/aspirelists/lib.php';
-require_once dirname(__FILE__) . '/../../../mod/forum/lib.php';
+require_once(dirname(__FILE__) . '/../../../course/lib.php');
+require_once(dirname(__FILE__) . '/../../../mod/aspirelists/lib.php');
+require_once(dirname(__FILE__) . '/../../../mod/forum/lib.php');
 
 /**
  * Connect courses container.
@@ -50,7 +50,11 @@ class course extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "mid", "module_delivery_key", "session_code", "module_version", "campusid", "module_week_beginning", "module_length", "week_beginning_date", "module_title", "module_code", "synopsis", "category");
+        return array(
+            "id", "mid", "module_delivery_key", "session_code", "module_version",
+            "campusid", "module_week_beginning", "module_length", "week_beginning_date",
+            "module_title", "module_code", "synopsis", "category"
+        );
     }
 
     /**
@@ -114,8 +118,8 @@ class course extends data
      * Returns the addition to the shortname (e.g. (2013/2014))
      */
     public function _get_bracket_period() {
-        $prev_year = date('Y', strtotime('1-1-' . $this->session_code . ' -1 year'));
-        return "({$prev_year} / {$this->session_code})";
+        $lastyear = date('Y', strtotime('1-1-' . $this->session_code . ' -1 year'));
+        return "({$lastyear} / {$this->session_code})";
     }
 
     /**
@@ -253,7 +257,9 @@ class course extends data
             'id' => $this->mid
         ), 'id, shortname, fullname, category, summary');
 
-        return $course->fullname !== $this->fullname || $course->category !== $this->category || $course->summary !== $this->synopsis;
+        return  $course->fullname !== $this->fullname ||
+                $course->category !== $this->category ||
+                $course->summary !== $this->synopsis;
     }
 
     /**
@@ -264,23 +270,23 @@ class course extends data
         global $CFG, $DB;
 
         // Try to find an existing set of data.
-        $connect_data = $DB->get_record('connect_course_dets', array(
+        $data = $DB->get_record('connect_course_dets', array(
             'course' => $this->mid
         ));
 
         // Create a data container.
-        if (!$connect_data) {
-            $connect_data = new \stdClass();
+        if (!$data) {
+            $data = new \stdClass();
         }
 
         // Update the container's data.
-        $connect_data->course = $this->mid;
-        $connect_data->campus = $this->campus_name;
-        $connect_data->startdate = $this->week_beginning_date;
-        $connect_data->enddate = $this->week_ending_date;
-        $connect_data->weeks = $this->module_length;
+        $data->course = $this->mid;
+        $data->campus = $this->campus_name;
+        $data->startdate = $this->week_beginning_date;
+        $data->enddate = $this->week_ending_date;
+        $data->weeks = $this->module_length;
 
-        return $connect_data;
+        return $data;
     }
 
     /**
@@ -289,21 +295,21 @@ class course extends data
     private function create_connect_extras() {
         global $DB;
 
-        $connect_data = $this->get_dets_data();
+        $data = $this->get_dets_data();
 
-        if (!isset($connect_data->id)) {
-            $DB->insert_record('connect_course_dets', $connect_data);
+        if (!isset($data->id)) {
+            $DB->insert_record('connect_course_dets', $data);
         } else {
-            $DB->update_record('connect_course_dets', $connect_data);
+            $DB->update_record('connect_course_dets', $data);
         }
     }
 
     /**
      * Create this course in Moodle
-     * @param string $shortname_ext (optional)
+     * @param string $shortnameext (optional)
      * @return boolean
      */
-    public function create_in_moodle($shortname_ext = "") {
+    public function create_in_moodle($shortnameext = "") {
         global $DB, $USER;
 
         // Check we have a category.
@@ -314,13 +320,13 @@ class course extends data
 
         // Append shortname extension if it exists.
         $shortname = $this->shortname;
-        if (!empty($shortname_ext)) {
-            $shortname = $this->append_date($this->module_code . " " . $shortname_ext);
+        if (!empty($shortnameext)) {
+            $shortname = $this->append_date($this->module_code . " " . $shortnameext);
         }
 
         // Ensure the shortname is unique.
         if (!$this->is_unique_shortname($shortname)) {
-            utils::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle. It failed becuase the shortname was not unique :(");
+            utils::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle but the shortname was not unique.");
             return false;
         }
 
@@ -342,7 +348,7 @@ class course extends data
             $this->mid = $course->id;
         } catch (\moodle_exception $e) {
             $msg = $e->getMessage();
-            utils::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle. Something went really wrong: {$msg}");
+            utils::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle but '{$msg}'.");
             return false;
         }
 
@@ -533,9 +539,7 @@ class course extends data
      * Delete this course's enrolments.
      */
     public function delete_enrolments() {
-        $enrolments = $this->enrolments;
-        $group_enrolments = $this->group_enrolments;
-        $todo = array_merge($enrolments, $group_enrolments);
+        $todo = array_merge($this->enrolments, $this->group_enrolments);
         foreach ($todo as $enrolment) {
             if ($enrolment->is_in_moodle()) {
                 $enrolment->delete();
@@ -639,7 +643,7 @@ class course extends data
     public static function get_by_moodle_id($id) {
         global $DB;
 
-        // Select a bunch of records
+        // Select a bunch of records.
         $result = $DB->get_records('connect_course', array('mid' => $id));
         if (!$result) {
             return array();
@@ -658,16 +662,16 @@ class course extends data
 
     /**
      * Get a Connect Course by Devliery Key and Session Code
-     * @param unknown $module_delivery_key
+     * @param unknown $moduledeliverykey
      * @param unknown $session_code
      * @return unknown
      */
-    public static function get_by_uid($module_delivery_key, $session_code) {
+    public static function get_by_uid($moduledeliverykey, $sessioncode) {
         global $DB;
 
         $data = $DB->get_record('connect_course', array(
-            'module_delivery_key' => $module_delivery_key,
-            'session_code' => $session_code
+            'module_delivery_key' => $moduledeliverykey,
+            'session_code' => $sessioncode
         ), "*");
 
         if (!$data) {
@@ -719,8 +723,8 @@ class course extends data
 
         foreach ($data->courses as $course) {
             // Try to find the Connect version of the course.
-            $connect_course = self::get($course);
-            if (!$connect_course) {
+            $obj = self::get($course);
+            if (!$obj) {
                 $response[] = array(
                     'error_code' => 'does_not_exist',
                     'id' => $course
@@ -729,7 +733,7 @@ class course extends data
             }
 
             // Make sure this was in Moodle.
-            if (!$connect_course->is_in_moodle()) {
+            if (!$obj->is_in_moodle()) {
                 $response[] = array(
                     'error_code' => 'not_created_in_moodle',
                     'id' => $course
@@ -737,7 +741,7 @@ class course extends data
                 continue;
             }
 
-            $connect_course->delete();
+            $obj->delete();
         }
 
         return $response;
@@ -755,8 +759,8 @@ class course extends data
 
         foreach ($data->courses as $course) {
             // Try to find the Connect version of the course.
-            $connect_course = self::get($course->id);
-            if (!$connect_course) {
+            $obj = self::get($course->id);
+            if (!$obj) {
                 $response[] = array(
                     'error_code' => 'does_not_exist',
                     'id' => $course->id
@@ -765,7 +769,7 @@ class course extends data
             }
 
             // Make sure we are unique.
-            if (!$connect_course->is_unique()) {
+            if (!$obj->is_unique()) {
                 $response[] = array(
                     'error_code' => 'duplicate',
                     'id' => $course->id
@@ -774,10 +778,10 @@ class course extends data
             }
 
             // Did we specify a shortname extension?
-            $shortname_ext = isset($course->shortname_ext) ? $course->shortname_ext : "";
+            $shortnameext = isset($course->shortnameext) ? $course->shortnameext : "";
 
             // Attempt to create in Moodle.
-            if (!$connect_course->create_in_moodle($shortname_ext)) {
+            if (!$obj->create_in_moodle($shortnameext)) {
                 $response[] = array(
                     'error_code' => 'error',
                     'id' => $course->id
@@ -806,16 +810,16 @@ class course extends data
             }
         }
 
-        $primary_child = $courses[0];
+        $primary = $courses[0];
         foreach ($courses as $course) {
             if ($course->is_in_moodle()) {
-                $primary_child = $course;
+                $primary = $course;
             }
         }
 
-        $link_course = new course();
-        $link_course->set_class_data($primary_child->get_data());
-        $link_course->set_class_data(array(
+        $link = new course();
+        $link->set_class_data($primary->get_data());
+        $link->set_class_data(array(
             'module_code' => $input->code,
             'module_title' => $input->title,
             'synopsis' => $input->synopsis,
@@ -823,18 +827,18 @@ class course extends data
         ));
 
         // Create the linked course if it doesnt exist.
-        if (!$link_course->is_in_moodle()) {
-            if (!$link_course->create_in_moodle()) {
-                utils::error("Could not create linked course: $link_course");
+        if (!$link->is_in_moodle()) {
+            if (!$link->create_in_moodle()) {
+                utils::error("Could not create linked course: $link");
             }
         } else {
-            $link_course->update_moodle();
+            $link->update_moodle();
         }
 
         // Add children.
         foreach ($courses as $child) {
-            if (!$link_course->add_child($child)) {
-                utils::error("Could not add child '$child' to course: $link_course");
+            if (!$link->add_child($child)) {
+                utils::error("Could not add child '$child' to course: $link");
             }
         }
 
@@ -843,11 +847,11 @@ class course extends data
 
     /**
      *
-     * @param unknown $in_courses
+     * @param unknown $in
      * @return unknown
      */
-    public static function process_unlink($in_courses) {
-        foreach ($in_courses as $c) {
+    public static function process_unlink($in) {
+        foreach ($in as $c) {
             $course = self::get($c);
             // All good!
             if (!$course->unlink()) {

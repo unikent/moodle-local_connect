@@ -46,7 +46,8 @@ class sharedbprovider {
             return;
         }
 
-        if (!$SHAREDB = \moodle_database::get_driver_instance($CFG->connect->sharedb['driver'], $CFG->connect->sharedb['library'])) {
+        if (!$SHAREDB = \moodle_database::get_driver_instance($CFG->connect->sharedb['driver'],
+                                                              $CFG->connect->sharedb['library'])) {
             throw new \dml_exception('dbdriverproblem', "Unknown driver for connect");
         }
 
@@ -69,15 +70,15 @@ class sharedbprovider {
     public function __call($name, $arguments) {
         global $SHAREDB;
 
-        if (!\local_connect\utils::enable_sharedb()) {
+        if (!utils::enable_sharedb()) {
             return false;
         }
 
-        // Ensure we are connected
+        // Ensure we are connected.
         self::setup_connect_database();
 
-        // Reflect in this instance, subsequent calls should be routed straight to the DML provider
-        $reflectionMethod = new \ReflectionMethod($SHAREDB, $name);
-        return $reflectionMethod->invokeArgs($SHAREDB, $arguments);
+        // Reflect in this instance, subsequent calls should be routed straight to the DML provider.
+        $method = new \ReflectionMethod($SHAREDB, $name);
+        return $method->invokeArgs($SHAREDB, $arguments);
     }
 }

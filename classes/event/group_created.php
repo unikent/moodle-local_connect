@@ -23,64 +23,64 @@ defined('MOODLE_INTERNAL') || die();
  */
 class group_created extends \core\event\base
 {
-	/**
-	 * Init method.
-	 */
-	protected function init() {
-		global $CFG;
+    /**
+     * Init method.
+     */
+    protected function init() {
+        global $CFG;
 
-		$this->data['objecttable'] = 'connect_group';
-		$this->data['crud'] = 'c';
-		$this->data[(floatval($CFG->release) <= 2.6) ? 'level' : 'edulevel'] = self::LEVEL_TEACHING;
-	}
+        $this->data['objecttable'] = 'connect_group';
+        $this->data['crud'] = 'c';
+        $this->data[(floatval($CFG->release) <= 2.6) ? 'level' : 'edulevel'] = self::LEVEL_TEACHING;
+    }
 
-	/**
-	 * Returns localised general event name.
-	 * 
-	 * @return string
-	 */
-	public static function get_name() {
-		return "Connect Group Pushed";
-	}
+    /**
+     * Returns localised general event name.
+     * 
+     * @return string
+     */
+    public static function get_name() {
+        return "Connect Group Pushed";
+    }
 
-	/**
-	 * Returns description of what happened.
-	 *
-	 * @return string
-	 */
-	public function get_description() {
-		return 'The Connect group with an ID of ' . $this->objectid . ' was pushed to Moodle.';
-	}
+    /**
+     * Returns description of what happened.
+     *
+     * @return string
+     */
+    public function get_description() {
+        return 'The Connect group with an ID of ' . $this->objectid . ' was pushed to Moodle.';
+    }
 
-	/**
-	 * Returns relevant URL.
-	 * 
-	 * @return \moodle_url
-	 */
-	public function get_url() {
-		return new \moodle_url('/local/connect/browse/group.php', array('id' => $this->objectid));
-	}
+    /**
+     * Returns relevant URL.
+     * 
+     * @return \moodle_url
+     */
+    public function get_url() {
+        return new \moodle_url('/local/connect/browse/group.php', array('id' => $this->objectid));
+    }
 
-	/**
-	 * Return the legacy event log data.
-	 * 
-	 * @return array
-	 */
-	protected function get_legacy_logdata() {
-		return array($this->courseid, 'course', 'add group', 'view.php?id=' . $this->courseid, $this->objectid);
-	}
+    /**
+     * Return the legacy event log data.
+     * 
+     * @return array
+     */
+    protected function get_legacy_logdata() {
+        return array($this->courseid, 'course', 'add group', 'view.php?id=' . $this->courseid, $this->objectid);
+    }
 
-	/**
-	 * Custom validation.
-	 *
-	 * @throws \coding_exception
-	 * @return void
-	 */
-	protected function validate_data() {
-		parent::validate_data();
+    /**
+     * Custom validation.
+     *
+     * @throws \coding_exception
+     * @return void
+     */
+    protected function validate_data() {
+        parent::validate_data();
 
-		if (!isset($this->courseid)) {
-			throw new \coding_exception('The \'courseid\' must be set.');
-		}
-	}
+        if (!isset($this->courseid)) {
+            throw new \coding_exception('The \'courseid\' must be set.');
+        }
+    }
 }
