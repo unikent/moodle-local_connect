@@ -95,7 +95,7 @@ class rollover {
         $courses = $DB->get_records('course', null, '', 'id,shortname,fullname,summary');
 
         // Grab a list of courses in ShareDB.
-        $shared_courses = $SHAREDB->get_records('course_list', array(
+        $shared = $SHAREDB->get_records('course_list', array(
             "moodle_env" => $CFG->kent->environment,
             "moodle_dist" => $CFG->kent->distribution
         ), '', 'moodle_id,id,shortname,fullname,summary');
@@ -105,7 +105,7 @@ class rollover {
         // First, all the new modules.
         foreach ($courses as $item) {
             // If this is already here, dont insert.
-            if (isset($shared_courses[$item->id])) {
+            if (isset($shared[$item->id])) {
                 continue;
             }
 
@@ -126,26 +126,26 @@ class rollover {
         $ids = array_map(function($item) {
             return $item->id;
         }, $courses);
-        $ids_to_stay = implode(', ', $ids);
-        $SHAREDB->delete_records_select("course_list", "moodle_env=:env AND moodle_dist=:dist AND moodle_id NOT IN ($ids_to_stay)", array(
+        $ids = implode(', ', $ids);
+        $SHAREDB->delete_records_select("course_list", "moodle_env=:env AND moodle_dist=:dist AND moodle_id NOT IN ($ids)", array(
             "env" => $CFG->kent->environment,
             "dist" => $CFG->kent->distribution
         ));
 
         // Now update everything remaining.
         foreach ($courses as $item) {
-            if (!isset($shared_courses[$item->id])) {
+            if (!isset($shared[$item->id])) {
                 continue;
             }
 
-            $shared_obj = $shared_courses[$item->id];
-            if ($shared_obj->shortname != $item->shortname || $shared_obj->fullname != $item->fullname || $shared_obj->summary != $item->summary) {
+            $obj = $shared[$item->id];
+            if ($obj->shortname != $item->shortname || $obj->fullname != $item->fullname || $obj->summary != $item->summary) {
                 // It needs updating.
-                $shared_obj->shortname = $item->shortname;
-                $shared_obj->fullname = $item->fullname;
-                $shared_obj->summary = $item->summary;
+                $obj->shortname = $item->shortname;
+                $obj->fullname = $item->fullname;
+                $obj->summary = $item->summary;
 
-                $SHAREDB->update_record('course_list', $shared_obj);
+                $SHAREDB->update_record('course_list', $obj);
 
                 echo "Updated {$item->id}.\n";
             }

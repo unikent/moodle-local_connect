@@ -68,25 +68,25 @@ class campus extends data
         return $this->name;
     }
 
-	/**
-	 * Is this campus in Moodle?
-	 * @return boolean
-	 */
-	public function is_in_moodle() {
+    /**
+     * Is this campus in Moodle?
+     * @return boolean
+     */
+    public function is_in_moodle() {
         return false;
-	}
+    }
 
-	/**
-	 * Create this campus in Moodle.
-	 */
-	public function create_in_moodle() {
+    /**
+     * Create this campus in Moodle.
+     */
+    public function create_in_moodle() {
         return false;
-	}
+    }
 
-	/**
-	 * Delete this campus from Moodle
-	 */
-	public function delete() {
+    /**
+     * Delete this campus from Moodle
+     */
+    public function delete() {
         return false;
-	}
+    }
 }
