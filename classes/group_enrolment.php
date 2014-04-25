@@ -25,7 +25,7 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once $CFG->dirroot.'/group/lib.php';
+require_once($CFG->dirroot.'/group/lib.php');
 
 /**
  * Connect group enrolment container

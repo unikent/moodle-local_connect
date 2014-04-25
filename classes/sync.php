@@ -73,7 +73,8 @@ class sync
                                         INNER JOIN {course} c ON c.id = e.courseid
                                         INNER JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
                                         INNER JOIN {role_assignments} ra ON ra.userid = u.id AND ra.contextid = ctx.id
-                                        INNER JOIN {role} r ON r.id = ra.roleid AND r.shortname IN ('sds_student', 'sds_teacher', 'convenor')");
+                                        INNER JOIN {role} r ON r.id = ra.roleid
+                                                            AND r.shortname IN ('sds_student', 'sds_teacher', 'convenor')");
 
         return $data;
     }
@@ -99,14 +100,14 @@ class sync
      * Grab a list of enrolments due to be created.
      * This is not just one SQL statement because custard sucks at temporary tables.
      *
-     * @param boolean $role_only Only check if roleid matches 
+     * @param boolean $strict Only check if roleid matches 
      */
-    private static function compare_enrolments($structure, $data, $role_only = false) {
+    private static function compare_enrolments($structure, $data, $strict = false) {
         $ids = array();
 
         foreach ($data as $enrolment) {
             if (!isset($structure[$enrolment->userid]) || !isset($structure[$enrolment->userid][$enrolment->courseid])) {
-                if (!$role_only) {
+                if (!$strict) {
                     $ids[] = $enrolment->id;
                 }
 

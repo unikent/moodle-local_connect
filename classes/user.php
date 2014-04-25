@@ -85,163 +85,163 @@ class user extends data
         return $url->out(false);
     }
 
-	/**
-	 * Is this user in Moodle?
-	 * @return boolean [description]
-	 */
-	public function is_in_moodle() {
-		return !empty($this->mid);
-	}
+    /**
+     * Is this user in Moodle?
+     * @return boolean [description]
+     */
+    public function is_in_moodle() {
+        return !empty($this->mid);
+    }
 
-	/**
-	 * Sync all my enrolments
-	 */
-	public function sync_enrolments() {
-		if (empty($this->mid)) {
-			return false;
-		}
+    /**
+     * Sync all my enrolments
+     */
+    public function sync_enrolments() {
+        if (empty($this->mid)) {
+            return false;
+        }
 
-		$enrolments = array_merge($this->enrolments, $this->group_enrolments);
-		foreach ($enrolments as $enrolment) {
-			if (!$enrolment->is_in_moodle()) {
-				$enrolment->create_in_moodle();
-			}
-		}
-	}
+        $enrolments = array_merge($this->enrolments, $this->group_enrolments);
+        foreach ($enrolments as $enrolment) {
+            if (!$enrolment->is_in_moodle()) {
+                $enrolment->create_in_moodle();
+            }
+        }
+    }
 
-	/**
-	 * Create this user in Moodle.
-	 */
-	public function create_in_moodle() {
-		global $CFG, $DB;
+    /**
+     * Create this user in Moodle.
+     */
+    public function create_in_moodle() {
+        global $CFG, $DB;
 
-		require_once ($CFG->dirroot . "/user/lib.php");
+        require_once($CFG->dirroot . "/user/lib.php");
 
-		if ($this->is_in_moodle()) {
-			return true;
-		}
+        if ($this->is_in_moodle()) {
+            return true;
+        }
 
-		if (empty($this->login)) {
-			return false;
-		}
+        if (empty($this->login)) {
+            return false;
+        }
 
-		// Try to link up if there is already a matching user.
-		if ($obj = $DB->get_record('user', array('username' => $this->login))) {
-			$this->mid = $obj->id;
-			if ($this->save()) {
-				$this->sync_enrolments();
-			}
+        // Try to link up if there is already a matching user.
+        if ($obj = $DB->get_record('user', array('username' => $this->login))) {
+            $this->mid = $obj->id;
+            if ($this->save()) {
+                $this->sync_enrolments();
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		$user = new \stdClass();
-		$user->username = $this->login;
-		$user->email = $this->login . "@kent.ac.uk";
-		$user->auth = "kentsaml";
-		$user->password = "not cached";
-		$user->confirmed = 1;
-		$user->mnethostid = $CFG->mnet_localhost_id;
+        $user = new \stdClass();
+        $user->username = $this->login;
+        $user->email = $this->login . "@kent.ac.uk";
+        $user->auth = "kentsaml";
+        $user->password = "not cached";
+        $user->confirmed = 1;
+        $user->mnethostid = $CFG->mnet_localhost_id;
 
-		if (!empty($this->initials)) {
-			$user->firstname = $this->initials;
-		}
+        if (!empty($this->initials)) {
+            $user->firstname = $this->initials;
+        }
 
-		if (!empty($this->family_name)) {
-			$user->lastname = $this->family_name;
-		}
+        if (!empty($this->family_name)) {
+            $user->lastname = $this->family_name;
+        }
 
-		$this->mid = user_create_user($user, false);
-		if ($this->save()) {
-			$this->sync_enrolments();
-		}
+        $this->mid = user_create_user($user, false);
+        if ($this->save()) {
+            $this->sync_enrolments();
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Delete this user from Moodle
-	 */
-	public function delete() {
-		$user = new \stdClass();
-		$user->id = $this->mid;
-		$user->username = $this->login;
-		delete_user($user);
+    /**
+     * Delete this user from Moodle
+     */
+    public function delete() {
+        $user = new \stdClass();
+        $user->id = $this->mid;
+        $user->username = $this->login;
+        delete_user($user);
 
-		$this->mid = null;
-		$this->save();
-	}
+        $this->mid = null;
+        $this->save();
+    }
 
-	/**
-	 * Get a user by Username
-	 */
-	public static function get_by_username($username) {
-		global $DB;
+    /**
+     * Get a user by Username
+     */
+    public static function get_by_username($username) {
+        global $DB;
 
-		$user = $DB->get_record("connect_user", array(
-			'login' => $username
-		));
+        $user = $DB->get_record("connect_user", array(
+            'login' => $username
+        ));
 
-		if (!$user) {
-			return null;
-		}
+        if (!$user) {
+            return null;
+        }
 
-		$obj = new static();
-		$obj->set_class_data($user);
+        $obj = new static();
+        $obj->set_class_data($user);
 
-		return $obj;
-	}
+        return $obj;
+    }
 
-	/**
-	 * Returns a list of all known users in a given role.
-	 */
-	public static function get_by_role($role) {
-		global $DB;
+    /**
+     * Returns a list of all known users in a given role.
+     */
+    public static function get_by_role($role) {
+        global $DB;
 
-		// Allow a special "staff" case that covers convenors and teachers.
-		$selector = '=';
-		if ($role === 'staff') {
-			$selector = '<>';
-			$role = 'student';
-		}
+        // Allow a special "staff" case that covers convenors and teachers.
+        $selector = '=';
+        if ($role === 'staff') {
+            $selector = '<>';
+            $role = 'student';
+        }
 
-		$roleid = $DB->get_field('connect_role', 'id', array(
-			'name' => $role
-		));
+        $roleid = $DB->get_field('connect_role', 'id', array(
+            'name' => $role
+        ));
 
-		$sql = "SELECT cu.*
-			FROM {connect_user} cu
-			INNER JOIN {connect_enrolments} ce ON ce.userid=cu.id
-			WHERE ce.roleid $selector :roleid";
-		$data = $DB->get_records_sql($sql, array(
-			"roleid" => $roleid
-		));
+        $sql = "SELECT cu.*
+            FROM {connect_user} cu
+            INNER JOIN {connect_enrolments} ce ON ce.userid=cu.id
+            WHERE ce.roleid $selector :roleid";
+        $data = $DB->get_records_sql($sql, array(
+            "roleid" => $roleid
+        ));
 
-		$result = array();
-		foreach ($data as $obj) {
-			if (isset($result[$obj->login]) || empty($obj->login)) {
-				continue;
-			}
+        $result = array();
+        foreach ($data as $obj) {
+            if (isset($result[$obj->login]) || empty($obj->login)) {
+                continue;
+            }
 
-			$user = new static();
+            $user = new static();
             $user->set_class_data($obj);
             $result[$obj->login] = $user;
-		}
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * Returns a list of all known students.
-	 */
-	public static function get_students() {
-		return static::get_by_role('student');
-	}
+    /**
+     * Returns a list of all known students.
+     */
+    public static function get_students() {
+        return static::get_by_role('student');
+    }
 
-	/**
-	 * Returns a list of all known students.
-	 */
-	public static function get_staff() {
-		return static::get_by_role('staff');
-	}
+    /**
+     * Returns a list of all known students.
+     */
+    public static function get_staff() {
+        return static::get_by_role('staff');
+    }
 }

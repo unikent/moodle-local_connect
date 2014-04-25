@@ -31,64 +31,64 @@ defined('MOODLE_INTERNAL') || die();
  */
 class utils {
 
-	/**
-	 * Decide what to do with an error.
-	 */
-	public static function error($message) {
-		if (get_config("local_connect", "enable_hipchat")) {
-			\local_hipchat\Message::send($message, "red", false, "text", "Connect");
-		} else {
-			debugging($message, DEBUG_DEVELOPER);
-		}
-	}
+    /**
+     * Decide what to do with an error.
+     */
+    public static function error($message) {
+        if (get_config("local_connect", "enable_hipchat")) {
+            \local_hipchat\Message::send($message, "red", false, "text", "Connect");
+        } else {
+            debugging($message, DEBUG_DEVELOPER);
+        }
+    }
 
-	/**
-	 * Is connect configured properly?
-	 */
-	public static function is_enabled() {
-		global $CFG;
-		return isset($CFG->local_connect_enable) && $CFG->local_connect_enable;
-	}
+    /**
+     * Is connect configured properly?
+     */
+    public static function is_enabled() {
+        global $CFG;
+        return isset($CFG->local_connect_enable) && $CFG->local_connect_enable;
+    }
 
-	/**
-	 * Enable the fancy new connect features?
-	 */
-	public static function enable_new_features() {
-		global $CFG;
-		return static::is_enabled() && isset($CFG->local_connect_enable_new_features) && $CFG->local_connect_enable_new_features;
-	}
+    /**
+     * Enable the fancy new connect features?
+     */
+    public static function enable_new_features() {
+        global $CFG;
+        return static::is_enabled() && isset($CFG->local_connect_enable_new_features) && $CFG->local_connect_enable_new_features;
+    }
 
-	/**
-	 * Enable the fancy new connect observers?
-	 */
-	public static function enable_new_observers() {
-		global $CFG;
-		return static::is_enabled() && isset($CFG->local_connect_enable_observers) && $CFG->local_connect_enable_observers;
-	}
+    /**
+     * Enable the fancy new connect observers?
+     */
+    public static function enable_new_observers() {
+        global $CFG;
+        return static::is_enabled() && isset($CFG->local_connect_enable_observers) && $CFG->local_connect_enable_observers;
+    }
 
-	/**
-	 * Enable the SHAREDB?
-	 */
-	public static function enable_sharedb() {
-		global $CFG;
-		return static::is_enabled() && isset($CFG->local_connect_enable_sharedb) && $CFG->local_connect_enable_sharedb;
-	}
+    /**
+     * Enable the SHAREDB?
+     */
+    public static function enable_sharedb() {
+        global $CFG;
+        return static::is_enabled() && isset($CFG->local_connect_enable_sharedb) && $CFG->local_connect_enable_sharedb;
+    }
 
-	/**
-	 * Enable the cron?
-	 */
-	public static function enable_cron() {
-		global $CFG;
-		return static::is_enabled() && isset($CFG->local_connect_enable_cron) && $CFG->local_connect_enable_cron;
-	}
+    /**
+     * Enable the cron?
+     */
+    public static function enable_cron() {
+        global $CFG;
+        return static::is_enabled() && isset($CFG->local_connect_enable_cron) && $CFG->local_connect_enable_cron;
+    }
 
-	/**
-	 * Enable rollover?
-	 */
-	public static function enable_rollover() {
-		global $CFG;
-		return static::is_enabled() && isset($CFG->local_connect_enable_rollover) && $CFG->local_connect_enable_rollover;
-	}
+    /**
+     * Enable rollover?
+     */
+    public static function enable_rollover() {
+        global $CFG;
+        return static::is_enabled() && isset($CFG->local_connect_enable_rollover) && $CFG->local_connect_enable_rollover;
+    }
 
 
     /**
@@ -104,7 +104,7 @@ class utils {
 
         $cats = $DB->get_records('course_categories');
 
-        // Check permissions
+        // Check permissions.
         foreach ($cats as $cat) {
             $context = \context_coursecat::instance($cat->id);
 

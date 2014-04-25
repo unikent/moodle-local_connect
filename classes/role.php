@@ -61,20 +61,20 @@ class role extends data
         return array("id");
     }
 
-	/**
-	 * Is this role in Moodle?
-	 * @return boolean
-	 */
-	public function is_in_moodle() {
-		return !empty($this->mid);
-	}
+    /**
+     * Is this role in Moodle?
+     * @return boolean
+     */
+    public function is_in_moodle() {
+        return !empty($this->mid);
+    }
 
-	/**
-	 * Returns our data mappings.
-	 * @todo Move this to DB.
-	 */
-	public function get_data_mapping() {
-        static $data_map = array(
+    /**
+     * Returns our data mappings.
+     * @todo Move this to DB.
+     */
+    public function get_data_mapping() {
+        static $map = array(
             "student" => array(
                 "name" => "Student (SDS)",
                 "short" => "sds_student",
@@ -95,13 +95,13 @@ class role extends data
             )
         );
 
-        return isset($data_map[$this->name]) ? $data_map[$this->name] : false;
-	}
+        return isset($map[$this->name]) ? $map[$this->name] : false;
+    }
 
-	/**
-	 * Create this role in Moodle.
-	 */
-	public function create_in_moodle() {
+    /**
+     * Create this role in Moodle.
+     */
+    public function create_in_moodle() {
         global $DB;
 
         $data = $this->get_data_mapping();
@@ -118,25 +118,25 @@ class role extends data
         }
 
         return false;
-	}
+    }
 
-	/**
-	 * Delete this role from Moodle
-	 */
-	public function delete() {
-		if ($this->is_in_moodle()) {
-			return delete_role($this->mid);
-		}
-	}
+    /**
+     * Delete this role from Moodle
+     */
+    public function delete() {
+        if ($this->is_in_moodle()) {
+            return delete_role($this->mid);
+        }
+    }
 
-	/**
-	 * Require a Moodle ID.
-	 */
-	public function get_or_create_mid() {
-		if (!$this->is_in_moodle()) {
-			$this->create_in_moodle();
-		}
+    /**
+     * Require a Moodle ID.
+     */
+    public function get_or_create_mid() {
+        if (!$this->is_in_moodle()) {
+            $this->create_in_moodle();
+        }
 
-		return $this->mid;
-	}
+        return $this->mid;
+    }
 }
