@@ -28,8 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Connect observers
  */
-class observers {
-
+class observers
+{
     /**
      * Triggered when 'course_created' event is triggered.
      *
@@ -43,7 +43,7 @@ class observers {
 
         // Update ShareDB if it is enabled.
         if (utils::enable_sharedb()) {
-            // Update course listings DB
+            // Update course listings DB.
             $record = $DB->get_record('course', array(
                 "id" => $event->objectid
             ));
@@ -92,7 +92,7 @@ class observers {
 
         // Update ShareDB if it is enabled.
         if (utils::enable_sharedb()) {
-            // Update course listings DB
+            // Update course listings DB.
             $moodle = $DB->get_record('course', array(
                 "id" => $event->objectid
             ));
@@ -130,7 +130,7 @@ class observers {
 
         // Update ShareDB if it is enabled.
         if (utils::enable_sharedb()) {
-            // Update course listings DB
+            // Update course listings DB.
             $moodle = $DB->get_record('course', array(
                 "id" => $event->objectid
             ));
@@ -156,12 +156,12 @@ class observers {
         global $DB;
 
         if (utils::enable_new_features()) {
-            // Grab user info
+            // Grab user info.
             $record = $DB->get_record('user', array(
                 "id" => $event->objectid
             ));
 
-            // Grab Connect User
+            // Grab Connect User.
             $user = user::get_by_username($record->username);
             if (!$user) {
                 return true;
@@ -173,7 +173,7 @@ class observers {
                 $user->save();
             }
 
-            // Sync Enrollments
+            // Sync Enrollments.
             $enrolments = enrolment::get_for_user($user);
             foreach ($enrolments as $enrolment) {
                 if (!$enrolment->is_in_moodle()) {
@@ -181,11 +181,11 @@ class observers {
                 }
             }
 
-            // Sync Group Enrollments
-            $group_enrolments = group_enrolment::get_for_user($user);
-            foreach ($group_enrolments as $group_enrolment) {
-                if (!$group_enrolment->is_in_moodle()) {
-                    $group_enrolment->create_in_moodle();
+            // Sync Group Enrollments.
+            $enrolments = group_enrolment::get_for_user($user);
+            foreach ($enrolments as $enrolment) {
+                if (!$enrolment->is_in_moodle()) {
+                    $enrolment->create_in_moodle();
                 }
             }
         }
@@ -235,23 +235,23 @@ class observers {
 
         $group = $event->get_record_snapshot('groups', $event->objectid);
 
-        $connect_courses = $DB->get_records('connect_course', array(
+        $courses = $DB->get_records('connect_course', array(
             'mid' => $group->courseid
         ));
 
-        foreach ($connect_courses as $connect_course) {
-            $connect_groups = $DB->get_records('connect_group', array(
-                'courseid' => $connect_course->id,
+        foreach ($courses as $course) {
+            $groups = $DB->get_records('connect_group', array(
+                'courseid' => $course->id,
                 'name' => $group->name
             ));
 
-            foreach ($connect_groups as $connect_group) {
+            foreach ($groups as $group) {
                 // Reset mid.
-                if ($connect_group->id) {
-                    $group = group::get($connect_group->id);
-                    if ($group->mid !== $event->objectid) {
-                        $group->mid = $event->objectid;
-                        $group->save();
+                if ($group->id) {
+                    $obj = group::get($group->id);
+                    if ($obj->mid !== $event->objectid) {
+                        $obj->mid = $event->objectid;
+                        $obj->save();
                     }
                 }
             }

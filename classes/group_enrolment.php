@@ -25,7 +25,7 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once $CFG->dirroot.'/group/lib.php';
+require_once($CFG->dirroot.'/group/lib.php');
 
 /**
  * Connect group enrolment container
@@ -91,7 +91,7 @@ class group_enrolment extends data
         }
 
         // Easy option.
-        if (!$this->is_in_moodle()) {
+        if (!$this->is_in_moodle() && $this->group->is_in_moodle()) {
             if (!$dry) {
                 $this->create_in_moodle();
             }

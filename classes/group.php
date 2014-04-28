@@ -25,7 +25,7 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once $CFG->dirroot . '/group/lib.php';
+require_once($CFG->dirroot . '/group/lib.php');
 
 /**
  * Connect group container
@@ -83,6 +83,15 @@ class group extends data
             }
 
             return;
+        }
+
+        // On sync we can be a bit slower... check the mid is valid.
+        if ($this->is_in_moodle()) {
+            // Do we already *actually* exist?
+            if (!$DB->record_exists('groups', array('id' => $this->mid))) {
+                $this->mid = 0;
+                $this->save();
+            }
         }
 
         // The easiest path!
@@ -150,7 +159,7 @@ class group extends data
             return "";
         }
 
-        $url = new \moodle_url("/group/index.php", array("id" => $this->courseid, "group" => $this->mid));
+        $url = new \moodle_url("/group/index.php", array("id" => $this->course->mid, "group" => $this->mid));
         return $url->out(false);
     }
 
@@ -158,7 +167,7 @@ class group extends data
      * Create this group in Moodle
      * @return unknown
      */
-    public function create_in_moodle($grouping_name = 'Seminar groups') {
+    public function create_in_moodle($name = 'Seminar groups') {
         global $DB;
 
         if (!empty($this->mid)) {
@@ -197,10 +206,10 @@ class group extends data
         $this->save();
 
         // Grab our grouping.
-        $grouping_id = $this->get_or_create_grouping($grouping_name);
+        $groupingid = $this->get_or_create_grouping($name);
 
         // And add this group to the grouping.
-        groups_assign_grouping($grouping_id, $this->mid);
+        groups_assign_grouping($groupingid, $this->mid);
 
         // Fire the event.
         $params = array(

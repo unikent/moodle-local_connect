@@ -30,229 +30,229 @@ defined('MOODLE_INTERNAL') || die();
  * Connect data container
  */
 abstract class data {
-	/** Stores all our data */
-	private $_data;
+    /** Stores all our data */
+    private $_data;
 
-	/** Stores all our objects */
-	private $_objects;
+    /** Stores all our objects */
+    private $_objects;
 
-	public function __construct() {
-		$this->_data = array();
-		$this->_objects = array();
-	}
+    public function __construct() {
+        $this->_data = array();
+        $this->_objects = array();
+    }
 
     /**
      * The name of our connect table.
      */
     protected static function get_table() {
-    	return null;
+        return null;
     }
 
-	/**
-	 * A list of valid fields for this data object.
-	 */
-	protected static function valid_fields() {
-		return array();
-	}
+    /**
+     * A list of valid fields for this data object.
+     */
+    protected static function valid_fields() {
+        return array();
+    }
 
     /**
      * A list of key fields for this data object.
      */
     protected static function key_fields() {
-    	return array("id");
+        return array("id");
     }
 
-	/**
-	 * A list of immutable fields for this data object.
-	 */
-	protected static function immutable_fields() {
-		return array();
-	}
+    /**
+     * A list of immutable fields for this data object.
+     */
+    protected static function immutable_fields() {
+        return array();
+    }
 
-	/**
-	 * Get all of our data as an object
-	 */
-	protected final function get_data() {
-		return (object)$this->_data;
-	}
+    /**
+     * Get all of our data as an object
+     */
+    protected final function get_data() {
+        return (object)$this->_data;
+    }
 
-	/**
-	 * Given an object containing data, set appropriate class vars.
-	 */
-	protected function set_class_data($obj) {
-		if (!is_array($obj)) {
-			$obj = get_object_vars($obj);
-		}
+    /**
+     * Given an object containing data, set appropriate class vars.
+     */
+    protected function set_class_data($obj) {
+        if (!is_array($obj)) {
+            $obj = get_object_vars($obj);
+        }
 
-		foreach ($obj as $key => $value) {
-			if (in_array($key, $this->valid_fields())) {
-				$this->$key = $value;
-			}
-		}
-	}
+        foreach ($obj as $key => $value) {
+            if (in_array($key, $this->valid_fields())) {
+                $this->$key = $value;
+            }
+        }
+    }
 
-	/**
-	 * Reset object cache.
-	 */
-	protected function reset_object_cache() {
-		$this->_objects = array();
-	}
+    /**
+     * Reset object cache.
+     */
+    protected function reset_object_cache() {
+        $this->_objects = array();
+    }
 
-	/**
-	 * Magic method!
-	 */
-	public function __get($name) {
-		$additional = "_get_" . $name;
-		if (method_exists($this, $additional)) {
-			return $this->$additional();
-		}
+    /**
+     * Magic method!
+     */
+    public function __get($name) {
+        $additional = "_get_" . $name;
+        if (method_exists($this, $additional)) {
+            return $this->$additional();
+        }
 
-		if (isset($this->_data[$name])) {
-			return $this->_data[$name];
-		}
+        if (isset($this->_data[$name])) {
+            return $this->_data[$name];
+        }
 
-		// Are we trying to get the object for an id column?
-		if (isset($this->_data[$name . "id"])) {
-			$id = $this->_data[$name . "id"];
-			$class = "\\local_connect\\" . $name;
-			if (class_exists($class)) {
-				$obj_key = $class . "\\" . $id;
-				if (!isset($this->_objects[$obj_key])) {
-					$this->_objects[$obj_key] = $class::get($id);
-				}
+        // Are we trying to get the object for an id column?
+        if (isset($this->_data[$name . "id"])) {
+            $id = $this->_data[$name . "id"];
+            $class = "\\local_connect\\" . $name;
+            if (class_exists($class)) {
+                $key = $class . "\\" . $id;
+                if (!isset($this->_objects[$key])) {
+                    $this->_objects[$key] = $class::get($id);
+                }
 
-				return $this->_objects[$obj_key];
-			}
-		}
+                return $this->_objects[$key];
+            }
+        }
 
-		if (!in_array($name, $this->valid_fields())) {
-			debugging("Invalid field: $name!");
-		}
+        if (!in_array($name, $this->valid_fields())) {
+            debugging("Invalid field: $name!");
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Magic!
-	 */
-	public function __isset($name) {
-		return isset($this->_data[$name]);
-	}
+    /**
+     * Magic!
+     */
+    public function __isset($name) {
+        return isset($this->_data[$name]);
+    }
 
-	/**
-	 * Magic!
-	 */
-	public function __unset($name) {
-		unset($this->_data[$name]);
-	}
+    /**
+     * Magic!
+     */
+    public function __unset($name) {
+        unset($this->_data[$name]);
+    }
 
-	/**
-	 * Magic!
-	 */
-	public function __set($name, $value) {
-		if (!in_array($name, $this->valid_fields())) {
-			debugging("Invalid field: $name!");
-			return;
-		}
+    /**
+     * Magic!
+     */
+    public function __set($name, $value) {
+        if (!in_array($name, $this->valid_fields())) {
+            debugging("Invalid field: $name!");
+            return;
+        }
 
-		$validation = "_validate_" . $name;
-		if (method_exists($this, $validation)) {
-			if (!$this->$validation($value)) {
-				throw new \moodle_exception("Invalid value for field '$name': $value!");
-			}
-		}
+        $validation = "_validate_" . $name;
+        if (method_exists($this, $validation)) {
+            if (!$this->$validation($value)) {
+                throw new \moodle_exception("Invalid value for field '$name': $value!");
+            }
+        }
 
-		$this->_data[$name] = $value;
-	}
+        $this->_data[$name] = $value;
+    }
 
-	/**
-	 * Is this in Moodle?
-	 * 
-	 * @return boolean
-	 */
-	public abstract function is_in_moodle();
+    /**
+     * Is this in Moodle?
+     * 
+     * @return boolean
+     */
+    public abstract function is_in_moodle();
 
-	/**
-	 * Save to Moodle
-	 * 
-	 * @return boolean
-	 */
-	public abstract function create_in_moodle();
+    /**
+     * Save to Moodle
+     * 
+     * @return boolean
+     */
+    public abstract function create_in_moodle();
 
-	/**
-	 * Save to the Connect database
-	 * 
-	 * @return boolean
-	 */
-	public function save() {
-		global $DB;
+    /**
+     * Save to the Connect database
+     * 
+     * @return boolean
+     */
+    public function save() {
+        global $DB;
 
         $table = $this->get_table();
         if ($table === null) {
-        	return false;
+            return false;
         }
 
-		$params = (array)$this->get_data();
+        $params = (array)$this->get_data();
 
         $sets = array();
         foreach ($params as $field => $value) {
-        	if (!in_array($field, $this->immutable_fields())) {
-	            $sets[] = "$field = :" . $field;
-	        } else {
-	        	unset($params[$field]);
-	        }
+            if (!in_array($field, $this->immutable_fields())) {
+                $sets[] = "$field = :" . $field;
+            } else {
+                unset($params[$field]);
+            }
         }
 
-		$ids = array();
+        $ids = array();
         foreach ($this->key_fields() as $key) {
-        	$ids[] = $key . " = :" . $key;
-        	$params[$key] = $this->_data[$key];
+            $ids[] = $key . " = :" . $key;
+            $params[$key] = $this->_data[$key];
         }
 
         $idstr = implode(' AND ', $ids);
         $sets = implode(', ', $sets);
         $sql = "UPDATE {{$table}} SET {$sets} WHERE {$idstr}";
 
-		return $DB->execute($sql, $params);
-	}
+        return $DB->execute($sql, $params);
+    }
 
-	/**
-	 * Delete from Moodle
-	 * 
-	 * @return boolean
-	 */
-	public function delete() {
-		debugging("delete() has not been implemented for this!", DEBUG_DEVELOPER);
-	}
+    /**
+     * Delete from Moodle
+     * 
+     * @return boolean
+     */
+    public function delete() {
+        debugging("delete() has not been implemented for this!", DEBUG_DEVELOPER);
+    }
 
-	/**
-	 * Sync with Moodle
-	 * 
-	 * @return boolean
-	 */
-	public function sync($dry = false) {
-		debugging("sync() has not been implemented for this!", DEBUG_DEVELOPER);
-	}
+    /**
+     * Sync with Moodle
+     * 
+     * @return boolean
+     */
+    public function sync($dry = false) {
+        debugging("sync() has not been implemented for this!", DEBUG_DEVELOPER);
+    }
 
-	/**
-	 * Get an object by ID
-	 */
-	public static function get($id) {
-		global $DB;
+    /**
+     * Get an object by ID
+     */
+    public static function get($id) {
+        global $DB;
 
-		$data = $DB->get_record(static::get_table(), array(
-			'id' => $id
-		));
+        $data = $DB->get_record(static::get_table(), array(
+            'id' => $id
+        ));
 
         if (!$data) {
             return null;
         }
 
-		$obj = new static();
-		$obj->set_class_data($data);
+        $obj = new static();
+        $obj->set_class_data($data);
 
-		return $obj;
-	}
+        return $obj;
+    }
 
     /**
      * Returns all known objects.
@@ -265,11 +265,11 @@ abstract class data {
         $set = $DB->get_records(static::get_table());
 
         if (!$raw) {
-	        foreach ($set as &$o) {
-	            $obj = new static();
-	            $obj->set_class_data($o);
-	            $o = $obj;
-	        }
+            foreach ($set as &$o) {
+                $obj = new static();
+                $obj->set_class_data($o);
+                $o = $obj;
+            }
         }
 
         return $set;
