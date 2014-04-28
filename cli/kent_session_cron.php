@@ -114,7 +114,7 @@ foreach ($allSlabs as $server => $slabs) {
 
 // Halve count (locks + data)
 if ($count > 0) {
-    $count = min($count / 2, 1);
+    $count = max($count / 2, 1);
 
     print "Cleaned up $count sessions.\n";
 
