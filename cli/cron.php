@@ -31,3 +31,5 @@ require_once($CFG->libdir . '/clilib.php');
 \local_connect\migrate::all_create();
 \local_connect\migrate::map_users();
 \local_connect\cli::enrolment_sync();
+\local_connect\cli::group_sync();
+\local_connect\cli::group_enrolment_sync();
