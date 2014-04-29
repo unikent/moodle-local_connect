@@ -63,7 +63,7 @@ class sync
     /**
      * Grabs a list of Moodle enrolments
      */
-    public static function get_moodle_enrolments() {
+    public static function get_moodle_enrolments($limitfrom, $limitnum) {
         global $DB;
 
         $data = $DB->get_records_sql("SELECT ue.id, ue.userid, e.courseid, r.id as roleid
@@ -74,9 +74,32 @@ class sync
                                         INNER JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
                                         INNER JOIN {role_assignments} ra ON ra.userid = u.id AND ra.contextid = ctx.id
                                         INNER JOIN {role} r ON r.id = ra.roleid
-                                                            AND r.shortname IN ('sds_student', 'sds_teacher', 'convenor')");
+                                        WHERE r.shortname IN ('sds_student', 'sds_teacher', 'convenor')",
+                                    array(), $limitfrom, $limitnum);
 
         return $data;
+    }
+
+    /**
+     * Run a function against batched Moodle enrolments.
+     */
+    private static function batch_moodle_enrolments($func) {
+        $limitfrom = 0;
+        $limitnum = 1000;
+
+        $data = array();
+        $result = array();
+
+        do {
+            $data = self::get_moodle_enrolments($limitfrom, $limitnum);
+            $mapped = self::map_structure($data);
+            $current = $func($mapped);
+            $result = array_merge($result, $current);
+
+            $limitfrom += $limitnum;
+        } while (count($data) >= $limitnum);
+
+        return $result;
     }
 
     /**
@@ -102,7 +125,7 @@ class sync
      *
      * @param boolean $strict Only check if roleid matches 
      */
-    private static function compare_enrolments($structure, $data, $strict = false) {
+    public static function compare_enrolments($structure, $data, $strict = false) {
         $ids = array();
 
         foreach ($data as $enrolment) {
@@ -124,12 +147,31 @@ class sync
 
     /**
      * Grab a list of enrolments due to be created.
+     * 
+     * Translates roughly to:
+     * SELECT ce.id, cu.mid as userid, cc.mid as courseid, cr.mid as roleid
+     * FROM mdl_connect_enrolments ce
+     * INNER JOIN mdl_connect_user cu ON cu.id = ce.userid
+     * INNER JOIN mdl_connect_course cc ON cc.id = ce.courseid
+     * INNER JOIN mdl_connect_role cr ON cr.id = ce.roleid
+     * LEFT OUTER JOIN (
+     *     SELECT ue.id, ue.userid, e.courseid, r.id as roleid
+     *     FROM mdl_user_enrolments ue
+     *     INNER JOIN mdl_user u on u.id = ue.userid
+     *     INNER JOIN mdl_enrol e ON e.id = ue.enrolid
+     *     INNER JOIN mdl_course c ON c.id = e.courseid
+     *     INNER JOIN mdl_context ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
+     *     INNER JOIN mdl_role_assignments ra ON ra.userid = u.id AND ra.contextid = ctx.id
+     *     INNER JOIN mdl_role r ON r.id = ra.roleid
+     *     WHERE r.shortname IN ('sds_student', 'sds_teacher', 'convenor')
+     * ) cur ON cur.userid=cu.mid AND cur.courseid=cc.mid AND cur.roleid=cr.mid
+     * WHERE cc.mid != 0 AND ce.deleted = 0 AND cur.id IS NULL
      */
     public static function get_new_enrolments() {
-        $data = self::get_moodle_enrolments();
-        $moodle = self::map_structure($data);
         $connect = self::get_connect_enrolments();
-        return self::compare_enrolments($moodle, $connect, false);
+        return self::batch_moodle_enrolments(function($data) use($connect) {
+            return sync::compare_enrolments($data, $connect, false);
+        });
     }
 
     /**
@@ -137,10 +179,10 @@ class sync
      * There isnt much we do about this.. and it shouldnt really happen.
      */
     public static function get_changed_enrolments() {
-        $data = self::get_moodle_enrolments();
-        $moodle = self::map_structure($data);
         $connect = self::get_connect_enrolments();
-        return self::compare_enrolments($moodle, $connect, true);
+        return self::batch_moodle_enrolments(function($data) use($connect) {
+            return sync::compare_enrolments($data, $connect, true);
+        });
     }
 
     /**
@@ -189,7 +231,7 @@ class sync
          * WHERE ce.id IS NULL
          */
 
-        $moodle = self::get_moodle_enrolments();
+        $moodle = self::get_moodle_enrolments(0, 100000000);
         $data = self::get_connect_enrolments();
         $connect = self::map_structure($data);
         return self::compare_enrolments($connect, $moodle, false);
