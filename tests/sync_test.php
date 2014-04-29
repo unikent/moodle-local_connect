@@ -42,7 +42,7 @@ class kent_sync_tests extends local_connect\util\connect_testcase
 		$teacher_obj = \local_connect\enrolment::get($teacher);
 
 		$this->assertEquals(33, count(\local_connect\sync::get_connect_enrolments()));
-		$this->assertEquals(0, count(\local_connect\sync::get_moodle_enrolments()));
+		$this->assertEquals(0, count(\local_connect\sync::get_moodle_enrolments(0, 1000)));
 		$this->assertEquals(33, count(\local_connect\sync::get_new_enrolments()));
 
 		$enrolments = \local_connect\enrolment::get_all();
