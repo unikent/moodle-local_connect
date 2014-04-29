@@ -22,27 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-global $CFG;
+define('CLI_SCRIPT', true);
 
-require_once($CFG->libdir . "/clilib.php");
+require(dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->libdir . '/clilib.php');
 
-// Only enable this for 2014.
-if (\local_connect\utils::is_enabled() && \local_connect\utils::enable_new_features() && \local_connect\utils::enable_cron()) {
-	mtrace('');
-
-	// Sync courses
-	\local_connect\cli::course_sync();
-	mtrace('');
-
-	// Sync enrolments
-	\local_connect\cli::enrolment_sync();
-	mtrace('');
-
-	// Sync groups
-	\local_connect\cli::group_sync();
-	mtrace('');
-
-	// Sync group enrolments
-	\local_connect\cli::group_enrolment_sync();
-	mtrace('');
-}
+// For now, only perform jobs that have been deemed stable.
+\local_connect\migrate::all_create();
+\local_connect\migrate::map_users();
+\local_connect\cli::enrolment_sync();
