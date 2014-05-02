@@ -72,10 +72,10 @@ class enrolment extends data
                     $this->delete();
                 }
 
-                return "Deleting Enrolment: $this->id";
+                return self::STATUS_DELETE;
             }
 
-            return null;
+            return self::STATUS_NONE;
         }
 
         // Or creating it?
@@ -84,8 +84,10 @@ class enrolment extends data
                 $this->create_in_moodle();
             }
 
-            return "Creating Enrolment: $this->id";
+            return self::STATUS_CREATE;
         }
+
+        return self::STATUS_NONE;
     }
 
     /**

@@ -184,13 +184,13 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 
 		$obj = \local_connect\group_enrolment::get($ge);
 		$this->assertFalse($obj->is_in_moodle());
-		$this->assertEquals("Creating Group Enrolment: {$obj->id}", $obj->sync());
+		$this->assertEquals(\local_connect\data::STATUS_CREATE, $obj->sync());
 		$this->assertTrue($obj->is_in_moodle());
 
 		$obj->deleted = 1;
 
 		$this->assertTrue($obj->is_in_moodle());
-		$this->assertEquals("Deleting Group Enrolment: {$obj->id}", $obj->sync());
+		$this->assertEquals(\local_connect\data::STATUS_DELETE, $obj->sync());
 		$this->assertFalse($obj->is_in_moodle());
 	}
 
