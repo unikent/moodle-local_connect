@@ -90,6 +90,11 @@ class group_enrolment extends data
             return self::STATUS_NONE;
         }
 
+        // If our group is screwed up, something is wrong.
+        if (!$this->group) {
+            return self::STATUS_NONE;
+        }
+
         // Easy option.
         if (!$this->is_in_moodle() && $this->group->is_in_moodle()) {
             if (!$dry) {
