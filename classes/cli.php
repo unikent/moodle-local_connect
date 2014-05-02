@@ -32,6 +32,25 @@ defined('MOODLE_INTERNAL') || die();
 class cli
 {
     /**
+     * Map status to actions.
+     */
+    public static function map_status($status, $obj) {
+        switch ($result) {
+            case data::STATUS_CREATE:
+                mtrace("    Created: " . $obj->id);
+            break;
+            case data::STATUS_MODIFY:
+                mtrace("    Modified: " . $obj->id);
+            break;
+            case data::STATUS_DELETE:
+                mtrace("    Deleted: " . $obj->id);
+            break;
+            default:
+            break;
+        }
+    }
+
+    /**
      * Run the course sync cron
      */
     public static function course_sync($dry = false, $mid = null) {
@@ -48,9 +67,7 @@ class cli
         course::batch_all(function ($obj) use($dry) {
             try {
                 $result = $obj->sync($dry);
-                if ($result !== null) {
-                    mtrace("    " . $result);
-                }
+                cli::map_status($result, $obj);
             } catch (Excepton $e) {
                 $msg = $e->getMessage();
                 mtrace("    Error: {$msg}\n");
@@ -73,9 +90,7 @@ class cli
             // Just run a batch_all on the set.
             enrolment::batch_all(function ($obj) use($dry) {
                 $result = $obj->sync($dry);
-                if ($result !== null) {
-                    mtrace("    " . $result);
-                }
+                cli::map_status($result, $obj);
             });
 
             mtrace("  done.\n");
@@ -117,9 +132,7 @@ class cli
             // Just run a batch_all on the set.
             group::batch_all(function ($obj) use($dry) {
                 $result = $obj->sync($dry);
-                if ($result !== null) {
-                    mtrace("    " . $result);
-                }
+                cli::map_status($result, $obj);
             });
 
             mtrace("  done.\n");
@@ -159,9 +172,7 @@ class cli
             // Just run a batch_all on the set.
             group_enrolment::batch_all(function ($obj) use($dry) {
                 $result = $obj->sync($dry);
-                if ($result !== null) {
-                    mtrace("    " . $result);
-                }
+                cli::map_status($result, $obj);
             });
 
             mtrace("  done.\n");
