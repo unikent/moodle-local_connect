@@ -103,11 +103,13 @@ class migrate
             FROM `$connectdb`.`enrollments` e
             LEFT OUTER JOIN {connect_role} cr
                 ON cr.name=e.role
-            WHERE cr.id IS NULL
+            WHERE cr.id IS NULL AND e.session_code=:session_code
             GROUP BY e.role
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -125,11 +127,13 @@ class migrate
             FROM `$connectdb`.`enrollments` e
             LEFT OUTER JOIN {connect_user} u
                 ON u.login=e.login
-            WHERE u.id IS NULL
+            WHERE u.id IS NULL AND e.session_code=:session_code
             GROUP BY e.login
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -147,11 +151,13 @@ class migrate
             FROM `$connectdb`.`courses` c
             LEFT OUTER JOIN {connect_campus} cc
                 ON cc.id=c.campus
-            WHERE cc.id IS NULL
+            WHERE cc.id IS NULL AND c.session_code=:session_code
             GROUP BY c.campus
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -171,14 +177,17 @@ class migrate
                    COALESCE(c.synopsis, ''),c.category_id,COALESCE(cc.mid,0)
             FROM `connect_development`.`courses` c
             INNER JOIN {connect_course} cc ON cc.module_delivery_key=c.module_delivery_key AND cc.session_code=c.session_code
-            WHERE c.module_title <> cc.module_title
-	              OR c.module_code <> cc.module_code
-	              OR c.synopsis <> cc.synopsis
-	              OR c.category_id <> cc.category
+            WHERE (c.module_title <> cc.module_title
+                        OR c.module_code <> cc.module_code
+                        OR c.synopsis <> cc.synopsis
+                        OR c.category_id <> cc.category)
+                    AND c.session_code=:session_code
             GROUP BY c.module_delivery_key,c.session_code,c.module_version
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -198,11 +207,13 @@ class migrate
                    c.module_title,c.module_code,COALESCE(c.synopsis, ''),c.category_id,COALESCE(c.moodle_id, 0)
             FROM `$connectdb`.`courses` c
             LEFT OUTER JOIN {connect_course} cc ON cc.module_delivery_key=c.module_delivery_key AND cc.session_code=c.session_code
-            WHERE cc.id IS NULL
+            WHERE cc.id IS NULL AND c.session_code=:session_code
             GROUP BY c.module_delivery_key,c.session_code,c.module_version
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -220,11 +231,13 @@ class migrate
             FROM `connect_development`.`groups` g
             INNER JOIN {connect_course} c ON c.module_delivery_key=g.module_delivery_key AND c.session_code=g.session_code
             INNER JOIN {connect_group} cg ON cg.id=g.group_id
-            WHERE g.group_desc <> cg.name
+            WHERE g.group_desc <> cg.name AND g.session_code=:session_code
             GROUP BY g.group_id
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -242,11 +255,13 @@ class migrate
             FROM `$connectdb`.`groups` g
             INNER JOIN {connect_course} c ON c.module_delivery_key=g.module_delivery_key AND c.session_code=g.session_code
             LEFT OUTER JOIN {connect_group} cg ON cg.id=g.group_id
-            WHERE cg.id IS NULL
+            WHERE cg.id IS NULL AND g.session_code=:session_code
             GROUP BY g.group_id
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -266,11 +281,13 @@ class migrate
             INNER JOIN {connect_user} u ON u.login=e.login
             INNER JOIN {connect_role} r ON r.name=e.role
             INNER JOIN {connect_enrolments} ce ON ce.courseid=c.id AND ce.userid=u.id AND ce.roleid=r.id
-            WHERE e.sink_deleted <> ce.deleted
+            WHERE e.sink_deleted <> ce.deleted AND e.session_code=:session_code
             GROUP BY ce.id
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -285,15 +302,17 @@ class migrate
 
         $sql = "REPLACE INTO {connect_enrolments} (`courseid`, `userid`, `roleid`,`deleted`) (
             SELECT c.id, u.id, r.id, e.sink_deleted
-            FROM `$connectdb`.`enrollments` e
+            FROM `$connectdb`.`enrollments` e AND e.session_code=:session_code
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key AND c.session_code=e.session_code
             INNER JOIN {connect_user} u ON u.login=e.login
             INNER JOIN {connect_role} r ON r.name=e.role
             LEFT OUTER JOIN {connect_enrolments} ce ON ce.courseid=c.id AND ce.userid=u.id AND ce.roleid=r.id
-            WHERE ce.id IS NULL
+            WHERE ce.id IS NULL AND e.session_code=:session_code
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -311,11 +330,13 @@ class migrate
             FROM `$connectdb`.`group_enrollments` ge
             INNER JOIN {connect_user} u ON u.login=ge.login
             INNER JOIN {connect_group_enrolments} cge ON cge.groupid=ge.group_id AND cge.userid=u.id
-            WHERE cge.deleted <> ge.sink_deleted
+            WHERE cge.deleted <> ge.sink_deleted AND ge.session_code=:session_code
             GROUP BY cge.id
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -333,10 +354,12 @@ class migrate
             FROM `$connectdb`.`group_enrollments` ge
             INNER JOIN {connect_user} u ON u.login=ge.login
             LEFT OUTER JOIN {connect_group_enrolments} cge ON cge.groupid=ge.group_id AND cge.userid=u.id
-            WHERE cge.id IS NULL
+            WHERE cge.id IS NULL AND ge.session_code=:session_code
         )";
 
-        return $DB->execute($sql);
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
