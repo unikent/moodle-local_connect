@@ -84,10 +84,15 @@ class group_enrolment extends data
                     $this->delete();
                 }
 
-                return "Deleting Group Enrolment: $this->id";
+                return self::STATUS_DELETE;
             }
 
-            return null;
+            return self::STATUS_NONE;
+        }
+
+        // If our group is screwed up, something is wrong.
+        if (!$this->group) {
+            return self::STATUS_NONE;
         }
 
         // Easy option.
@@ -96,8 +101,10 @@ class group_enrolment extends data
                 $this->create_in_moodle();
             }
 
-            return "Creating Group Enrolment: " . $this->id;
+            return self::STATUS_CREATE;
         }
+
+        return self::STATUS_NONE;
     }
 
     /**

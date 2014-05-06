@@ -160,9 +160,9 @@ class kent_group_tests extends local_connect\util\connect_testcase
 
 		// Sync it.
 		$this->assertFalse($group->is_in_moodle());
-		$this->assertEquals("Creating group: $group->id", $group->sync());
+		$this->assertEquals(\local_connect\data::STATUS_CREATE, $group->sync());
 		$this->assertTrue($group->is_in_moodle());
-		$this->assertEquals(null, $group->sync());
+		$this->assertEquals(\local_connect\data::STATUS_NONE, $group->sync());
 
 		// Check the Moodle name.
 		$mgroup = $DB->get_record('groups', array(
@@ -176,7 +176,7 @@ class kent_group_tests extends local_connect\util\connect_testcase
             "id" => $group->mid
         ));
         $this->assertNotEquals($mgroup->name, $group->name);
-		$this->assertEquals("Updating group: $group->id", $group->sync());
+		$this->assertEquals(\local_connect\data::STATUS_MODIFY, $group->sync());
 
 		// Check the Moodle name again.
 		$mgroup = $DB->get_record('groups', array(
@@ -238,13 +238,13 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->assertEquals(0, $group->mid);
 
 		// Try to sync, see what happens.
-		$this->assertEquals(null, $group->sync());
+		$this->assertEquals(\local_connect\data::STATUS_NONE, $group->sync());
 		$this->assertEquals(0, $group->mid);
 
 		// Force-set the mid, and ensure sync cleans up.
 		$group->mid = 100;
 		$this->assertEquals(100, $group->mid);
-		$this->assertEquals(null, $group->sync());
+		$this->assertEquals(\local_connect\data::STATUS_MODIFY, $group->sync());
 		$this->assertEquals(0, $group->mid);
 
 		$group = \local_connect\group::get($group->id);

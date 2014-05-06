@@ -30,6 +30,11 @@ defined('MOODLE_INTERNAL') || die();
  * Connect data container
  */
 abstract class data {
+    const STATUS_NONE = 0;
+    const STATUS_CREATE = 1;
+    const STATUS_MODIFY = 2;
+    const STATUS_DELETE = 3;
+
     /** Stores all our data */
     private $_data;
 

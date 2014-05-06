@@ -32,6 +32,25 @@ defined('MOODLE_INTERNAL') || die();
 class cli
 {
     /**
+     * Map status to actions.
+     */
+    public static function map_status($status, $obj) {
+        switch ($status) {
+            case data::STATUS_CREATE:
+                mtrace("  Created: " . $obj->id);
+            break;
+            case data::STATUS_MODIFY:
+                mtrace("  Modified: " . $obj->id);
+            break;
+            case data::STATUS_DELETE:
+                mtrace("  Deleted: " . $obj->id);
+            break;
+            default:
+            break;
+        }
+    }
+
+    /**
      * Run the course sync cron
      */
     public static function course_sync($dry = false, $mid = null) {
@@ -39,25 +58,23 @@ class cli
 
         if (isset($mid)) {
             $conditions['mid'] = $mid;
-            mtrace("  Synchronizing course: '{$mid}'...\n");
+            mtrace("Synchronizing course: '{$mid}'...");
         } else {
-            mtrace("  Synchronizing courses...\n");
+            mtrace("Synchronizing courses...");
         }
 
         // Just run a batch_all on the set.
         course::batch_all(function ($obj) use($dry) {
             try {
                 $result = $obj->sync($dry);
-                if ($result !== null) {
-                    mtrace("    " . $result);
-                }
+                cli::map_status($result, $obj);
             } catch (Excepton $e) {
                 $msg = $e->getMessage();
-                mtrace("    Error: {$msg}\n");
+                mtrace("  Error: {$msg}");
             }
         }, $conditions);
 
-        mtrace("  done.\n");
+        mtrace("done!");
 
         return true;
     }
@@ -68,29 +85,27 @@ class cli
     public static function enrolment_sync($dry = false, $mid = null) {
         // If we dont have an mid, this is easy.
         if (!isset($mid)) {
-            mtrace("  Synchronizing enrolments...\n");
+            mtrace("Synchronizing enrolments...");
 
             // Just run a batch_all on the set.
             enrolment::batch_all(function ($obj) use($dry) {
                 $result = $obj->sync($dry);
-                if ($result !== null) {
-                    mtrace("    " . $result);
-                }
+                cli::map_status($result, $obj);
             });
 
-            mtrace("  done.\n");
+            mtrace("  done.");
 
             return true;
         }
 
-        mtrace("  Synchronizing enrolments for course: '{$mid}'...\n");
+        mtrace("Synchronizing enrolments for course: '{$mid}'...");
 
         // Get the connect version of the course.
         $courses = course::get_by_moodle_id($mid);
 
         // Validate the course.
         if (empty($courses)) {
-            mtrace("  Course does not exist in Moodle: {$mid}\n");
+            mtrace("Course does not exist in Moodle: {$mid}");
             return false;
         }
 
@@ -101,7 +116,7 @@ class cli
             }
         }
 
-        mtrace("  done.\n");
+        mtrace("  done.");
 
         return true;
     }
@@ -112,29 +127,27 @@ class cli
     public static function group_sync($dry = false, $mid = null) {
         // If we dont have a moodle id limiting us, batch it all.
         if (!isset($mid)) {
-            mtrace("  Synchronizing groups...\n");
+            mtrace("Synchronizing groups...");
 
             // Just run a batch_all on the set.
             group::batch_all(function ($obj) use($dry) {
                 $result = $obj->sync($dry);
-                if ($result !== null) {
-                    mtrace("    " . $result);
-                }
+                cli::map_status($result, $obj);
             });
 
-            mtrace("  done.\n");
+            mtrace("  done.");
 
             return true;
         }
 
-        mtrace("  Synchronizing groups for course: '{$mid}'...\n");
+        mtrace("Synchronizing groups for course: '{$mid}'...");
 
         // Get the connect version of the course.
         $courses = course::get_by_moodle_id($mid);
 
         // Validate the course.
         if (empty($courses)) {
-            mtrace("  Course does not exist in Moodle: {$mid}\n");
+            mtrace("Course does not exist in Moodle: {$mid}");
             return false;
         }
 
@@ -145,7 +158,7 @@ class cli
             }
         }
 
-        mtrace("  done!\n");
+        mtrace("  done!");
     }
 
     /**
@@ -154,29 +167,27 @@ class cli
     public static function group_enrolment_sync($dry = false, $mid = null) {
         // If we dont have a moodle id limiting us, batch it all.
         if (!isset($mid)) {
-            mtrace("  Synchronizing group enrolments...\n");
+            mtrace("Synchronizing group enrolments...");
 
             // Just run a batch_all on the set.
             group_enrolment::batch_all(function ($obj) use($dry) {
                 $result = $obj->sync($dry);
-                if ($result !== null) {
-                    mtrace("    " . $result);
-                }
+                cli::map_status($result, $obj);
             });
 
-            mtrace("  done.\n");
+            mtrace("  done.");
 
             return true;
         }
 
-        mtrace("  Synchronizing group enrolments for course: '{$mid}'...\n");
+        mtrace("Synchronizing group enrolments for course: '{$mid}'...");
 
         // Get the connect version of the course.
         $courses = course::get_by_moodle_id($mid);
 
         // Validate the course.
         if (empty($courses)) {
-            mtrace("  Course does not exist in Moodle: {$mid}\n");
+            mtrace("Course does not exist in Moodle: {$mid}");
             return false;
         }
 
@@ -187,7 +198,7 @@ class cli
             }
         }
 
-        mtrace("  done!\n");
+        mtrace("  done!");
     }
 
 }

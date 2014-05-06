@@ -70,23 +70,16 @@ class course extends data
     public function sync($dry = false) {
         $this->reset_object_cache();
 
-        // Should we be creating this?
-        if (!$this->is_in_moodle() && $this->is_unique_shortname($this->shortname)) {
-            if (!$dry) {
-                $this->create_in_moodle();
-            }
-
-            return "Creating Course: $this->id";
-        }
-
         // Have we changed at all?
         if ($this->is_locked() && $this->has_changed()) {
             if (!$dry) {
                 $this->update_moodle();
             }
 
-            return "Updating Course: $this->id";
+            return self::STATUS_MODIFY;
         }
+
+        return self::STATUS_NONE;
     }
 
     /**

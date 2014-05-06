@@ -275,7 +275,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 
 		$enrolment = array_pop($enrolments);
 		$this->assertFalse($enrolment->is_in_moodle());
-		$this->assertEquals("Creating Enrolment: {$enrolment->id}", $enrolment->sync());
+		$this->assertEquals(\local_connect\data::STATUS_CREATE, $enrolment->sync());
 		$this->assertTrue($enrolment->is_in_moodle());
 	}
 
