@@ -80,10 +80,14 @@ class group extends data
             if (!empty($this->mid)) {
                 $this->mid = 0;
                 $this->save();
+
+                return self::STATUS_MODIFY;
             }
 
-            return;
+            return self::STATUS_NONE;
         }
+
+        $status = self::STATUS_NONE;
 
         // On sync we can be a bit slower... check the mid is valid.
         if ($this->is_in_moodle()) {
@@ -91,6 +95,7 @@ class group extends data
             if (!$DB->record_exists('groups', array('id' => $this->mid))) {
                 $this->mid = 0;
                 $this->save();
+                $status = self::STATUS_MODIFY;
             }
         }
 
@@ -100,7 +105,7 @@ class group extends data
                 $this->create_in_moodle();
             }
 
-            return 'Creating group: ' . $this->id;
+            return self::STATUS_CREATE;
         }
 
         // We are currently in Moodle!
@@ -114,8 +119,10 @@ class group extends data
                 $this->update_in_moodle();
             }
 
-            return 'Updating group: ' . $this->id;
+            return self::STATUS_MODIFY;
         }
+
+        return $status;
     }
 
     /**

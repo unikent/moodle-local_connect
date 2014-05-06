@@ -47,12 +47,12 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         // Creates.
         $this->assertFalse($course->is_in_moodle());
-        $this->assertEquals("Creating Course: " . $course->id, $course->sync());
+        $this->assertTrue($course->create_in_moodle());
         $this->assertTrue($course->is_in_moodle());
 
         // Updates.
         $course->module_title = "TESTING NAME CHANGE";
-        $this->assertEquals("Updating Course: " . $course->id, $course->sync());
+        $this->assertEquals(\local_connect\data::STATUS_MODIFY, $course->sync());
         $this->assertTrue($course->is_in_moodle());
         $mcourse = $DB->get_record('course', array(
             "id" => $course->mid
@@ -126,7 +126,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
         // Unlink!
         $this->assertTrue($course1->unlink());
 
-        // TODO - test more stuff, enrolments etc
+        // TODO - test more stuff, enrolments etc.
     }
 
     /**
