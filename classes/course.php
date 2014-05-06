@@ -71,7 +71,7 @@ class course extends data
         $this->reset_object_cache();
 
         // Have we changed at all?
-        if ($this->is_locked() && $this->has_changed()) {
+        if (!$this->is_merged() && $this->is_locked() && $this->has_changed()) {
             if (!$dry) {
                 $this->update_moodle();
             }
@@ -112,14 +112,14 @@ class course extends data
      */
     public function _get_bracket_period() {
         $lastyear = date('Y', strtotime('1-1-' . $this->session_code . ' -1 year'));
-        return "({$lastyear} / {$this->session_code})";
+        return "({$lastyear}/{$this->session_code})";
     }
 
     /**
-     * Returns the duration of this course in the format: "i - i"
+     * Returns the duration of this course in the format: "i-i"
      */
     public function _get_duration() {
-        return $this->module_week_beginning . ' - ' . ($this->module_week_beginning + $this->module_length);
+        return $this->module_week_beginning . '-' . ($this->module_week_beginning + $this->module_length);
     }
 
     /**
@@ -169,12 +169,47 @@ class course extends data
     }
 
     /**
+     * Get the summary, based on the synopsis
+     */
+    public function _get_summary() {
+        $code = $this->module_code;
+        if (strpos($code, " ") !== false) {
+            $code = substr($code, 0, strpos($code, " "));
+        }
+
+        $more = "<a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/{$code}'>more</a>";
+
+        $text = $this->synopsis;
+        if (strlen($text) > 250) {
+            $text = substr($text, 0, 247) . "... " . $more;
+        }
+
+        $text = '<div class="synopsistext">' . strip_tags($text) . '</div>';
+
+        $text .= "&nbsp;<p style='margin-top:10px' class='module_summary_extra_info'>";
+        $text .= $this->campus->name . ", ";
+        $text .= "week " . $this->duration;
+        $text .= "</p>";
+
+        return $text;
+    }
+
+    /**
      * Is this course unique?
      * @return boolean
      */
     public function is_unique() {
         global $DB;
         return $DB->count_records('connect_course', array('module_code' => $this->module_code)) === 1;
+    }
+
+    /**
+     * Is this course part of a merged set?
+     * @return boolean
+     */
+    public function is_merged() {
+        global $DB;
+        return $DB->count_records('connect_course', array('mid' => $this->mid)) > 1;
     }
 
     /**
@@ -251,8 +286,7 @@ class course extends data
         ), 'id, shortname, fullname, category, summary');
 
         return  $course->fullname !== $this->fullname ||
-                $course->category !== $this->category ||
-                $course->summary !== $this->synopsis;
+                $course->category !== $this->category;
     }
 
     /**
@@ -329,7 +363,7 @@ class course extends data
             $obj->category = $this->category;
             $obj->shortname = $shortname;
             $obj->fullname = $this->fullname;
-            $obj->summary = $this->synopsis;
+            $obj->summary = $this->summary;
             $obj->visible = 0;
 
             $course = create_course($obj);
@@ -470,7 +504,6 @@ class course extends data
         // Updates!
         $course->fullname = $this->fullname;
         $course->category = $this->category;
-        $course->summary = $this->synopsis;
 
         // Update this course in Moodle.
         update_course($course);
