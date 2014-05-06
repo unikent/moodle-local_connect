@@ -51,6 +51,27 @@ class cli
     }
 
     /**
+     * Helper to fix up mids.
+     * Shouldnt be needed (observers) but is here "just in case".
+     */
+    public static function fix_mids() {
+        global $DB;
+
+        // Fix courses.
+        $sql = <<<SQL
+            SELECT cc.id, cc.mid
+            FROM {connect_course} cc
+            LEFT OUTER JOIN {course} c ON c.id=cc.mid
+            WHERE cc.mid > 0 AND c.id IS NULL
+SQL;
+        $records = $DB->get_records_sql($sql);
+        foreach ($records as $record) {
+            $record->mid = null;
+            $DB->update_record('connect_course', $record);
+        }
+    }
+
+    /**
      * Run the course sync cron
      */
     public static function course_sync($dry = false, $mid = null) {

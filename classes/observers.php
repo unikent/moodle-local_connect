@@ -128,6 +128,11 @@ class observers
             return true;
         }
 
+        // Update any mids.
+        $DB->set_field('connect_course', 'mid', null, array(
+            'mid' => $event->objectid
+        ));
+
         // Update ShareDB if it is enabled.
         if (utils::enable_sharedb()) {
             // Update course listings DB.
