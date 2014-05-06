@@ -128,6 +128,11 @@ class observers
             return true;
         }
 
+        // Update any mids.
+        $DB->set_field('connect_course', 'mid', null, array(
+            'mid' => $event->objectid
+        ));
+
         // Update ShareDB if it is enabled.
         if (utils::enable_sharedb()) {
             // Update course listings DB.
@@ -153,40 +158,42 @@ class observers
      * @return unknown
      */
     public static function user_created(\core\event\user_created $event) {
-        global $DB;
+        global $DB, $USER;
 
-        if (utils::enable_new_features()) {
-            // Grab user info.
-            $record = $DB->get_record('user', array(
-                "id" => $event->objectid
-            ));
+        // Grab user info.
+        $username = $DB->get_field('user', 'username', array(
+            "id" => $event->objectid
+        ));
 
-            // Grab Connect User.
-            $user = user::get_by_username($record->username);
-            if (!$user) {
-                return true;
-            }
+        $obj = $DB->get_record('connect_user', array(
+            "login" => $username
+        ));
 
-            // Set mid for the new user if necessary.
-            if ($user->mid !== $event->objectid) {
-                $user->mid = $event->objectid;
-                $user->save();
-            }
+        // If there is no valid connect user, bail out.
+        if (!$obj) {
+            return true;
+        }
 
+        // Update any mids.
+        $obj->mid = $event->objectid;
+        $DB->update_record('connect_user', $obj);
+
+        // Grab connect object.
+        $obj = user::get($obj->id);
+
+        // If we created the user on first login, sync enrolments.
+        // TODO - make this a "task" in 2.7.
+        if ($USER->id === $obj->mid) {
             // Sync Enrollments.
-            $enrolments = enrolment::get_for_user($user);
+            $enrolments = enrolment::get_for_user($obj);
             foreach ($enrolments as $enrolment) {
-                if (!$enrolment->is_in_moodle()) {
-                    $enrolment->create_in_moodle();
-                }
+                $enrolment->create_in_moodle();
             }
 
             // Sync Group Enrollments.
-            $enrolments = group_enrolment::get_for_user($user);
+            $enrolments = group_enrolment::get_for_user($obj);
             foreach ($enrolments as $enrolment) {
-                if (!$enrolment->is_in_moodle()) {
-                    $enrolment->create_in_moodle();
-                }
+                $enrolment->create_in_moodle();
             }
         }
 
@@ -203,18 +210,10 @@ class observers
     public static function user_deleted(\core\event\user_deleted $event) {
         global $DB;
 
-        if (utils::enable_new_features()) {
-            $record = $DB->get_record('connect_user', array(
-                'mid' => $event->objectid
-            ));
-
-            // Unset this user's mid.
-            if ($record) {
-                $user = user::get($record->id);
-                $user->mid = 0;
-                $user->save();
-            }
-        }
+        // Update any mids.
+        $DB->set_field('connect_user', 'mid', null, array(
+            'mid' => $event->objectid
+        ));
 
         return true;
     }
@@ -269,11 +268,8 @@ class observers
     public static function group_deleted(\core\event\group_deleted $event) {
         global $DB;
 
-        if (!utils::enable_new_features()) {
-            return true;
-        }
-
-        $DB->set_field('connect_group', 'mid', 0, array(
+        // Update any mids.
+        $DB->set_field('connect_group', 'mid', null, array(
             'mid' => $event->objectid
         ));
 

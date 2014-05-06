@@ -16,9 +16,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . "/local/connect/classes/course.php");
-
 /**
  * Tests new Kent course code
  */
@@ -76,6 +73,40 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $this->assertTrue($course2->is_unique_shortname($course2->shortname));
         $course2->module_code = $course->module_code;
         $this->assertFalse($course2->is_unique_shortname($course2->shortname));
+    }
+
+    /**
+     * Test summary generator
+     */
+    public function test_course_summary_check() {
+        $this->resetAfterTest();
+
+        $courseid = $this->generate_course();
+        $course = \local_connect\course::get($courseid);
+        $this->assertEquals('A test course', $course->synopsis);
+
+        $expected = "<div class=\"synopsistext\">A test course</div>&nbsp;";
+        $expected .= "<p style='margin-top:10px' class='module_summary_extra_info'>Canterbury, week 1-13</p>";
+        $this->assertEquals($expected, $course->summary);
+
+        // Also test we properly shorten them!
+
+        $synopsis = "";
+        for ($i = 0; $i < 247; $i++) {
+            $synopsis .= ":";
+        }
+
+        $expected = "<div class=\"synopsistext\">";
+        $expected .= $synopsis;
+        $expected .= "... more</div>&nbsp;<p style='margin-top:10px' class='module_summary_extra_info'>Canterbury, week 1-13</p>";
+
+        for ($i = 0; $i < 53; $i++) {
+            $synopsis .= ":";
+        }
+
+        $course->synopsis = $synopsis;
+
+        $this->assertEquals($expected, $course->summary);
     }
 
     /**
