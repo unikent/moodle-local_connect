@@ -169,6 +169,32 @@ class course extends data
     }
 
     /**
+     * Get the summary, based on the synopsis
+     */
+    public function _get_summary() {
+        $code = $this->module_code;
+        if (strpos($code, " ") !== false) {
+            $code = substr($code, 0, strpos($code, " "));
+        }
+
+        $more = "<a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/{$code}'>more</a>";
+
+        $text = $this->synopsis;
+        if (strlen($text) > 250) {
+            $text = substr($text, 0, 247) . "... " . $more;
+        }
+
+        $text = '<div class="synopsistext">' . strip_tags($text) . '</div>';
+
+        $text .= "&nbsp;<p style='margin-top:10px' class='module_summary_extra_info'>";
+        $text .= $this->campus->name . ", ";
+        $text .= "week " . $this->duration;
+        $text .= "</p>";
+
+        return $text;
+    }
+
+    /**
      * Is this course unique?
      * @return boolean
      */
