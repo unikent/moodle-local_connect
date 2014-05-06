@@ -53,7 +53,9 @@ class migrate
      */
     public static function all() {
         self::new_roles();
+        self::map_roles();
         self::new_users();
+        self::map_users();
         self::new_campus();
         self::updated_courses();
         self::new_courses();
@@ -98,7 +100,7 @@ class migrate
 
         echo "Migrating new roles\n";
 
-        $sql = "REPLACE INTO {connect_role} (name) (
+        $sql = "INSERT INTO {connect_role} (name) (
             SELECT e.role
             FROM `$connectdb`.`enrollments` e
             LEFT OUTER JOIN {connect_role} cr
@@ -122,7 +124,7 @@ class migrate
 
         echo "Migrating new users\n";
 
-        $sql = "REPLACE INTO {connect_user} (ukc, login, title, initials, family_name) (
+        $sql = "INSERT INTO {connect_user} (ukc, login, title, initials, family_name) (
             SELECT e.ukc, e.login, COALESCE(e.title, ''), COALESCE(e.initials, ''), COALESCE(e.family_name, '')
             FROM `$connectdb`.`enrollments` e
             LEFT OUTER JOIN {connect_user} u
@@ -146,7 +148,7 @@ class migrate
 
         echo "Migrating new campus\n";
 
-        $sql = "REPLACE INTO {connect_campus} (`id`, `name`) (
+        $sql = "INSERT INTO {connect_campus} (`id`, `name`) (
             SELECT c.campus, c.campus_desc
             FROM `$connectdb`.`courses` c
             LEFT OUTER JOIN {connect_campus} cc
@@ -175,7 +177,7 @@ class migrate
             SELECT cc.id, c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),
                    c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,c.module_title,c.module_code,
                    COALESCE(c.synopsis, ''),c.category_id,COALESCE(cc.mid,0)
-            FROM `connect_development`.`courses` c
+            FROM `$connectdb`.`courses` c
             INNER JOIN {connect_course} cc ON cc.module_delivery_key=c.module_delivery_key AND cc.session_code=c.session_code
             WHERE (c.module_title <> cc.module_title
                         OR c.module_code <> cc.module_code
@@ -200,7 +202,7 @@ class migrate
 
         echo "Migrating new courses\n";
 
-        $sql = "REPLACE INTO {connect_course} (module_delivery_key,session_code,module_version,campusid,module_week_beginning,
+        $sql = "INSERT INTO {connect_course} (module_delivery_key,session_code,module_version,campusid,module_week_beginning,
         	                                   module_length,week_beginning_date,module_title,module_code,synopsis,category, mid) (
             SELECT c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),
                    c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,
@@ -228,7 +230,7 @@ class migrate
 
         $sql = "REPLACE INTO {connect_group} (`id`, `courseid`, `name`, `mid`) (
             SELECT g.group_id, c.id, g.group_desc, cg.mid
-            FROM `connect_development`.`groups` g
+            FROM `$connectdb`.`groups` g
             INNER JOIN {connect_course} c ON c.module_delivery_key=g.module_delivery_key AND c.session_code=g.session_code
             INNER JOIN {connect_group} cg ON cg.id=g.group_id
             WHERE g.group_desc <> cg.name AND g.session_code=:session_code
@@ -250,7 +252,7 @@ class migrate
 
         echo "Migrating new groups\n";
 
-        $sql = "REPLACE INTO {connect_group} (`id`, `courseid`, `name`, `mid`) (
+        $sql = "INSERT INTO {connect_group} (`id`, `courseid`, `name`, `mid`) (
             SELECT g.group_id, c.id, g.group_desc, g.moodle_id
             FROM `$connectdb`.`groups` g
             INNER JOIN {connect_course} c ON c.module_delivery_key=g.module_delivery_key AND c.session_code=g.session_code
@@ -276,7 +278,7 @@ class migrate
 
         $sql = "REPLACE INTO {connect_enrolments} (`id`, `courseid`, `userid`, `roleid`,`deleted`) (
             SELECT ce.id, c.id, u.id, r.id, e.sink_deleted
-            FROM `connect_development`.`enrollments` e
+            FROM `$connectdb`.`enrollments` e
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key AND c.session_code=e.session_code
             INNER JOIN {connect_user} u ON u.login=e.login
             INNER JOIN {connect_role} r ON r.name=e.role
@@ -300,7 +302,7 @@ class migrate
 
         echo "Migrating new enrolments\n";
 
-        $sql = "REPLACE INTO {connect_enrolments} (`courseid`, `userid`, `roleid`,`deleted`) (
+        $sql = "INSERT INTO {connect_enrolments} (`courseid`, `userid`, `roleid`,`deleted`) (
             SELECT c.id, u.id, r.id, e.sink_deleted
             FROM `$connectdb`.`enrollments` e AND e.session_code=:session_code
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key AND c.session_code=e.session_code
@@ -349,7 +351,7 @@ class migrate
 
         echo "Migrating new group enrolments\n";
 
-        $sql = "REPLACE INTO {connect_group_enrolments} (`groupid`, `userid`,`deleted`) (
+        $sql = "INSERT INTO {connect_group_enrolments} (`groupid`, `userid`,`deleted`) (
             SELECT ge.group_id, u.id, ge.sink_deleted
             FROM `$connectdb`.`group_enrollments` ge
             INNER JOIN {connect_user} u ON u.login=ge.login
