@@ -363,7 +363,7 @@ class course extends data
             $obj->category = $this->category;
             $obj->shortname = $shortname;
             $obj->fullname = $this->fullname;
-            $obj->summary = $this->synopsis;
+            $obj->summary = $this->summary;
             $obj->visible = 0;
 
             $course = create_course($obj);
