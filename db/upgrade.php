@@ -402,5 +402,19 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014031801, 'local', 'connect');
     }
 
+    if ($oldversion < 2014050601) {
+
+        // Define table connect_group to be dropped.
+        $table = new xmldb_table('connect_course_links');
+
+        // Conditionally launch drop table for connect_group.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014050601, 'local', 'connect');
+    }
+
     return true;
 }
