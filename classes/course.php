@@ -112,14 +112,14 @@ class course extends data
      */
     public function _get_bracket_period() {
         $lastyear = date('Y', strtotime('1-1-' . $this->session_code . ' -1 year'));
-        return "({$lastyear} / {$this->session_code})";
+        return "({$lastyear}/{$this->session_code})";
     }
 
     /**
-     * Returns the duration of this course in the format: "i - i"
+     * Returns the duration of this course in the format: "i-i"
      */
     public function _get_duration() {
-        return $this->module_week_beginning . ' - ' . ($this->module_week_beginning + $this->module_length);
+        return $this->module_week_beginning . '-' . ($this->module_week_beginning + $this->module_length);
     }
 
     /**
