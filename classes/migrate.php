@@ -175,7 +175,7 @@ class migrate
             SELECT cc.id, c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),
                    c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,c.module_title,c.module_code,
                    COALESCE(c.synopsis, ''),c.category_id,COALESCE(cc.mid,0)
-            FROM `connect_development`.`courses` c
+            FROM `$connectdb`.`courses` c
             INNER JOIN {connect_course} cc ON cc.module_delivery_key=c.module_delivery_key AND cc.session_code=c.session_code
             WHERE (c.module_title <> cc.module_title
                         OR c.module_code <> cc.module_code
@@ -228,7 +228,7 @@ class migrate
 
         $sql = "REPLACE INTO {connect_group} (`id`, `courseid`, `name`, `mid`) (
             SELECT g.group_id, c.id, g.group_desc, cg.mid
-            FROM `connect_development`.`groups` g
+            FROM `$connectdb`.`groups` g
             INNER JOIN {connect_course} c ON c.module_delivery_key=g.module_delivery_key AND c.session_code=g.session_code
             INNER JOIN {connect_group} cg ON cg.id=g.group_id
             WHERE g.group_desc <> cg.name AND g.session_code=:session_code
@@ -276,7 +276,7 @@ class migrate
 
         $sql = "REPLACE INTO {connect_enrolments} (`id`, `courseid`, `userid`, `roleid`,`deleted`) (
             SELECT ce.id, c.id, u.id, r.id, e.sink_deleted
-            FROM `connect_development`.`enrollments` e
+            FROM `$connectdb`.`enrollments` e
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key AND c.session_code=e.session_code
             INNER JOIN {connect_user} u ON u.login=e.login
             INNER JOIN {connect_role} r ON r.name=e.role
