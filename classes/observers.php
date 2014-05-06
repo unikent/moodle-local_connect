@@ -208,18 +208,10 @@ class observers
     public static function user_deleted(\core\event\user_deleted $event) {
         global $DB;
 
-        if (utils::enable_new_features()) {
-            $record = $DB->get_record('connect_user', array(
-                'mid' => $event->objectid
-            ));
-
-            // Unset this user's mid.
-            if ($record) {
-                $user = user::get($record->id);
-                $user->mid = 0;
-                $user->save();
-            }
-        }
+        // Update any mids.
+        $DB->set_field('connect_user', 'mid', null, array(
+            'mid' => $event->objectid
+        ));
 
         return true;
     }
@@ -274,11 +266,8 @@ class observers
     public static function group_deleted(\core\event\group_deleted $event) {
         global $DB;
 
-        if (!utils::enable_new_features()) {
-            return true;
-        }
-
-        $DB->set_field('connect_group', 'mid', 0, array(
+        // Update any mids.
+        $DB->set_field('connect_group', 'mid', null, array(
             'mid' => $event->objectid
         ));
 
