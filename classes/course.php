@@ -286,8 +286,7 @@ class course extends data
         ), 'id, shortname, fullname, category, summary');
 
         return  $course->fullname !== $this->fullname ||
-                $course->category !== $this->category ||
-                $course->summary !== $this->synopsis;
+                $course->category !== $this->category;
     }
 
     /**
@@ -505,7 +504,6 @@ class course extends data
         // Updates!
         $course->fullname = $this->fullname;
         $course->category = $this->category;
-        $course->summary = $this->synopsis;
 
         // Update this course in Moodle.
         update_course($course);
