@@ -53,7 +53,9 @@ class migrate
      */
     public static function all() {
         self::new_roles();
+        self::map_roles();
         self::new_users();
+        self::map_users();
         self::new_campus();
         self::updated_courses();
         self::new_courses();
