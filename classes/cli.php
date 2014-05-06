@@ -70,6 +70,9 @@ SQL;
             $DB->update_record('connect_course', $record);
         }
 
+        $count = count($records);
+        mtrace("Fixed {$count} course MIDs.");
+
         unset($records);
 
         // Fix users.
@@ -85,6 +88,9 @@ SQL;
             $DB->update_record('connect_user', $record);
         }
 
+        $count = count($records);
+        mtrace("Fixed {$count} user MIDs.");
+
         unset($records);
 
         // Fix groups.
@@ -99,6 +105,9 @@ SQL;
             $record->mid = null;
             $DB->update_record('connect_group', $record);
         }
+
+        $count = count($records);
+        mtrace("Fixed {$count} group MIDs.");
     }
 
     /**
