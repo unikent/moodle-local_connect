@@ -71,7 +71,7 @@ class course extends data
         $this->reset_object_cache();
 
         // Have we changed at all?
-        if ($this->is_locked() && $this->has_changed()) {
+        if (!$this->is_merged() && $this->is_locked() && $this->has_changed()) {
             if (!$dry) {
                 $this->update_moodle();
             }
@@ -175,6 +175,15 @@ class course extends data
     public function is_unique() {
         global $DB;
         return $DB->count_records('connect_course', array('module_code' => $this->module_code)) === 1;
+    }
+
+    /**
+     * Is this course part of a merged set?
+     * @return boolean
+     */
+    public function is_merged() {
+        global $DB;
+        return $DB->count_records('connect_course', array('mid' => $this->mid)) > 1;
     }
 
     /**
