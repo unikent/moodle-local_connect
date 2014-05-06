@@ -51,6 +51,66 @@ class cli
     }
 
     /**
+     * Helper to fix up mids.
+     * Shouldnt be needed (observers) but is here "just in case".
+     */
+    public static function fix_mids() {
+        global $DB;
+
+        // Fix courses.
+        $sql = <<<SQL
+            SELECT cc.id, cc.mid
+            FROM {connect_course} cc
+            LEFT OUTER JOIN {course} c ON c.id=cc.mid
+            WHERE cc.mid > 0 AND c.id IS NULL
+SQL;
+        $records = $DB->get_records_sql($sql);
+        foreach ($records as $record) {
+            $record->mid = null;
+            $DB->update_record('connect_course', $record);
+        }
+
+        $count = count($records);
+        mtrace("Fixed {$count} course MIDs.");
+
+        unset($records);
+
+        // Fix users.
+        $sql = <<<SQL
+            SELECT cu.id, cu.mid
+            FROM {connect_user} cu
+            LEFT OUTER JOIN {user} u ON u.id=cu.mid
+            WHERE cu.mid > 0 AND u.id IS NULL
+SQL;
+        $records = $DB->get_records_sql($sql);
+        foreach ($records as $record) {
+            $record->mid = null;
+            $DB->update_record('connect_user', $record);
+        }
+
+        $count = count($records);
+        mtrace("Fixed {$count} user MIDs.");
+
+        unset($records);
+
+        // Fix groups.
+        $sql = <<<SQL
+            SELECT cg.id, cg.mid
+            FROM {connect_group} cg
+            LEFT OUTER JOIN {groups} g ON g.id=cg.mid
+            WHERE cg.mid > 0 AND g.id IS NULL
+SQL;
+        $records = $DB->get_records_sql($sql);
+        foreach ($records as $record) {
+            $record->mid = null;
+            $DB->update_record('connect_group', $record);
+        }
+
+        $count = count($records);
+        mtrace("Fixed {$count} group MIDs.");
+    }
+
+    /**
      * Run the course sync cron
      */
     public static function course_sync($dry = false, $mid = null) {
