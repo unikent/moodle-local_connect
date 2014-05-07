@@ -44,7 +44,7 @@ $table->head = array(
 $table->data = array();
 foreach ($rules as $rule) {
     $category = new \html_table_cell(\html_writer::tag('a', $rule->catname, array(
-        'href' => $CFG->wwwroot . '/course/category.php?id=' . $rule->category
+        'href' => $CFG->wwwroot . '/course/index.php?categoryid=' . $rule->category
     )));
     $table->data[] = new \html_table_row(array(
         $rule->id,
