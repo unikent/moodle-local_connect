@@ -49,7 +49,7 @@ foreach ($rules as $rule) {
     $table->data[] = new \html_table_row(array(
         $rule->id,
         $rule->prefix,
-        $rule->category,
+        $category,
         "Do Nothing"
     ));
 }
