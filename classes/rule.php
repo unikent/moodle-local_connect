@@ -73,14 +73,35 @@ class rule extends data
      * Increase the priority of this rule (bumps it's weight up)
      */
     public function increase_priority() {
-        
+        $this->weight += 10;
+        if ($this->weight > 100) {
+            $this->weight = 100;
+        }
+
+        $this->save();
     }
 
     /**
      * Decrease the priority of this rule (bumps it's weight up)
      */
     public function decrease_priority() {
-        
+        $this->weight -= 10;
+        if ($this->weight < 0) {
+            $this->weight = 0;
+        }
+
+        $this->save();
+    }
+
+    /**
+     * Delete this rule
+     */
+    public function delete() {
+        global $DB;
+
+        $DB->delete_records('connect_rules', array(
+            "id" => $this->id
+        ));
     }
 
     /**
