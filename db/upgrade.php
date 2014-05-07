@@ -410,7 +410,6 @@ function xmldb_local_connect_upgrade($oldversion) {
         $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('prefix', XMLDB_TYPE_CHAR, '25', null, XMLDB_NOTNULL, null, null);
         $table->add_field('category', XMLDB_TYPE_INTEGER, '11', null, null, null, '0');
-        $table->add_field('weight', XMLDB_TYPE_INTEGER, '3', null, null, null, '50');
 
         // Adding keys to table connect_rules.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));

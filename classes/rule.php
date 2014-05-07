@@ -44,7 +44,7 @@ class rule extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "prefix", "category", "weight");
+        return array("id", "prefix", "category");
     }
 
     /**
