@@ -31,11 +31,21 @@ if (!has_capability('moodle/site:config', \context_system::instance())) {
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_url('/local/connect/rules.php');
 
-$rules = $DB->get_records_sql('SELECT c.name as catname, cr.*
-	FROM {connect_rules} cr
-	INNER JOIN {course_categories} c ON c.id=cr.category
-');
+// Create a new rule form.
+$form = new \local_connect\forms\rule(null, array());
+if ($data = $form->get_data()) {
+    // Create the rule.
+    $DB->insert_record('connect_rules', array(
+        "prefix" => $data->prefix,
+        "category" => $data->category
+    ));
+}
 
+// Grab all the rules.
+$rules = $DB->get_records_sql('SELECT cr.id, cr.prefix, cr.category, c.name as catname
+    FROM {connect_rules} cr
+    INNER JOIN {course_categories} c ON c.id=cr.category
+');
 
 $table = new \html_table();
 $table->head = array(
@@ -44,8 +54,10 @@ $table->head = array(
 $table->data = array();
 foreach ($rules as $rule) {
     $category = new \html_table_cell(\html_writer::tag('a', $rule->catname, array(
-        'href' => $CFG->wwwroot . '/course/index.php?categoryid=' . $rule->category
+        'href' => $CFG->wwwroot . '/course/index.php?categoryid=' . $rule->category,
+        'target' => '_blank'
     )));
+
     $table->data[] = new \html_table_row(array(
         $rule->id,
         $rule->prefix,
@@ -61,5 +73,9 @@ echo $OUTPUT->heading("Connect Rules");
 echo $OUTPUT->box_start('contents');
 echo \html_writer::table($table);
 echo $OUTPUT->box_end();
+
+echo $OUTPUT->heading("New Rule", 3);
+
+$form->display();
 
 echo $OUTPUT->footer();
