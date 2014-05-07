@@ -105,7 +105,11 @@ class rule extends data
     }
 
     /**
-     * Map a shortname or a course to a category
+     * Map a shortname or a course to a category.
+     * 
+     *   - Order by weight
+     *   - If there is a matching rule with a weight higher than all others, return that
+     *   - If there are multiple matching rules with the same weights, return the longest string
      */
     public static function map($shortname) {
         global $DB;
