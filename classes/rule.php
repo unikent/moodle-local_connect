@@ -70,27 +70,26 @@ class rule extends data
     }
 
     /**
-     * Map a course to a category
+     * Map a shortname or a course to a category
      */
-    public static function map($course) {
+    public static function map($shortname) {
         global $DB;
 
         // Accept either an object or a string.
-        if (is_object($course)) {
-            $course = $course->shortname;
+        if (is_object($shortname)) {
+            $shortname = $course->shortname;
         }
 
-        // Cut up the shortname.
-        preg_match("/[a-zA-Z]*/", $course, $matches);
-        if (empty($matches)) {
-            // Errr.....
-            return false;
+        // Grab all possible rules.
+        $rules = $DB->get_records('connect_rules');
+
+        // Go through and compare until we find the first one that matches.
+        foreach ($rules as $rule) {
+            if (strpos($shortname, $rule->prefix) === 0) {
+                return $rule->category;
+            }
         }
 
-        $rules = $DB->get_field("connect_rules", "category", array(
-            "prefix" => $matches[0]
-        ));
-
-        return $rules;
+        return false;
     }
 }

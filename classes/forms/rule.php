@@ -42,7 +42,7 @@ class rule extends \moodleform
         // Add rule prefix.
         $mform->addElement('text', 'prefix', "Course Prefix");
         $mform->addRule('prefix', $strrequired, 'required', null, 'client');
-        $mform->setType('prefix', PARAM_ALPHA);
+        $mform->setType('prefix', PARAM_ALPHANUM);
 
         // Add category dropdown.
         $categories = $DB->get_records('course_categories', null, 'name ASC', 'id, name');
