@@ -23,10 +23,13 @@
  */
 
 require_once('../../config.php');
+require_once($CFG->libdir.'/adminlib.php');
 
 if (!has_capability('moodle/site:config', \context_system::instance())) {
     print_error("Access Denied");
 }
+
+admin_externalpage_setup('connectrules', '', null, '', array('pagelayout' => 'report'));
 
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_url('/local/connect/rules.php');
