@@ -16,11 +16,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014043000;
+$plugin->version   = 2014050700;
 $plugin->requires  = 2013110500;
 $plugin->cron      = 0;
 
 $plugin->dependencies = array(
     'local_catman' => 2014022600,
-    'local_hipchat' => 2014042300
+    'local_hipchat' => 2014043000
 );
