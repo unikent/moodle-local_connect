@@ -116,15 +116,52 @@ class rule extends data
         }
 
         // Grab all possible rules.
-        $rules = $DB->get_records('connect_rules');
+        $rules = $DB->get_records('connect_rules', null, 'weight DESC');
 
         // Go through and compare until we find the first one that matches.
+        $maps = array();
+        $matches = array();
         foreach ($rules as $rule) {
             if (strpos($shortname, $rule->prefix) === 0) {
-                return $rule->category;
+                $matches[$rule->prefix] = $rule->weight;
+                $maps[$rule->prefix] = $rule->category;
             }
         }
 
-        return false;
+        // If we dont have any.
+        if (count($matches) == 0) {
+            return false;
+        }
+
+        // If we only have one.
+        if (count($matches) == 1) {
+            return $maps[key($matches)];
+        }
+
+        // Sort it.
+        arsort($matches);
+
+        $first = key($matches);
+
+        // Is there a clear winner?
+        $values = array_values($matches);
+        if ($values[0] > $values[1]) {
+            return $maps[$first];
+        }
+
+        // Nope, go through them and find the longest matching.
+        $current = $first;
+        $maxweight = $values[0];
+        foreach ($matches as $prefix => $weight) {
+            if ($weight < $maxweight) {
+                break;
+            }
+
+            if (strlen($prefix) > strlen($current)) {
+                $current = $prefix;
+            }
+        }
+
+        return $maps[$first];
     }
 }

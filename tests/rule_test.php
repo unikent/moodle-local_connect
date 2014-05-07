@@ -60,7 +60,7 @@ class kent_rule_tests extends local_connect\util\connect_testcase
 
         $this->create_rules();
 
-        $this->assertEquals(1, \local_connect\rule::map("TST214"));
+        $this->assertEquals(1, \local_connect\rule::map("TST814"));
         $this->assertEquals(1, \local_connect\rule::map("TST816B"));
         $this->assertEquals(1, \local_connect\rule::map("TST124"));
         $this->assertEquals(1, \local_connect\rule::map("TST1"));
