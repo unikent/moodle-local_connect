@@ -34,6 +34,24 @@ admin_externalpage_setup('connectrules', '', null, '', array('pagelayout' => 're
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_url('/local/connect/rules.php');
 
+$id = optional_param('id', 11, PARAM_INT);
+$action = optional_param('action', null, PARAM_ALPHA);
+
+if ($id && $action) {
+    $rule = \local_connect\rule::get($id);
+    switch ($action) {
+        case 'up':
+            $rule->increase_priority();
+        break;
+        case 'down':
+            $rule->decrease_priority();
+        break;
+        case 'delete':
+            $rule->delete();
+        break;
+    }
+}
+
 // Create a new rule form.
 $form = new \local_connect\forms\rule(null, array());
 if ($data = $form->get_data()) {
@@ -61,11 +79,23 @@ foreach ($rules as $rule) {
         'target' => '_blank'
     )));
 
+    $bumpup = \html_writer::tag('a', 'Up', array(
+        'href' => $CFG->wwwroot . '/local/connect/rules.php?id=' . $rule->id . '&action=up'
+    ));
+
+    $bumpdown = \html_writer::tag('a', 'Down', array(
+        'href' => $CFG->wwwroot . '/local/connect/rules.php?id=' . $rule->id . '&action=down'
+    ));
+
+    $delete = \html_writer::tag('a', 'Delete', array(
+        'href' => $CFG->wwwroot . '/local/connect/rules.php?id=' . $rule->id . '&action=delete'
+    ));
+
     $table->data[] = new \html_table_row(array(
         $rule->id,
         $rule->prefix,
         $category,
-        "Do Nothing"
+        "$bumpup $bumpdown $delete"
     ));
 }
 
