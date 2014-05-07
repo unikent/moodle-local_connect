@@ -66,7 +66,6 @@ foreach ($rules as $rule) {
     ));
 }
 
-
 echo $OUTPUT->header();
 echo $OUTPUT->heading("Connect Rules");
 
@@ -74,7 +73,7 @@ echo $OUTPUT->box_start('contents');
 echo \html_writer::table($table);
 echo $OUTPUT->box_end();
 
-echo $OUTPUT->heading("New Rule", 3);
+echo $OUTPUT->heading("New Rule");
 
 $form->display();
 
