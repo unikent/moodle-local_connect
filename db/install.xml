@@ -138,5 +138,20 @@
         <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="connect_rules" COMMENT="Connect Rulesets">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="prefix" TYPE="char" LENGTH="25" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="category" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="weight" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="50" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="prefix" TYPE="unique" FIELDS="prefix"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="index_category" UNIQUE="false" FIELDS="category"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
