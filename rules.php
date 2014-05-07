@@ -63,14 +63,15 @@ if ($data = $form->get_data()) {
 }
 
 // Grab all the rules.
-$rules = $DB->get_records_sql('SELECT cr.id, cr.prefix, cr.category, c.name as catname
+$rules = $DB->get_records_sql('SELECT cr.id, cr.prefix, cr.category, cr.weight, c.name as catname
     FROM {connect_rules} cr
     INNER JOIN {course_categories} c ON c.id=cr.category
+    ORDER BY weight DESC
 ');
 
 $table = new \html_table();
 $table->head = array(
-    "Rule", "Prefix", "Category", "Action"
+    "Rule", "Prefix", "Category", "Weight", "Action"
 );
 $table->data = array();
 foreach ($rules as $rule) {
@@ -95,6 +96,7 @@ foreach ($rules as $rule) {
         $rule->id,
         $rule->prefix,
         $category,
+        $rule->weight,
         "$bumpup $bumpdown $delete"
     ));
 }

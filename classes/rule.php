@@ -44,7 +44,7 @@ class rule extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "prefix", "category");
+        return array("id", "prefix", "category", "weight");
     }
 
     /**
@@ -67,6 +67,20 @@ class rule extends data
      */
     public function is_in_moodle() {
         return !empty($this->mid);
+    }
+
+    /**
+     * Increase the priority of this rule (bumps it's weight up)
+     */
+    public function increase_priority() {
+        
+    }
+
+    /**
+     * Decrease the priority of this rule (bumps it's weight up)
+     */
+    public function decrease_priority() {
+        
     }
 
     /**
