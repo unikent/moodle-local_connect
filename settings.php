@@ -48,6 +48,13 @@ if ($hassiteconfig) {
 	));
 
 	$settings->add(new admin_setting_configcheckbox(
+		'local_connect/strict_sync',
+		'Enable stricter SDS sync',
+		'Forces modules to update to SDS data, rather than letting convenors modify them Moodle-side.',
+		0
+	));
+
+	$settings->add(new admin_setting_configcheckbox(
 		'local_connect/enable_hipchat',
 		'Enable hipchat notifications',
 		'Note: Spams the developers when things go wrong.',

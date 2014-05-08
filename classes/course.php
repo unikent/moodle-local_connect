@@ -209,7 +209,8 @@ class course extends data
      */
     public function is_merged() {
         global $DB;
-        return $DB->count_records('connect_course', array('mid' => $this->mid)) > 1;
+        return strpos($this->module_delivery_key, '-') !== false ||
+               $DB->count_records('connect_course', array('mid' => $this->mid)) > 1;
     }
 
     /**
@@ -285,7 +286,14 @@ class course extends data
             'id' => $this->mid
         ), 'id, shortname, fullname, category, summary');
 
+        // Courses do not sync unless in strict mode.
+        $strict = get_config('local_connect', 'strict_sync');
+        if (!$strict) {
+            return false;
+        }
+
         return  $course->fullname !== $this->fullname ||
+                $course->summary !== $this->summary ||
                 $course->category !== $this->category;
     }
 
@@ -504,6 +512,7 @@ class course extends data
         // Updates!
         $course->fullname = $this->fullname;
         $course->category = $this->category;
+        $course->summary = $this->summary;
 
         // Update this course in Moodle.
         update_course($course);
