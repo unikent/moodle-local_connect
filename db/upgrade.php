@@ -402,5 +402,31 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014031801, 'local', 'connect');
     }
 
+    if ($oldversion < 2014050701) {
+        // Define table connect_rules to be created.
+        $table = new xmldb_table('connect_rules');
+
+        // Adding fields to table connect_rules.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('prefix', XMLDB_TYPE_CHAR, '25', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('category', XMLDB_TYPE_INTEGER, '11', null, null, null, '0');
+        $table->add_field('weight', XMLDB_TYPE_INTEGER, '3', null, null, null, '50');
+
+        // Adding keys to table connect_rules.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('prefix', XMLDB_KEY_UNIQUE, array('prefix'));
+
+        // Adding indexes to table connect_rules.
+        $table->add_index('index_category', XMLDB_INDEX_NOTUNIQUE, array('category'));
+
+        // Conditionally launch create table for connect_rules.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014050701, 'local', 'connect');
+    }
+
     return true;
 }

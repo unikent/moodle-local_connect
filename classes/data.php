@@ -175,14 +175,18 @@ abstract class data {
      * 
      * @return boolean
      */
-    public abstract function is_in_moodle();
+    public function is_in_moodle() {
+        debugging("is_in_moodle() has not been implemented for this!", DEBUG_DEVELOPER);
+    }
 
     /**
      * Save to Moodle
      * 
      * @return boolean
      */
-    public abstract function create_in_moodle();
+    public function create_in_moodle() {
+        debugging("create_in_moodle() has not been implemented for this!", DEBUG_DEVELOPER);
+    }
 
     /**
      * Save to the Connect database
