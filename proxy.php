@@ -1,15 +1,31 @@
 <?php
-/**
- * /tmp/phptidy-sublime-buffer.php
- *
- * @package default
- */
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Local stuff for Moodle Connect
+ *
+ * @package    local_connect
+ * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 define('AJAX_SCRIPT', true);
 
-require_once dirname(dirname(dirname(__FILE__))) . '/config.php';
-require_once dirname(__FILE__) . '/locallib.php';
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/locallib.php');
 
 if (!\local_connect\utils::is_enabled()) {
     die(json_encode(array("error" => "Connect has been disabled")));
@@ -19,15 +35,6 @@ if (!\local_connect\utils::can_course_manage()) {
     die(json_encode(array("error" => "You do not have access to view this")));
 }
 
-/**
- * We now have two choices:
- *   1) We can use the fancy new stuff
- *   2) The fancy new stuff does not do what we want yet, so we use the old stuff.
- */
-
-//
-// New stuff
-//
 switch ($_SERVER['PATH_INFO']) {
     case '/courses/schedule':
     case '/courses/schedule/':
@@ -81,10 +88,10 @@ switch ($_SERVER['PATH_INFO']) {
     case '/courses':
     case '/courses/':
         header('Content-type: application/json');
-        $category_restrictions = isset($_GET['category_restrictions']) ? json_decode(urldecode($_GET['category_restrictions'])) : array();
+        $restrictions = isset($_GET['category_restrictions']) ? json_decode(urldecode($_GET['category_restrictions'])) : array();
         $courses = array();
-        if (!empty($category_restrictions)) {
-            $courses = \local_connect\course::get_by_category($category_restrictions, true);
+        if (!empty($restrictions)) {
+            $courses = \local_connect\course::get_by_category($restrictions, true);
         } else {
             $courses = \local_connect\course::get_all(true);
         }

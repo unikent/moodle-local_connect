@@ -25,7 +25,7 @@
 require_once('../../config.php');
 
 if (!has_capability('moodle/site:config', \context_system::instance())) {
-	print_error("Access Denied");
+    print_error("Access Denied");
 }
 
 $PAGE->set_context(context_system::instance());

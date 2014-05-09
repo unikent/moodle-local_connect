@@ -1,46 +1,68 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Local stuff for Moodle Connect
+ *
+ * @package    local_connect
+ * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die;
 
 function xmldb_local_connect_upgrade($oldversion) {
-	global $CFG, $DB;
+    global $CFG, $DB;
 
-	$dbman = $DB->get_manager();
+    $dbman = $DB->get_manager();
 
-	if ($oldversion < 2012052912) {
-		$table = new xmldb_table('connect_course_dets');
+    if ($oldversion < 2012052912) {
+        $table = new xmldb_table('connect_course_dets');
 
-		$field = new xmldb_field('id');
-		$field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
-								XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
-		$table->addField($field);
+        $field = new xmldb_field('id');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+                                XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->addField($field);
 
-		$field = new xmldb_field('course');
-		$field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
-								XMLDB_NOTNULL, null, null, null);
-		$table->addField($field);
+        $field = new xmldb_field('course');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+                                XMLDB_NOTNULL, null, null, null);
+        $table->addField($field);
 
-		$field = new xmldb_field('campus');
-		$field->set_attributes(XMLDB_TYPE_CHAR, '255', null,
-								null, null, '', null);
-		$table->addField($field);
+        $field = new xmldb_field('campus');
+        $field->set_attributes(XMLDB_TYPE_CHAR, '255', null,
+                                null, null, '', null);
+        $table->addField($field);
 
-		$field = new xmldb_field('startdate');
-		$field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
-								null, null, '0', null);
-		$table->addField($field);
+        $field = new xmldb_field('startdate');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+                                null, null, '0', null);
+        $table->addField($field);
 
-		$field = new xmldb_field('enddate');
-		$field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
-								null, null, '0', null);
-		$table->addField($field);
+        $field = new xmldb_field('enddate');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+                                null, null, '0', null);
+        $table->addField($field);
 
-		$field = new xmldb_field('weeks');
-		$field->set_attributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED,
-								null, null, '0', null);
-		$table->addField($field);
+        $field = new xmldb_field('weeks');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED,
+                                null, null, '0', null);
+        $table->addField($field);
 
-		$key = new xmldb_key('primary');
+        $key = new xmldb_key('primary');
         $key->set_attributes(XMLDB_KEY_PRIMARY, array('id'));
         $table->addKey($key);
 
@@ -51,23 +73,24 @@ function xmldb_local_connect_upgrade($oldversion) {
         $dbman->create_table($table);
 
         upgrade_plugin_savepoint(true, 2012052912, 'local', 'connect');
-	}
+    }
 
-	if ($oldversion < 2012052913) {
-		$table = new xmldb_table('connect_course_dets');
-		$field = new xmldb_field('unlocked', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'weeks');
-		$dbman->add_field($table, $field);
+    if ($oldversion < 2012052913) {
+        $table = new xmldb_table('connect_course_dets');
+        $field = new xmldb_field('unlocked', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'weeks');
+        $dbman->add_field($table, $field);
 
-		$table = new xmldb_table('connect_course_dets');
-		$field = new xmldb_field('locked_change_at', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, '0', 'unlocked');
-		$dbman->add_field($table, $field);
+        $table = new xmldb_table('connect_course_dets');
+        $field = new xmldb_field('locked_change_at', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, '0', 'unlocked');
+        $dbman->add_field($table, $field);
 
-		$table = new xmldb_table('connect_course_dets');
-		$field = new xmldb_field('locked_change_by', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, 'locked_change_at');
-		$dbman->add_field($table, $field);
+        $table = new xmldb_table('connect_course_dets');
+        $field = new xmldb_field('locked_change_by', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+            null, null, null, 'locked_change_at');
+        $dbman->add_field($table, $field);
 
-		upgrade_plugin_savepoint(true, 2012052913, 'local', 'connect');
-	}
+        upgrade_plugin_savepoint(true, 2012052913, 'local', 'connect');
+    }
 
     if ($oldversion < 2014031201) {
         // Connect Campus.
@@ -225,12 +248,14 @@ function xmldb_local_connect_upgrade($oldversion) {
             $table->add_field('category', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, null);
 
             // Adding keys to table connect_course.
-            $table->add_key('unique_module_delivery_key_session_code_module_version', XMLDB_KEY_UNIQUE, array('module_delivery_key', 'session_code', 'module_version'));
+            $table->add_key('unique_module_delivery_key_session_code_module_version', XMLDB_KEY_UNIQUE,
+                array('module_delivery_key', 'session_code', 'module_version'));
 
             // Adding indexes to table connect_course.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $table->add_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
-            $table->add_index('index_module_delivery_key_session_code', XMLDB_INDEX_NOTUNIQUE, array('module_delivery_key', 'session_code'));
+            $table->add_index('index_module_delivery_key_session_code', XMLDB_INDEX_NOTUNIQUE,
+                array('module_delivery_key', 'session_code'));
             $table->add_index('index_category', XMLDB_INDEX_NOTUNIQUE, array('category'));
             $table->add_index('index_module_code', XMLDB_INDEX_NOTUNIQUE, array('module_code'));
 
