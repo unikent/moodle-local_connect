@@ -52,6 +52,7 @@ class migrate
      * Run all of them.
      */
     public static function all() {
+        self::new_rules();
         self::new_roles();
         self::map_roles();
         self::new_users();
@@ -71,6 +72,7 @@ class migrate
      * Run all of the creates.
      */
     public static function all_create() {
+        self::new_rules();
         self::new_roles();
         self::new_users();
         self::new_campus();
@@ -88,6 +90,29 @@ class migrate
         self::updated_groups();
         self::updated_enrolments();
         self::updated_group_enrolments();
+    }
+
+    /**
+     * New Rules
+     */
+    public static function new_rules() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating new rules\n";
+
+        $sql = "INSERT INTO {connect_rules} (`prefix`, `category`,`weight`) (
+            SELECT r.rule, r.mdl_category, 50
+            FROM `$connectdb`.`rules` r
+            LEFT OUTER JOIN {connect_rules} cr ON cr.prefix=r.rule AND cr.category=r.mdl_category
+            WHERE cr.id IS NULL AND r.rule IS NOT NULL
+            GROUP BY r.rule
+        )";
+
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 
     /**
