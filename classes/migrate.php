@@ -304,7 +304,7 @@ class migrate
 
         $sql = "INSERT INTO {connect_enrolments} (`courseid`, `userid`, `roleid`,`deleted`) (
             SELECT c.id, u.id, r.id, e.sink_deleted
-            FROM `$connectdb`.`enrollments` e AND e.session_code=:session_code
+            FROM `$connectdb`.`enrollments` e
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key AND c.session_code=e.session_code
             INNER JOIN {connect_user} u ON u.login=e.login
             INNER JOIN {connect_role} r ON r.name=e.role
