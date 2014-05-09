@@ -21,11 +21,12 @@
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/group/lib.php');
+require_once($CFG->dirroot . '/group/lib.php');
 
 /**
  * Connect group enrolment container

@@ -1,21 +1,46 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Local stuff for Moodle Connect
+ *
+ * @package    local_connect
+ * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die;
+
 /**
  * Returns a JSON list of courses we can manage
  */
 function kent_get_connect_course_categories() {
     global $DB;
 
-    $cat_permissions = array();
-    
+    $catpermissions = array();
+
     $cats = $DB->get_records('course_categories');
     foreach ($cats as $cat) {
         $context = context_coursecat::instance($cat->id);
         if (has_capability('moodle/category:manage', $context)) {
-            array_push($cat_permissions, array($cat->id, $cat->name));
+            array_push($catpermissions, array($cat->id, $cat->name));
         }
     }
 
-    return $cat_permissions;
+    return $catpermissions;
 }
 
 /**
@@ -32,14 +57,22 @@ function kent_is_user_enrolled_as_role($courseid, $userid, $roleid) {
               JOIN {user} u ON u.id = ue.userid
               JOIN {role_assignments} ra ON ra.userid = u.id AND contextid = :contextid
              WHERE ue.userid = :userid AND ue.status = :active AND e.status = :enabled AND u.deleted = 0 AND ra.roleid = :roleid";
-    $params = array('enabled'=>ENROL_INSTANCE_ENABLED, 'active'=>ENROL_USER_ACTIVE, 'userid'=>$userid, 'courseid'=>$courseid, 'roleid'=>$roleid, 'contextid'=>$context->id);
+    $params = array(
+        'enabled' => ENROL_INSTANCE_ENABLED,
+        'active' => ENROL_USER_ACTIVE,
+        'userid' => $userid,
+        'courseid' => $courseid,
+        'roleid' => $roleid,
+        'contextid' => $context->id
+    );
 
     if (!$enrolments = $DB->get_records_sql($sql, $params)) {
         return false;
     }
 
-    //TODO - FG30 - I don't think we actually need all of this below, as its mainly the above bit which checks if the user is enrolled.
-    //Test at earliest opportunity and get rid if not needed
+    // TODO - FG30 - I don't think we actually need all of this below,
+    // as its mainly the above bit which checks if the user is enrolled.
+    // Test at earliest opportunity and get rid if not needed.
 
     $changes = array();
 
@@ -55,17 +88,18 @@ function kent_is_user_enrolled_as_role($courseid, $userid, $roleid) {
         } else {
             $changes[$start] = 1;
         }
-        if ($end === 0) {
-            // no end
-        } else if (isset($changes[$end])) {
-            $changes[$end] = $changes[$end] - 1;
-        } else {
-            $changes[$end] = -1;
+
+        if ($end !== 0) {
+            if (isset($changes[$end])) {
+                $changes[$end] = $changes[$end] - 1;
+            } else {
+                $changes[$end] = -1;
+            }
         }
     }
 
-    // let's sort then enrolment starts&ends and go through them chronologically,
-    // looking for current status and the next future end of enrolment
+    // Let's sort then enrolment starts&ends and go through them chronologically,
+    // looking for current status and the next future end of enrolment.
     ksort($changes);
 
     $now = time();
@@ -75,15 +109,15 @@ function kent_is_user_enrolled_as_role($courseid, $userid, $roleid) {
     foreach ($changes as $time => $change) {
         if ($time > $now) {
             if ($present === null) {
-                // we have just went past current time
+                // We have just went past current time.
                 $present = $current;
                 if ($present < 1) {
-                    // no enrolment active
+                    // No enrolment active.
                     return false;
                 }
             }
             if ($present !== null) {
-                // we are already in the future - look for possible end
+                // We are already in the future - look for possible end.
                 if ($current + $change < 1) {
                     return $time;
                 }

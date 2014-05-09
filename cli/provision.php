@@ -15,7 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This synchronises Connect Courses with Moodle Courses
+ * This script is still under development, it will provision
+ * Moodle 2014/2015.
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
@@ -24,14 +25,36 @@
 
 define('CLI_SCRIPT', true);
 
-require (dirname(__FILE__) . '/../../../config.php');
+require(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
 list($options, $unrecognized) = cli_get_params(
     array(
-        'dry' => false,
-        'moodle_id' => null
+        'dry' => false
     )
 );
 
-\local_connect\cli::course_sync($options['dry'], $options['moodle_id']);
+// Grab a list of courses, grouped by their module code, week beginning and module length.
+$sql = <<<SQL
+    SELECT c.module_code, c.module_week_beginning, c.module_length, GROUP_CONCAT(c.id) ids
+    FROM {connect_course} c
+    GROUP BY c.module_code, c.module_week_beginning, c.module_length
+SQL;
+
+$rs = $DB->get_recordset_sql($sql);
+
+foreach ($rs as $record) {
+    // Create it if we can.
+    if (true) {
+        continue;
+    }
+
+    // Merge it if we can't just create it.
+    if (true) {
+        continue;
+    }
+
+    // Append AUT,SPR,SUM if we can't.
+}
+
+$rs->close();
