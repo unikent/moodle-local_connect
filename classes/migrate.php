@@ -209,7 +209,7 @@ class migrate
                    c.module_title,c.module_code,COALESCE(c.synopsis, ''),c.category_id,COALESCE(c.moodle_id, 0)
             FROM `$connectdb`.`courses` c
             LEFT OUTER JOIN {connect_course} cc ON cc.module_delivery_key=c.module_delivery_key AND cc.session_code=c.session_code
-            WHERE cc.id IS NULL AND c.session_code=:session_code
+            WHERE cc.id IS NULL AND c.session_code=:session_code AND c.module_delivery_key NOT LIKE \"%-%\"
             GROUP BY c.module_delivery_key,c.session_code,c.module_version
         )";
 
