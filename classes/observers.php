@@ -184,18 +184,17 @@ class observers
 
         // If we created the user on first login, sync enrolments.
         // TODO - make this a "task" in 2.7.
-        if ($USER->id === $obj->mid) {
-            // Sync Enrollments.
-            $enrolments = enrolment::get_for_user($obj);
-            foreach ($enrolments as $enrolment) {
-                $enrolment->create_in_moodle();
-            }
 
-            // Sync Group Enrollments.
-            $enrolments = group_enrolment::get_for_user($obj);
-            foreach ($enrolments as $enrolment) {
-                $enrolment->create_in_moodle();
-            }
+        // Sync Enrollments.
+        $enrolments = enrolment::get_for_user($obj);
+        foreach ($enrolments as $enrolment) {
+            $enrolment->create_in_moodle();
+        }
+
+        // Sync Group Enrollments.
+        $enrolments = group_enrolment::get_for_user($obj);
+        foreach ($enrolments as $enrolment) {
+            $enrolment->create_in_moodle();
         }
 
         return true;
