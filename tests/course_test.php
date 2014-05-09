@@ -49,7 +49,11 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         // Updates.
         $course->module_title = "TESTING NAME CHANGE";
+
+        $this->assertEquals(\local_connect\data::STATUS_NONE, $course->sync());
+        set_config('strict_sync', true, 'local_connect');
         $this->assertEquals(\local_connect\data::STATUS_MODIFY, $course->sync());
+
         $this->assertTrue($course->is_in_moodle());
         $mcourse = $DB->get_record('course', array(
             "id" => $course->mid
