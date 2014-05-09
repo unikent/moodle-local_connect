@@ -188,7 +188,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$this->assertFalse($enrolment->is_in_moodle());
 
 		// Now create the user (properly - otherwise the observer wont be called).
-		user_create_user(array(
+		$uid = user_create_user(array(
 			'username' => $user->username,
 			'password' => 'Moodle2012!',
 			'idnumber' => 'idnumbertest1',
