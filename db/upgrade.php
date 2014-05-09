@@ -461,5 +461,12 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014050800, 'local', 'connect');
     }
 
+    if ($oldversion < 2014050900) {
+        $DB->delete_records_select('connect_course', 'module_delivery_key LIKE "%-%"');
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014050900, 'local', 'connect');
+    }
+
     return true;
 }
