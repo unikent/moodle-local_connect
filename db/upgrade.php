@@ -468,5 +468,32 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014050900, 'local', 'connect');
     }
 
+    if ($oldversion < 2014051200) {
+
+        // Define table connect_meta to be created.
+        $table = new xmldb_table('connect_meta');
+
+        // Adding fields to table connect_meta.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('objectid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('objecttype', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table connect_meta.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table connect_meta.
+        $table->add_index('i_object', XMLDB_INDEX_NOTUNIQUE, array('objectid', 'objecttype'));
+        $table->add_index('i_courseid', XMLDB_INDEX_NOTUNIQUE, array('courseid'));
+
+        // Conditionally launch create table for connect_meta.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014051200, 'local', 'connect');
+    }
+
     return true;
 }
