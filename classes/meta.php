@@ -67,10 +67,10 @@ class meta extends data
     /**
      * Sync up.
      */
-    public function sync() {
+    public function sync($dry = false) {
         foreach ($this->enrolments as $enrolment) {
             $enrolment->courseid = $this->courseid;
-            $enrolment->sync();
+            $enrolment->sync($dry);
         }
     }
 
