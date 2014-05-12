@@ -65,6 +65,16 @@ class meta extends data
     }
 
     /**
+     * Sync up.
+     */
+    public function sync() {
+        foreach ($this->enrolments as $enrolment) {
+            $enrolment->courseid = $this->courseid;
+            $enrolment->sync();
+        }
+    }
+
+    /**
      * Returns the object for this meta set.
      */
     public function _get_object() {
