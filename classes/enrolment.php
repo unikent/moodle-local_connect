@@ -249,6 +249,56 @@ class enrolment extends data
     }
 
     /**
+     * Returns all enrolments for a given category
+     * 
+     * @param  local_connect_category $category A category
+     * @return local_connect_enrolment Enrolment object
+     */
+    public static function get_for_category($category) {
+        global $DB;
+
+        $sql = <<<SQL
+        SELECT ce.* FROM {connect_enrolments} ce
+        INNER JOIN {connect_course} c
+        WHERE c.category = :category
+SQL;
+
+        $objs = $DB->get_records_sql($sql, array(
+            'category' => $category->id
+        ));
+
+        foreach ($objs as &$obj) {
+            $enrolment = new enrolment();
+            $enrolment->set_class_data($obj);
+            $obj = $enrolment;
+        }
+
+        return $objs;
+    }
+
+    /**
+     * Returns all enrolments for a given role
+     * 
+     * @param  local_connect_role $role A role
+     * @return local_connect_enrolment Enrolment object
+     */
+    public static function get_for_role($role) {
+        global $DB;
+
+        $objs = $DB->get_records('connect_enrolments', array(
+            'roleid' => $role->id
+        ));
+
+        foreach ($objs as &$obj) {
+            $enrolment = new enrolment();
+            $enrolment->set_class_data($obj);
+            $obj = $enrolment;
+        }
+
+        return $objs;
+    }
+
+    /**
      * Returns an enrolment, given a user and a course
      */
     public static function get_for_user_and_course($user, $course) {
