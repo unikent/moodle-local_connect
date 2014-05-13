@@ -72,12 +72,17 @@ foreach ($records as $record) {
     $obj = \local_connect\meta::get($record->id);
     $enrolments = $obj->enrolments;
 
+    $course = new \html_table_cell(\html_writer::tag('a', $obj->course->shortname, array(
+        'href' => $CFG->wwwroot . '/course/view.php?id=' . $obj->courseid,
+        'target' => '_blank'
+    )));
+
     // Create the delete meta form.
     $form = new \local_connect\forms\deletemeta($obj->id);
 
     $table->data[] = array(
         $obj,
-        $obj->course->shortname,
+        $course,
         count($enrolments),
         $form->render()
     );

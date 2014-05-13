@@ -36,6 +36,9 @@ class meta extends data
     const OBJECT_TYPE_GROUP = 3;
     const OBJECT_TYPE_ROLE = 4;
 
+    /** Course object cache */
+    private $course;
+
     /**
      * The name of our connect table.
      */
@@ -68,9 +71,23 @@ class meta extends data
      * Sync up.
      */
     public function sync($dry = false) {
+        $context = \context_course::instance($this->courseid, IGNORE_MISSING);
+        if ($context === false) {
+            return false;
+        }
+
         foreach ($this->enrolments as $enrolment) {
-            $enrolment->courseid = $this->courseid;
-            $enrolment->sync($dry);
+            if ($this->objecttype == self::OBJECT_TYPE_GROUP) {
+                // This is a group enrolment.. grr...
+                // Map it to a real enrolment.
+                $enrolment = enrolment::get_for_user_and_course($enrolment->user, $enrolment->group->course);
+            }
+
+            $uid = $enrolment->user->mid;
+
+            if ($uid && !is_enrolled($context, $uid)) {
+                enrol_try_internal_enrol($this->courseid, $uid, $enrolment->role->mid);
+            }
         }
     }
 
@@ -101,7 +118,10 @@ class meta extends data
      */
     public function _get_course() {
         global $DB;
-        return $DB->get_record('course', array('id' => $this->courseid));
+        if (!isset($this->course)) {
+            $this->course = $DB->get_record('course', array('id' => $this->courseid));
+        }
+        return $this->course;
     }
 
     /**
