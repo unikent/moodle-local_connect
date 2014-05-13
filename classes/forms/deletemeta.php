@@ -51,6 +51,6 @@ class deletemeta extends \moodleform
         $mform->addElement('hidden', 'id', $this->id);
         $mform->setType('id', PARAM_INT);
 
-        $this->add_action_buttons(true, "Delete");
+        $this->add_action_buttons(false, "Delete");
     }
 }

@@ -97,6 +97,14 @@ class meta extends data
     }
 
     /**
+     * The course is a Moodle course here.
+     */
+    public function _get_course() {
+        global $DB;
+        return $DB->get_record('course', array('id' => $this->courseid));
+    }
+
+    /**
      * Returns an array of enrolments for this meta set.
      */
     public function _get_enrolments() {

@@ -28,6 +28,8 @@ require_once($CFG->libdir . '/adminlib.php');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/meta/index.php');
 
+$PAGE->requires->css('/local/connect/styles/meta.css');
+
 // Allow admins to regenerate list.
 if (!has_capability('moodle/site:config', \context_system::instance())) {
     print_error('Access Denied');
@@ -41,7 +43,11 @@ admin_externalpage_setup('reportconnectmeta', '', null, '', array('pagelayout' =
 // Did we get a delete meta request?
 $form = new \local_connect\forms\deletemeta(null);
 if ($data = $form->get_data()) {
-    print($data);
+    if (!empty($data->id)) {
+        $DB->delete_records('connect_meta', array(
+            'id' => $data->id
+        ));
+    }
 }
 
 // Output header.
@@ -73,7 +79,7 @@ foreach ($records as $record) {
         $obj,
         $obj->course->shortname,
         count($enrolments),
-        $form->display()
+        $form->render()
     );
 }
 
