@@ -105,7 +105,7 @@ class migrate
         $sql = "INSERT INTO {connect_rules} (`prefix`, `category`,`weight`) (
             SELECT r.rule, r.mdl_category, 50
             FROM `$connectdb`.`rules` r
-            LEFT OUTER JOIN {connect_rules} cr ON cr.prefix=r.rule AND cr.category=r.mdl_category
+            LEFT OUTER JOIN {connect_rules} cr ON cr.prefix=r.rule
             WHERE cr.id IS NULL AND r.rule IS NOT NULL
             GROUP BY r.rule
         )";
