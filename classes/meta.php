@@ -124,4 +124,26 @@ class meta extends data
     public function delete() {
         return false;
     }
+
+    /**
+     * To string method
+     */
+    public function __toString() {
+        $str = '';
+        switch ($this->objecttype) {
+            case self::OBJECT_TYPE_CATEGORY:
+                $str .= "Category";
+            break;
+            case self::OBJECT_TYPE_COURSE:
+                $str .= "Course";
+            break;
+            case self::OBJECT_TYPE_GROUP:
+                $str .= "Group";
+            break;
+            case self::OBJECT_TYPE_ROLE:
+                $str .= "Role";
+            break;
+        }
+        return "{$str} ({$this->objectid})";
+    }
 }

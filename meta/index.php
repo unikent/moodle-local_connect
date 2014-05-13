@@ -33,11 +33,51 @@ if (!has_capability('moodle/site:config', \context_system::instance())) {
     print_error('Access Denied');
 }
 
+$page    = optional_param('page', 0, PARAM_INT);
+$perpage = optional_param('perpage', 30, PARAM_INT);
+
 admin_externalpage_setup('reportconnectmeta', '', null, '', array('pagelayout' => 'report'));
+
+// Did we get a delete meta request?
+$form = new \local_connect\forms\deletemeta(null);
+if ($data = $form->get_data()) {
+    print($data);
+}
 
 // Output header.
 echo $OUTPUT->header();
 echo $OUTPUT->heading("Connect Meta Enrolment Manager");
+
+// Data table.
+$table = new \html_table();
+$table->head = array("Object", "Moodle Course", "Enrolments", "Action");
+$table->attributes = array('class' => 'admintable generaltable');
+$table->data = array();
+
+$deleteform = '';
+
+$records = $DB->get_records('connect_meta', null, '', 'id', $page * $perpage, $perpage);
+foreach ($records as $record) {
+    $obj = \local_connect\meta::get($record->id);
+    $enrolments = $obj->enrolments;
+
+    // Create the delete meta form.
+    $form = new \local_connect\forms\deletemeta($obj->id);
+
+    $table->data[] = array(
+        $obj,
+        $obj->course->shortname,
+        count($enrolments),
+        $form->display()
+    );
+}
+
+echo \html_writer::table($table);
+
+// Paging bar.
+$total = $DB->count_records('connect_meta');
+$baseurl = new moodle_url('/local/connect/meta/index.php', array('perpage' => $perpage));
+echo $OUTPUT->paging_bar($total, $page, $perpage, $baseurl);
 
 // Output footer.
 echo $OUTPUT->footer();
