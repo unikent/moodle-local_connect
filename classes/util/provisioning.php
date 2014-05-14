@@ -81,7 +81,10 @@ class provisioning
      * Does the given course have any enrolments?
      */
     private function has_enrolments($course) {
-        
+        global $DB;
+        return $DB->count_records('connect_enrolments', array(
+            "courseid" => $course->id
+        ));
     }
 
     /**
@@ -223,6 +226,10 @@ class provisioning
 
         $rs = $DB->get_recordset_select('connect_course', 'mid IS NULL or mid=0');
         foreach ($rs as $data) {
+            if (!$this->has_enrolments($data)) {
+                continue;
+            }
+
             $course = \local_connect\course::from_sql_result($data);
 
             $match = $this->find_match($data);
@@ -254,6 +261,10 @@ SQL;
 
         $rs = $DB->get_recordset_sql($sql);
         foreach ($rs as $course) {
+            if (!$this->has_enrolments($course)) {
+                continue;
+            }
+
             $course = \local_connect\course::from_sql_result($course);
             if (!$course->is_in_moodle()) {
                 $this->create_course($course);
