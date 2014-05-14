@@ -40,6 +40,9 @@ class course extends data
     /** Have we been locked? */
     private $_locked;
 
+    /** Set a shortname extension. */
+    private $_shortnameext;
+
     /**
      * The name of our connect table.
      */
@@ -95,9 +98,19 @@ class course extends data
     }
 
     /**
+     * Set a shortname extension.
+     */
+    public function set_shortname_extension($ext) {
+        $this->_shortnameext = $ext;
+    }
+
+    /**
      * Returns the shortname
      */
     public function _get_shortname() {
+        if (!empty($this->_shortnameext)) {
+            return $this->append_date($this->module_code . " " . $this->_shortnameext);
+        }
         return $this->append_date($this->module_code);
     }
 

@@ -56,6 +56,11 @@ class provisioning
         // Right. Now. What's left?
         // We want to start by grabbing everything with a unique shortcode and creating it.
         $this->handle_unique();
+
+        // Right. Now. What's left? #2.
+        $this->handle_remaining_mergers();
+
+        // Okay the rest is never going to happen. Create the skeletons anyway.
     }
 
     /**
@@ -73,28 +78,99 @@ class provisioning
     }
 
     /**
+     * Does the given course have any enrolments?
+     */
+    private function has_enrolments($course) {
+        
+    }
+
+    /**
+     * Get the ID for Canterbury campus.
+     */
+    private function get_canterbury() {
+        global $DB;
+
+        static $id = null;
+        if ($id === null) {
+            $id = $DB->get_field('connect_campus', 'id', array(
+                'name' => 'Canterbury'
+            ));
+        }
+
+        return $id;
+    }
+
+
+    /**
+     * Get the ID for Medway campus.
+     */
+    private function get_medway() {
+        global $DB;
+
+        static $id = null;
+        if ($id === null) {
+            $id = $DB->get_field('connect_campus', 'id', array(
+                'name' => 'Medway'
+            ));
+        }
+
+        return $id;
+    }
+
+    /**
      * Create a course (also handles automatic shortnameext).
      */
     private function create_course($course) {
+        global $DB;
+
         $shortnameext = "";
+
+        if (strpos($course->module_code, "WSHOP") === 0) {
+            if (!$course->is_unique_shortname($course->shortname)) {
+                $shortnameext = "(week " . $course->module_week_beginning . ")";
+                $course->set_shortname_extension($shortnameext);
+            }
+        }
+
         if (!$course->is_unique_shortname($course->shortname)) {
             if ($course->module_week_beginning == 1) {
                 $shortnameext = "AUT";
             }
-            if ($course->module_week_beginning == 13) {
+            if ($course->module_week_beginning >= 12) {
                 $shortnameext = "SPR";
             }
-            if ($course->module_week_beginning == 25) {
+            if ($course->module_week_beginning >= 24) {
                 $shortnameext = "SUM";
             }
 
             if (empty($shortnameext)) {
+                $this->error("Could not find suitable date shortnameext for course '{$course->id}'.");
+                return false;
+            }
+
+            $course->set_shortname_extension($shortnameext);
+        }
+
+        // Make sure we are still unique.
+        if (!$course->is_unique_shortname($course->shortname)) {
+            $canterbury = $this->get_canterbury();
+            $medway = $this->get_medway();
+
+            if ($course->campusid !== $canterbury && $course->campusid !== $medway) {
+                // Append the campus name too.
+                $campus = $DB->get_field('connect_campus', 'name', array(
+                    'id' => $course->campusid
+                ));
+
+                $shortnameext = "{$shortnameext} ({$campus})";
+                $course->set_shortname_extension($shortnameext);
+            } else {
                 $this->error("Could not find suitable shortnameext for course '{$course->id}'.");
                 return false;
             }
         }
 
-        $result = $course->create_in_moodle($shortnameext);
+        $result = $course->create_in_moodle();
 
         // Log it.
         if ($result) {
@@ -107,6 +183,62 @@ class provisioning
     }
 
     /**
+     * Can we match this course to an existing course?
+     */
+    private function find_match($course) {
+        global $DB;
+
+        $canterbury = $this->get_canterbury();
+        $medway = $this->get_medway();
+
+        if ($course->campusid !== $canterbury && $course->campusid !== $medway) {
+            return false;
+        }
+
+        // We match on everything relevant.
+        $matches = $DB->get_records('connect_course', array(
+            'module_code' => $course->module_code,
+            'module_week_beginning' => $course->module_week_beginning,
+            'module_length' => $course->module_length,
+            'category' => $course->category
+        ));
+
+        foreach ($matches as $match) {
+            if ($match->mid > 0) {
+                if ($match->campusid === $canterbury || $match->campusid === $medway) {
+                    // We have a match!
+                    return $match;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * What is left?
+     */
+    private function handle_remaining_mergers() {
+        global $DB;
+
+        $rs = $DB->get_recordset_select('connect_course', 'mid IS NULL or mid=0');
+        foreach ($rs as $data) {
+            $course = \local_connect\course::from_sql_result($data);
+
+            $match = $this->find_match($data);
+            if ($match !== false) {
+                $match = \local_connect\course::from_sql_result($match);
+                $match->add_child($course);
+                $this->log("Mapped course '{$course->id}' to Moodle course '{$match->mid}'.");
+                continue;
+            }
+
+            $this->create_course($course);
+        }
+        $rs->close();
+    }
+
+    /**
      * Create unique modules.
      */
     private function handle_unique() {
@@ -115,6 +247,7 @@ class provisioning
         $sql = <<<SQL
         SELECT *
         FROM {connect_course} c
+        WHERE c.mid IS NULL OR c.mid = 0
         GROUP BY module_code
         HAVING COUNT(c.id) = 1
 SQL;
