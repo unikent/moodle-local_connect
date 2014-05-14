@@ -432,7 +432,7 @@ class course extends data
      * @param unknown $target
      * @return unknown
      */
-    private function add_child($target) {
+    public function add_child($target) {
         // Add a link.
         $target->mid = $this->mid;
         $target->save();
