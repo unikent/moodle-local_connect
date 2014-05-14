@@ -34,27 +34,5 @@ list($options, $unrecognized) = cli_get_params(
     )
 );
 
-// Grab a list of courses, grouped by their module code, week beginning and module length.
-$sql = <<<SQL
-    SELECT c.module_code, c.module_week_beginning, c.module_length, GROUP_CONCAT(c.id) ids
-    FROM {connect_course} c
-    GROUP BY c.module_code, c.module_week_beginning, c.module_length
-SQL;
-
-$rs = $DB->get_recordset_sql($sql);
-
-foreach ($rs as $record) {
-    // Create it if we can.
-    if (true) {
-        continue;
-    }
-
-    // Merge it if we can't just create it.
-    if (true) {
-        continue;
-    }
-
-    // Append AUT,SPR,SUM if we can't.
-}
-
-$rs->close();
+$provisioning = new \local_connect\util\provisioning();
+$provisioning->go();
