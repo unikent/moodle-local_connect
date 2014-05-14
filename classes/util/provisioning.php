@@ -47,11 +47,37 @@ class provisioning
         // Then, we grab a list of mergers from last year.
         $this->build_matches();
 
+        // Find matches between the module and merger list.
+        $matches = $this->match_mergers();
+
         // Create it if we can.
 
         // Merge it if we can't just create it.
 
         // Append AUT,SPR,SUM if we can't.
+    }
+
+    /**
+     * Matches things in modules with mergers.
+     */
+    private function match_mergers() {
+        $matches = array();
+
+        foreach ($this->mergers as $k => $v) {
+            if (isset($this->modules[$k])) {
+                if (!isset($matches[$v])) {
+                    $matches[$v] = array();
+                }
+                $matches[$v][] = $k;
+            }
+        }
+
+        // Strip out singles.
+        $matches = array_filter($matches, function($entry) {
+            return count($entry) > 1;
+        });
+
+        return array_values($matches);
     }
 
     /**
@@ -72,7 +98,8 @@ class provisioning
             $uid = $this->get_uid($record->module_code, $record->module_version, $record->module_week_beginning,
                                   $record->module_length, $record->campusid);
             if (isset($this->modules[$uid])) {
-                print "Error: duplicate module {$record->id}: {$uid}!";
+                print "Error: duplicate module {$record->id}: {$uid}!\n";
+                continue;
             }
 
             $this->modules[$uid] = $record;
@@ -87,24 +114,21 @@ class provisioning
         $mergers = $this->get_csv_data();
 
         foreach ($mergers as $merger) {
-            $deliverykey = $merger[0];
-            $code = $merger[1];
+            $code = $merger[0];
+            $version = $merger[1];
             $weekbeginning = $merger[2];
             $length = $merger[3];
-            $version = $merger[4];
+            $campusid = $merger[4];
             $parentid = $merger[5];
 
-            if (!isset($this->mergers[$parentid])) {
-                $this->mergers[$parentid] = array();
+            $uid = $this->get_uid($code, $version, $weekbeginning, $length, $campusid);
+
+            if (isset($this->mergers[$uid])) {
+                print "Error: duplicate module {$uid}!\n";
+                continue;
             }
 
-            $this->mergers[$parentid][] = array(
-                "module_delivery_key" => $deliverykey,
-                "module_code" => $code,
-                "module_week_beginning" => $weekbeginning,
-                "module_length" => $length,
-                "module_version" => $version
-            );
+            $this->mergers[$uid] = $parentid;
         }
     }
 
