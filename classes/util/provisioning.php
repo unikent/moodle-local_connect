@@ -51,10 +51,59 @@ class provisioning
         $matches = $this->match_mergers();
 
         // Create it if we can.
+        $this->handle_mergers($matches);
 
         // Merge it if we can't just create it.
 
         // Append AUT,SPR,SUM if we can't.
+    }
+
+    /**
+     * Create a course (also handles automatic shortnameext).
+     */
+    private function create_course($course) {
+        $shortnameext = "";
+        if (!$course->is_unique_shortname($course->shortname)) {
+            if ($course->module_week_beginning == 1) {
+                $shortnameext = "AUT";
+            }
+            if ($course->module_week_beginning == 13) {
+                $shortnameext = "SPR";
+            }
+            if ($course->module_week_beginning == 25) {
+                $shortnameext = "SUM";
+            }
+        }
+
+        return $course->create_in_moodle($shortnameext);
+    }
+
+    /**
+     * Handles the creation of merged modules.
+     */
+    private function handle_mergers($matches) {
+        foreach ($matches as $match) {
+            $courses = array();
+            foreach ($match as $key) {
+                $courses[] = $this->modules[$key];
+
+                // Don't do anything else with this.
+                unset($this->modules[$key]);
+            }
+
+            // Take the primary course.
+            $primary = array_shift($courses);
+            $primary = \local_connect\course::get($primary->id);
+            if (!$this->create_course($primary)) {
+                print "Error creating course {$primary->id}!\n";
+                continue;
+            }
+
+            foreach ($courses as $course) {
+                $course = \local_connect\course::get($course->id);
+                $primary->add_child($course);
+            }
+        }
     }
 
     /**
