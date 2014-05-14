@@ -34,5 +34,14 @@ list($options, $unrecognized) = cli_get_params(
     )
 );
 
+$username = exec('whoami');
+$user = $DB->get_record('user', array(
+    'username' => $username
+));
+
+if ($user) {
+    \core\session\manager::set_user($user);
+}
+
 $provisioning = new \local_connect\util\provisioning();
 $provisioning->go();
