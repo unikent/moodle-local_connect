@@ -53,7 +53,9 @@ class provisioning
         // Create it if we can.
         $this->handle_mergers($matches);
 
-        // Right. Now.
+        // Right. Now. What's left?
+        // We want to start by grabbing everything with a unique shortcode and creating it.
+        $this->handle_unique();
     }
 
     /**
@@ -92,7 +94,39 @@ class provisioning
             }
         }
 
-        return $course->create_in_moodle($shortnameext);
+        $result = $course->create_in_moodle($shortnameext);
+
+        // Log it.
+        if ($result) {
+            $this->log("Created course '{$course->id}'.");
+        } else {
+            $this->error("Error creating course '{$course->id}'!");
+        }
+
+        return $result;
+    }
+
+    /**
+     * Create unique modules.
+     */
+    private function handle_unique() {
+        global $DB;
+
+        $sql = <<<SQL
+        SELECT *
+        FROM {connect_course} c
+        GROUP BY module_code
+        HAVING COUNT(c.id) = 1
+SQL;
+
+        $rs = $DB->get_recordset_sql($sql);
+        foreach ($rs as $course) {
+            $course = \local_connect\course::from_sql_result($course);
+            if (!$course->is_in_moodle()) {
+                $this->create_course($course);
+            }
+        }
+        $rs->close();
     }
 
     /**
@@ -115,11 +149,8 @@ class provisioning
             // Create the primary.
             if (!$primary->is_in_moodle()) {
                 if (!$this->create_course($primary)) {
-                    $this->error("Error creating course '{$primary->id}'!");
                     continue;
                 }
-
-                $this->log("Created primary course '{$primary->id}'.");
             }
 
             // Add children.
