@@ -94,14 +94,21 @@ class provisioning
             // Take the primary course.
             $primary = array_shift($courses);
             $primary = \local_connect\course::get($primary->id);
-            if (!$this->create_course($primary)) {
-                print "Error creating course {$primary->id}!\n";
-                continue;
+
+            // Create the primary.
+            if (!$primary->is_in_moodle()) {
+                if (!$this->create_course($primary)) {
+                    print "Error creating course {$primary->id}!\n";
+                    continue;
+                }
             }
 
+            // Add children.
             foreach ($courses as $course) {
                 $course = \local_connect\course::get($course->id);
-                $primary->add_child($course);
+                if (!$course->is_in_moodle()) {
+                    $primary->add_child($course);
+                }
             }
         }
     }
