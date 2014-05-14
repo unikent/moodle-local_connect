@@ -53,9 +53,7 @@ class provisioning
         // Create it if we can.
         $this->handle_mergers($matches);
 
-        // Merge it if we can't just create it.
-
-        // Append AUT,SPR,SUM if we can't.
+        // Right. Now.
     }
 
     /**
@@ -129,7 +127,7 @@ class provisioning
                 $course = \local_connect\course::get($course->id);
                 if (!$course->is_in_moodle()) {
                     $primary->add_child($course);
-                    $this->log("Mapped course '{$course->id}' to Moodle course '{$parent->mid}'.");
+                    $this->log("Mapped course '{$course->id}' to Moodle course '{$primary->mid}'.");
                 }
             }
         }
