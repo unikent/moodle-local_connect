@@ -59,6 +59,20 @@ class provisioning
     }
 
     /**
+     * A log of errors.
+     */
+    private function error($message) {
+        echo "[Error] $message\n";
+    }
+
+    /**
+     * A log of actions.
+     */
+    private function log($message) {
+        echo "[Action] $message\n";
+    }
+
+    /**
      * Create a course (also handles automatic shortnameext).
      */
     private function create_course($course) {
@@ -72,6 +86,11 @@ class provisioning
             }
             if ($course->module_week_beginning == 25) {
                 $shortnameext = "SUM";
+            }
+
+            if (empty($shortnameext)) {
+                $this->error("Could not find suitable shortnameext for course '{$course->id}'.");
+                return false;
             }
         }
 
@@ -98,9 +117,11 @@ class provisioning
             // Create the primary.
             if (!$primary->is_in_moodle()) {
                 if (!$this->create_course($primary)) {
-                    print "Error creating course {$primary->id}!\n";
+                    $this->error("Error creating course '{$primary->id}'!");
                     continue;
                 }
+
+                $this->log("Created primary course '{$primary->id}'.");
             }
 
             // Add children.
@@ -108,6 +129,7 @@ class provisioning
                 $course = \local_connect\course::get($course->id);
                 if (!$course->is_in_moodle()) {
                     $primary->add_child($course);
+                    $this->log("Mapped course '{$course->id}' to Moodle course '{$parent->mid}'.");
                 }
             }
         }
@@ -154,7 +176,7 @@ class provisioning
             $uid = $this->get_uid($record->module_code, $record->module_version, $record->module_week_beginning,
                                   $record->module_length, $record->campusid);
             if (isset($this->modules[$uid])) {
-                print "Error: duplicate module {$record->id}: {$uid}!\n";
+                $this->error("Duplicate module found: '{$record->id}' - '{$uid}'!");
                 continue;
             }
 
@@ -180,7 +202,7 @@ class provisioning
             $uid = $this->get_uid($code, $version, $weekbeginning, $length, $campusid);
 
             if (isset($this->mergers[$uid])) {
-                print "Error: duplicate module {$uid}!\n";
+                $this->error("Error: duplicate module '{$uid}'!");
                 continue;
             }
 
