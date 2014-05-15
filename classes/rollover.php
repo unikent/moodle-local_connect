@@ -39,7 +39,7 @@ class rollover {
     public static function get_course_list($dist = '', $shortname = '') {
         global $CFG, $SHAREDB;
 
-        if (!utils::enable_sharedb()) {
+        if (!\local_connect\util\helpers::enable_sharedb()) {
             return array();
         }
 
@@ -87,7 +87,7 @@ class rollover {
     public static function populate_sharedb() {
         global $CFG, $DB, $SHAREDB;
 
-        if (!utils::enable_sharedb()) {
+        if (!\local_connect\util\helpers::enable_sharedb()) {
             return null;
         }
 

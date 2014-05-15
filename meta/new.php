@@ -22,19 +22,43 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../config.php');
-
-if (!has_capability('moodle/site:config', \context_system::instance())) {
-    print_error("Access Denied");
-}
+require_once(dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/connect/regenerate_shared_list.php');
+$PAGE->set_url('/local/connect/meta/new.php');
 
-\local_connect\rollover::populate_sharedb();
+// Allow admins to regenerate list.
+if (!has_capability('moodle/site:config', \context_system::instance())) {
+    print_error('Access Denied');
+}
 
-redirect($CFG->wwwroot . "/local/connect/sharedreport.php");
+admin_externalpage_setup('reportconnectmeta', '', null, '', array('pagelayout' => 'report'));
 
+$stage = optional_param('stage', 1, PARAM_INT);
+
+$form = new \local_connect\forms\newmeta($stage);
+
+if ($stage === 3 && ($data = $form->get_data())) {
+    $DB->insert_record('connect_meta', array(
+        'objectid' => $data->objectid,
+        'objecttype' => $data->objecttype,
+        'courseid' => $data->courseid
+    ));
+    redirect($CFG->wwwroot . '/local/connect/meta/index.php');
+}
+
+if ($form->is_cancelled()) {
+    redirect($CFG->wwwroot . '/local/connect/meta/index.php');
+}
+
+// Output header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading("Population Successful");
+echo $OUTPUT->heading("Create new meta set");
+
+print \html_writer::tag("p", "Stage {$stage}/3");
+
+$form->display();
+
+// Output footer.
 echo $OUTPUT->footer();

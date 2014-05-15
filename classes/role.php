@@ -70,6 +70,13 @@ class role extends data
     }
 
     /**
+     * Get all enrollments for this role
+     */
+    public function _get_enrolments() {
+        return enrolment::get_for_role($this);
+    }
+
+    /**
      * Returns our data mappings.
      * @todo Move this to DB.
      */
@@ -106,7 +113,7 @@ class role extends data
 
         $data = $this->get_data_mapping();
         if ($data === false) {
-            utils::error("No role mapping for: '{$this->name}'!");
+            \local_connect\util\helpers::error("No role mapping for: '{$this->name}'!");
             return false;
         }
 

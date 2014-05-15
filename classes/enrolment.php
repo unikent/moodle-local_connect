@@ -144,7 +144,7 @@ class enrolment extends data
         }
 
         // Check enrolment status.
-        return is_enrolled($context, $this->user->mid);
+        return is_enrolled($context, $this->user->mid);// && user_has_role_assignment($this->user->mid, $this->role->mid, $context->id);
     }
 
     /**
@@ -155,7 +155,9 @@ class enrolment extends data
 
         // Create the user.
         if ($this->user && !$this->user->is_in_moodle()) {
-            $this->user->create_in_moodle();
+            if (!$this->user->create_in_moodle()) {
+                return false;
+            }
         }
 
         // Create the role.
@@ -168,7 +170,8 @@ class enrolment extends data
         }
 
         if (!enrol_try_internal_enrol($this->course->mid, $this->user->mid, $this->role->mid)) {
-            utils::error("Enrol '{$this->user->mid}' on '{$this->course->mid}' as a '{$this->role->name}' failed.");
+            $msg = "Enrol '{$this->user->mid}' on '{$this->course->mid}' as a '{$this->role->name}' failed.";
+            \local_connect\util\helpers::error($msg);
             return false;
         }
 
@@ -237,6 +240,56 @@ class enrolment extends data
 
         $objs = $DB->get_records('connect_enrolments', array(
             'courseid' => $course->id
+        ));
+
+        foreach ($objs as &$obj) {
+            $enrolment = new enrolment();
+            $enrolment->set_class_data($obj);
+            $obj = $enrolment;
+        }
+
+        return $objs;
+    }
+
+    /**
+     * Returns all enrolments for a given category
+     * 
+     * @param  local_connect_category $category A category
+     * @return local_connect_enrolment Enrolment object
+     */
+    public static function get_for_category($category) {
+        global $DB;
+
+        $sql = <<<SQL
+        SELECT ce.* FROM {connect_enrolments} ce
+        INNER JOIN {connect_course} c
+        WHERE c.category = :category
+SQL;
+
+        $objs = $DB->get_records_sql($sql, array(
+            'category' => $category->id
+        ));
+
+        foreach ($objs as &$obj) {
+            $enrolment = new enrolment();
+            $enrolment->set_class_data($obj);
+            $obj = $enrolment;
+        }
+
+        return $objs;
+    }
+
+    /**
+     * Returns all enrolments for a given role
+     * 
+     * @param  local_connect_role $role A role
+     * @return local_connect_enrolment Enrolment object
+     */
+    public static function get_for_role($role) {
+        global $DB;
+
+        $objs = $DB->get_records('connect_enrolments', array(
+            'roleid' => $role->id
         ));
 
         foreach ($objs as &$obj) {

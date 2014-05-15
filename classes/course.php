@@ -40,6 +40,9 @@ class course extends data
     /** Have we been locked? */
     private $_locked;
 
+    /** Set a shortname extension. */
+    private $_shortnameext;
+
     /**
      * The name of our connect table.
      */
@@ -95,9 +98,19 @@ class course extends data
     }
 
     /**
+     * Set a shortname extension.
+     */
+    public function set_shortname_extension($ext) {
+        $this->_shortnameext = $ext;
+    }
+
+    /**
      * Returns the shortname
      */
     public function _get_shortname() {
+        if (!empty($this->_shortnameext)) {
+            return $this->append_date($this->module_code . " " . $this->_shortnameext);
+        }
         return $this->append_date($this->module_code);
     }
 
@@ -350,7 +363,7 @@ class course extends data
 
         // Check we have a category.
         if (empty($this->category)) {
-            utils::error("No category set for course: '{$this->id}'!");
+            \local_connect\util\helpers::error("No category set for course: '{$this->id}'!");
             return false;
         }
 
@@ -362,7 +375,7 @@ class course extends data
 
         // Ensure the shortname is unique.
         if (!$this->is_unique_shortname($shortname)) {
-            utils::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle but the shortname was not unique.");
+            \local_connect\util\helpers::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle but the shortname was not unique.");
             return false;
         }
 
@@ -372,7 +385,7 @@ class course extends data
             $obj->category = $this->category;
             $obj->shortname = $shortname;
             $obj->fullname = $this->fullname;
-            $obj->summary = $this->summary;
+            $obj->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
             $obj->visible = 0;
 
             $course = create_course($obj);
@@ -384,7 +397,7 @@ class course extends data
             $this->mid = $course->id;
         } catch (\moodle_exception $e) {
             $msg = $e->getMessage();
-            utils::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle but '{$msg}'.");
+            \local_connect\util\helpers::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle but '{$msg}'.");
             return false;
         }
 
@@ -432,7 +445,7 @@ class course extends data
      * @param unknown $target
      * @return unknown
      */
-    private function add_child($target) {
+    public function add_child($target) {
         // Add a link.
         $target->mid = $this->mid;
         $target->save();
@@ -865,7 +878,7 @@ class course extends data
         // Create the linked course if it doesnt exist.
         if (!$link->is_in_moodle()) {
             if (!$link->create_in_moodle()) {
-                utils::error("Could not create linked course: $link");
+                \local_connect\util\helpers::error("Could not create linked course: $link");
             }
         } else {
             $link->update_moodle();
@@ -874,7 +887,7 @@ class course extends data
         // Add children.
         foreach ($courses as $child) {
             if (!$link->add_child($child)) {
-                utils::error("Could not add child '$child' to course: $link");
+                \local_connect\util\helpers::error("Could not add child '$child' to course: $link");
             }
         }
 
@@ -891,7 +904,7 @@ class course extends data
             $course = self::get($c);
             // All good!
             if (!$course->unlink()) {
-                utils::error("Could not remove child '$course'!");
+                \local_connect\util\helpers::error("Could not remove child '$course'!");
             }
         }
 

@@ -15,24 +15,42 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Connect Cron
+ * Local stuff for Moodle Connect
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('CLI_SCRIPT', true);
+namespace local_connect\forms;
 
-require(dirname(__FILE__) . '/../../../config.php');
-require_once($CFG->libdir . '/clilib.php');
+defined('MOODLE_INTERNAL') || die();
 
-raise_memory_limit(MEMORY_HUGE);
+require_once($CFG->dirroot.'/lib/formslib.php');
 
-// For now, only perform jobs that have been deemed stable.
-\local_connect\util\cli::fix_mids();
-\local_connect\util\migrate::all();
-\local_connect\util\cli::enrolment_sync();
-\local_connect\util\cli::group_sync();
-\local_connect\util\cli::group_enrolment_sync();
-\local_connect\util\cli::meta_sync();
+class deletemeta extends \moodleform
+{
+    /** The ID we are referencing. */
+    private $id;
+
+    /**
+     * Constructor
+     */
+    public function __construct($id, $action=null, $customdata=null, $method='post', $target='', $attributes=null, $editable=true) {
+        $this->id = $id;
+        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
+    }
+
+    /**
+     * Form definition
+     */
+    public function definition() {
+        $mform =& $this->_form;
+
+        // Add rule prefix.
+        $mform->addElement('hidden', 'id', $this->id);
+        $mform->setType('id', PARAM_INT);
+
+        $this->add_action_buttons(false, "Delete");
+    }
+}

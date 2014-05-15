@@ -15,24 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Connect Cron
+ * Local stuff for Moodle Connect
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('CLI_SCRIPT', true);
+require_once('../../config.php');
 
-require(dirname(__FILE__) . '/../../../config.php');
-require_once($CFG->libdir . '/clilib.php');
+if (!has_capability('moodle/site:config', \context_system::instance())) {
+    print_error("Access Denied");
+}
 
-raise_memory_limit(MEMORY_HUGE);
+$PAGE->set_context(context_system::instance());
+$PAGE->set_url('/local/connect/sharedb/regenerate.php');
 
-// For now, only perform jobs that have been deemed stable.
-\local_connect\util\cli::fix_mids();
-\local_connect\util\migrate::all();
-\local_connect\util\cli::enrolment_sync();
-\local_connect\util\cli::group_sync();
-\local_connect\util\cli::group_enrolment_sync();
-\local_connect\util\cli::meta_sync();
+\local_connect\rollover::populate_sharedb();
+
+redirect($CFG->wwwroot . "/local/connect/sharedb/index.php");
+
+echo $OUTPUT->header();
+echo $OUTPUT->heading("Population Successful");
+echo $OUTPUT->footer();

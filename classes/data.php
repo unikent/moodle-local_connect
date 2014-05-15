@@ -244,6 +244,15 @@ abstract class data {
     }
 
     /**
+     * This is *basically* a public version of set_class_data
+     */
+    public static function from_sql_result($data) {
+        $obj = new static();
+        $obj->set_class_data($data);
+        return $obj;
+    }
+
+    /**
      * Get an object by ID
      */
     public static function get($id) {
@@ -257,10 +266,7 @@ abstract class data {
             return null;
         }
 
-        $obj = new static();
-        $obj->set_class_data($data);
-
-        return $obj;
+        return static::from_sql_result($data);
     }
 
     /**
@@ -275,9 +281,7 @@ abstract class data {
 
         if (!$raw) {
             foreach ($set as &$o) {
-                $obj = new static();
-                $obj->set_class_data($o);
-                $o = $obj;
+                $o = static::from_sql_result($o);
             }
         }
 
@@ -295,9 +299,7 @@ abstract class data {
 
         // Go through each record, create an object and call the function.
         foreach ($rs as $record) {
-            $obj = new static();
-            $obj->set_class_data($record);
-
+            $obj = static::from_sql_result($record);
             $func($obj);
         }
 

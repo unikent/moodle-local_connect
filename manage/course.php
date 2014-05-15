@@ -15,24 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Connect Cron
+ * Local stuff for Moodle Connect
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('CLI_SCRIPT', true);
+require_once('../../../config.php');
+require_once($CFG->libdir . '/accesslib.php');
 
-require(dirname(__FILE__) . '/../../../config.php');
-require_once($CFG->libdir . '/clilib.php');
+require_login();
 
-raise_memory_limit(MEMORY_HUGE);
+if (!\local_connect\util\helpers::is_enabled()) {
+    print_error('connect_disabled', 'local_connect');
+}
 
-// For now, only perform jobs that have been deemed stable.
-\local_connect\util\cli::fix_mids();
-\local_connect\util\migrate::all();
-\local_connect\util\cli::enrolment_sync();
-\local_connect\util\cli::group_sync();
-\local_connect\util\cli::group_enrolment_sync();
-\local_connect\util\cli::meta_sync();
+$mid = required_param('mid', PARAM_INT);
+
+// Check we have the capabilities.

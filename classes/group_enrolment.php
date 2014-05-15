@@ -158,7 +158,7 @@ class group_enrolment extends data
         }
 
         if (!groups_add_member($this->group->mid, $this->user->mid)) {
-            utils::error("Failed to enrol '{$this->user->mid}' in '{$this->group->mid}'. Sorry :(((");
+            \local_connect\util\helpers::error("Failed to enrol '{$this->user->mid}' in '{$this->group->mid}'. Sorry :(((");
             return false;
         }
 
@@ -166,8 +166,8 @@ class group_enrolment extends data
         $params = array(
             'objectid' => $this->id,
             'relateduserid' => $this->user->mid,
-            'courseid' => $this->group->course->mid,
-            'context' => \context_course::instance($this->group->course->mid),
+            'courseid' => $this->course->mid,
+            'context' => \context_course::instance($this->course->mid),
             'other' => array(
                 'groupid' => $this->groupid
             )

@@ -28,7 +28,7 @@ if ($hassiteconfig) {
     $ADMIN->add('reports', new admin_externalpage('reportconnectreport', get_string('connectreport', 'local_connect'),
         "$CFG->wwwroot/local/connect/index.php", 'local/kentconnect:manage'));
     $ADMIN->add('reports', new admin_externalpage('reportconnectsharedreport', get_string('sharedreport', 'local_connect'),
-        "$CFG->wwwroot/local/connect/sharedreport.php", 'local/kentconnect:manage'));
+        "$CFG->wwwroot/local/connect/sharedb/index.php", 'local/kentconnect:manage'));
 
     $settings = new admin_settingpage('local_connect', get_string('pluginname', 'local_connect'));
     $ADMIN->add('localplugins', $settings);
@@ -36,6 +36,10 @@ if ($hassiteconfig) {
     $rules = new admin_externalpage('connectrules', "Category Rules", "$CFG->wwwroot/local/connect/rules.php",
         'moodle/site:config');
     $ADMIN->add('localplugins', $rules);
+
+    $meta = new admin_externalpage('reportconnectmeta', "Connect Meta Manager", "$CFG->wwwroot/local/connect/meta/index.php",
+        'moodle/site:config');
+    $ADMIN->add('localplugins', $meta);
 
     $settings->add(new admin_setting_configcheckbox(
         'local_connect_enable',

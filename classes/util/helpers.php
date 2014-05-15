@@ -22,14 +22,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect;
+namespace local_connect\util;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Connect utils
  */
-class utils {
+class helpers {
 
     /**
      * Decide what to do with an error.
