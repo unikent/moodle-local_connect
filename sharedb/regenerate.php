@@ -29,11 +29,11 @@ if (!has_capability('moodle/site:config', \context_system::instance())) {
 }
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/connect/regenerate_shared_list.php');
+$PAGE->set_url('/local/connect/sharedb/regenerate.php');
 
 \local_connect\rollover::populate_sharedb();
 
-redirect($CFG->wwwroot . "/local/connect/sharedreport.php");
+redirect($CFG->wwwroot . "/local/connect/sharedb/index.php");
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading("Population Successful");
