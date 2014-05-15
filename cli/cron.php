@@ -27,6 +27,8 @@ define('CLI_SCRIPT', true);
 require(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
+raise_memory_limit(MEMORY_HUGE);
+
 // For now, only perform jobs that have been deemed stable.
 \local_connect\util\cli::fix_mids();
 \local_connect\util\migrate::all();
