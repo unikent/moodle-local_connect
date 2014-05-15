@@ -151,7 +151,13 @@ class user extends data
             $user->lastname = $this->family_name;
         }
 
-        $this->mid = user_create_user($user, false);
+        try {
+            $this->mid = user_create_user($user, false);
+        } catch (\moodle_exception $e) {
+            // TODO - error.
+            return false;
+        }
+
         if ($this->save()) {
             $this->sync_enrolments();
         }

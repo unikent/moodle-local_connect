@@ -155,7 +155,9 @@ class enrolment extends data
 
         // Create the user.
         if ($this->user && !$this->user->is_in_moodle()) {
-            $this->user->create_in_moodle();
+            if (!$this->user->create_in_moodle()) {
+                return false;
+            }
         }
 
         // Create the role.
@@ -168,7 +170,8 @@ class enrolment extends data
         }
 
         if (!enrol_try_internal_enrol($this->course->mid, $this->user->mid, $this->role->mid)) {
-            \local_connect\util\helpers::error("Enrol '{$this->user->mid}' on '{$this->course->mid}' as a '{$this->role->name}' failed.");
+            $msg = "Enrol '{$this->user->mid}' on '{$this->course->mid}' as a '{$this->role->name}' failed.";
+            \local_connect\util\helpers::error($msg);
             return false;
         }
 
