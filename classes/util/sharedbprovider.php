@@ -70,7 +70,7 @@ class sharedbprovider {
     public function __call($name, $arguments) {
         global $SHAREDB;
 
-        if (!\local_connect\util\helpers::enable_sharedb()) {
+        if (!helpers::enable_sharedb()) {
             return false;
         }
 

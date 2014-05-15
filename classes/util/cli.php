@@ -36,13 +36,13 @@ class cli
      */
     public static function map_status($status, $obj) {
         switch ($status) {
-            case data::STATUS_CREATE:
+            case \local_connect\data::STATUS_CREATE:
                 mtrace("  Created: " . $obj->id);
             break;
-            case data::STATUS_MODIFY:
+            case \local_connect\data::STATUS_MODIFY:
                 mtrace("  Modified: " . $obj->id);
             break;
-            case data::STATUS_DELETE:
+            case \local_connect\data::STATUS_DELETE:
                 mtrace("  Deleted: " . $obj->id);
             break;
             default:
@@ -124,7 +124,7 @@ SQL;
         }
 
         // Just run a batch_all on the set.
-        course::batch_all(function ($obj) use($dry) {
+        \local_connect\course::batch_all(function ($obj) use($dry) {
             try {
                 $result = $obj->sync($dry);
                 cli::map_status($result, $obj);
@@ -148,7 +148,7 @@ SQL;
             mtrace("Synchronizing enrolments...");
 
             // Just run a batch_all on the set.
-            enrolment::batch_all(function ($obj) use($dry) {
+            \local_connect\enrolment::batch_all(function ($obj) use($dry) {
                 $result = $obj->sync($dry);
                 cli::map_status($result, $obj);
             });
@@ -161,7 +161,7 @@ SQL;
         mtrace("Synchronizing enrolments for course: '{$mid}'...");
 
         // Get the connect version of the course.
-        $courses = course::get_by_moodle_id($mid);
+        $courses = \local_connect\course::get_by_moodle_id($mid);
 
         // Validate the course.
         if (empty($courses)) {
@@ -190,7 +190,7 @@ SQL;
             mtrace("Synchronizing groups...");
 
             // Just run a batch_all on the set.
-            group::batch_all(function ($obj) use($dry) {
+            \local_connect\group::batch_all(function ($obj) use($dry) {
                 $result = $obj->sync($dry);
                 cli::map_status($result, $obj);
             });
@@ -203,7 +203,7 @@ SQL;
         mtrace("Synchronizing groups for course: '{$mid}'...");
 
         // Get the connect version of the course.
-        $courses = course::get_by_moodle_id($mid);
+        $courses = \local_connect\course::get_by_moodle_id($mid);
 
         // Validate the course.
         if (empty($courses)) {
@@ -230,7 +230,7 @@ SQL;
             mtrace("Synchronizing group enrolments...");
 
             // Just run a batch_all on the set.
-            group_enrolment::batch_all(function ($obj) use($dry) {
+            \local_connect\group_enrolment::batch_all(function ($obj) use($dry) {
                 $result = $obj->sync($dry);
                 cli::map_status($result, $obj);
             });
@@ -243,7 +243,7 @@ SQL;
         mtrace("Synchronizing group enrolments for course: '{$mid}'...");
 
         // Get the connect version of the course.
-        $courses = course::get_by_moodle_id($mid);
+        $courses = \local_connect\course::get_by_moodle_id($mid);
 
         // Validate the course.
         if (empty($courses)) {
@@ -267,7 +267,7 @@ SQL;
     public static function meta_sync($dry = false) {
         mtrace("Synchronizing meta enrolments...");
 
-        meta::batch_all(function ($obj) use($dry) {
+        \local_connect\meta::batch_all(function ($obj) use($dry) {
             $obj->sync($dry);
         });
     }
