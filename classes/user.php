@@ -135,6 +135,10 @@ class user extends data
             return true;
         }
 
+        if (empty($this->initials) || empty($this->family_name)) {
+            return false;
+        }
+
         $user = new \stdClass();
         $user->username = \core_text::convert($this->login, 'utf-8', 'utf-8');
         $user->email = $user->username . "@kent.ac.uk";
@@ -142,14 +146,8 @@ class user extends data
         $user->password = "not cached";
         $user->confirmed = 1;
         $user->mnethostid = $CFG->mnet_localhost_id;
-
-        if (!empty($this->initials)) {
-            $user->firstname = $this->initials;
-        }
-
-        if (!empty($this->family_name)) {
-            $user->lastname = $this->family_name;
-        }
+        $user->firstname = $this->initials;
+        $user->lastname = $this->family_name;
 
         try {
             $this->mid = user_create_user($user, false);
