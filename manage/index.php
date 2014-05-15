@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../config.php');
+require_once('../../../config.php');
 require_once($CFG->libdir . '/accesslib.php');
 
 require_login();
@@ -31,21 +31,33 @@ if (!\local_connect\util\helpers::is_enabled()) {
     print_error('connect_disabled', 'local_connect');
 }
 
-if (!\local_connect\util\helpers::can_course_manage()) {
+$courses = get_user_capability_course('moodle/course:update');
+if (empty($courses)) {
     print_error('accessdenied', 'local_connect');
 }
 
 // Page setup.
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/connect/index2.php');
+$PAGE->set_url('/local/connect/manage/index.php');
 $PAGE->set_pagelayout('admin');
-$PAGE->navbar->add("Connect Administration");
+$PAGE->navbar->add('Connect Administration');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading("Connect Administration");
+echo $OUTPUT->heading('Connect Administration');
 
-$courses = get_user_capability_course('moodle/course:update');
+echo \html_writer::tag('p', 'You currently manage the following courses:');
 
-print 'Coming Soon.';
+// We have a list of courses we can manage.
+// We want to manage SDS deliveries to those courses.
+echo \html_writer::start_tag('ul');
+foreach ($courses as $obj) {
+    $course = $DB->get_record('course', array('id' => $obj->id));
+
+    $a = \html_writer::tag('a', $course->shortname . " - " . $course->fullname, array(
+        'href' => $CFG->wwwroot . '/local/connect/manage/course.php?mid=' . $course->id
+    ));
+    echo \html_writer::tag('li', $a);
+}
+echo \html_writer::end_tag('ul');
 
 echo $OUTPUT->footer();
