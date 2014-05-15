@@ -39,7 +39,7 @@ $conditions = empty($dist) ? null : array("moodle_dist" => $dist);
 admin_externalpage_setup('reportconnectsharedreport', '', null, '', array('pagelayout' => 'report'));
 
 // Dont show anything if there is nothing to show!
-if (!\local_connect\utils::enable_sharedb()) {
+if (!\local_connect\util\helpers::enable_sharedb()) {
 	print_error("Shared Moodle has not been enabled on this system, so there is nothing to show!");
 }
 

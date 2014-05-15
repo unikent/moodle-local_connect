@@ -41,25 +41,25 @@ list($options, $unrecognized) = cli_get_params(
 raise_memory_limit(MEMORY_HUGE);
 
 if ($options['clean']) {
-    \local_connect\migrate::empty_all();
+    \local_connect\util\migrate::empty_all();
 }
 
 if ($options['update']) {
-    \local_connect\migrate::all_updated();
+    \local_connect\util\migrate::all_updated();
 }
 
 if ($options['new']) {
-    \local_connect\migrate::all_create();
+    \local_connect\util\migrate::all_create();
 }
 
 if ($options['all']) {
-    \local_connect\migrate::all();
+    \local_connect\util\migrate::all();
 }
 
 if ($options['map-roles']) {
-    \local_connect\migrate::map_roles();
+    \local_connect\util\migrate::map_roles();
 }
 
 if ($options['map-users']) {
-    \local_connect\migrate::map_users();
+    \local_connect\util\migrate::map_users();
 }

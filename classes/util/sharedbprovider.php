@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect;
+namespace local_connect\util;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -70,7 +70,7 @@ class sharedbprovider {
     public function __call($name, $arguments) {
         global $SHAREDB;
 
-        if (!utils::enable_sharedb()) {
+        if (!\local_connect\util\helpers::enable_sharedb()) {
             return false;
         }
 

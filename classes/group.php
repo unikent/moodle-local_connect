@@ -183,7 +183,7 @@ class group extends data
         }
 
         if (!$this->course->is_in_moodle()) {
-            utils::error("Attempting to create group '{$this->id}' but course '{$this->courseid}' doesnt exist!");
+            \local_connect\util\helpers::error("Attempting to create group '{$this->id}' but course '{$this->courseid}' doesnt exist!");
             return false;
         }
 
@@ -206,7 +206,7 @@ class group extends data
         $data->description = '';
         $this->mid = groups_create_group($data);
         if ($this->mid === false) {
-            utils::error("Failed attempting to create group '{$this->id}'. I don't know why :'(");
+            \local_connect\util\helpers::error("Failed attempting to create group '{$this->id}'. I don't know why :'(");
             return false;
         }
 

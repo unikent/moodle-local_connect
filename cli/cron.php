@@ -28,9 +28,9 @@ require(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
 // For now, only perform jobs that have been deemed stable.
-\local_connect\cli::fix_mids();
-\local_connect\migrate::all();
-\local_connect\cli::enrolment_sync();
-\local_connect\cli::group_sync();
-\local_connect\cli::group_enrolment_sync();
-\local_connect\cli::meta_sync();
+\local_connect\util\cli::fix_mids();
+\local_connect\util\migrate::all();
+\local_connect\util\cli::enrolment_sync();
+\local_connect\util\cli::group_sync();
+\local_connect\util\cli::group_enrolment_sync();
+\local_connect\util\cli::meta_sync();

@@ -43,7 +43,7 @@ class observers
         global $CFG, $DB, $SHAREDB;
 
         // Update ShareDB if it is enabled.
-        if (utils::enable_sharedb()) {
+        if (\local_connect\util\helpers::enable_sharedb()) {
             // Update course listings DB.
             $record = $DB->get_record('course', array(
                 "id" => $event->objectid
@@ -92,7 +92,7 @@ class observers
         }
 
         // Update ShareDB if it is enabled.
-        if (utils::enable_sharedb()) {
+        if (\local_connect\util\helpers::enable_sharedb()) {
             // Update course listings DB.
             $moodle = $DB->get_record('course', array(
                 "id" => $event->objectid
@@ -135,7 +135,7 @@ class observers
         ));
 
         // Update ShareDB if it is enabled.
-        if (utils::enable_sharedb()) {
+        if (\local_connect\util\helpers::enable_sharedb()) {
             // Update course listings DB.
             $moodle = $DB->get_record('course', array(
                 "id" => $event->objectid
@@ -228,7 +228,7 @@ class observers
     public static function group_created(\core\event\group_created $event) {
         global $DB;
 
-        if (!utils::enable_new_features()) {
+        if (!\local_connect\util\helpers::enable_new_features()) {
             return true;
         }
 

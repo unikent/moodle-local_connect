@@ -113,7 +113,7 @@ class role extends data
 
         $data = $this->get_data_mapping();
         if ($data === false) {
-            utils::error("No role mapping for: '{$this->name}'!");
+            \local_connect\util\helpers::error("No role mapping for: '{$this->name}'!");
             return false;
         }
 

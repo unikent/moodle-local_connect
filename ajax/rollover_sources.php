@@ -35,7 +35,7 @@ if (!isloggedin()) {
     throw new moodleexception("You must be logged in.");
 }
 
-if (!\local_connect\utils::is_enabled() || !\local_connect\utils::enable_new_features()) {
+if (!\local_connect\util\helpers::is_enabled() || !\local_connect\util\helpers::enable_new_features()) {
     throw new moodleexception("This feature has not been enabled.");
 }
 

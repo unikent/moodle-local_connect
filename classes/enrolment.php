@@ -168,7 +168,7 @@ class enrolment extends data
         }
 
         if (!enrol_try_internal_enrol($this->course->mid, $this->user->mid, $this->role->mid)) {
-            utils::error("Enrol '{$this->user->mid}' on '{$this->course->mid}' as a '{$this->role->name}' failed.");
+            \local_connect\util\helpers::error("Enrol '{$this->user->mid}' on '{$this->course->mid}' as a '{$this->role->name}' failed.");
             return false;
         }
 

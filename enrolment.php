@@ -38,7 +38,7 @@ $PAGE->set_url('/local/connect/enrolment.php');
 $PAGE->set_title("Enrolment");
 $PAGE->set_heading("Enrolment");
 
-if (!\local_connect\utils::enable_new_features()) {
+if (!\local_connect\util\helpers::enable_new_features()) {
     print_error('new_feature_disabled', 'local_connect');
 }
 
@@ -50,7 +50,7 @@ $PAGE->requires->js_init_call('M.local_enrolment.init', array(), false, array(
 
 require_login();
 
-if (!\local_connect\utils::is_enabled()) {
+if (!\local_connect\util\helpers::is_enabled()) {
     print_error('connect_disabled', 'local_connect');
 }
 
