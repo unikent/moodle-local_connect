@@ -22,13 +22,35 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_connect\forms;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014051200;
-$plugin->requires  = 2013110500;
-$plugin->cron      = 0;
+require_once($CFG->dirroot.'/lib/formslib.php');
 
-$plugin->dependencies = array(
-    'local_catman' => 2014022600,
-    'local_hipchat' => 2014043000
-);
+class deletemeta extends \moodleform
+{
+    /** The ID we are referencing. */
+    private $id;
+
+    /**
+     * Constructor
+     */
+    public function __construct($id, $action=null, $customdata=null, $method='post', $target='', $attributes=null, $editable=true) {
+        $this->id = $id;
+        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
+    }
+
+    /**
+     * Form definition
+     */
+    public function definition() {
+        $mform =& $this->_form;
+
+        // Add rule prefix.
+        $mform->addElement('hidden', 'id', $this->id);
+        $mform->setType('id', PARAM_INT);
+
+        $this->add_action_buttons(false, "Delete");
+    }
+}

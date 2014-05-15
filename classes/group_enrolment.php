@@ -166,8 +166,8 @@ class group_enrolment extends data
         $params = array(
             'objectid' => $this->id,
             'relateduserid' => $this->user->mid,
-            'courseid' => $this->group->course->mid,
-            'context' => \context_course::instance($this->group->course->mid),
+            'courseid' => $this->course->mid,
+            'context' => \context_course::instance($this->course->mid),
             'other' => array(
                 'groupid' => $this->groupid
             )

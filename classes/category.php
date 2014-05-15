@@ -22,13 +22,32 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_connect;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014051200;
-$plugin->requires  = 2013110500;
-$plugin->cron      = 0;
+/**
+ * Connect category container.
+ * Unlike most connect classes, this is not a data type.
+ */
+class category
+{
+    private $id;
 
-$plugin->dependencies = array(
-    'local_catman' => 2014022600,
-    'local_hipchat' => 2014043000
-);
+    /**
+     * Returns an object of type category in the same
+     * manner the rest of connect creates objects.
+     */
+    public static function get($id) {
+        $obj = new static();
+        $obj->id = $id;
+        return $obj;
+    }
+
+    /**
+     * Get enrollments for this Category
+     */
+    public function _get_enrolments() {
+        return enrolment::get_for_category($this);
+    }
+}

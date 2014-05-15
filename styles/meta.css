@@ -1,0 +1,19 @@
+.admintable.generaltable .mform fieldset.hidden {
+	background: none;
+	border: 0 !important;
+	margin: 0;
+}
+
+.admintable.generaltable .mform fieldset.hidden div {
+	margin: 0;
+}
+
+.admintable.generaltable .mform .fitem {
+	margin: 0;
+}
+
+.admintable.generaltable .mform .fitem .felement {
+	margin: 0;
+	padding: 0;
+	width: auto;
+}

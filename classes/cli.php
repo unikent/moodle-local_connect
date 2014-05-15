@@ -261,4 +261,15 @@ SQL;
         mtrace("  done!");
     }
 
+    /**
+     * Sync up meta enrolments
+     */
+    public static function meta_sync($dry = false) {
+        mtrace("Synchronizing meta enrolments...");
+
+        meta::batch_all(function ($obj) use($dry) {
+            $obj->sync($dry);
+        });
+    }
+
 }

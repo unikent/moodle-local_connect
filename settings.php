@@ -37,6 +37,10 @@ if ($hassiteconfig) {
         'moodle/site:config');
     $ADMIN->add('localplugins', $rules);
 
+    $meta = new admin_externalpage('reportconnectmeta', "Connect Meta Manager", "$CFG->wwwroot/local/connect/meta/index.php",
+        'moodle/site:config');
+    $ADMIN->add('localplugins', $meta);
+
     $settings->add(new admin_setting_configcheckbox(
         'local_connect_enable',
         get_string('enable', 'local_connect'),
