@@ -136,8 +136,8 @@ class user extends data
         }
 
         $user = new \stdClass();
-        $user->username = $this->login;
-        $user->email = $this->login . "@kent.ac.uk";
+        $user->username = \core_text::convert($this->login, 'utf-8', 'utf-8');
+        $user->email = $user->username . "@kent.ac.uk";
         $user->auth = "kentsaml";
         $user->password = "not cached";
         $user->confirmed = 1;
