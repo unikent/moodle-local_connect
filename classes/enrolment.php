@@ -144,7 +144,7 @@ class enrolment extends data
         }
 
         // Check enrolment status.
-        return is_enrolled($context, $this->user->mid);
+        return is_enrolled($context, $this->user->mid);// && user_has_role_assignment($this->user->mid, $this->role->mid, $context->id);
     }
 
     /**
