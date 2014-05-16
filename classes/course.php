@@ -238,7 +238,7 @@ class course extends data
         }
 
         if (!isset($this->_locked)) {
-            $locked = $DB->get_field('connect_course_locked', 'locked', array(
+            $locked = $DB->get_field('connect_course_locks', 'locked', array(
                 "mid" => $this->mid
             ));
 
