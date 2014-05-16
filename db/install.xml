@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/connect/db" VERSION="20140512" COMMENT="XMLDB file for Connect module"
+<XMLDB PATH="local/connect/db" VERSION="20140516" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -94,6 +94,7 @@
         <FIELD NAME="module_code" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="synopsis" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="category" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="locked" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

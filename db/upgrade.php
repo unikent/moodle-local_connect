@@ -495,5 +495,20 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014051200, 'local', 'connect');
     }
 
+    if ($oldversion < 2014051600) {
+
+        // Define field locked to be added to connect_course.
+        $table = new xmldb_table('connect_course');
+        $field = new xmldb_field('locked', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'category');
+
+        // Conditionally launch add field locked.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014051600, 'local', 'connect');
+    }
+
     return true;
 }
