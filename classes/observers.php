@@ -111,6 +111,11 @@ class observers
             $SHAREDB->update_record("course_list", $record);
         }
 
+        // Set new lock status.
+        $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
+            "courseid" => $event->objectid
+        ));
+
         return true;
     }
 
