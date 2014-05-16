@@ -495,5 +495,39 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014051200, 'local', 'connect');
     }
 
+    if ($oldversion < 2014051600) {
+        // Define table connect_course_locks to be created.
+        $table = new xmldb_table('connect_course_locks');
+
+        // Adding fields to table connect_course_locks.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('mid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('locked', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+
+        // Adding keys to table connect_course_locks.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('i_mid', XMLDB_KEY_UNIQUE, array('mid'));
+
+        // Conditionally launch create table for connect_course_locks.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Now update locks.
+        $DB->execute("INSERT INTO {connect_course_locks} (mid, locked)
+            (SELECT DISTINCT course, CASE WHEN unlocked = 0 THEN 1 ELSE 0 END FROM {connect_course_dets})");
+
+        // Define table connect_course_dets to be dropped.
+        $table = new xmldb_table('connect_course_dets');
+
+        // Conditionally launch drop table for connect_course_dets.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014051600, 'local', 'connect');
+    }
+
     return true;
 }

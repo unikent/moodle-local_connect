@@ -223,8 +223,7 @@ class course extends data
      */
     public function is_merged() {
         global $DB;
-        return strpos($this->module_delivery_key, '-') !== false ||
-               $DB->count_records('connect_course', array('mid' => $this->mid)) > 1;
+        return $DB->count_records('connect_course', array('mid' => $this->mid)) > 1;
     }
 
     /**
@@ -234,16 +233,16 @@ class course extends data
     public function is_locked() {
         global $DB;
 
+        if (empty($this->mid)) {
+            return true;
+        }
+
         if (!isset($this->_locked)) {
-            $this->_locked = true;
+            $locked = $DB->get_field('connect_course_locked', 'locked', array(
+                "mid" => $this->mid
+            ));
 
-            $conditions = array(
-                "course" => $this->mid
-            );
-
-            if ($DB->record_exists('connect_course_dets', $conditions)) {
-                $this->_locked = $DB->get_field('connect_course_dets', 'unlocked', $conditions) == 0;
-            }
+            $this->_locked = $locked === 1;
         }
 
         return $this->_locked;
@@ -312,48 +311,6 @@ class course extends data
     }
 
     /**
-     * Returns connect_course_dets data.
-     * @return unknown
-     */
-    private function get_dets_data() {
-        global $CFG, $DB;
-
-        // Try to find an existing set of data.
-        $data = $DB->get_record('connect_course_dets', array(
-            'course' => $this->mid
-        ));
-
-        // Create a data container.
-        if (!$data) {
-            $data = new \stdClass();
-        }
-
-        // Update the container's data.
-        $data->course = $this->mid;
-        $data->campus = $this->campus_name;
-        $data->startdate = $this->week_beginning_date;
-        $data->enddate = $this->week_ending_date;
-        $data->weeks = $this->module_length;
-
-        return $data;
-    }
-
-    /**
-     * Add Connect extra details for this course
-     */
-    private function create_connect_extras() {
-        global $DB;
-
-        $data = $this->get_dets_data();
-
-        if (!isset($data->id)) {
-            $DB->insert_record('connect_course_dets', $data);
-        } else {
-            $DB->update_record('connect_course_dets', $data);
-        }
-    }
-
-    /**
      * Create this course in Moodle
      * @param string $shortnameext (optional)
      * @return boolean
@@ -409,9 +366,6 @@ class course extends data
             'course' => $this->mid,
             'section' => 0
         ));
-
-        // Add module extra details to the connect_course_dets table.
-        $this->create_connect_extras();
 
         // Add the reading list module to our course if it is based in Canterbury.
         if ($this->campus_name === 'Canterbury') {
@@ -530,9 +484,6 @@ class course extends data
 
         // Update this course in Moodle.
         update_course($course);
-
-        // Add module extra details to the connect_course_dets table.
-        $this->create_connect_extras();
 
         return true;
     }
