@@ -223,8 +223,7 @@ class course extends data
      */
     public function is_merged() {
         global $DB;
-        return strpos($this->module_delivery_key, '-') !== false ||
-               $DB->count_records('connect_course', array('mid' => $this->mid)) > 1;
+        return $DB->count_records('connect_course', array('mid' => $this->mid)) > 1;
     }
 
     /**
