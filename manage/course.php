@@ -32,5 +32,36 @@ if (!\local_connect\util\helpers::is_enabled()) {
 }
 
 $mid = required_param('mid', PARAM_INT);
+$course = $DB->get_record('course', array('id' => $mid), '*', MUST_EXIST);
+$ctx = context_course::instance($course->id);
+
+$PAGE->set_context($ctx);
+$PAGE->set_url('/local/connect/manage/course.php');
+$PAGE->set_pagelayout('admin');
+$PAGE->navbar->add(\html_writer::tag('a', 'Connect Administration', array(
+    'href' => '/local/connect/manage/index.php'
+)));
+$PAGE->navbar->add($course->shortname);
 
 // Check we have the capabilities.
+if (!has_capability('moodle/course:update', $ctx)) {
+    print_error("Access denied");
+}
+
+echo $OUTPUT->header();
+echo $OUTPUT->heading($course->shortname);
+
+echo \html_writer::tag('p', 'This course recieves data from the following SDS modules:');
+
+echo \html_writer::start_tag('ul');
+$links = $DB->get_records('connect_course', array('mid' => $course->id));
+foreach ($links as $obj) {
+    $a = \html_writer::tag('a', $obj->module_delivery_key, array(
+        'href' => $CFG->wwwroot . '/local/connect/browse/course.php?id=' . $obj->id,
+        'target' => 'blank'
+    ));
+    echo \html_writer::tag('li', $a);
+}
+echo \html_writer::end_tag('ul');
+
+echo $OUTPUT->footer();
