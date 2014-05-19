@@ -81,7 +81,9 @@ class role extends data
      * @todo Move this to DB.
      */
     public function get_data_mapping() {
-        static $map = array(
+        global $CFG;
+
+        $map = array(
             "student" => array(
                 "name" => "Student (SDS)",
                 "short" => "sds_student",
@@ -96,7 +98,7 @@ class role extends data
             ),
             "convenor" => array(
                 "name" => "Convenor (SDS)",
-                "short" => "convenor",
+                "short" => (int)$CFG->kent->distribution >= 2014 ? "sds_convenor" : "convenor",
                 "desc" => "A Convenor has the same permissions as a teacher, but can manually enrol teachers.",
                 "archetype" => "editingteacher"
             )

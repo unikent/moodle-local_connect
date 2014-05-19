@@ -75,6 +75,7 @@ abstract class connect_testcase extends \advanced_testcase
         // Delete the roles too.
         $DB->delete_records('role', array('shortname' => 'sds_student'));
         $DB->delete_records('role', array('shortname' => 'sds_teacher'));
+        $DB->delete_records('role', array('shortname' => 'sds_convenor'));
         $DB->delete_records('role', array('shortname' => 'convenor'));
     }
 
