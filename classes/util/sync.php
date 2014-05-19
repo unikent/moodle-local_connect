@@ -74,7 +74,7 @@ class sync
                                         INNER JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
                                         INNER JOIN {role_assignments} ra ON ra.userid = u.id AND ra.contextid = ctx.id
                                         INNER JOIN {role} r ON r.id = ra.roleid
-                                        WHERE r.shortname IN ('sds_student', 'sds_teacher', 'convenor')",
+                                        WHERE r.shortname IN ('sds_student', 'sds_teacher', 'convenor', 'sds_convenor')",
                                     array(), $limitfrom, $limitnum);
 
         return $data;
@@ -163,7 +163,7 @@ class sync
      *     INNER JOIN mdl_context ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
      *     INNER JOIN mdl_role_assignments ra ON ra.userid = u.id AND ra.contextid = ctx.id
      *     INNER JOIN mdl_role r ON r.id = ra.roleid
-     *     WHERE r.shortname IN ('sds_student', 'sds_teacher', 'convenor')
+     *     WHERE r.shortname IN ('sds_student', 'sds_teacher', 'convenor', 'sds_convenor')
      * ) cur ON cur.userid=cu.mid AND cur.courseid=cc.mid AND cur.roleid=cr.mid
      * WHERE cc.mid != 0 AND ce.deleted = 0 AND cur.id IS NULL
      */
@@ -221,7 +221,7 @@ class sync
          * INNER JOIN moodle_2013.mdl_course c ON c.id = e.courseid
          * INNER JOIN moodle_2013.mdl_context ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
          * INNER JOIN moodle_2013.mdl_role_assignments ra ON ra.userid = u.id AND ra.contextid = ctx.id
-         * INNER JOIN moodle_2013.mdl_role r ON r.id = ra.roleid AND r.shortname IN ('sds_student', 'sds_teacher', 'convenor')
+         * INNER JOIN moodle_2013.mdl_role r ON r.id = ra.roleid AND r.shortname IN ('sds_student', 'sds_teacher', 'sds_convenor', 'convenor')
          * LEFT OUTER JOIN (
          *     SELECT mce.id, mcu.mid userid, mcc.mid courseid
          *     FROM moodle_2013.mdl_connect_enrolments mce
