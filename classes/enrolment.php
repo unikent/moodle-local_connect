@@ -312,6 +312,10 @@ SQL;
             "courseid" => $course->id
         ));
 
+        if (!$obj) {
+            return null;
+        }
+
         $enrolment = new enrolment();
         $enrolment->set_class_data($obj);
 
