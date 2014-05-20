@@ -91,13 +91,14 @@ class group_enrolment extends data
             return self::STATUS_NONE;
         }
 
-        // If our group is screwed up, something is wrong.
-        if (!$this->group) {
+        // If our group doesn't exist, or is not in Moodle,
+        // we cannot continue.
+        if (!$this->group || !$this->is_valid()) {
             return self::STATUS_NONE;
         }
 
-        // Easy option.
-        if (!$this->is_in_moodle() && $this->group->is_in_moodle()) {
+        // Create the enrolment if needed.
+        if (!$this->is_in_moodle()) {
             if (!$dry) {
                 $this->create_in_moodle();
             }
@@ -115,7 +116,7 @@ class group_enrolment extends data
     public function is_valid() {
         $this->reset_object_cache();
 
-        if (!$this->course || !$this->user|| !$this->group) {
+        if (!$this->course || !$this->user || !$this->group) {
             return false;
         }
 
@@ -151,6 +152,11 @@ class group_enrolment extends data
 
         // Is the user enrolled?
         $enrolment = enrolment::get_for_user_and_course($this->user, $this->course);
+        if (!$enrolment) {
+            return false;
+        }
+
+        // Create the enrolment if we need to.
         if (!$enrolment->is_in_moodle()) {
             if (!$enrolment->create_in_moodle()) {
                 return false;

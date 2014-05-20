@@ -295,14 +295,22 @@ abstract class data {
     public static function batch_all($func, $conditions = array()) {
         global $DB;
 
+        $errors = array();
+
         $rs = $DB->get_recordset(static::get_table(), $conditions);
 
         // Go through each record, create an object and call the function.
         foreach ($rs as $record) {
-            $obj = static::from_sql_result($record);
-            $func($obj);
+            try {
+                $obj = static::from_sql_result($record);
+                $func($obj);
+            } catch (\moodle_exception $e) {
+                $errors[] = $e->getMessage();
+            }
         }
 
         $rs->close();
+
+        return $errors;
     }
 }

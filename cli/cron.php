@@ -36,3 +36,8 @@ raise_memory_limit(MEMORY_HUGE);
 \local_connect\util\cli::group_sync();
 \local_connect\util\cli::group_enrolment_sync();
 \local_connect\util\cli::meta_sync();
+
+// For 2014, also sync courses.
+if ($CFG->kent->distribution === "2014") {
+    \local_connect\util\cli::course_sync();
+}
