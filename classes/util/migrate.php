@@ -488,7 +488,7 @@ class migrate
             SELECT tt.activity_type
             FROM `$connectdb`.`timetabling` tt
             LEFT OUTER JOIN {connect_type} cr ON cr.name=tt.activity_type
-            WHERE ctt.id IS NULL AND tt.session_code=:session_code
+            WHERE cr.id IS NULL AND tt.session_code=:session_code
             GROUP BY tt.activity_type
         )";
 
@@ -509,7 +509,7 @@ class migrate
 
         $sql = "
         INSERT INTO {connect_timetabling} (`eventid`, `typeid`, `userid`, `courseid`, `roomid`, `starts`, `ends`, `day`, `weeks`) (
-            SELECT tt.event_number, ct.id, cu.id, cc.id, cr.id, tt.activity_start, tt.activity_end, tt.activity_day, tt.weeks
+            SELECT tt.event_number, ct.id, cu.id, cc.id, cr.id, tt.activity_start, tt.activity_end, days.id, tt.weeks
             FROM `$connectdb`.`timetabling` tt
             INNER JOIN {connect_type} ct ON ct.name=tt.activity_type
             INNER JOIN {connect_user} cu ON cu.login=tt.login
@@ -519,6 +519,21 @@ class migrate
                 AND cc.module_week_beginning=tt.module_week_beginning
                 AND cc.campusid=tt.campus
             INNER JOIN {connect_room} cr ON cr.campusid=tt.campus AND cr.name=tt.venue
+            INNER JOIN (
+                SELECT 0 as id, 'Monday' as day
+                UNION
+                SELECT 1, 'Tuesday'
+                UNION
+                SELECT 2, 'Wednesday'
+                UNION
+                SELECT 3, 'Thursday'
+                UNION
+                SELECT 4, 'Friday'
+                UNION
+                SELECT 5, 'Saturday'
+                UNION
+                SELECT 6, 'Sunday'
+            ) days ON days.day=tt.activity_day
 
             LEFT OUTER JOIN {connect_timetabling} ctt
                 ON ctt.eventid = tt.event_number
@@ -546,7 +561,7 @@ class migrate
 
         $sql = "
         REPLACE INTO {connect_timetabling} (`eventid`, `typeid`, `userid`, `courseid`, `roomid`, `starts`, `ends`, `day`, `weeks`) (
-            SELECT tt.event_number, ct.id, cu.id, cc.id, cr.id, tt.activity_start, tt.activity_end, tt.activity_day, tt.weeks
+            SELECT tt.event_number, ct.id, cu.id, cc.id, cr.id, tt.activity_start, tt.activity_end, days.id, tt.weeks
             FROM `$connectdb`.`timetabling` tt
             INNER JOIN {connect_type} ct ON ct.name=tt.activity_type
             INNER JOIN {connect_user} cu ON cu.login=tt.login
@@ -556,6 +571,21 @@ class migrate
                 AND cc.module_week_beginning=tt.module_week_beginning
                 AND cc.campusid=tt.campus
             INNER JOIN {connect_room} cr ON cr.campusid=tt.campus AND cr.name=tt.venue
+            INNER JOIN (
+                SELECT 0 as id, 'Monday' as day
+                UNION
+                SELECT 1, 'Tuesday'
+                UNION
+                SELECT 2, 'Wednesday'
+                UNION
+                SELECT 3, 'Thursday'
+                UNION
+                SELECT 4, 'Friday'
+                UNION
+                SELECT 5, 'Saturday'
+                UNION
+                SELECT 6, 'Sunday'
+            ) days ON days.day=tt.activity_day
 
             INNER JOIN {connect_timetabling} ctt
                 ON ctt.eventid = tt.event_number
