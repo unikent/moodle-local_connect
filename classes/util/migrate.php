@@ -69,6 +69,12 @@ class migrate
         self::new_enrolments();
         self::updated_group_enrolments();
         self::new_group_enrolments();
+
+        // Timetabling.
+        self::new_rooms();
+        self::new_timetabling_types();
+        self::new_timetabling();
+        self::updated_timetabling();
     }
 
     /**
@@ -83,6 +89,9 @@ class migrate
         self::new_groups();
         self::new_enrolments();
         self::new_group_enrolments();
+        self::new_rooms();
+        self::new_timetabling_types();
+        self::new_timetabling();
     }
 
     /**
@@ -93,6 +102,7 @@ class migrate
         self::updated_groups();
         self::updated_enrolments();
         self::updated_group_enrolments();
+        self::updated_timetabling();
     }
 
     /**
@@ -439,5 +449,130 @@ class migrate
                 print "Mapped user {$user->login} to {$user->mid}.\n";
             }
         }
+    }
+
+    /**
+     * Port new rooms
+     */
+    public static function new_rooms() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating new rooms\n";
+
+        $sql = "INSERT INTO {connect_room} (`campusid`, `name`) (
+            SELECT tt.campus, tt.venue
+            FROM `$connectdb`.`timetabling` tt
+            LEFT OUTER JOIN {connect_room} ctt ON ctt.campusid=tt.campus AND ctt.name=tt.venue
+            WHERE ctt.id IS NULL AND tt.session_code=:session_code
+            GROUP BY tt.campus, tt.venue
+        )";
+
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
+    }
+
+    /**
+     * Port new timetabling types
+     */
+    public static function new_timetabling_types() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating new timetabling types\n";
+
+        $sql = "INSERT INTO {connect_type} (`name`) (
+            SELECT tt.activity_type
+            FROM `$connectdb`.`timetabling` tt
+            LEFT OUTER JOIN {connect_type} cr ON cr.name=tt.activity_type
+            WHERE ctt.id IS NULL AND tt.session_code=:session_code
+            GROUP BY tt.activity_type
+        )";
+
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
+    }
+
+    /**
+     * Port new timetabling information
+     */
+    public static function new_timetabling() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating new timetabling information\n";
+
+        $sql = "
+        INSERT INTO {connect_timetabling} (`eventid`, `typeid`, `userid`, `courseid`, `roomid`, `starts`, `ends`, `day`, `weeks`) (
+            SELECT tt.event_number, ct.id, cu.id, cc.id, cr.id, tt.activity_start, tt.activity_end, tt.activity_day, tt.weeks
+            FROM `$connectdb`.`timetabling` tt
+            INNER JOIN {connect_type} ct ON ct.name=tt.activity_type
+            INNER JOIN {connect_user} cu ON cu.login=tt.login
+            INNER JOIN {connect_course} cc
+                ON cc.module_code=tt.module_code
+                AND cc.module_title=tt.module_title
+                AND cc.module_week_beginning=tt.module_week_beginning
+                AND cc.campusid=tt.campus
+            INNER JOIN {connect_room} cr ON cr.campusid=tt.campus AND cr.name=tt.venue
+
+            LEFT OUTER JOIN {connect_timetabling} ctt
+                ON ctt.eventid = tt.event_number
+                AND ctt.userid = cu.id
+                AND ctt.typeid = ct.id
+                AND ctt.courseid = cc.id
+
+            WHERE ctt.id IS NULL AND tt.session_code=:session_code
+        )";
+
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
+    }
+
+    /**
+     * Port updated timetabling information
+     */
+    public static function updated_timetabling() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Updating timetabling information\n";
+
+        $sql = "
+        REPLACE INTO {connect_timetabling} (`eventid`, `typeid`, `userid`, `courseid`, `roomid`, `starts`, `ends`, `day`, `weeks`) (
+            SELECT tt.event_number, ct.id, cu.id, cc.id, cr.id, tt.activity_start, tt.activity_end, tt.activity_day, tt.weeks
+            FROM `$connectdb`.`timetabling` tt
+            INNER JOIN {connect_type} ct ON ct.name=tt.activity_type
+            INNER JOIN {connect_user} cu ON cu.login=tt.login
+            INNER JOIN {connect_course} cc
+                ON cc.module_code=tt.module_code
+                AND cc.module_title=tt.module_title
+                AND cc.module_week_beginning=tt.module_week_beginning
+                AND cc.campusid=tt.campus
+            INNER JOIN {connect_room} cr ON cr.campusid=tt.campus AND cr.name=tt.venue
+
+            INNER JOIN {connect_timetabling} ctt
+                ON ctt.eventid = tt.event_number
+                AND ctt.userid = cu.id
+                AND ctt.typeid = ct.id
+                AND ctt.courseid = cc.id
+
+            WHERE
+                tt.roomid <> cr.id
+                OR tt.starts <> tt.activity_start
+                OR tt.ends <> tt.activity_end
+                OR tt.day <> tt.activity_day
+                OR tt.weeks <> tt.weeks
+        )";
+
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
     }
 }

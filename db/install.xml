@@ -163,7 +163,8 @@
     <TABLE NAME="connect_timetabling" COMMENT="Timetabling Information">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="typeid" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Activity Type"/>
+        <FIELD NAME="eventid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="typeid" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="roomid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
@@ -176,6 +177,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
+        <INDEX NAME="i_eventid" UNIQUE="false" FIELDS="eventid"/>
         <INDEX NAME="i_typeid" UNIQUE="false" FIELDS="typeid"/>
         <INDEX NAME="i_userid" UNIQUE="false" FIELDS="userid"/>
         <INDEX NAME="i_courseid" UNIQUE="false" FIELDS="courseid"/>

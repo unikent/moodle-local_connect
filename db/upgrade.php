@@ -536,6 +536,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
         // Adding fields to table connect_timetabling.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('eventid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
         $table->add_field('typeid', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
         $table->add_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
@@ -549,6 +550,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
         // Adding indexes to table connect_timetabling.
+        $table->add_index('i_eventid', XMLDB_INDEX_NOTUNIQUE, array('eventid'));
         $table->add_index('i_typeid', XMLDB_INDEX_NOTUNIQUE, array('typeid'));
         $table->add_index('i_userid', XMLDB_INDEX_NOTUNIQUE, array('userid'));
         $table->add_index('i_courseid', XMLDB_INDEX_NOTUNIQUE, array('courseid'));
