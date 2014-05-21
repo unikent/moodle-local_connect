@@ -46,6 +46,9 @@ class migrate
         $DB->execute('TRUNCATE {connect_group_enrolments}');
         $DB->execute('TRUNCATE {connect_role}');
         $DB->execute('TRUNCATE {connect_user}');
+        $DB->execute('TRUNCATE {connect_timetabling}');
+        $DB->execute('TRUNCATE {connect_room}');
+        $DB->execute('TRUNCATE {connect_type}');
     }
 
     /**
