@@ -58,4 +58,67 @@ class timetabling extends data
     protected static function key_fields() {
         return array("id");
     }
+
+    /**
+     * Returns the date, given the occurrence week.
+     */
+    public function week_date($week) {
+        $day = $this->day;
+        // TODO.
+    }
+
+    /**
+     * Get each occurrence of this event.
+     * Returns each week this event falls on.
+     */
+    public function get_occurrences() {
+        $weeks = explode('-', $this->weeks);
+
+        if (count($weeks) > 1) {
+            $s = (int)$weeks[0];
+            $e = (int)$weeks[1];
+
+            $weeks = array();
+            for ($i = $s; $i <= $e; $i++) {
+                $weeks[] = $i;
+            }
+        }
+
+        return $weeks;
+    }
+
+    /**
+     * Return start time for a given occurrence.
+     */
+    public function get_start_time($occurrence) {
+        $date = $this->week_date($occurrence);
+        return strtotime("{$date} {$this->starts}");
+    }
+
+    /**
+     * Return start time for a given occurrence.
+     */
+    public function get_end_time($occurrence) {
+        $date = $this->week_date($occurrence);
+        return strtotime("{$date} {$this->ends}");
+    }
+
+    /**
+     * Get all events for a course.
+     */
+    public static function get_for_course($course) {
+        global $DB;
+
+        $objs = $DB->get_records('connect_timetabling', array(
+            'courseid' => $course->id
+        ));
+
+        foreach ($objs as &$data) {
+            $obj = new static();
+            $obj->set_class_data($data);
+            $data = $obj;
+        }
+
+        return $objs;
+    }
 }
