@@ -567,8 +567,10 @@ class migrate
         echo "Updating timetabling information\n";
 
         $sql = "
-        REPLACE INTO {connect_timetabling} (`eventid`, `typeid`, `userid`, `courseid`, `roomid`, `starts`, `ends`, `day`, `weeks`) (
-            SELECT tt.event_number, ct.id, cu.id, cc.id, cr.id, tt.activity_start, tt.activity_end, days.id, tt.weeks
+        REPLACE INTO {connect_timetabling} (
+            `id`, `eventid`, `typeid`, `userid`, `courseid`, `roomid`, `starts`, `ends`, `day`, `weeks`
+        ) (
+            SELECT ctt.id, tt.event_number, ct.id, cu.id, cc.id, cr.id, tt.activity_start, tt.activity_end, days.id, tt.weeks
             FROM `$connectdb`.`timetabling` tt
             INNER JOIN {connect_type} ct ON ct.name=tt.activity_type
             INNER JOIN {connect_user} cu ON cu.login=tt.login
