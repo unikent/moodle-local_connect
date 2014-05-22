@@ -597,11 +597,11 @@ class migrate
                 AND ctt.courseid = cc.id
 
             WHERE
-                tt.venue <> cr.name
-                OR tt.starts <> tt.activity_start
-                OR tt.ends <> tt.activity_end
-                OR tt.day <> tt.activity_day
-                OR tt.weeks <> tt.weeks
+                cr.name <> tt.venue
+                OR ctt.starts <> tt.activity_start
+                OR ctt.ends <> tt.activity_end
+                OR ctt.day <> tt.activity_day
+                OR ctt.weeks <> tt.weeks
         )";
 
         return $DB->execute($sql, array(
