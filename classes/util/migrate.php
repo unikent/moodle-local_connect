@@ -413,7 +413,7 @@ class migrate
 
         $roles = $DB->get_records('connect_role', array("mid" => 0));
         foreach ($roles as $role) {
-            $obj = role::get($role->id);
+            $obj = \local_connect\role::get($role->id);
             $data = $obj->get_data_mapping();
 
             // Try to find a matching role.
@@ -597,7 +597,7 @@ class migrate
                 AND ctt.courseid = cc.id
 
             WHERE
-                tt.roomid <> cr.id
+                tt.venue <> cr.name
                 OR tt.starts <> tt.activity_start
                 OR tt.ends <> tt.activity_end
                 OR tt.day <> tt.activity_day
@@ -615,7 +615,7 @@ class migrate
      * rooms or weeks come comma separated. I'd rather handle that in PHP
      * than MySQL, wouldn't you?
      */
-    private static function sanitize_timetabling() {
+    public static function sanitize_timetabling() {
         global $DB;
 
         // Select all rooms that have a comma.
@@ -696,7 +696,7 @@ class migrate
             }
 
             // No errors! Delete the old room, nothing should be referencing it now.
-            $DB->delete_records("connect_rooms", array(
+            $DB->delete_records("connect_room", array(
                 "id" => $room->id
             ));
         }
