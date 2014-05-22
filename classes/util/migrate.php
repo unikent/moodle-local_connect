@@ -76,6 +76,7 @@ class migrate
         self::new_timetabling();
         self::updated_timetabling();
         self::sanitize_timetabling();
+        self::cleanup_timetabling();
     }
 
     /**
@@ -94,6 +95,7 @@ class migrate
         self::new_timetabling_types();
         self::new_timetabling();
         self::sanitize_timetabling();
+        self::cleanup_timetabling();
     }
 
     /**
@@ -106,6 +108,7 @@ class migrate
         self::updated_group_enrolments();
         self::updated_timetabling();
         self::sanitize_timetabling();
+        self::cleanup_timetabling();
     }
 
     /**
@@ -744,5 +747,18 @@ class migrate
             ON cr.id=ct.roomid
             WHERE cr.id IS NULL
         ");
+    }
+
+    /**
+     * God when will this end.
+     * The timetabling information has one last issue we need to hack our way around.
+     * Because of all the mapping we do above, we might have extra (old) records that
+     * need to be deleted. Yay! >:/
+     */
+    private static function cleanup_timetabling() {
+        global $DB;
+
+        echo "Tidying up timetabling information\n";
+
     }
 }
