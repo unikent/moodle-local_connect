@@ -546,6 +546,7 @@ class migrate
                 AND ctt.userid = cu.id
                 AND ctt.typeid = ct.id
                 AND ctt.courseid = cc.id
+                AND ctt.weeks = tt.weeks
 
             WHERE ctt.id IS NULL AND tt.session_code=:session_code
         )";
@@ -598,13 +599,13 @@ class migrate
                 AND ctt.userid = cu.id
                 AND ctt.typeid = ct.id
                 AND ctt.courseid = cc.id
+                AND ctt.weeks = tt.weeks
 
             WHERE
                 cr.name <> tt.venue
                 OR ctt.starts <> tt.activity_start
                 OR ctt.ends <> tt.activity_end
                 OR ctt.day <> tt.activity_day
-                OR ctt.weeks <> tt.weeks
         )";
 
         return $DB->execute($sql, array(
