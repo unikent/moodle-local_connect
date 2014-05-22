@@ -49,6 +49,7 @@ class migrate
         $DB->execute('TRUNCATE {connect_timetabling}');
         $DB->execute('TRUNCATE {connect_room}');
         $DB->execute('TRUNCATE {connect_type}');
+        $DB->execute('TRUNCATE {connect_weeks}');
     }
 
     /**
@@ -69,6 +70,8 @@ class migrate
         self::new_enrolments();
         self::updated_group_enrolments();
         self::new_group_enrolments();
+        self::new_weeks();
+        self::updated_weeks();
 
         // Timetabling.
         self::new_rooms();
@@ -91,6 +94,7 @@ class migrate
         self::new_groups();
         self::new_enrolments();
         self::new_group_enrolments();
+        self::new_weeks();
         self::new_rooms();
         self::new_timetabling_types();
         self::new_timetabling();
@@ -106,6 +110,7 @@ class migrate
         self::updated_groups();
         self::updated_enrolments();
         self::updated_group_enrolments();
+        self::updated_weeks();
         self::updated_timetabling();
         self::sanitize_timetabling();
         self::cleanup_timetabling();
@@ -458,6 +463,51 @@ class migrate
     }
 
     /**
+     * Port new weeks.
+     */
+    public static function new_weeks() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating new weeks\n";
+
+        $sql = "INSERT INTO {connect_weeks} (`week_beginning`, `week_beginning_date`, `week_number`) (
+            SELECT cwb.week_beginning, STR_TO_DATE(cwb.week_beginning_date, '%b %e %Y %H:%iAM'), cwb.week_number
+            FROM `$connectdb`.`week_beginning` cwb
+            LEFT OUTER JOIN {connect_weeks} cw ON cw.week_beginning=cwb.week_beginning
+            WHERE cw.id IS NULL AND cwb.session_code=:session_code
+        )";
+
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
+    }
+
+    /**
+     * Port updated weeks.
+     */
+    public static function updated_weeks() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating updated weeks\n";
+
+        $sql = "REPLACE INTO {connect_weeks} (`id`, `week_beginning`, `week_beginning_date`, `week_number`) (
+            SELECT cw.id, cwb.week_beginning, STR_TO_DATE(cwb.week_beginning_date, '%b %e %Y %H:%iAM'), cwb.week_number
+            FROM `$connectdb`.`week_beginning` cwb
+            INNER JOIN {connect_weeks} cw ON cw.week_beginning=cwb.week_beginning
+            WHERE
+                cw.week_beginning_date <> STR_TO_DATE(cwb.week_beginning_date, '%b %e %Y %H:%iAM')
+                OR cw.week_number <> cwb.week_number
+        )";
+
+        return $DB->execute($sql);
+    }
+
+
+    /**
      * Port new rooms
      */
     public static function new_rooms() {
@@ -610,9 +660,7 @@ class migrate
                 OR ctt.day <> tt.activity_day
         )";
 
-        return $DB->execute($sql, array(
-            "session_code" => $CFG->connect->session_code
-        ));
+        return $DB->execute($sql);
     }
 
     /**
