@@ -656,7 +656,6 @@ class migrate
             ));
 
             // Right! We have a bunch of records from timetabling and a bunch of rooms.
-            $error = false;
             foreach ($timetabling as $event) {
                 // Lets hope the number of rooms lines up with the number of events.
                 $weeks = explode(',', $event->weeks);
@@ -665,9 +664,16 @@ class migrate
                 }
 
                 // Check!
-                if (count($weeks) != count($names)) {
-                    echo "[Error] Number of weeks does not line up with room names for event {$event->id}.\n";
-                    $error = true;
+                $cweeks = count($weeks);
+                $cnames = count($names);
+                if ($cweeks != $cnames && $cnames !== 1) {
+                    // Number of weeks does not line up with room names.
+                    // And, there is nothing we can do about it.
+                    // Just delete this record.
+                    $DB->delete_records("connect_timetabling", array(
+                        "id" => $event->id
+                    ));
+
                     continue;
                 }
 
@@ -677,9 +683,25 @@ class migrate
                 $i = 0;
                 foreach ($weeks as $week) {
                     $newevent = clone($event);
+                    unset($newevent->id);
                     $newevent->weeks = $week;
-                    $newevent->roomid = $map[$i];
-                    $DB->insert_record("connect_timetabling", $newevent);
+
+                    // We may only have one room for each occurrence.
+                    if ($cweeks != $cnames && $cnames === 1) {
+                        $newevent->roomid = $map[0];
+                    } else {
+                        $newevent->roomid = $map[$i];
+                    }
+
+                    // Can't compare text columns.
+                    $comparison = clone($newevent);
+                    unset($comparison->weeks);
+                    $comparison = (array)$comparison;
+
+                    // If this doesnt exist, create it.
+                    if (!$DB->record_exists("connect_timetabling", $comparison)) {
+                        $DB->insert_record("connect_timetabling", $newevent);
+                    }
 
                     $i++;
                 }
@@ -690,15 +712,21 @@ class migrate
                 ));
             }
 
-            // If we errored, do not continue with this iteration.
-            if ($error) {
-                continue;
-            }
-
             // No errors! Delete the old room, nothing should be referencing it now.
             $DB->delete_records("connect_room", array(
                 "id" => $room->id
             ));
         }
+
+        // Cleanup.
+        $DB->execute("DELETE FROM {connect_room} cr WHERE cr.name LIKE \"%,%\";");
+        $DB->execute("DELETE ct
+            FROM {connect_timetabling} ct
+            LEFT OUTER JOIN {connect_room} cr
+            ON cr.id=ct.roomid
+            WHERE cr.id IS NULL");
+
+        // Okay! After all of that, we still have events that map to a single room, right?
+        
     }
 }
