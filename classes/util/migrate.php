@@ -757,9 +757,26 @@ class migrate
      * need to be deleted. Yay! >:/
      */
     private static function cleanup_timetabling() {
-        global $DB;
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
 
         echo "Tidying up timetabling information\n";
 
+        // Does it (appear) to exist in connect? if not, kill it.
+        $DB->execute("
+            DELETE ctt FROM {connect_timetabling} ctt
+            INNER JOIN {connect_type} ct ON ct.id=ctt.typeid
+            INNER JOIN {connect_user} cu ON cu.id=ctt.userid
+            INNER JOIN {connect_course} cc ON cc.id=ctt.courseid
+            INNER JOIN {connect_room} cr ON cr.id=ctt.roomid
+
+            LEFT OUTER JOIN `$connectdb`.`timetabling` tt
+                ON tt.event_number=ctt.eventid
+                AND tt.login=cu.login
+                AND tt.weeks LIKE CONCAT('%', ctt.weeks, '%')
+
+            WHERE tt.id IS NULL
+        ");
     }
 }
