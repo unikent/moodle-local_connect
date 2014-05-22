@@ -610,6 +610,78 @@ class migrate
     }
 
     /**
+     * Takes an array of room names, and a campus id, and returns an array
+     * of room IDs. This also creates new rooms, if needs be.
+     */
+    private static function timetabling_map_rooms($campusid, $rooms) {
+        global $DB;
+
+        $map = array();
+        foreach ($rooms as $name) {
+            $obj = $DB->get_record("connect_room", array(
+                "campusid" => $campusid,
+                "name" => $name
+            ));
+
+            // Create it if it doesnt exist.
+            if (!$obj) {
+                $obj = new \stdClass();
+                $obj->campusid = $campusid;
+                $obj->name = $name;
+
+                $obj->id = $DB->insert_record("connect_room", $obj, true);
+            }
+
+            $map[] = $obj->id;
+        }
+
+        return $map;
+    }
+
+    /**
+     * Split one timetabling event into multiple events.
+     */
+    private static function timetabling_delete_event($event) {
+        global $DB;
+
+        $DB->delete_records("connect_timetabling", array(
+            "id" => $event->id
+        ));
+    }
+
+    /**
+     * Split one timetabling event into multiple events.
+     */
+    private static function timetabling_split_event($event, $rooms, $weeks) {
+        // For each occurrence, create an event.
+        $i = 0;
+        foreach ($weeks as $week) {
+            $obj = clone($event);
+            unset($obj->id);
+            $obj->weeks = $week;
+
+            // Okay we mapped the new week, but what do we do about the room?
+            if (!is_array($rooms)) {
+                $obj->roomid = $rooms;
+            } else {
+                $obj->roomid = $rooms[$i];
+            }
+
+            // Can't compare text columns.
+            $comparison = clone($obj);
+            unset($comparison->weeks);
+            $comparison = (array)$comparison;
+
+            // If this doesnt exist, create it.
+            if (!$DB->record_exists("connect_timetabling", $comparison)) {
+                $DB->insert_record("connect_timetabling", $obj);
+            }
+
+            $i++;
+        }
+    }
+
+    /**
      * Timetabling data comes in an odd format.
      * Unfortunately, by default, the events that span multiple different
      * rooms or weeks come comma separated. I'd rather handle that in PHP
@@ -618,115 +690,53 @@ class migrate
     public static function sanitize_timetabling() {
         global $DB;
 
-        // Select all rooms that have a comma.
-        $rooms = $DB->get_records_sql("SELECT * FROM {connect_room} WHERE name LIKE '%,%'");
-        foreach ($rooms as $room) {
-            // Trim the names.
-            $names = explode(',', $room->name);
-            foreach ($names as &$name) {
-                $name = trim($name);
+        // Select every event with multiple occurences.
+        $events = $DB->get_records_sql("SELECT ct.*, cr.name as roomname
+            FROM {connect_timetabling} ct
+            INNER JOIN {connect_room} cr ON cr.id=ct.roomid
+            WHERE ct.weeks LIKE '%,%'
+        ");
+
+        foreach ($events as $event) {
+            // Sanitize object.
+            $room = $event->roomname;
+            unset($event->roomname);
+
+            $rooms = explode(',', $room);
+            $rooms = array_map('trim', $rooms);
+            $roomslen = count($rooms);
+
+            $weeks = explode(',', $event->weeks);
+            $weeks = array_map('trim', $weeks);
+            $weekslen = count($weeks);
+
+            // If the rooms and weeks dont line up, just delete the event.
+            if ($roomslen > $weekslen || ($roomslen > 1 && $roomslen != $weekslen)) {
+                self::timetabling_delete_event($event);
+                continue;
             }
 
-            // We need to re-map the rooms to old or new IDs.
-            // Create the rooms if they dont exist as single objects.
-            // I imagine they would though.
-            $map = array();
-            foreach ($names as $name) {
-                $obj = $DB->get_record("connect_room", array(
-                    "campusid" => $room->campusid,
-                    "name" => $name
-                ));
+            // Map rooms to IDs.
+            $rooms = self::timetabling_map_rooms($event->campusid, $rooms);
 
-                // Create it if it doesnt exist.
-                if (!$obj) {
-                    $obj = new \stdClass();
-                    $obj->campusid = $room->campusid;
-                    $obj->name = $name;
-
-                    $obj->id = $DB->insert_record("connect_room", $obj, true);
-                }
-
-                $map[] = $obj->id;
+            // Take out the array if not needed.
+            if (count($rooms) == 1) {
+                $rooms = $rooms[0];
             }
 
-            // Right. We have a room with multiple names.
-            // This probably maps to stuff.
-            $timetabling = $DB->get_records_sql("SELECT * FROM {connect_timetabling} WHERE roomid=:roomid", array(
-                "roomid" => $room->id
-            ));
-
-            // Right! We have a bunch of records from timetabling and a bunch of rooms.
-            foreach ($timetabling as $event) {
-                // Lets hope the number of rooms lines up with the number of events.
-                $weeks = explode(',', $event->weeks);
-                foreach ($weeks as &$week) {
-                    $week = trim($week);
-                }
-
-                // Check!
-                $cweeks = count($weeks);
-                $cnames = count($names);
-                if ($cweeks != $cnames && $cnames !== 1) {
-                    // Number of weeks does not line up with room names.
-                    // And, there is nothing we can do about it.
-                    // Just delete this record.
-                    $DB->delete_records("connect_timetabling", array(
-                        "id" => $event->id
-                    ));
-
-                    continue;
-                }
-
-                // We are good to go!
-                // Okay what we now want to do is create new events for each week occurrence.
-                // So if we have '12,14,16' for weeks, we create 3 events out of this one.
-                $i = 0;
-                foreach ($weeks as $week) {
-                    $newevent = clone($event);
-                    unset($newevent->id);
-                    $newevent->weeks = $week;
-
-                    // We may only have one room for each occurrence.
-                    if ($cweeks != $cnames && $cnames === 1) {
-                        $newevent->roomid = $map[0];
-                    } else {
-                        $newevent->roomid = $map[$i];
-                    }
-
-                    // Can't compare text columns.
-                    $comparison = clone($newevent);
-                    unset($comparison->weeks);
-                    $comparison = (array)$comparison;
-
-                    // If this doesnt exist, create it.
-                    if (!$DB->record_exists("connect_timetabling", $comparison)) {
-                        $DB->insert_record("connect_timetabling", $newevent);
-                    }
-
-                    $i++;
-                }
-
-                // And we need to clean up this event.
-                $DB->delete_records("connect_timetabling", array(
-                    "id" => $event->id
-                ));
-            }
-
-            // No errors! Delete the old room, nothing should be referencing it now.
-            $DB->delete_records("connect_room", array(
-                "id" => $room->id
-            ));
+            self::timetabling_split_event($event, $rooms, $weeks);
+            self::timetabling_delete_event($event);
         }
 
         // Cleanup.
-        $DB->execute("DELETE FROM {connect_room} cr WHERE cr.name LIKE \"%,%\";");
-        $DB->execute("DELETE ct
+        $DB->execute("DELETE FROM {connect_room} WHERE name LIKE '%,%'");
+        $DB->execute("DELETE FROM {connect_timetabling} WHERE weeks LIKE '%,%'");
+        $DB->execute("
+            DELETE ct
             FROM {connect_timetabling} ct
             LEFT OUTER JOIN {connect_room} cr
             ON cr.id=ct.roomid
-            WHERE cr.id IS NULL");
-
-        // Okay! After all of that, we still have events that map to a single room, right?
-        
+            WHERE cr.id IS NULL
+        ");
     }
 }
