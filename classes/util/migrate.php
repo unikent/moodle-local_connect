@@ -75,6 +75,7 @@ class migrate
         self::new_timetabling_types();
         self::new_timetabling();
         self::updated_timetabling();
+        self::sanitize_timetabling();
     }
 
     /**
@@ -92,6 +93,7 @@ class migrate
         self::new_rooms();
         self::new_timetabling_types();
         self::new_timetabling();
+        self::sanitize_timetabling();
     }
 
     /**
@@ -103,6 +105,7 @@ class migrate
         self::updated_enrolments();
         self::updated_group_enrolments();
         self::updated_timetabling();
+        self::sanitize_timetabling();
     }
 
     /**
@@ -613,6 +616,89 @@ class migrate
      * than MySQL, wouldn't you?
      */
     private static function sanitize_timetabling() {
-        
+        global $DB;
+
+        // Select all rooms that have a comma.
+        $rooms = $DB->get_records_sql("SELECT * FROM {connect_room} WHERE name LIKE '%,%'");
+        foreach ($rooms as $room) {
+            // Trim the names.
+            $names = explode(',', $room->name);
+            foreach ($names as &$name) {
+                $name = trim($name);
+            }
+
+            // We need to re-map the rooms to old or new IDs.
+            // Create the rooms if they dont exist as single objects.
+            // I imagine they would though.
+            $map = array();
+            foreach ($names as $name) {
+                $obj = $DB->get_record("connect_room", array(
+                    "campusid" => $room->campusid,
+                    "name" => $name
+                ));
+
+                // Create it if it doesnt exist.
+                if (!$obj) {
+                    $obj = new \stdClass();
+                    $obj->campusid = $room->campusid;
+                    $obj->name = $name;
+
+                    $obj->id = $DB->insert_record("connect_room", $obj, true);
+                }
+
+                $map[] = $obj->id;
+            }
+
+            // Right. We have a room with multiple names.
+            // This probably maps to stuff.
+            $timetabling = $DB->get_records_sql("SELECT * FROM {connect_timetabling} WHERE roomid=:roomid", array(
+                "roomid" => $room->id
+            ));
+
+            // Right! We have a bunch of records from timetabling and a bunch of rooms.
+            $error = false;
+            foreach ($timetabling as $event) {
+                // Lets hope the number of rooms lines up with the number of events.
+                $weeks = explode(',', $event->weeks);
+                foreach ($weeks as &$week) {
+                    $week = trim($week);
+                }
+
+                // Check!
+                if (count($weeks) != count($names)) {
+                    echo "[Error] Number of weeks does not line up with room names for event {$event->id}.\n";
+                    $error = true;
+                    continue;
+                }
+
+                // We are good to go!
+                // Okay what we now want to do is create new events for each week occurrence.
+                // So if we have '12,14,16' for weeks, we create 3 events out of this one.
+                $i = 0;
+                foreach ($weeks as $week) {
+                    $newevent = clone($event);
+                    $newevent->weeks = $week;
+                    $newevent->roomid = $map[$i];
+                    $DB->insert_record("connect_timetabling", $newevent);
+
+                    $i++;
+                }
+
+                // And we need to clean up this event.
+                $DB->delete_records("connect_timetabling", array(
+                    "id" => $event->id
+                ));
+            }
+
+            // If we errored, do not continue with this iteration.
+            if ($error) {
+                continue;
+            }
+
+            // No errors! Delete the old room, nothing should be referencing it now.
+            $DB->delete_records("connect_rooms", array(
+                "id" => $room->id
+            ));
+        }
     }
 }
