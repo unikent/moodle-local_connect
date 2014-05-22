@@ -63,8 +63,12 @@ class timetabling extends data
      * Returns the date, given the occurrence week.
      */
     public function week_date($week) {
-        $day = $this->day;
-        // TODO.
+        $week = week::get_by_week($week);
+        $date = (object)date_parse($week->week_beginning_date);
+
+        // Apparently strtotime magically works out what we want
+        // and translates the "I want {Thursday} of this week.".
+        return strtotime("{$this->day} {$date->day}-{$date->month}-{$date->year} GMT");
     }
 
     /**
@@ -92,7 +96,7 @@ class timetabling extends data
      */
     public function get_start_time($occurrence) {
         $date = $this->week_date($occurrence);
-        return strtotime("{$date} {$this->starts}");
+        return strtotime("{$this->starts} GMT", $date);
     }
 
     /**
@@ -100,7 +104,7 @@ class timetabling extends data
      */
     public function get_end_time($occurrence) {
         $date = $this->week_date($occurrence);
-        return strtotime("{$date} {$this->ends}");
+        return strtotime("{$this->ends} GMT", $date);
     }
 
     /**
