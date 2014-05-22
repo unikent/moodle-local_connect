@@ -605,4 +605,14 @@ class migrate
             "session_code" => $CFG->connect->session_code
         ));
     }
+
+    /**
+     * Timetabling data comes in an odd format.
+     * Unfortunately, by default, the events that span multiple different
+     * rooms or weeks come comma separated. I'd rather handle that in PHP
+     * than MySQL, wouldn't you?
+     */
+    private static function sanitize_timetabling() {
+        
+    }
 }
