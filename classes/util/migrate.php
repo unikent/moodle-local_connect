@@ -653,6 +653,8 @@ class migrate
      * Split one timetabling event into multiple events.
      */
     private static function timetabling_split_event($event, $rooms, $weeks) {
+        global $DB;
+
         // For each occurrence, create an event.
         $i = 0;
         foreach ($weeks as $week) {
@@ -690,8 +692,10 @@ class migrate
     public static function sanitize_timetabling() {
         global $DB;
 
+        echo "Sanitizing timetabling information\n";
+
         // Select every event with multiple occurences.
-        $events = $DB->get_records_sql("SELECT ct.*, cr.name as roomname
+        $events = $DB->get_records_sql("SELECT ct.*, cr.name as roomname, cr.campusid
             FROM {connect_timetabling} ct
             INNER JOIN {connect_room} cr ON cr.id=ct.roomid
             WHERE ct.weeks LIKE '%,%'
@@ -700,7 +704,9 @@ class migrate
         foreach ($events as $event) {
             // Sanitize object.
             $room = $event->roomname;
+            $campusid = $event->campusid;
             unset($event->roomname);
+            unset($event->campusid);
 
             $rooms = explode(',', $room);
             $rooms = array_map('trim', $rooms);
@@ -717,7 +723,7 @@ class migrate
             }
 
             // Map rooms to IDs.
-            $rooms = self::timetabling_map_rooms($event->campusid, $rooms);
+            $rooms = self::timetabling_map_rooms($campusid, $rooms);
 
             // Take out the array if not needed.
             if (count($rooms) == 1) {
