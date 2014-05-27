@@ -22,12 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require (dirname(__FILE__) . '/../../../../config.php');
+require(dirname(__FILE__) . '/../../../../config.php');
 
 $geid = required_param("id", PARAM_INT);
 $ge = \local_connect\group_enrolment::get($geid);
 
-/**
+/*
  * Page setup.
  */
 $PAGE->set_context(context_system::instance());
@@ -38,7 +38,7 @@ $PAGE->set_title(get_string('connectbrowse_push', 'local_connect'));
 require_capability("local/helpdesk:access", context_system::instance());
 
 if ($ge === null) {
-	print_error("Group Enrolment does not exist!");
+    print_error("Group Enrolment does not exist!");
 }
 
 $PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/index.php'));
@@ -47,41 +47,41 @@ $PAGE->navbar->add("Connect Group", new moodle_url('/local/connect/browse/group.
 $PAGE->navbar->add("Pushing...");
 
 
-/**
+/*
  * And, the actual page.
  */
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('connectbrowse_push', 'local_connect'));
 
 if (!$ge->group->course->is_in_moodle()) {
-	print_error("Course must exist before you push the group enrolment!");
+    print_error("Course must exist before you push the group enrolment!");
 }
 
 // We can create the group if needs be.
 if (!$ge->group->is_in_moodle()) {
-	if ($ge->group->create_in_moodle()) {
-		echo "Creating group... done!<br />";
-	} else {
-		print_error("Error creating group!");
-	}
+    if ($ge->group->create_in_moodle()) {
+        echo "Creating group... done!<br />";
+    } else {
+        print_error("Error creating group!");
+    }
 }
 
 // Can also create the user.
 if (!$ge->user->is_in_moodle()) {
-	if ($ge->user->create_in_moodle()) {
-		echo "Creating user... done!<br />";
-	} else {
-		print_error("Error creating user!");
-	}
+    if ($ge->user->create_in_moodle()) {
+        echo "Creating user... done!<br />";
+    } else {
+        print_error("Error creating user!");
+    }
 }
 
 // Create it in Moodle!
 if (!$ge->is_in_moodle()) {
-	if ($ge->create_in_moodle()) {
-		echo "Enrolling user in group... done!<br />";
-	} else {
-		print_error("Error creating group enrolment!");
-	}
+    if ($ge->create_in_moodle()) {
+        echo "Enrolling user in group... done!<br />";
+    } else {
+        print_error("Error creating group enrolment!");
+    }
 }
 
 echo "Done!<br/>";
