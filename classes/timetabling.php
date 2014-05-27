@@ -60,10 +60,10 @@ class timetabling extends data
     }
 
     /**
-     * Returns the date, given the occurrence week.
+     * Returns the date of a given occurrence.
      */
-    public function week_date($week) {
-        $week = week::get_by_week($week);
+    public function occurrence_date($occurrence) {
+        $week = week::get_by_week($occurrence);
         $date = (object)date_parse($week->week_beginning_date);
 
         // Apparently strtotime magically works out what we want
@@ -95,7 +95,7 @@ class timetabling extends data
      * Return start time for a given occurrence.
      */
     public function get_start_time($occurrence) {
-        $date = $this->week_date($occurrence);
+        $date = $this->occurrence_date($occurrence);
         return strtotime("{$this->starts} GMT", $date);
     }
 
@@ -103,7 +103,7 @@ class timetabling extends data
      * Return start time for a given occurrence.
      */
     public function get_end_time($occurrence) {
-        $date = $this->week_date($occurrence);
+        $date = $this->occurrence_date($occurrence);
         return strtotime("{$this->ends} GMT", $date);
     }
 
