@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/connect/db" VERSION="20140516" COMMENT="XMLDB file for Connect module"
+<XMLDB PATH="local/connect/db" VERSION="20140522" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -158,6 +158,66 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="i_mid" TYPE="unique" FIELDS="mid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="connect_timetabling" COMMENT="Timetabling Information">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="eventid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="typeid" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="roomid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="starts" TYPE="char" LENGTH="5" NOTNULL="false" DEFAULT="0900" SEQUENCE="false"/>
+        <FIELD NAME="ends" TYPE="char" LENGTH="5" NOTNULL="false" DEFAULT="1000" SEQUENCE="false"/>
+        <FIELD NAME="day" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="weeks" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="i_eventid" UNIQUE="false" FIELDS="eventid"/>
+        <INDEX NAME="i_typeid" UNIQUE="false" FIELDS="typeid"/>
+        <INDEX NAME="i_userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="i_courseid" UNIQUE="false" FIELDS="courseid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="connect_type" COMMENT="Connect Types">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="k_name" TYPE="unique" FIELDS="name"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="connect_room" COMMENT="Timetabling Rooms">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="campusid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="k_name_campusid" TYPE="unique" FIELDS="name, campusid"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="i_campusid" UNIQUE="false" FIELDS="campusid"/>
+        <INDEX NAME="i_name" UNIQUE="false" FIELDS="name"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="connect_weeks" COMMENT="Week information for the year">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="week_beginning" TYPE="char" LENGTH="21" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="week_beginning_date" TYPE="datetime" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="week_number" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="k_week_beginning" TYPE="unique" FIELDS="week_beginning"/>
       </KEYS>
     </TABLE>
   </TABLES>

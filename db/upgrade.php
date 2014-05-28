@@ -529,5 +529,100 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014051600, 'local', 'connect');
     }
 
+    if ($oldversion < 2014052100) {
+
+        // Define table connect_timetabling to be created.
+        $table = new xmldb_table('connect_timetabling');
+
+        // Adding fields to table connect_timetabling.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('eventid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('typeid', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('roomid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('starts', XMLDB_TYPE_CHAR, '5', null, null, null, '0900');
+        $table->add_field('ends', XMLDB_TYPE_CHAR, '5', null, null, null, '1000');
+        $table->add_field('day', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('weeks', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        // Adding keys to table connect_timetabling.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table connect_timetabling.
+        $table->add_index('i_eventid', XMLDB_INDEX_NOTUNIQUE, array('eventid'));
+        $table->add_index('i_typeid', XMLDB_INDEX_NOTUNIQUE, array('typeid'));
+        $table->add_index('i_userid', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+        $table->add_index('i_courseid', XMLDB_INDEX_NOTUNIQUE, array('courseid'));
+
+        // Conditionally launch create table for connect_timetabling.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table connect_type to be created.
+        $table = new xmldb_table('connect_type');
+
+        // Adding fields to table connect_type.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table connect_type.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('k_name', XMLDB_KEY_UNIQUE, array('name'));
+
+        // Conditionally launch create table for connect_type.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table connect_room to be created.
+        $table = new xmldb_table('connect_room');
+
+        // Adding fields to table connect_room.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('campusid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table connect_room.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('k_name_campusid', XMLDB_KEY_UNIQUE, array('name', 'campusid'));
+
+        // Adding indexes to table connect_room.
+        $table->add_index('i_campusid', XMLDB_INDEX_NOTUNIQUE, array('campusid'));
+        $table->add_index('i_name', XMLDB_INDEX_NOTUNIQUE, array('name'));
+
+        // Conditionally launch create table for connect_room.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014052100, 'local', 'connect');
+    }
+
+    if ($oldversion < 2014052200) {
+        // Define table connect_weeks to be created.
+        $table = new xmldb_table('connect_weeks');
+
+        // Adding fields to table connect_weeks.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('week_beginning', XMLDB_TYPE_CHAR, '21', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('week_beginning_date', XMLDB_TYPE_DATETIME, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('week_number', XMLDB_TYPE_INTEGER, '2', null, null, null, '0');
+
+        // Adding keys to table connect_weeks.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('k_week_beginning', XMLDB_KEY_UNIQUE, array('week_beginning'));
+
+        // Conditionally launch create table for connect_weeks.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014052200, 'local', 'connect');
+    }
+
     return true;
 }
