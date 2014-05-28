@@ -46,6 +46,10 @@ class migrate
         $DB->execute('TRUNCATE {connect_group_enrolments}');
         $DB->execute('TRUNCATE {connect_role}');
         $DB->execute('TRUNCATE {connect_user}');
+        $DB->execute('TRUNCATE {connect_timetabling}');
+        $DB->execute('TRUNCATE {connect_room}');
+        $DB->execute('TRUNCATE {connect_type}');
+        $DB->execute('TRUNCATE {connect_weeks}');
     }
 
     /**
@@ -66,6 +70,16 @@ class migrate
         self::new_enrolments();
         self::updated_group_enrolments();
         self::new_group_enrolments();
+        self::new_weeks();
+        self::updated_weeks();
+
+        // Timetabling.
+        self::new_rooms();
+        self::new_timetabling_types();
+        self::new_timetabling();
+        self::updated_timetabling();
+        self::sanitize_timetabling();
+        self::cleanup_timetabling();
     }
 
     /**
@@ -80,6 +94,12 @@ class migrate
         self::new_groups();
         self::new_enrolments();
         self::new_group_enrolments();
+        self::new_weeks();
+        self::new_rooms();
+        self::new_timetabling_types();
+        self::new_timetabling();
+        self::sanitize_timetabling();
+        self::cleanup_timetabling();
     }
 
     /**
@@ -90,6 +110,10 @@ class migrate
         self::updated_groups();
         self::updated_enrolments();
         self::updated_group_enrolments();
+        self::updated_weeks();
+        self::updated_timetabling();
+        self::sanitize_timetabling();
+        self::cleanup_timetabling();
     }
 
     /**
@@ -397,7 +421,7 @@ class migrate
 
         $roles = $DB->get_records('connect_role', array("mid" => 0));
         foreach ($roles as $role) {
-            $obj = role::get($role->id);
+            $obj = \local_connect\role::get($role->id);
             $data = $obj->get_data_mapping();
 
             // Try to find a matching role.
@@ -436,5 +460,373 @@ class migrate
                 print "Mapped user {$user->login} to {$user->mid}.\n";
             }
         }
+    }
+
+    /**
+     * Port new weeks.
+     */
+    public static function new_weeks() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating new weeks\n";
+
+        $sql = "INSERT INTO {connect_weeks} (`week_beginning`, `week_beginning_date`, `week_number`) (
+            SELECT cwb.week_beginning, STR_TO_DATE(cwb.week_beginning_date, '%b %e %Y %H:%iAM'), cwb.week_number
+            FROM `$connectdb`.`week_beginning` cwb
+            LEFT OUTER JOIN {connect_weeks} cw ON cw.week_beginning=cwb.week_beginning
+            WHERE cw.id IS NULL AND cwb.session_code=:session_code
+        )";
+
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
+    }
+
+    /**
+     * Port updated weeks.
+     */
+    public static function updated_weeks() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating updated weeks\n";
+
+        $sql = "REPLACE INTO {connect_weeks} (`id`, `week_beginning`, `week_beginning_date`, `week_number`) (
+            SELECT cw.id, cwb.week_beginning, STR_TO_DATE(cwb.week_beginning_date, '%b %e %Y %H:%iAM'), cwb.week_number
+            FROM `$connectdb`.`week_beginning` cwb
+            INNER JOIN {connect_weeks} cw ON cw.week_beginning=cwb.week_beginning
+            WHERE
+                cw.week_beginning_date <> STR_TO_DATE(cwb.week_beginning_date, '%b %e %Y %H:%iAM')
+                OR cw.week_number <> cwb.week_number
+        )";
+
+        return $DB->execute($sql);
+    }
+
+
+    /**
+     * Port new rooms
+     */
+    public static function new_rooms() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating new rooms\n";
+
+        $sql = "INSERT INTO {connect_room} (`campusid`, `name`) (
+            SELECT tt.campus, tt.venue
+            FROM `$connectdb`.`timetabling` tt
+            LEFT OUTER JOIN {connect_room} ctt ON ctt.campusid=tt.campus AND ctt.name=tt.venue
+            WHERE ctt.id IS NULL AND tt.session_code=:session_code
+            GROUP BY tt.campus, tt.venue
+        )";
+
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
+    }
+
+    /**
+     * Port new timetabling types
+     */
+    public static function new_timetabling_types() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating new timetabling types\n";
+
+        $sql = "INSERT INTO {connect_type} (`name`) (
+            SELECT tt.activity_type
+            FROM `$connectdb`.`timetabling` tt
+            LEFT OUTER JOIN {connect_type} cr ON cr.name=tt.activity_type
+            WHERE cr.id IS NULL AND tt.session_code=:session_code
+            GROUP BY tt.activity_type
+        )";
+
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
+    }
+
+    /**
+     * Port new timetabling information
+     */
+    public static function new_timetabling() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Migrating new timetabling information\n";
+
+        $sql = "
+        INSERT INTO {connect_timetabling} (`eventid`, `typeid`, `userid`, `courseid`, `roomid`, `starts`, `ends`, `day`, `weeks`) (
+            SELECT tt.event_number, ct.id, cu.id, cc.id, cr.id, tt.activity_start, tt.activity_end, days.id, tt.weeks
+            FROM `$connectdb`.`timetabling` tt
+            INNER JOIN {connect_type} ct ON ct.name=tt.activity_type
+            INNER JOIN {connect_user} cu ON cu.login=tt.login
+            INNER JOIN {connect_course} cc
+                ON cc.module_code=tt.module_code
+                AND cc.module_title=tt.module_title
+                AND cc.module_week_beginning=tt.module_week_beginning
+                AND cc.campusid=tt.campus
+            INNER JOIN {connect_room} cr ON cr.campusid=tt.campus AND cr.name=tt.venue
+            INNER JOIN (
+                SELECT 0 as id, 'Monday' as day
+                UNION
+                SELECT 1, 'Tuesday'
+                UNION
+                SELECT 2, 'Wednesday'
+                UNION
+                SELECT 3, 'Thursday'
+                UNION
+                SELECT 4, 'Friday'
+                UNION
+                SELECT 5, 'Saturday'
+                UNION
+                SELECT 6, 'Sunday'
+            ) days ON days.day=tt.activity_day
+
+            LEFT OUTER JOIN {connect_timetabling} ctt
+                ON ctt.eventid = tt.event_number
+                AND ctt.userid = cu.id
+                AND ctt.typeid = ct.id
+                AND ctt.courseid = cc.id
+                AND ctt.weeks = tt.weeks
+
+            WHERE ctt.id IS NULL AND tt.session_code=:session_code
+        )";
+
+        return $DB->execute($sql, array(
+            "session_code" => $CFG->connect->session_code
+        ));
+    }
+
+    /**
+     * Port updated timetabling information
+     */
+    public static function updated_timetabling() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Updating timetabling information\n";
+
+        $sql = "
+        REPLACE INTO {connect_timetabling} (
+            `id`, `eventid`, `typeid`, `userid`, `courseid`, `roomid`, `starts`, `ends`, `day`, `weeks`
+        ) (
+            SELECT ctt.id, tt.event_number, ct.id, cu.id, cc.id, cr.id, tt.activity_start, tt.activity_end, days.id, tt.weeks
+            FROM `$connectdb`.`timetabling` tt
+            INNER JOIN {connect_type} ct ON ct.name=tt.activity_type
+            INNER JOIN {connect_user} cu ON cu.login=tt.login
+            INNER JOIN {connect_course} cc
+                ON cc.module_code=tt.module_code
+                AND cc.module_title=tt.module_title
+                AND cc.module_week_beginning=tt.module_week_beginning
+                AND cc.campusid=tt.campus
+            INNER JOIN {connect_room} cr ON cr.campusid=tt.campus AND cr.name=tt.venue
+            INNER JOIN (
+                SELECT 0 as id, 'Monday' as day
+                UNION
+                SELECT 1, 'Tuesday'
+                UNION
+                SELECT 2, 'Wednesday'
+                UNION
+                SELECT 3, 'Thursday'
+                UNION
+                SELECT 4, 'Friday'
+                UNION
+                SELECT 5, 'Saturday'
+                UNION
+                SELECT 6, 'Sunday'
+            ) days ON days.day=tt.activity_day
+
+            INNER JOIN {connect_timetabling} ctt
+                ON ctt.eventid = tt.event_number
+                AND ctt.userid = cu.id
+                AND ctt.typeid = ct.id
+                AND ctt.courseid = cc.id
+                AND ctt.weeks = tt.weeks
+
+            WHERE
+                cr.name <> tt.venue
+                OR ctt.starts <> tt.activity_start
+                OR ctt.ends <> tt.activity_end
+                OR ctt.day <> tt.activity_day
+        )";
+
+        return $DB->execute($sql);
+    }
+
+    /**
+     * Takes an array of room names, and a campus id, and returns an array
+     * of room IDs. This also creates new rooms, if needs be.
+     */
+    private static function timetabling_map_rooms($campusid, $rooms) {
+        global $DB;
+
+        $map = array();
+        foreach ($rooms as $name) {
+            $obj = $DB->get_record("connect_room", array(
+                "campusid" => $campusid,
+                "name" => $name
+            ));
+
+            // Create it if it doesnt exist.
+            if (!$obj) {
+                $obj = new \stdClass();
+                $obj->campusid = $campusid;
+                $obj->name = $name;
+
+                $obj->id = $DB->insert_record("connect_room", $obj, true);
+            }
+
+            $map[] = $obj->id;
+        }
+
+        return $map;
+    }
+
+    /**
+     * Split one timetabling event into multiple events.
+     */
+    private static function timetabling_delete_event($event) {
+        global $DB;
+
+        $DB->delete_records("connect_timetabling", array(
+            "id" => $event->id
+        ));
+    }
+
+    /**
+     * Split one timetabling event into multiple events.
+     */
+    private static function timetabling_split_event($event, $rooms, $weeks) {
+        global $DB;
+
+        // For each occurrence, create an event.
+        $i = 0;
+        foreach ($weeks as $week) {
+            $obj = clone($event);
+            unset($obj->id);
+            $obj->weeks = $week;
+
+            // Okay we mapped the new week, but what do we do about the room?
+            if (!is_array($rooms)) {
+                $obj->roomid = $rooms;
+            } else {
+                $obj->roomid = $rooms[$i];
+            }
+
+            // Can't compare text columns.
+            $comparison = clone($obj);
+            unset($comparison->weeks);
+            $comparison = (array)$comparison;
+
+            // If this doesnt exist, create it.
+            if (!$DB->record_exists("connect_timetabling", $comparison)) {
+                $DB->insert_record("connect_timetabling", $obj);
+            }
+
+            $i++;
+        }
+    }
+
+    /**
+     * Timetabling data comes in an odd format.
+     * Unfortunately, by default, the events that span multiple different
+     * rooms or weeks come comma separated. I'd rather handle that in PHP
+     * than MySQL, wouldn't you?
+     */
+    public static function sanitize_timetabling() {
+        global $DB;
+
+        echo "Sanitizing timetabling information\n";
+
+        // Select every event with multiple occurences.
+        $events = $DB->get_records_sql("SELECT ct.*, cr.name as roomname, cr.campusid
+            FROM {connect_timetabling} ct
+            INNER JOIN {connect_room} cr ON cr.id=ct.roomid
+            WHERE ct.weeks LIKE '%,%'
+        ");
+
+        foreach ($events as $event) {
+            // Sanitize object.
+            $room = $event->roomname;
+            $campusid = $event->campusid;
+            unset($event->roomname);
+            unset($event->campusid);
+
+            $rooms = explode(',', $room);
+            $rooms = array_map('trim', $rooms);
+            $roomslen = count($rooms);
+
+            $weeks = explode(',', $event->weeks);
+            $weeks = array_map('trim', $weeks);
+            $weekslen = count($weeks);
+
+            // If the rooms and weeks dont line up, just delete the event.
+            if ($roomslen > $weekslen || ($roomslen > 1 && $roomslen != $weekslen)) {
+                self::timetabling_delete_event($event);
+                continue;
+            }
+
+            // Map rooms to IDs.
+            $rooms = self::timetabling_map_rooms($campusid, $rooms);
+
+            // Take out the array if not needed.
+            if (count($rooms) == 1) {
+                $rooms = $rooms[0];
+            }
+
+            self::timetabling_split_event($event, $rooms, $weeks);
+            self::timetabling_delete_event($event);
+        }
+
+        // Cleanup.
+        $DB->execute("DELETE FROM {connect_room} WHERE name LIKE '%,%'");
+        $DB->execute("DELETE FROM {connect_timetabling} WHERE weeks LIKE '%,%'");
+        $DB->execute("
+            DELETE ct
+            FROM {connect_timetabling} ct
+            LEFT OUTER JOIN {connect_room} cr
+            ON cr.id=ct.roomid
+            WHERE cr.id IS NULL
+        ");
+    }
+
+    /**
+     * God when will this end.
+     * The timetabling information has one last issue we need to hack our way around.
+     * Because of all the mapping we do above, we might have extra (old) records that
+     * need to be deleted. Yay! >:/
+     */
+    private static function cleanup_timetabling() {
+        global $DB, $CFG;
+
+        $connectdb = $CFG->connect->db["name"];
+
+        echo "Tidying up timetabling information\n";
+
+        // Does it (appear) to exist in connect? if not, kill it.
+        $DB->execute("
+            DELETE ctt FROM {connect_timetabling} ctt
+            INNER JOIN {connect_type} ct ON ct.id=ctt.typeid
+            INNER JOIN {connect_user} cu ON cu.id=ctt.userid
+            INNER JOIN {connect_course} cc ON cc.id=ctt.courseid
+            INNER JOIN {connect_room} cr ON cr.id=ctt.roomid
+
+            LEFT OUTER JOIN `$connectdb`.`timetabling` tt
+                ON tt.event_number=ctt.eventid
+                AND tt.login=cu.login
+                AND tt.weeks LIKE CONCAT('%', ctt.weeks, '%')
+
+            WHERE tt.id IS NULL
+        ");
     }
 }

@@ -33,6 +33,7 @@ list($options, $unrecognized) = cli_get_params(
         'update' => false,
         'new' => false,
         'all' => false,
+        'sanitize-timetabling' => false,
         'map-roles' => false,
         'map-users' => false
     )
@@ -62,4 +63,8 @@ if ($options['map-roles']) {
 
 if ($options['map-users']) {
     \local_connect\util\migrate::map_users();
+}
+
+if ($options['sanitize-timetabling']) {
+    \local_connect\util\migrate::sanitize_timetabling();
 }
