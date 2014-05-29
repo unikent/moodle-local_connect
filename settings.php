@@ -54,13 +54,6 @@ if ($hassiteconfig) {
     ));
 
     $settings->add(new admin_setting_configcheckbox(
-        'local_connect_enable_sharedb',
-        get_string('sharedb_toggle', 'local_connect'),
-        "This is currently experimental though it appears to be stable. Be careful!",
-        0
-    ));
-
-    $settings->add(new admin_setting_configcheckbox(
         'local_connect_enable_cron',
         get_string('cron_toggle', 'local_connect'),
         get_string('cron_toggle_desc', 'local_connect'),
