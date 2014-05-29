@@ -32,20 +32,6 @@ defined('MOODLE_INTERNAL') || die();
 class observers
 {
     /**
-     * Triggered when 'course_created' event is triggered.
-     *
-     * Adds the course to the SHAREDB clone-table
-     *
-     * @param \core\event\course_created $event
-     * @return unknown
-     */
-    public static function course_created(\core\event\course_created $event) {
-        global $CFG, $DB, $SHAREDB;
-
-        return true;
-    }
-
-    /**
      * Triggered when 'course_updated' event is triggered.
      *
      * Updates the course in the SHAREDB clone-table
@@ -55,10 +41,6 @@ class observers
      */
     public static function course_updated(\core\event\course_updated $event) {
         global $CFG, $DB, $SHAREDB;
-
-        if ($event->objectid == 1) {
-            return true;
-        }
 
         // Set new lock status.
         $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
@@ -78,10 +60,6 @@ class observers
      */
     public static function course_deleted(\core\event\course_deleted $event) {
         global $CFG, $DB, $SHAREDB;
-
-        if ($event->objectid == 1) {
-            return true;
-        }
 
         // Update any mids.
         $DB->set_field('connect_course', 'mid', null, array(
@@ -155,17 +133,6 @@ class observers
             'mid' => $event->objectid
         ));
 
-        return true;
-    }
-
-
-    /**
-     * Triggered when 'group_created' event is triggered.
-     *
-     * @param \core\event\group_created $event
-     * @return unknown
-     */
-    public static function group_created(\core\event\group_created $event) {
         return true;
     }
 
