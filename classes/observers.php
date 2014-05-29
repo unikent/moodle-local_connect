@@ -42,37 +42,6 @@ class observers
     public static function course_created(\core\event\course_created $event) {
         global $CFG, $DB, $SHAREDB;
 
-        // Update ShareDB if it is enabled.
-        if (\local_connect\util\helpers::enable_sharedb()) {
-            // Update course listings DB.
-            $record = $DB->get_record('course', array(
-                "id" => $event->objectid
-            ));
-
-            if ($record->id == 1) {
-                return true;
-            }
-
-            $record->moodle_id = $record->id;
-            $record->moodle_env = $CFG->kent->environment;
-            $record->moodle_dist = $CFG->kent->distribution;
-
-            $conditions = array(
-                "moodle_id" => $record->id,
-                "moodle_env" => $record->moodle_env,
-                "moodle_dist" => $record->moodle_dist
-            );
-
-            // Is there one of these already?
-            if ($SHAREDB->record_exists("course_list", $conditions)) {
-                return true;
-            }
-
-            unset($record->id);
-
-            $SHAREDB->insert_record("course_list", $record);
-        }
-
         return true;
     }
 
@@ -89,26 +58,6 @@ class observers
 
         if ($event->objectid == 1) {
             return true;
-        }
-
-        // Update ShareDB if it is enabled.
-        if (\local_connect\util\helpers::enable_sharedb()) {
-            // Update course listings DB.
-            $moodle = $DB->get_record('course', array(
-                "id" => $event->objectid
-            ));
-
-            $record = $SHAREDB->get_record('course_list', array(
-                "moodle_id" => $moodle->id,
-                "moodle_env" => $CFG->kent->environment,
-                "moodle_dist" => $CFG->kent->distribution
-            ));
-
-            $record->shortname = $moodle->shortname;
-            $record->fullname = $moodle->fullname;
-            $record->summary = $moodle->summary;
-
-            $SHAREDB->update_record("course_list", $record);
         }
 
         // Set new lock status.
@@ -138,20 +87,6 @@ class observers
         $DB->set_field('connect_course', 'mid', null, array(
             'mid' => $event->objectid
         ));
-
-        // Update ShareDB if it is enabled.
-        if (\local_connect\util\helpers::enable_sharedb()) {
-            // Update course listings DB.
-            $moodle = $DB->get_record('course', array(
-                "id" => $event->objectid
-            ));
-
-            $SHAREDB->delete_records("course_list", array(
-                "moodle_id" => $moodle->id,
-                "moodle_env" => $CFG->kent->environment,
-                "moodle_dist" => $CFG->kent->distribution
-            ));
-        }
 
         return true;
     }
@@ -232,10 +167,6 @@ class observers
      */
     public static function group_created(\core\event\group_created $event) {
         global $DB;
-
-        if (!\local_connect\util\helpers::enable_new_features()) {
-            return true;
-        }
 
         $group = $event->get_record_snapshot('groups', $event->objectid);
 
