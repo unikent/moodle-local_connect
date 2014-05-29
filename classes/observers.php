@@ -172,24 +172,14 @@ class observers
 
         $courses = $DB->get_records('connect_course', array(
             'mid' => $group->courseid
-        ));
+        ), '', 'id');
 
         foreach ($courses as $course) {
-            $groups = $DB->get_records('connect_group', array(
+            // Update any mids.
+            $DB->set_field('connect_group', 'mid', $event->objectid, array(
                 'courseid' => $course->id,
                 'name' => $group->name
             ));
-
-            foreach ($groups as $group) {
-                // Reset mid.
-                if ($group->id) {
-                    $obj = group::get($group->id);
-                    if ($obj->mid !== $event->objectid) {
-                        $obj->mid = $event->objectid;
-                        $obj->save();
-                    }
-                }
-            }
         }
 
         return true;
