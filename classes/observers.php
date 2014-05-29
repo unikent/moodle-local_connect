@@ -106,33 +106,33 @@ class observers
             "id" => $event->objectid
         ));
 
-        $obj = $DB->get_record('connect_user', array(
+        $user = $DB->get_record('connect_user', array(
             "login" => $username
         ));
 
         // If there is no valid connect user, bail out.
-        if (!$obj) {
+        if (!$user) {
             return true;
         }
 
         // Update any mids.
-        $obj->mid = $event->objectid;
-        $DB->update_record('connect_user', $obj);
+        $user->mid = $event->objectid;
+        $DB->update_record('connect_user', $user);
 
         // Grab connect object.
-        $obj = user::get($obj->id);
+        $user = user::from_sql_result($user);
 
         // If we created the user on first login, sync enrolments.
         // TODO - make this a "task" in 2.7.
 
         // Sync Enrollments.
-        $enrolments = enrolment::get_for_user($obj);
+        $enrolments = enrolment::get_for_user($user);
         foreach ($enrolments as $enrolment) {
             $enrolment->create_in_moodle();
         }
 
         // Sync Group Enrollments.
-        $enrolments = group_enrolment::get_for_user($obj);
+        $enrolments = group_enrolment::get_for_user($user);
         foreach ($enrolments as $enrolment) {
             $enrolment->create_in_moodle();
         }
@@ -166,22 +166,6 @@ class observers
      * @return unknown
      */
     public static function group_created(\core\event\group_created $event) {
-        global $DB;
-
-        $group = $event->get_record_snapshot('groups', $event->objectid);
-
-        $courses = $DB->get_records('connect_course', array(
-            'mid' => $group->courseid
-        ), '', 'id');
-
-        foreach ($courses as $course) {
-            // Update any mids.
-            $DB->set_field('connect_group', 'mid', $event->objectid, array(
-                'courseid' => $course->id,
-                'name' => $group->name
-            ));
-        }
-
         return true;
     }
 
