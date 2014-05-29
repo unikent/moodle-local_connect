@@ -67,14 +67,6 @@ class helpers {
     }
 
     /**
-     * Enable the SHAREDB?
-     */
-    public static function enable_sharedb() {
-        global $CFG;
-        return static::is_enabled() && isset($CFG->local_connect_enable_sharedb) && $CFG->local_connect_enable_sharedb;
-    }
-
-    /**
      * Enable the cron?
      */
     public static function enable_cron() {
