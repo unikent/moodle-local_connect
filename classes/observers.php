@@ -32,51 +32,6 @@ defined('MOODLE_INTERNAL') || die();
 class observers
 {
     /**
-     * Triggered when 'course_created' event is triggered.
-     *
-     * Adds the course to the SHAREDB clone-table
-     *
-     * @param \core\event\course_created $event
-     * @return unknown
-     */
-    public static function course_created(\core\event\course_created $event) {
-        global $CFG, $DB, $SHAREDB;
-
-        // Update ShareDB if it is enabled.
-        if (\local_connect\util\helpers::enable_sharedb()) {
-            // Update course listings DB.
-            $record = $DB->get_record('course', array(
-                "id" => $event->objectid
-            ));
-
-            if ($record->id == 1) {
-                return true;
-            }
-
-            $record->moodle_id = $record->id;
-            $record->moodle_env = $CFG->kent->environment;
-            $record->moodle_dist = $CFG->kent->distribution;
-
-            $conditions = array(
-                "moodle_id" => $record->id,
-                "moodle_env" => $record->moodle_env,
-                "moodle_dist" => $record->moodle_dist
-            );
-
-            // Is there one of these already?
-            if ($SHAREDB->record_exists("course_list", $conditions)) {
-                return true;
-            }
-
-            unset($record->id);
-
-            $SHAREDB->insert_record("course_list", $record);
-        }
-
-        return true;
-    }
-
-    /**
      * Triggered when 'course_updated' event is triggered.
      *
      * Updates the course in the SHAREDB clone-table
@@ -86,30 +41,6 @@ class observers
      */
     public static function course_updated(\core\event\course_updated $event) {
         global $CFG, $DB, $SHAREDB;
-
-        if ($event->objectid == 1) {
-            return true;
-        }
-
-        // Update ShareDB if it is enabled.
-        if (\local_connect\util\helpers::enable_sharedb()) {
-            // Update course listings DB.
-            $moodle = $DB->get_record('course', array(
-                "id" => $event->objectid
-            ));
-
-            $record = $SHAREDB->get_record('course_list', array(
-                "moodle_id" => $moodle->id,
-                "moodle_env" => $CFG->kent->environment,
-                "moodle_dist" => $CFG->kent->distribution
-            ));
-
-            $record->shortname = $moodle->shortname;
-            $record->fullname = $moodle->fullname;
-            $record->summary = $moodle->summary;
-
-            $SHAREDB->update_record("course_list", $record);
-        }
 
         // Set new lock status.
         $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
@@ -130,28 +61,10 @@ class observers
     public static function course_deleted(\core\event\course_deleted $event) {
         global $CFG, $DB, $SHAREDB;
 
-        if ($event->objectid == 1) {
-            return true;
-        }
-
         // Update any mids.
         $DB->set_field('connect_course', 'mid', null, array(
             'mid' => $event->objectid
         ));
-
-        // Update ShareDB if it is enabled.
-        if (\local_connect\util\helpers::enable_sharedb()) {
-            // Update course listings DB.
-            $moodle = $DB->get_record('course', array(
-                "id" => $event->objectid
-            ));
-
-            $SHAREDB->delete_records("course_list", array(
-                "moodle_id" => $moodle->id,
-                "moodle_env" => $CFG->kent->environment,
-                "moodle_dist" => $CFG->kent->distribution
-            ));
-        }
 
         return true;
     }
@@ -171,33 +84,33 @@ class observers
             "id" => $event->objectid
         ));
 
-        $obj = $DB->get_record('connect_user', array(
+        $user = $DB->get_record('connect_user', array(
             "login" => $username
         ));
 
         // If there is no valid connect user, bail out.
-        if (!$obj) {
+        if (!$user) {
             return true;
         }
 
         // Update any mids.
-        $obj->mid = $event->objectid;
-        $DB->update_record('connect_user', $obj);
+        $user->mid = $event->objectid;
+        $DB->update_record('connect_user', $user);
 
         // Grab connect object.
-        $obj = user::get($obj->id);
+        $user = user::from_sql_result($user);
 
         // If we created the user on first login, sync enrolments.
         // TODO - make this a "task" in 2.7.
 
         // Sync Enrollments.
-        $enrolments = enrolment::get_for_user($obj);
+        $enrolments = enrolment::get_for_user($user);
         foreach ($enrolments as $enrolment) {
             $enrolment->create_in_moodle();
         }
 
         // Sync Group Enrollments.
-        $enrolments = group_enrolment::get_for_user($obj);
+        $enrolments = group_enrolment::get_for_user($user);
         foreach ($enrolments as $enrolment) {
             $enrolment->create_in_moodle();
         }
@@ -219,47 +132,6 @@ class observers
         $DB->set_field('connect_user', 'mid', null, array(
             'mid' => $event->objectid
         ));
-
-        return true;
-    }
-
-
-    /**
-     * Triggered when 'group_created' event is triggered.
-     *
-     * @param \core\event\group_created $event
-     * @return unknown
-     */
-    public static function group_created(\core\event\group_created $event) {
-        global $DB;
-
-        if (!\local_connect\util\helpers::enable_new_features()) {
-            return true;
-        }
-
-        $group = $event->get_record_snapshot('groups', $event->objectid);
-
-        $courses = $DB->get_records('connect_course', array(
-            'mid' => $group->courseid
-        ));
-
-        foreach ($courses as $course) {
-            $groups = $DB->get_records('connect_group', array(
-                'courseid' => $course->id,
-                'name' => $group->name
-            ));
-
-            foreach ($groups as $group) {
-                // Reset mid.
-                if ($group->id) {
-                    $obj = group::get($group->id);
-                    if ($obj->mid !== $event->objectid) {
-                        $obj->mid = $event->objectid;
-                        $obj->save();
-                    }
-                }
-            }
-        }
 
         return true;
     }

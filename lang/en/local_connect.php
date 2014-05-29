@@ -44,9 +44,6 @@ $string['new_feature_toggle'] = 'Enable new Connect features';
 $string['new_feature_toggle_desc'] = 'Warning: These features are experimental and may not work!';
 $string['new_feature_disabled'] = 'This feature is still experimental and has been disabled on your system.';
 
-$string['sharedb_toggle'] = 'Enable SHAREDB';
-$string['sharedb_toggle_desc'] = 'Warning: This can break everything.';
-
 $string['cron_toggle'] = 'Enable Connect Cron';
 $string['cron_toggle_desc'] = 'Warning: This is not a good idea!';
 

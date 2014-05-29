@@ -33,7 +33,6 @@ abstract class connect_testcase extends \advanced_testcase
         $CFG->local_connect_enable = true;
         $CFG->local_connect_enable_new_features = true;
         $CFG->local_connect_enable_observers = true;
-        $CFG->local_connect_enable_sharedb = true;
         $CFG->local_connect_enable_cron = true;
         $CFG->local_connect_enable_rollover = true;
 
@@ -57,7 +56,6 @@ abstract class connect_testcase extends \advanced_testcase
         unset($CFG->local_connect_enable);
         unset($CFG->local_connect_enable_new_features);
         unset($CFG->local_connect_enable_observers);
-        unset($CFG->local_connect_enable_sharedb);
         unset($CFG->local_connect_enable_cron);
         unset($CFG->local_connect_enable_rollover);
 
