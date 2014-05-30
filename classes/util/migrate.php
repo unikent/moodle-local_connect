@@ -56,6 +56,8 @@ class migrate
      * Run all of them.
      */
     public static function all() {
+        global $CFG;
+
         self::new_rules();
         self::new_roles();
         self::map_roles();
@@ -72,6 +74,8 @@ class migrate
         self::new_group_enrolments();
         self::new_weeks();
         self::updated_weeks();
+
+        sleep($CFG->kent->cluster_sleep);
 
         // Timetabling.
         self::new_rooms();
