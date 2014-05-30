@@ -209,17 +209,6 @@ class kent_group_tests extends local_connect\util\connect_testcase
 
 		$group = \local_connect\group::get($group->id);
 		$this->assertFalse($group->is_in_moodle());
-
-		// Recreate in Moodle.
-        $data = new \stdClass();
-        $data->name = $group->name;
-        $data->courseid = $course->mid;
-        $data->description = '';
-        groups_create_group($data);
-
-		$group = \local_connect\group::get($group->id);
-		$this->assertTrue($group->is_in_moodle());
-
 	}
 
 	/**
