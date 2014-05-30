@@ -29,13 +29,22 @@ require_once($CFG->libdir . '/clilib.php');
 
 raise_memory_limit(MEMORY_HUGE);
 
-// For now, only perform jobs that have been deemed stable.
 \local_connect\util\cli::fix_mids();
+
 \local_connect\util\migrate::all();
+sleep($CFG->kent->cluster_sleep);
+
 \local_connect\util\cli::enrolment_sync();
+sleep($CFG->kent->cluster_sleep);
+
 \local_connect\util\cli::group_sync();
+sleep($CFG->kent->cluster_sleep);
+
 \local_connect\util\cli::group_enrolment_sync();
+sleep($CFG->kent->cluster_sleep);
+
 \local_connect\util\cli::meta_sync();
+sleep($CFG->kent->cluster_sleep);
 
 // For 2014, also sync courses.
 if ($CFG->kent->distribution === "2014") {
