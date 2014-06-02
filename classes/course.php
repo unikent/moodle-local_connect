@@ -525,8 +525,6 @@ class course extends data
      * Process a course unlink
      */
     public function unlink() {
-        global $DB;
-
         $this->delete_enrolments();
 
         $this->mid = 0;

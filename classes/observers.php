@@ -34,13 +34,11 @@ class observers
     /**
      * Triggered when 'course_updated' event is triggered.
      *
-     * Updates the course in the SHAREDB clone-table
-     *
      * @param \core\event\course_updated $event
      * @return unknown
      */
     public static function course_updated(\core\event\course_updated $event) {
-        global $CFG, $DB, $SHAREDB;
+        global $DB;
 
         // Set new lock status.
         $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
@@ -53,13 +51,11 @@ class observers
     /**
      * Triggered when 'course_deleted' event is triggered.
      *
-     * Deletes the course from the SHAREDB clone-table
-     *
      * @param \core\event\course_deleted $event
      * @return unknown
      */
     public static function course_deleted(\core\event\course_deleted $event) {
-        global $CFG, $DB, $SHAREDB;
+        global $DB;
 
         // Update any mids.
         $DB->set_field('connect_course', 'mid', null, array(
@@ -77,7 +73,7 @@ class observers
      * @return unknown
      */
     public static function user_created(\core\event\user_created $event) {
-        global $DB, $USER;
+        global $DB;
 
         // Grab user info.
         $username = $DB->get_field('user', 'username', array(
