@@ -111,13 +111,16 @@ class rule extends data
      *   - If there is a matching rule with a weight higher than all others, return that
      *   - If there are multiple matching rules with the same weights, return the longest string
      */
-    public static function map($shortname) {
+    public static function map($obj) {
         global $DB;
 
         // Accept either an object or a string.
-        if (is_object($shortname)) {
-            $shortname = $course->shortname;
+        if (is_object($obj)) {
+            $obj = $obj->shortname;
         }
+
+        // Map to variable.
+        $shortname = $obj;
 
         // Grab all possible rules.
         $rules = $DB->get_records('connect_rules', null, 'weight DESC');
