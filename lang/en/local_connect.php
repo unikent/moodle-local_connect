@@ -24,8 +24,8 @@
 
 $string['pluginname'] = 'Kent Connect';
 
-$string['local_connect:helpdesk'] = 'Access to the Connect helpdesk portal';
-$string['local_connect:manage'] = 'Manage Moodle-Connect';
+$string['connect:helpdesk'] = 'Access to the Connect helpdesk portal';
+$string['connect:manage'] = 'Manage Moodle-Connect';
 
 $string['connectreport'] = 'Departmental administration';
 $string['kentconnect:manage'] = 'Departmental administrator';
