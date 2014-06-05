@@ -38,7 +38,7 @@ $PAGE->navbar->add("User View");
 /**
  * Check capabilities.
  */
-require_capability("local/helpdesk:access", context_system::instance());
+require_capability("local/connect:helpdesk", context_system::instance());
 
 /**
  * And, the actual page.

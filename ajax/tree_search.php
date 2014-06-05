@@ -31,7 +31,7 @@ global $PAGE, $OUTPUT, $USER;
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/ajax/tree_search.php');
 
-require_capability("local/helpdesk:access", context_system::instance());
+require_capability("local/connect:helpdesk", context_system::instance());
 
 $query = required_param('str', PARAM_ALPHANUMEXT);
 

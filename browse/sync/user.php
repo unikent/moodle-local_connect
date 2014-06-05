@@ -35,7 +35,7 @@ $PAGE->set_url('/local/connect/browse/sync/user.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse_push', 'local_connect'));
 
-require_capability("local/helpdesk:access", context_system::instance());
+require_capability("local/connect:helpdesk", context_system::instance());
 
 if ($user === null) {
 	print_error("User does not exist!");
