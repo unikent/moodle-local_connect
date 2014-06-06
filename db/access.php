@@ -24,7 +24,7 @@
 
 $capabilities = array(
     // Ability to access da pages.
-    'local/kentconnect:manage' => array(
+    'local/connect:manage' => array(
         'riskbitmask' => RISK_MANAGETRUST & RISK_CONFIG,
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -36,7 +36,7 @@ $capabilities = array(
             'manager' => CAP_PREVENT
         )
     ),
-    'local/helpdesk:access' => array(
+    'local/connect:helpdesk' => array(
         'riskbitmask' => RISK_PERSONAL & RISK_DATALOSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,

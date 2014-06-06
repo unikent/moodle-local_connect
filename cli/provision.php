@@ -34,7 +34,7 @@ list($options, $unrecognized) = cli_get_params(
     )
 );
 
-$username = exec('whoami');
+$username = exec('logname');
 $user = $DB->get_record('user', array(
     'username' => $username
 ));

@@ -24,6 +24,9 @@
 
 $string['pluginname'] = 'Kent Connect';
 
+$string['connect:helpdesk'] = 'Access to the Connect helpdesk portal';
+$string['connect:manage'] = 'Manage Moodle-Connect';
+
 $string['connectreport'] = 'Departmental administration';
 $string['kentconnect:manage'] = 'Departmental administrator';
 $string['accessdenied'] = 'You are not permitted to view the Departmental administration page';
