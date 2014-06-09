@@ -39,7 +39,7 @@ class rollover {
     public static function get_course_list($dist = '', $shortname = '') {
         global $CFG, $SHAREDB;
 
-        $sql = 'SELECT * FROM {course_list} WHERE moodle_env = :current_env';
+        $sql = 'SELECT * FROM {shared_courses} WHERE moodle_env = :current_env';
         if ($dist !== '*') {
             $sql .= empty($dist) ? ' AND moodle_dist != :current_dist' : ' AND moodle_dist = :current_dist';
         }

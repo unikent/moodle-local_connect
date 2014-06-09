@@ -17,10 +17,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `course_list`
+-- Table structure for table `shared_courses`
 --
 
-CREATE TABLE IF NOT EXISTS `course_list` (
+CREATE TABLE IF NOT EXISTS `shared_courses` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT,
   `moodle_env` varchar(24) NOT NULL,
   `moodle_dist` varchar(24) NOT NULL,
