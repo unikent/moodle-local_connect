@@ -32,8 +32,6 @@ require_once(dirname(__FILE__) . '/../../../mod/forum/lib.php');
 
 /**
  * Connect courses container.
- * This is all a bit dodgy as "it was the first one" to be moved to PHP so was a bit of a learning experience.
- * I shall re-write this at some point but if you are reading this then I probably never did, so sorry.
  */
 class course extends data
 {
@@ -332,7 +330,8 @@ class course extends data
 
         // Ensure the shortname is unique.
         if (!$this->is_unique_shortname($shortname)) {
-            \local_connect\util\helpers::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle but the shortname was not unique.");
+            $err = "'{$USER->username}' just tried to push course '{$this->id}' to Moodle but the shortname was not unique.";
+            \local_connect\util\helpers::error($err);
             return false;
         }
 
@@ -354,7 +353,8 @@ class course extends data
             $this->mid = $course->id;
         } catch (\moodle_exception $e) {
             $msg = $e->getMessage();
-            \local_connect\util\helpers::error("'{$USER->username}' just tried to push course '{$this->id}' to Moodle but '{$msg}'.");
+            $err = "'{$USER->username}' just tried to push course '{$this->id}' to Moodle but '{$msg}'.";
+            \local_connect\util\helpers::error($err);
             return false;
         }
 
