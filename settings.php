@@ -39,6 +39,10 @@ if ($hassiteconfig) {
         'moodle/site:config');
     $ADMIN->add('localplugins', $meta);
 
+    $cdb = new admin_externalpage('connectdatabrowse', "Connect Data Browser", "$CFG->wwwroot/local/connect/browse/index.php",
+        'local/connect:helpdesk');
+    $ADMIN->add('localplugins', $cdb);
+
     $settings->add(new admin_setting_configcheckbox(
         'local_connect_enable',
         get_string('enable', 'local_connect'),

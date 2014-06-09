@@ -23,15 +23,16 @@
  */
 
 require (dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 
 /**
  * Page setup.
  */
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/browse/index.php');
-$PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse', 'local_connect'));
-$PAGE->navbar->add("Connect Browser");
+
+admin_externalpage_setup('connectdatabrowse', '', null, '', array('pagelayout' => 'report'));
 
 /**
  * Script setup.
@@ -41,11 +42,6 @@ $PAGE->requires->jquery_plugin('migrate');
 $PAGE->requires->js('/local/connect/scripts/jstree.min.js');
 $PAGE->requires->js('/local/connect/scripts/browse.js');
 $PAGE->requires->css('/local/connect/styles/jtree.css');
-
-/**
- * Check capabilities.
- */
-require_capability("local/connect:helpdesk", context_system::instance());
 
 /**
  * And, the actual page.

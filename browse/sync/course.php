@@ -23,6 +23,7 @@
  */
 
 require (dirname(__FILE__) . '/../../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 
 $courseid = required_param("id", PARAM_INT);
 $course = \local_connect\course::get($courseid);
@@ -32,18 +33,16 @@ $course = \local_connect\course::get($courseid);
  */
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/browse/sync/course.php');
-$PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse_push', 'local_connect'));
 
-require_capability("local/connect:helpdesk", context_system::instance());
+admin_externalpage_setup('connectdatabrowse', '', null, '', array('pagelayout' => 'report'));
+
+$PAGE->navbar->add("Connect Course", new moodle_url('/local/connect/browse/course.php', array("id" => $course->id)));
+$PAGE->navbar->add("Pushing...");
 
 if ($course === null) {
 	print_error("Course does not exist!");
 }
-
-$PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/index.php'));
-$PAGE->navbar->add("Connect Course", new moodle_url('/local/connect/browse/course.php', array("id" => $course->id)));
-$PAGE->navbar->add("Pushing...");
 
 /**
  * And, the actual page.

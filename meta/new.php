@@ -28,11 +28,6 @@ require_once($CFG->libdir . '/adminlib.php');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/meta/new.php');
 
-// Allow admins to regenerate list.
-if (!has_capability('moodle/site:config', \context_system::instance())) {
-    print_error('Access Denied');
-}
-
 admin_externalpage_setup('reportconnectmeta', '', null, '', array('pagelayout' => 'report'));
 
 $stage = optional_param('stage', 1, PARAM_INT);
