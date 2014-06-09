@@ -23,6 +23,7 @@
  */
 
 require (dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/tablelib.php');
 
 $groupid = required_param("id", PARAM_INT);
@@ -33,17 +34,12 @@ $group = \local_connect\group::get($groupid);
  */
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/browse/group.php');
-$PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse_group', 'local_connect'));
 
-$PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/index.php'));
+admin_externalpage_setup('connectdatabrowse', '', null, '', array('pagelayout' => 'report'));
+
 $PAGE->navbar->add("Connect Course", new moodle_url('/local/connect/browse/course.php', array("id" => $group->courseid)));
 $PAGE->navbar->add("Connect Group");
-
-/**
- * Check capabilities.
- */
-require_capability("local/connect:helpdesk", context_system::instance());
 
 /**
  * And, the actual page.
