@@ -23,6 +23,7 @@
  */
 
 require (dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/tablelib.php');
 
 /**
@@ -30,15 +31,11 @@ require_once($CFG->libdir . '/tablelib.php');
  */
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/browse/course.php');
-$PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse', 'local_connect'));
-$PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/'));
-$PAGE->navbar->add("Course View");
 
-/**
- * Check capabilities.
- */
-require_capability("local/connect:helpdesk", context_system::instance());
+admin_externalpage_setup('connectdatabrowse', '', null, '', array('pagelayout' => 'report'));
+
+$PAGE->navbar->add("Course View");
 
 /**
  * Check course.

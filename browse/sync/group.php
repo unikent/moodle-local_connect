@@ -23,6 +23,7 @@
  */
 
 require (dirname(__FILE__) . '/../../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 
 $groupid = required_param("id", PARAM_INT);
 $group = \local_connect\group::get($groupid);
@@ -32,20 +33,17 @@ $group = \local_connect\group::get($groupid);
  */
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/browse/sync/group.php');
-$PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse_push', 'local_connect'));
 
-require_capability("local/connect:helpdesk", context_system::instance());
+admin_externalpage_setup('connectdatabrowse', '', null, '', array('pagelayout' => 'report'));
 
-if ($group === null) {
-	print_error("Group does not exist!");
-}
-
-$PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/index.php'));
 $PAGE->navbar->add("Connect Course", new moodle_url('/local/connect/browse/course.php', array("id" => $group->courseid)));
 $PAGE->navbar->add("Connect Group", new moodle_url('/local/connect/browse/group.php', array("id" => $group->id)));
 $PAGE->navbar->add("Pushing...");
 
+if ($group === null) {
+	print_error("Group does not exist!");
+}
 
 /**
  * And, the actual page.

@@ -23,6 +23,7 @@
  */
 
 require (dirname(__FILE__) . '/../../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 
 $userid = required_param("id", PARAM_INT);
 $user = \local_connect\user::get($userid);
@@ -32,18 +33,16 @@ $user = \local_connect\user::get($userid);
  */
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/browse/sync/user.php');
-$PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('connectbrowse_push', 'local_connect'));
 
-require_capability("local/connect:helpdesk", context_system::instance());
+admin_externalpage_setup('connectdatabrowse', '', null, '', array('pagelayout' => 'report'));
+
+$PAGE->navbar->add("Connect User", new moodle_url('/local/connect/browse/user.php', array("id" => $user->id)));
+$PAGE->navbar->add("Pushing...");
 
 if ($user === null) {
 	print_error("User does not exist!");
 }
-
-$PAGE->navbar->add("Connect Browser", new moodle_url('/local/connect/browse/index.php'));
-$PAGE->navbar->add("Connect User", new moodle_url('/local/connect/browse/user.php', array("id" => $user->id)));
-$PAGE->navbar->add("Pushing...");
 
 /**
  * And, the actual page.
