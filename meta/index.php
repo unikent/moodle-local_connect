@@ -30,15 +30,10 @@ $PAGE->set_url('/local/connect/meta/index.php');
 
 $PAGE->requires->css('/local/connect/styles/meta.css');
 
-// Allow admins to regenerate list.
-if (!has_capability('moodle/site:config', \context_system::instance())) {
-    print_error('Access Denied');
-}
+admin_externalpage_setup('reportconnectmeta', '', null, '', array('pagelayout' => 'report'));
 
 $page    = optional_param('page', 0, PARAM_INT);
 $perpage = optional_param('perpage', 30, PARAM_INT);
-
-admin_externalpage_setup('reportconnectmeta', '', null, '', array('pagelayout' => 'report'));
 
 // Did we get a delete meta request?
 $form = new \local_connect\forms\deletemeta(null);
