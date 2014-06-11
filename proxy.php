@@ -89,9 +89,18 @@ switch ($_SERVER['PATH_INFO']) {
     case '/courses/':
         header('Content-type: application/json');
         $restrictions = isset($_GET['category_restrictions']) ? json_decode(urldecode($_GET['category_restrictions'])) : array();
+
         $courses = array();
         if (!empty($restrictions)) {
-            $courses = \local_connect\course::get_by_category($restrictions, true);
+            // Map categories to IDs.
+            $categories = array();
+            foreach ($restrictions as $category) {
+                if (isset($category[0])) {
+                    $categories[] = $category[0];
+                }
+            }
+
+            $courses = \local_connect\course::get_by_category($categories, true);
         } else {
             $courses = \local_connect\course::get_all(true);
         }
