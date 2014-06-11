@@ -138,9 +138,7 @@ class migrate
             GROUP BY r.rule
         )";
 
-        return $DB->execute($sql, array(
-            "session_code" => $CFG->connect->session_code
-        ));
+        return $DB->execute($sql);
     }
 
     /**
