@@ -444,6 +444,9 @@ class course extends data
         $target->mid = $this->mid;
         $target->save();
 
+        // Update in Moodle.
+        $this->update_moodle();
+
         // Sync enrolments.
         $target->sync_enrolments();
 
