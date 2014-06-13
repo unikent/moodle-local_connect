@@ -38,7 +38,11 @@ class observers
      * @return unknown
      */
     public static function course_updated(\core\event\course_updated $event) {
-        global $DB;
+        global $DB, $USER;
+
+        if (!$USER || $USER->id <= 2) {
+            return true;
+        }
 
         // Set new lock status.
         $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
