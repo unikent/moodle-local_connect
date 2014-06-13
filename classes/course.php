@@ -106,10 +106,30 @@ class course extends data
      * Returns the shortname
      */
     public function _get_shortname() {
-        if (!empty($this->_shortnameext)) {
-            return $this->append_date($this->module_code . " " . $this->_shortnameext);
+        // If we are a merged course, we may have more than one module_code.
+        $modulecode = $this->module_code;
+        if ($this->is_in_moodle()) {
+            $courses = static::get_by_moodle_id($this->mid);
+            if (count($courses) > 1) {
+                $modulecode = array($modulecode);
+                foreach ($courses as $course) {
+                    $current = $course->module_code;
+                    if (!in_array($current, $modulecode)) {
+                        $modulecode[] = $current;
+                    }
+                }
+
+                // Sort and implode.
+                sort($modulecode);
+                $modulecode = implode('/', $modulecode);
+            }
         }
-        return $this->append_date($this->module_code);
+
+        if (!empty($this->_shortnameext)) {
+            return $modulecode . " " . $this->_shortnameext;
+        }
+
+        return $modulecode;
     }
 
     /**
@@ -196,10 +216,28 @@ class course extends data
             $text = substr($text, 0, 247) . "... " . $more;
         }
 
-        $text = '<div class="synopsistext">' . strip_tags($text) . '</div>';
+        // If we are a merged course, we may have more than one campus.
+        $campus = $this->campus->name;
+        if ($this->is_in_moodle()) {
+            $courses = static::get_by_moodle_id($this->mid);
+            if (count($courses) > 1) {
+                $campus = array($campus);
+                foreach ($courses as $course) {
+                    $current = $course->campus->name;
+                    if (!in_array($current, $campus)) {
+                        $campus[] = $current;
+                    }
+                }
 
+                // Sort and implode.
+                sort($campus);
+                $campus = implode('/', $campus);
+            }
+        }
+
+        $text = '<div class="synopsistext">' . strip_tags($text) . '</div>';
         $text .= "&nbsp;<p style='margin-top:10px' class='module_summary_extra_info'>";
-        $text .= $this->campus->name . ", ";
+        $text .= $campus . ", ";
         $text .= "week " . $this->duration;
         $text .= "</p>";
 
@@ -270,8 +308,19 @@ class course extends data
      * Does this course have a unique shortname?
      * @return boolean
      */
-    public function is_unique_shortname($shortname) {
+    public function is_unique_shortname($shortname, $strict = false) {
         global $DB;
+
+        // If in strict mode, we check against connect as well.
+        if ($strict) {
+            $count = $DB->count_records('connect_course', array(
+                "module_code" => $shortname
+            ));
+
+            if ($count > 1) {
+                return false;
+            }
+        }
 
         $expected = $this->is_in_moodle() ? 1 : 0;
         return $expected === $DB->count_records('course', array(
@@ -313,7 +362,7 @@ class course extends data
      * @param string $shortnameext (optional)
      * @return boolean
      */
-    public function create_in_moodle($shortnameext = "") {
+    public function create_in_moodle() {
         global $DB, $USER;
 
         // Check we have a category.
@@ -322,11 +371,8 @@ class course extends data
             return false;
         }
 
-        // Append shortname extension if it exists.
+        // Grab shortname.
         $shortname = $this->shortname;
-        if (!empty($shortnameext)) {
-            $shortname = $this->append_date($this->module_code . " " . $shortnameext);
-        }
 
         // Ensure the shortname is unique.
         if (!$this->is_unique_shortname($shortname)) {
@@ -404,6 +450,9 @@ class course extends data
         $target->mid = $this->mid;
         $target->save();
 
+        // Update in Moodle.
+        $this->update_moodle();
+
         // Sync enrolments.
         $target->sync_enrolments();
 
@@ -478,9 +527,10 @@ class course extends data
         ));
 
         // Updates!
+        $course->shortname = $this->shortname;
         $course->fullname = $this->fullname;
         $course->category = $this->category;
-        $course->summary = $this->summary;
+        $course->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
 
         // Update this course in Moodle.
         update_course($course);
@@ -777,9 +827,10 @@ class course extends data
 
             // Did we specify a shortname extension?
             $shortnameext = isset($course->shortnameext) ? $course->shortnameext : "";
+            $obj->set_shortname_extension($shortnameext);
 
             // Attempt to create in Moodle.
-            if (!$obj->create_in_moodle($shortnameext)) {
+            if (!$obj->create_in_moodle()) {
                 $response[] = array(
                     'error_code' => 'error',
                     'id' => $course->id
