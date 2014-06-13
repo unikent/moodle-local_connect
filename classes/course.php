@@ -524,7 +524,7 @@ class course extends data
         $course->shortname = $this->shortname;
         $course->fullname = $this->fullname;
         $course->category = $this->category;
-        $course->summary = $this->summary;
+        $course->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
 
         // Update this course in Moodle.
         update_course($course);
