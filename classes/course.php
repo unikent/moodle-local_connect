@@ -197,10 +197,25 @@ class course extends data
             $text = substr($text, 0, 247) . "... " . $more;
         }
 
-        $text = '<div class="synopsistext">' . strip_tags($text) . '</div>';
+        // If we are a merged course, we may have more than one campus.
+        $campus = $this->campus->name;
+        if ($this->is_in_moodle()) {
+            $courses = static::get_by_moodle_id();
+            if (count($courses) > 1) {
+                $campus = array($campus);
+                foreach ($courses as $course) {
+                    $current = $course->campus->name;
+                    if (!in_array($current, $campus)) {
+                        $campus[] = $current;
+                    }
+                }
+                $campus = implode('/', $campus);
+            }
+        }
 
+        $text = '<div class="synopsistext">' . strip_tags($text) . '</div>';
         $text .= "&nbsp;<p style='margin-top:10px' class='module_summary_extra_info'>";
-        $text .= $this->campus->name . ", ";
+        $text .= $campus . ", ";
         $text .= "week " . $this->duration;
         $text .= "</p>";
 
