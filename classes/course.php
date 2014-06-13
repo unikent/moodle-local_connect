@@ -109,7 +109,7 @@ class course extends data
         // If we are a merged course, we may have more than one module_code.
         $modulecode = $this->module_code;
         if ($this->is_in_moodle()) {
-            $courses = static::get_by_moodle_id();
+            $courses = static::get_by_moodle_id($this->mid);
             if (count($courses) > 1) {
                 $modulecode = array($modulecode);
                 foreach ($courses as $course) {
@@ -216,7 +216,7 @@ class course extends data
         // If we are a merged course, we may have more than one campus.
         $campus = $this->campus->name;
         if ($this->is_in_moodle()) {
-            $courses = static::get_by_moodle_id();
+            $courses = static::get_by_moodle_id($this->mid);
             if (count($courses) > 1) {
                 $campus = array($campus);
                 foreach ($courses as $course) {
