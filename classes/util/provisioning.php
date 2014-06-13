@@ -59,8 +59,6 @@ class provisioning
 
         // Right. Now. What's left? #2.
         $this->handle_remaining_mergers();
-
-        // Okay the rest is never going to happen. Create the skeletons anyway.
     }
 
     /**
