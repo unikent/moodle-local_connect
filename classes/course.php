@@ -107,9 +107,10 @@ class course extends data
      */
     public function _get_shortname() {
         if (!empty($this->_shortnameext)) {
-            return $this->append_date($this->module_code . " " . $this->_shortnameext);
+            return $this->module_code . " " . $this->_shortnameext;
         }
-        return $this->append_date($this->module_code);
+
+        return $this->module_code;
     }
 
     /**
