@@ -106,11 +106,27 @@ class course extends data
      * Returns the shortname
      */
     public function _get_shortname() {
-        if (!empty($this->_shortnameext)) {
-            return $this->module_code . " " . $this->_shortnameext;
+        // If we are a merged course, we may have more than one module_code.
+        $modulecode = $this->module_code;
+        if ($this->is_in_moodle()) {
+            $courses = static::get_by_moodle_id();
+            if (count($courses) > 1) {
+                $modulecode = array($modulecode);
+                foreach ($courses as $course) {
+                    $current = $course->module_code;
+                    if (!in_array($current, $modulecode)) {
+                        $modulecode[] = $current;
+                    }
+                }
+                $modulecode = implode('/', $modulecode);
+            }
         }
 
-        return $this->module_code;
+        if (!empty($this->_shortnameext)) {
+            return $modulecode . " " . $this->_shortnameext;
+        }
+
+        return $modulecode;
     }
 
     /**
