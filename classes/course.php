@@ -118,6 +118,9 @@ class course extends data
                         $modulecode[] = $current;
                     }
                 }
+
+                // Sort and implode.
+                sort($modulecode);
                 $modulecode = implode('/', $modulecode);
             }
         }
@@ -225,6 +228,9 @@ class course extends data
                         $campus[] = $current;
                     }
                 }
+
+                // Sort and implode.
+                sort($campus);
                 $campus = implode('/', $campus);
             }
         }
