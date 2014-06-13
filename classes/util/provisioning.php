@@ -127,13 +127,13 @@ class provisioning
         $shortnameext = "";
 
         if (strpos($course->module_code, "WSHOP") === 0) {
-            if (!$course->is_unique_shortname($course->shortname)) {
+            if (!$course->is_unique_shortname($course->shortname, true)) {
                 $shortnameext = "(week " . $course->module_week_beginning . ")";
                 $course->set_shortname_extension($shortnameext);
             }
         }
 
-        if (!$course->is_unique_shortname($course->shortname)) {
+        if (!$course->is_unique_shortname($course->shortname, true)) {
             if ($course->module_week_beginning == 1) {
                 $shortnameext = "AUT";
             }
@@ -153,7 +153,7 @@ class provisioning
         }
 
         // Make sure we are still unique.
-        if (!$course->is_unique_shortname($course->shortname)) {
+        if (!$course->is_unique_shortname($course->shortname, true)) {
             $canterbury = $this->get_canterbury();
             $medway = $this->get_medway();
 

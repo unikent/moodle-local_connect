@@ -271,8 +271,19 @@ class course extends data
      * Does this course have a unique shortname?
      * @return boolean
      */
-    public function is_unique_shortname($shortname) {
+    public function is_unique_shortname($shortname, $strict = false) {
         global $DB;
+
+        // If in strict mode, we check against connect as well.
+        if ($strict) {
+            $count = $DB->count_records('connect_course', array(
+                "module_code" => $shortname
+            ));
+
+            if ($count > 1) {
+                return false;
+            }
+        }
 
         $expected = $this->is_in_moodle() ? 1 : 0;
         return $expected === $DB->count_records('course', array(
