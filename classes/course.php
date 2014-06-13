@@ -340,7 +340,7 @@ class course extends data
      * @param string $shortnameext (optional)
      * @return boolean
      */
-    public function create_in_moodle($shortnameext = "") {
+    public function create_in_moodle() {
         global $DB, $USER;
 
         // Check we have a category.
@@ -349,11 +349,8 @@ class course extends data
             return false;
         }
 
-        // Append shortname extension if it exists.
+        // Grab shortname.
         $shortname = $this->shortname;
-        if (!empty($shortnameext)) {
-            $shortname = $this->append_date($this->module_code . " " . $shortnameext);
-        }
 
         // Ensure the shortname is unique.
         if (!$this->is_unique_shortname($shortname)) {
@@ -505,6 +502,7 @@ class course extends data
         ));
 
         // Updates!
+        $course->shortname = $this->shortname;
         $course->fullname = $this->fullname;
         $course->category = $this->category;
         $course->summary = $this->summary;
@@ -804,9 +802,10 @@ class course extends data
 
             // Did we specify a shortname extension?
             $shortnameext = isset($course->shortnameext) ? $course->shortnameext : "";
+            $obj->set_shortname_extension($shortnameext);
 
             // Attempt to create in Moodle.
-            if (!$obj->create_in_moodle($shortnameext)) {
+            if (!$obj->create_in_moodle()) {
                 $response[] = array(
                     'error_code' => 'error',
                     'id' => $course->id
