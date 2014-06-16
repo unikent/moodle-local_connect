@@ -253,13 +253,18 @@ abstract class data {
     }
 
     /**
-     * Get an object by ID
+     * Get an object by a specified field.
      */
-    public static function get($id) {
+    public static function get_by($field, $val) {
         global $DB;
 
+        if (!in_array($field, static::valid_fields())) {
+            debugging("Invalid field: $field!");
+            return;
+        }
+
         $data = $DB->get_record(static::get_table(), array(
-            'id' => $id
+            $field => $val
         ));
 
         if (!$data) {
@@ -267,6 +272,13 @@ abstract class data {
         }
 
         return static::from_sql_result($data);
+    }
+
+    /**
+     * Get an object by ID
+     */
+    public static function get($id) {
+        return static::get_by('id', $id);
     }
 
     /**
