@@ -60,6 +60,7 @@ class course_ext extends data
     public static function set($mid, $ext) {
         global $DB;
 
+        // Is this just an update?
         $obj = static::get_by('coursemid', $mid);
         if ($obj) {
             $obj->extension = $ext;
@@ -67,10 +68,10 @@ class course_ext extends data
             return;
         }
 
-        $obj = new \stdClass();
-        $obj->coursemid = $mid;
-        $obj->extension = $ext;
-
-        $DB->insert_record(static::get_table(), $obj);
+        // Nope, insert.
+        $DB->insert_record(static::get_table(), array(
+            'coursemid' => $mid,
+            'extension' => $ext
+        ));
     }
 }
