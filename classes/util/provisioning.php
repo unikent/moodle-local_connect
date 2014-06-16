@@ -171,6 +171,8 @@ class provisioning
             }
         }
 
+        $course->save();
+
         $result = $course->create_in_moodle();
 
         // Log it.

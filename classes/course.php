@@ -818,6 +818,7 @@ class course extends data
             // Did we specify a shortname extension?
             if (!empty($course->shortnameext)) {
                 $obj->shortname_ext = $course->shortnameext;
+                $obj->save();
             }
 
             // Attempt to create in Moodle.
