@@ -27,9 +27,9 @@ namespace local_connect;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Connect course exts container.
+ * Connect course ext container.
  */
-class course_exts extends data
+class course_ext extends data
 {
     /**
      * The name of our connect table.
@@ -52,5 +52,25 @@ class course_exts extends data
      */
     protected static function immutable_fields() {
         return array("id");
+    }
+
+    /**
+     * Set the extension of a course.
+     */
+    public static function set($mid, $ext) {
+        global $DB;
+
+        $obj = static::get_by('coursemid', $mid);
+        if ($obj) {
+            $obj->extension = $ext;
+            $obj->save();
+            return;
+        }
+
+        $obj = new \stdClass();
+        $obj->coursemid = $mid;
+        $obj->extension = $ext;
+
+        $DB->insert_record(static::get_table(), $obj);
     }
 }

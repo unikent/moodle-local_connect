@@ -52,7 +52,7 @@ class course extends data
         return array(
             "id", "mid", "module_delivery_key", "session_code", "module_version",
             "campusid", "module_week_beginning", "module_length", "week_beginning_date",
-            "module_title", "module_code", "synopsis", "category", "shortname_ext"
+            "module_title", "module_code", "synopsis", "category"
         );
     }
 
@@ -90,6 +90,22 @@ class course extends data
         }
 
         return $val;
+    }
+
+    public function set_shortname_ext($ext) {
+        course_ext::set($this->mid, $ext);
+    }
+
+    /**
+     * Returns the shortname extension
+     */
+    public function _get_shortname_ext() {
+        $obj = course_ext::get_by('coursemid', $this->mid);
+        if ($obj) {
+            return $obj->extension;
+        }
+
+        return "";
     }
 
     /**
@@ -817,8 +833,7 @@ class course extends data
 
             // Did we specify a shortname extension?
             if (!empty($course->shortnameext)) {
-                $obj->shortname_ext = $course->shortnameext;
-                $obj->save();
+                $obj->set_shortname_ext($course->shortnameext);
             }
 
             // Attempt to create in Moodle.
