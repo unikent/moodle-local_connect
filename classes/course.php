@@ -55,7 +55,7 @@ class course extends data
         return array(
             "id", "mid", "module_delivery_key", "session_code", "module_version",
             "campusid", "module_week_beginning", "module_length", "week_beginning_date",
-            "module_title", "module_code", "synopsis", "category"
+            "module_title", "module_code", "synopsis", "category", "shortname_ext"
         );
     }
 

@@ -624,5 +624,20 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014052200, 'local', 'connect');
     }
 
+    if ($oldversion < 2014061600) {
+
+        // Define field shortname_ext to be added to connect_course.
+        $table = new xmldb_table('connect_course');
+        $field = new xmldb_field('shortname_ext', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'category');
+
+        // Conditionally launch add field shortname_ext.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014061600, 'local', 'connect');
+    }
+
     return true;
 }
