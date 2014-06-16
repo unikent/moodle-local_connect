@@ -115,7 +115,7 @@ class course extends data
         // If we are a merged course, we may have more than one module_code.
         $modulecode = $this->module_code;
         if ($this->is_in_moodle()) {
-            $courses = static::get_by_moodle_id($this->mid);
+            $courses = static::get_by('mid', $this->mid);
             if (count($courses) > 1) {
                 $modulecode = array($modulecode);
                 foreach ($courses as $course) {
@@ -225,7 +225,7 @@ class course extends data
         // If we are a merged course, we may have more than one campus.
         $campus = $this->campus->name;
         if ($this->is_in_moodle()) {
-            $courses = static::get_by_moodle_id($this->mid);
+            $courses = static::get_by('mid', $this->mid);
             if (count($courses) > 1) {
                 $campus = array($campus);
                 foreach ($courses as $course) {
@@ -686,31 +686,6 @@ class course extends data
      */
     public function __toString() {
         return !empty($this->module_title) ? $this->shortname : $this->id;
-    }
-
-    /**
-     * Get a Connect Course by Moodle ID
-     * 
-     * @param unknown $id
-     * @return unknown
-     */
-    public static function get_by_moodle_id($id) {
-        global $DB;
-
-        // Select a bunch of records.
-        $result = $DB->get_records('connect_course', array('mid' => $id));
-        if (!$result) {
-            return array();
-        }
-
-        // Decode various elements.
-        foreach ($result as &$datum) {
-            $obj = new course();
-            $obj->set_class_data($datum);
-            $datum = $obj;
-        }
-
-        return $result;
     }
 
 

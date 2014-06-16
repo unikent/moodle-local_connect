@@ -177,26 +177,6 @@ class user extends data
     }
 
     /**
-     * Get a user by Username
-     */
-    public static function get_by_username($username) {
-        global $DB;
-
-        $user = $DB->get_record("connect_user", array(
-            'login' => $username
-        ));
-
-        if (!$user) {
-            return null;
-        }
-
-        $obj = new static();
-        $obj->set_class_data($user);
-
-        return $obj;
-    }
-
-    /**
      * Returns a list of all known users in a given role.
      */
     public static function get_by_role($role) {

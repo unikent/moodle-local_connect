@@ -58,21 +58,4 @@ class week extends data
     protected static function key_fields() {
         return array("id");
     }
-
-    /**
-     * Get by week beginning.
-     */
-    public static function get_by_week($week) {
-        global $DB;
-
-        $data = $DB->get_record(static::get_table(), array(
-            'week_beginning' => $week
-        ));
-
-        if (!$data) {
-            return null;
-        }
-
-        return static::from_sql_result($data);
-    }
 }

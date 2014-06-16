@@ -62,9 +62,9 @@ $table->data = array();
 
 $deleteform = '';
 
-$records = $DB->get_records('connect_meta', null, '', 'id', $page * $perpage, $perpage);
+$records = $DB->get_recordset('connect_meta', null, '', '*', $page * $perpage, $perpage);
 foreach ($records as $record) {
-    $obj = \local_connect\meta::get($record->id);
+    $obj = \local_connect\meta::from_sql_result($record);
     $enrolments = $obj->enrolments;
 
     $course = new \html_table_cell(\html_writer::tag('a', $obj->course->shortname, array(
@@ -82,6 +82,7 @@ foreach ($records as $record) {
         $form->render()
     );
 }
+$records->close();
 
 echo \html_writer::table($table);
 

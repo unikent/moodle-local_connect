@@ -225,7 +225,7 @@ class enrolment extends data
      */
     public static function get_my_enrolments() {
         global $USER;
-        $user = user::get_by_username($USER->username);
+        $user = user::get_by('login', $USER->username);
         return self::get_for_user($user);
     }
 

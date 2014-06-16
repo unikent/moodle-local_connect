@@ -63,7 +63,7 @@ class timetabling extends data
      * Returns the date of a given occurrence.
      */
     public function occurrence_date($occurrence) {
-        $week = week::get_by_week($occurrence);
+        $week = week::get_by('week_beginning', $occurrence);
         $date = (object)date_parse($week->week_beginning_date);
 
         // Apparently strtotime magically works out what we want
