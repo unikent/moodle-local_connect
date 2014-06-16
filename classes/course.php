@@ -38,9 +38,6 @@ class course extends data
     /** Have we been locked? */
     private $_locked;
 
-    /** Set a shortname extension. */
-    private $_shortnameext;
-
     /**
      * The name of our connect table.
      */
@@ -96,13 +93,6 @@ class course extends data
     }
 
     /**
-     * Set a shortname extension.
-     */
-    public function set_shortname_extension($ext) {
-        $this->_shortnameext = $ext;
-    }
-
-    /**
      * Returns the shortname
      */
     public function _get_shortname() {
@@ -125,8 +115,8 @@ class course extends data
             }
         }
 
-        if (!empty($this->_shortnameext)) {
-            return $modulecode . " " . $this->_shortnameext;
+        if (!empty($this->shortname_ext)) {
+            return $modulecode . " " . $this->shortname_ext;
         }
 
         return $modulecode;
@@ -827,7 +817,7 @@ class course extends data
 
             // Did we specify a shortname extension?
             $shortnameext = isset($course->shortnameext) ? $course->shortnameext : "";
-            $obj->set_shortname_extension($shortnameext);
+            $obj->shortname_ext = $shortnameext;
 
             // Attempt to create in Moodle.
             if (!$obj->create_in_moodle()) {
