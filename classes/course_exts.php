@@ -22,13 +22,35 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_connect;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014061601;
-$plugin->requires  = 2013110500;
-$plugin->cron      = 0;
+/**
+ * Connect course exts container.
+ */
+class course_exts extends data
+{
+    /**
+     * The name of our connect table.
+     */
+    protected static function get_table() {
+        return 'connect_course_exts';
+    }
 
-$plugin->dependencies = array(
-    'local_catman' => 2014022600,
-    'local_hipchat' => 2014043000
-);
+    /**
+     * A list of valid fields for this data object.
+     */
+    protected final static function valid_fields() {
+        return array(
+            "id", "coursemid", "extension"
+        );
+    }
+
+    /**
+     * A list of immutable fields for this data object.
+     */
+    protected static function immutable_fields() {
+        return array("id");
+    }
+}

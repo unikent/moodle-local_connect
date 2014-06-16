@@ -625,7 +625,6 @@ function xmldb_local_connect_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014061600) {
-
         // Define field shortname_ext to be added to connect_course.
         $table = new xmldb_table('connect_course');
         $field = new xmldb_field('shortname_ext', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'category');
@@ -637,6 +636,40 @@ function xmldb_local_connect_upgrade($oldversion) {
 
         // Connect savepoint reached.
         upgrade_plugin_savepoint(true, 2014061600, 'local', 'connect');
+    }
+
+    if ($oldversion < 2014061601) {
+        // Define field shortname_ext to be dropped from connect_course.
+        $table = new xmldb_table('connect_course');
+        $field = new xmldb_field('shortname_ext');
+
+        // Conditionally launch drop field shortname_ext.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        unset($table);
+        unset($field);
+
+        // Define table connect_course_exts to be created.
+        $table = new xmldb_table('connect_course_exts');
+
+        // Adding fields to table connect_course_exts.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('coursemid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('extension', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table connect_course_exts.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('k_coursemid', XMLDB_KEY_UNIQUE, array('coursemid'));
+
+        // Conditionally launch create table for connect_course_exts.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014061601, 'local', 'connect');
     }
 
     return true;

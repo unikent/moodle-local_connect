@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="UTF-8" ?>
 <XMLDB PATH="local/connect/db" VERSION="20140616" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -220,6 +219,17 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="k_week_beginning" TYPE="unique" FIELDS="week_beginning"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="connect_course_exts" COMMENT="Shortname extensions for courses">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="coursemid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="extension" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="k_coursemid" TYPE="unique" FIELDS="coursemid"/>
       </KEYS>
     </TABLE>
   </TABLES>
