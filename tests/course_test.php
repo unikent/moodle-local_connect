@@ -237,4 +237,21 @@ class kent_course_tests extends local_connect\util\connect_testcase
         // Check that the event data is valid.
         $this->assertInstanceOf('\local_connect\event\course_created', $event);
     }
+
+    /**
+     * Test course shortname methods
+     */
+    public function test_course_shortname_ext() {
+        $this->resetAfterTest();
+
+        $courseid = $this->generate_course();
+        $course = \local_connect\course::get($courseid);
+
+        $this->assertEquals('', $course->shortname_ext);
+        $course->set_shortname_ext('TEST');
+        $this->assertEquals('TEST', $course->shortname_ext);
+
+        $course = \local_connect\course::get($courseid);
+        $this->assertEquals('TEST', $course->shortname_ext);
+    }
 }

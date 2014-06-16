@@ -129,7 +129,7 @@ class provisioning
         if (strpos($course->module_code, "WSHOP") === 0) {
             if (!$course->is_unique_shortname($course->shortname, true)) {
                 $shortnameext = "(week " . $course->module_week_beginning . ")";
-                $course->set_shortname_extension($shortnameext);
+                $course->set_shortname_ext($shortnameext);
             }
         }
 
@@ -149,7 +149,7 @@ class provisioning
                 return false;
             }
 
-            $course->set_shortname_extension($shortnameext);
+            $course->set_shortname_ext($shortnameext);
         }
 
         // Make sure we are still unique.
@@ -164,7 +164,7 @@ class provisioning
                 ));
 
                 $shortnameext = "{$shortnameext} ({$campus})";
-                $course->set_shortname_extension($shortnameext);
+                $course->set_shortname_ext($shortnameext);
             } else {
                 $this->error("Could not find suitable shortnameext for course '{$course->id}'.");
                 return false;
