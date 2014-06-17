@@ -20,7 +20,7 @@
 
 define('AJAX_SCRIPT', true);
 
-require(dirname(__FILE__) . '/../../config.php');
+require(dirname(__FILE__) . '/../../../config.php');
 
 global $PAGE, $OUTPUT, $USER;
 
