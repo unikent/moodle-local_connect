@@ -59,7 +59,7 @@ abstract class connect_testcase extends \advanced_testcase
         unset($CFG->local_connect_enable_cron);
         unset($CFG->local_connect_enable_rollover);
 
-        $SHAREDB->execute("TRUNCATE TABLE {course_list}");
+        $SHAREDB->execute("TRUNCATE TABLE {shared_courses}");
 
         // Delete the roles too.
         $DB->delete_records('role', array('shortname' => 'sds_student'));

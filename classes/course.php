@@ -116,7 +116,7 @@ class course extends data
         $modulecode = $this->module_code;
         if ($this->is_in_moodle()) {
             $courses = static::get_by('mid', $this->mid);
-            if (count($courses) > 1) {
+            if (is_array($courses)) {
                 $modulecode = array($modulecode);
                 foreach ($courses as $course) {
                     $current = $course->module_code;
@@ -226,7 +226,7 @@ class course extends data
         $campus = $this->campus->name;
         if ($this->is_in_moodle()) {
             $courses = static::get_by('mid', $this->mid);
-            if (count($courses) > 1) {
+            if (is_array($courses)) {
                 $campus = array($campus);
                 foreach ($courses as $course) {
                     $current = $course->campus->name;
