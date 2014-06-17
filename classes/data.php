@@ -263,7 +263,7 @@ abstract class data {
             return;
         }
 
-        $data = $DB->get_record(static::get_table(), array(
+        $data = $DB->get_records(static::get_table(), array(
             $field => $val
         ));
 
@@ -271,7 +271,16 @@ abstract class data {
             return null;
         }
 
-        return static::from_sql_result($data);
+        if (count($data) === 1) {
+            return static::from_sql_result(array_pop($data));
+        }
+
+        $ret = array();
+        foreach ($data as $obj) {
+            $ret[] = static::from_sql_result($obj);
+        }
+
+        return $ret;
     }
 
     /**
