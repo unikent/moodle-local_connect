@@ -37,17 +37,30 @@ class rollover {
      * @return array
      */
     public static function get_course_list($dist = '', $shortname = '') {
-        global $CFG, $SHAREDB;
-
-        $sql = 'SELECT * FROM {shared_courses} WHERE moodle_env = :current_env';
-        if ($dist !== '*') {
-            $sql .= empty($dist) ? ' AND moodle_dist != :current_dist' : ' AND moodle_dist = :current_dist';
-        }
+        global $CFG, $USER, $SHAREDB;
 
         $params = array(
             'current_env' => $CFG->kent->environment,
             'current_dist' => empty($dist) ? $CFG->kent->distribution : $dist
         );
+
+        $admin = has_capability('moodle/site:config', \context_system::instance());
+
+        $sql = 'SELECT sc.* FROM {shared_courses} sc';
+
+        if (!$admin) {
+            $sql .= ' INNER JOIN {shared_course_admins} sca
+                        ON sca.moodle_env=sc.moodle_env
+                        AND sca.moodle_dist=sc.moodle_dist
+                        AND sca.courseid=sc.moodle_id
+                        AND sca.username=:username';
+            $params['username'] = $USER->username;
+        }
+
+        $sql .= ' WHERE moodle_env = :current_env';
+        if ($dist !== '*') {
+            $sql .= empty($dist) ? ' AND moodle_dist <> :current_dist' : ' AND moodle_dist = :current_dist';
+        }
 
         if (!empty($shortname)) {
             $shortname = "%" . $shortname . "%";
