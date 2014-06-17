@@ -169,6 +169,11 @@ SQL;
             return false;
         }
 
+        // Force array.
+        if (!is_array($courses)) {
+            $courses = array($courses);
+        }
+
         // We have a valid course(s)!
         foreach ($courses as $course) {
             if ($course->is_in_moodle()) {
@@ -211,6 +216,11 @@ SQL;
             return false;
         }
 
+        // Force array.
+        if (!is_array($courses)) {
+            $courses = array($courses);
+        }
+
         // We have a valid course(s)!
         foreach ($courses as $course) {
             if ($course->is_in_moodle()) {
@@ -249,6 +259,11 @@ SQL;
         if (empty($courses)) {
             mtrace("Course does not exist in Moodle: {$mid}");
             return false;
+        }
+
+        // Force array.
+        if (!is_array($courses)) {
+            $courses = array($courses);
         }
 
         // We have a valid course!
