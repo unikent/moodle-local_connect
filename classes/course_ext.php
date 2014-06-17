@@ -27,22 +27,24 @@ namespace local_connect;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Connect week container
+ * Connect course ext container.
  */
-class week extends data
+class course_ext extends data
 {
     /**
      * The name of our connect table.
      */
     protected static function get_table() {
-        return "connect_weeks";
+        return 'connect_course_exts';
     }
 
     /**
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "week_beginning", "week_beginning_date", "week_number");
+        return array(
+            "id", "coursemid", "extension"
+        );
     }
 
     /**
@@ -53,9 +55,23 @@ class week extends data
     }
 
     /**
-     * A list of key fields for this data object.
+     * Set the extension of a course.
      */
-    protected static function key_fields() {
-        return array("id");
+    public static function set($mid, $ext) {
+        global $DB;
+
+        // Is this just an update?
+        $obj = static::get_by('coursemid', $mid);
+        if ($obj) {
+            $obj->extension = $ext;
+            $obj->save();
+            return;
+        }
+
+        // Nope, insert.
+        $DB->insert_record(static::get_table(), array(
+            'coursemid' => $mid,
+            'extension' => $ext
+        ));
     }
 }

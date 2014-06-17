@@ -161,7 +161,7 @@ SQL;
         mtrace("Synchronizing enrolments for course: '{$mid}'...");
 
         // Get the connect version of the course.
-        $courses = \local_connect\course::get_by_moodle_id($mid);
+        $courses = \local_connect\course::get_by('mid', $mid);
 
         // Validate the course.
         if (empty($courses)) {
@@ -203,7 +203,7 @@ SQL;
         mtrace("Synchronizing groups for course: '{$mid}'...");
 
         // Get the connect version of the course.
-        $courses = \local_connect\course::get_by_moodle_id($mid);
+        $courses = \local_connect\course::get_by('mid', $mid);
 
         // Validate the course.
         if (empty($courses)) {
@@ -243,7 +243,7 @@ SQL;
         mtrace("Synchronizing group enrolments for course: '{$mid}'...");
 
         // Get the connect version of the course.
-        $courses = \local_connect\course::get_by_moodle_id($mid);
+        $courses = \local_connect\course::get_by('mid', $mid);
 
         // Validate the course.
         if (empty($courses)) {

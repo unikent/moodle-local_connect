@@ -38,9 +38,6 @@ class course extends data
     /** Have we been locked? */
     private $_locked;
 
-    /** Set a shortname extension. */
-    private $_shortnameext;
-
     /**
      * The name of our connect table.
      */
@@ -95,11 +92,20 @@ class course extends data
         return $val;
     }
 
+    public function set_shortname_ext($ext) {
+        course_ext::set($this->mid, $ext);
+    }
+
     /**
-     * Set a shortname extension.
+     * Returns the shortname extension
      */
-    public function set_shortname_extension($ext) {
-        $this->_shortnameext = $ext;
+    public function _get_shortname_ext() {
+        $obj = course_ext::get_by('coursemid', $this->mid);
+        if ($obj) {
+            return $obj->extension;
+        }
+
+        return "";
     }
 
     /**
@@ -109,7 +115,7 @@ class course extends data
         // If we are a merged course, we may have more than one module_code.
         $modulecode = $this->module_code;
         if ($this->is_in_moodle()) {
-            $courses = static::get_by_moodle_id($this->mid);
+            $courses = static::get_by('mid', $this->mid);
             if (count($courses) > 1) {
                 $modulecode = array($modulecode);
                 foreach ($courses as $course) {
@@ -125,8 +131,8 @@ class course extends data
             }
         }
 
-        if (!empty($this->_shortnameext)) {
-            return $modulecode . " " . $this->_shortnameext;
+        if (!empty($this->shortname_ext)) {
+            return $modulecode . " " . $this->shortname_ext;
         }
 
         return $modulecode;
@@ -219,7 +225,7 @@ class course extends data
         // If we are a merged course, we may have more than one campus.
         $campus = $this->campus->name;
         if ($this->is_in_moodle()) {
-            $courses = static::get_by_moodle_id($this->mid);
+            $courses = static::get_by('mid', $this->mid);
             if (count($courses) > 1) {
                 $campus = array($campus);
                 foreach ($courses as $course) {
@@ -682,31 +688,6 @@ class course extends data
         return !empty($this->module_title) ? $this->shortname : $this->id;
     }
 
-    /**
-     * Get a Connect Course by Moodle ID
-     * 
-     * @param unknown $id
-     * @return unknown
-     */
-    public static function get_by_moodle_id($id) {
-        global $DB;
-
-        // Select a bunch of records.
-        $result = $DB->get_records('connect_course', array('mid' => $id));
-        if (!$result) {
-            return array();
-        }
-
-        // Decode various elements.
-        foreach ($result as &$datum) {
-            $obj = new course();
-            $obj->set_class_data($datum);
-            $datum = $obj;
-        }
-
-        return $result;
-    }
-
 
     /**
      * Get a Connect Course by Devliery Key and Session Code
@@ -826,8 +807,9 @@ class course extends data
             }
 
             // Did we specify a shortname extension?
-            $shortnameext = isset($course->shortnameext) ? $course->shortnameext : "";
-            $obj->set_shortname_extension($shortnameext);
+            if (!empty($course->shortnameext)) {
+                $obj->set_shortname_ext($course->shortnameext);
+            }
 
             // Attempt to create in Moodle.
             if (!$obj->create_in_moodle()) {
