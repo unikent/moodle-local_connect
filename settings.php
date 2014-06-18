@@ -65,13 +65,6 @@ if ($hassiteconfig) {
     ));
 
     $settings->add(new admin_setting_configcheckbox(
-        'local_connect_enable_rollover',
-        "Enable new-style rollover",
-        "Warning: Rollover may not work after checking this! SHAREDB must be enabled for this to have any hope of working.",
-        0
-    ));
-
-    $settings->add(new admin_setting_configcheckbox(
         'local_connect/strict_sync',
         'Enable stricter SDS sync',
         'Forces modules to update to SDS data, rather than letting convenors modify them Moodle-side.',

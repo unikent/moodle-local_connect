@@ -34,7 +34,6 @@ abstract class connect_testcase extends \advanced_testcase
         $CFG->local_connect_enable_new_features = true;
         $CFG->local_connect_enable_observers = true;
         $CFG->local_connect_enable_cron = true;
-        $CFG->local_connect_enable_rollover = true;
 
         // Create new campus records.
         $DB->insert_record("connect_campus", array("name" => "Canterbury"));
@@ -57,7 +56,6 @@ abstract class connect_testcase extends \advanced_testcase
         unset($CFG->local_connect_enable_new_features);
         unset($CFG->local_connect_enable_observers);
         unset($CFG->local_connect_enable_cron);
-        unset($CFG->local_connect_enable_rollover);
 
         $SHAREDB->execute("TRUNCATE TABLE {shared_courses}");
 

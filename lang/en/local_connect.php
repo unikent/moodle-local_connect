@@ -33,13 +33,6 @@ $string['accessdenied'] = 'You are not permitted to view the Departmental admini
 $string['connect_error'] = 'Unable to display deliveries';
 $string['connect_disabled'] = 'Connect has been disabled on your system.';
 
-$string['rollover_heading'] = 'Rollover Pages (BETA)';
-$string['rollover_form_heading'] = 'Course Rollover';
-$string['rollover_form_source'] = 'Rollover source: ';
-$string['rollover_form_from'] = 'Rollover from: ';
-$string['rollover_form_to'] = 'Rollover into: ';
-$string['rollover'] = 'Rollover';
-
 $string['cachedef_kent_connect'] = 'Connect Caching';
 $string['enable'] = 'Enable Connect';
 

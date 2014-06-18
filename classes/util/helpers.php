@@ -74,14 +74,6 @@ class helpers {
         return static::is_enabled() && isset($CFG->local_connect_enable_cron) && $CFG->local_connect_enable_cron;
     }
 
-    /**
-     * Enable rollover?
-     */
-    public static function enable_rollover() {
-        global $CFG;
-        return static::is_enabled() && isset($CFG->local_connect_enable_rollover) && $CFG->local_connect_enable_rollover;
-    }
-
 
     /**
      * Is this user allowed to manage courses?
