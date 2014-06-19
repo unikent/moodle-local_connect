@@ -70,6 +70,7 @@ class migrate
         self::new_groups();
         self::updated_enrolments();
         self::new_enrolments();
+        self::clean_enrolments();
         self::updated_group_enrolments();
         self::new_group_enrolments();
         self::new_weeks();
@@ -97,6 +98,7 @@ class migrate
         self::new_courses();
         self::new_groups();
         self::new_enrolments();
+        self::clean_enrolments();
         self::new_group_enrolments();
         self::new_weeks();
         self::new_rooms();
@@ -113,6 +115,7 @@ class migrate
         self::updated_courses();
         self::updated_groups();
         self::updated_enrolments();
+        self::clean_enrolments();
         self::updated_group_enrolments();
         self::updated_weeks();
         self::updated_timetabling();
@@ -126,7 +129,7 @@ class migrate
     public static function new_rules() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new rules\n";
 
@@ -147,7 +150,7 @@ class migrate
     public static function new_roles() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new roles\n";
 
@@ -171,7 +174,7 @@ class migrate
     public static function new_users() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new users\n";
 
@@ -195,7 +198,7 @@ class migrate
     public static function new_campus() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new campus\n";
 
@@ -219,7 +222,7 @@ class migrate
     public static function updated_courses() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating updated courses\n";
 
@@ -249,7 +252,7 @@ class migrate
     public static function new_courses() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new courses\n";
 
@@ -275,7 +278,7 @@ class migrate
     public static function updated_groups() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating updated groups\n";
 
@@ -299,7 +302,7 @@ class migrate
     public static function new_groups() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new groups\n";
 
@@ -323,7 +326,7 @@ class migrate
     public static function updated_enrolments() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating updated enrolments\n";
 
@@ -349,7 +352,7 @@ class migrate
     public static function new_enrolments() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new enrolments\n";
 
@@ -369,12 +372,53 @@ class migrate
     }
 
     /**
+     * Clean up Enrolments
+     */
+    public static function clean_enrolments() {
+        global $DB;
+
+        echo "Cleaning enrolments\n";
+
+        $convenor = $DB->get_field('connect_role', 'id', array(
+            'name' => 'convenor'
+        ));
+
+        $teacher = $DB->get_field('connect_role', 'id', array(
+            'name' => 'teacher'
+        ));
+
+        // Delete all teachers who are also a convenor.
+        $sql = "
+            SELECT id, courseid, userid, GROUP_CONCAT(roleid)
+            FROM {connect_enrolments}
+            WHERE roleid IN (?, ?)
+            GROUP BY courseid, userid
+            HAVING COUNT(roleid) > 1
+        ";
+
+        $objs = $DB->get_records_sql($sql, array(
+            $convenor, $teacher
+        ));
+
+        foreach ($objs as $obj) {
+            $DB->delete_records('connect_enrolments', array(
+                'courseid' => $obj->courseid,
+                'userid' => $obj->userid,
+                'roleid' => $teacher
+            ));
+        }
+
+        $count = count($objs);
+        echo "Deleted {$count} duplicate enrolments\n";
+    }
+
+    /**
      * Updated Group Enrolments
      */
     public static function updated_group_enrolments() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating updated group enrolments\n";
 
@@ -398,7 +442,7 @@ class migrate
     public static function new_group_enrolments() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new group enrolments\n";
 
@@ -470,7 +514,7 @@ class migrate
     public static function new_weeks() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new weeks\n";
 
@@ -492,7 +536,7 @@ class migrate
     public static function updated_weeks() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating updated weeks\n";
 
@@ -515,7 +559,7 @@ class migrate
     public static function new_rooms() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new rooms\n";
 
@@ -538,7 +582,7 @@ class migrate
     public static function new_timetabling_types() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new timetabling types\n";
 
@@ -561,7 +605,7 @@ class migrate
     public static function new_timetabling() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Migrating new timetabling information\n";
 
@@ -614,7 +658,7 @@ class migrate
     public static function updated_timetabling() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Updating timetabling information\n";
 
@@ -811,7 +855,7 @@ class migrate
     private static function cleanup_timetabling() {
         global $DB, $CFG;
 
-        $connectdb = $CFG->sharedb->db["name"];
+        $connectdb = $CFG->kent->sharedb["name"];
 
         echo "Tidying up timetabling information\n";
 
