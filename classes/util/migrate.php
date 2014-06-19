@@ -70,6 +70,7 @@ class migrate
         self::new_groups();
         self::updated_enrolments();
         self::new_enrolments();
+        self::clean_enrolments();
         self::updated_group_enrolments();
         self::new_group_enrolments();
         self::new_weeks();
@@ -97,6 +98,7 @@ class migrate
         self::new_courses();
         self::new_groups();
         self::new_enrolments();
+        self::clean_enrolments();
         self::new_group_enrolments();
         self::new_weeks();
         self::new_rooms();
@@ -113,6 +115,7 @@ class migrate
         self::updated_courses();
         self::updated_groups();
         self::updated_enrolments();
+        self::clean_enrolments();
         self::updated_group_enrolments();
         self::updated_weeks();
         self::updated_timetabling();
@@ -366,6 +369,47 @@ class migrate
         return $DB->execute($sql, array(
             "session_code" => $CFG->connect->session_code
         ));
+    }
+
+    /**
+     * Clean up Enrolments
+     */
+    public static function clean_enrolments() {
+        global $DB;
+
+        echo "Cleaning enrolments\n";
+
+        $convenor = $DB->get_field('connect_role', 'id', array(
+            'name' => 'convenor'
+        ));
+
+        $teacher = $DB->get_field('connect_role', 'id', array(
+            'name' => 'teacher'
+        ));
+
+        // Delete all teachers who are also a convenor.
+        $sql = "
+            SELECT id, courseid, userid, GROUP_CONCAT(roleid)
+            FROM {connect_enrolments}
+            WHERE roleid IN (?, ?)
+            GROUP BY courseid, userid
+            HAVING COUNT(roleid) > 1
+        ";
+
+        $objs = $DB->get_records_sql($sql, array(
+            $convenor, $teacher
+        ));
+
+        foreach ($objs as $obj) {
+            $DB->delete_record('connect_enrolments', array(
+                'courseid' => $obj->courseid,
+                'userid' => $obj->userid,
+                'roleid' => $teacher
+            ));
+        }
+
+        $count = count($objs);
+        echo "Deleted {$count} duplicate enrolments\n";
     }
 
     /**
