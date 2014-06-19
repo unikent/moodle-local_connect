@@ -401,7 +401,7 @@ class migrate
         ));
 
         foreach ($objs as $obj) {
-            $DB->delete_record('connect_enrolments', array(
+            $DB->delete_records('connect_enrolments', array(
                 'courseid' => $obj->courseid,
                 'userid' => $obj->userid,
                 'roleid' => $teacher
