@@ -72,7 +72,9 @@ class course extends data
      * @return boolean
      */
     public function save() {
-        course_ext::set($this->mid, $this->_shortname_extension);
+        if (!empty($this->mid) && !empty($this->_shortname_extension)) {
+            course_ext::set($this->mid, $this->_shortname_extension);
+        }
 
         return parent::save();
     }
