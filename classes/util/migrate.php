@@ -389,7 +389,7 @@ class migrate
 
         // Delete all teachers who are also a convenor.
         $sql = "
-            SELECT id, courseid, userid, GROUP_CONCAT(roleid)
+            SELECT id, courseid, userid
             FROM {connect_enrolments}
             WHERE roleid IN (?, ?)
             GROUP BY courseid, userid
