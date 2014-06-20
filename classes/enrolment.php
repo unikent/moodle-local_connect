@@ -96,7 +96,7 @@ class enrolment extends data
                 $this->create_in_moodle();
             }
 
-            return self::STATUS_CREATE;
+            return self::STATUS_MODIFY;
         }
 
         return self::STATUS_NONE;
