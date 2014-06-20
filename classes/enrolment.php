@@ -26,6 +26,8 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir . "/accesslib.php");
+
 /**
  * Connect enrolment container
  */
@@ -87,6 +89,16 @@ class enrolment extends data
             return self::STATUS_CREATE;
         }
 
+        // Do we have the correct role id?
+        if (!$this->is_in_moodle_precise()) {
+            if (!$dry) {
+                $this->delete();
+                $this->create_in_moodle();
+            }
+
+            return self::STATUS_CREATE;
+        }
+
         return self::STATUS_NONE;
     }
 
@@ -126,9 +138,6 @@ class enrolment extends data
      * Check to see if a user is enrolled on this module in Moodle
      */
     public function is_in_moodle() {
-        global $CFG;
-        require_once($CFG->libdir . "/accesslib.php");
-
         $this->reset_object_cache();
 
         if (!$this->course->is_in_moodle()) {
@@ -144,7 +153,28 @@ class enrolment extends data
         }
 
         // Check enrolment status.
-        return is_enrolled($context, $this->user->mid);// && user_has_role_assignment($this->user->mid, $this->role->mid, $context->id);
+        return is_enrolled($context, $this->user->mid);
+    }
+
+    /**
+     * Check to see if a user is enrolled on this module in Moodle
+     * also checks they have the correct role.
+     */
+    public function is_in_moodle_precise() {
+        if (!$this->is_in_moodle()) {
+            return false;
+        }
+
+        // Get course context.
+        $context = \context_course::instance($this->course->mid, IGNORE_MISSING);
+        if ($context === false) {
+            // The course doesnt exist... it should!..
+            // TODO - fire event on the course to reset mid.
+            return false;
+        }
+
+        // Check enrolment status.
+        return user_has_role_assignment($this->user->mid, $this->role->mid, $context->id);
     }
 
     /**
