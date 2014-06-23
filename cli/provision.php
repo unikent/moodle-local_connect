@@ -28,12 +28,6 @@ define('CLI_SCRIPT', true);
 require(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
-list($options, $unrecognized) = cli_get_params(
-    array(
-        'dry' => false
-    )
-);
-
 $username = exec('logname');
 $user = $DB->get_record('user', array(
     'username' => $username

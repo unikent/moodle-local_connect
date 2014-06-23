@@ -34,6 +34,8 @@ list($options, $unrecognized) = cli_get_params(
     )
 );
 
+cli_error("This script is not yet supported.");
+
 raise_memory_limit(MEMORY_HUGE);
 
 echo "Beginning Connect Sync...\n";

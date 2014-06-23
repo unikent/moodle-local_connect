@@ -38,6 +38,9 @@ class course extends data
     /** Have we been locked? */
     private $_locked;
 
+    /** Shortname Extension Cache */
+    private $_shortname_extension;
+
     /**
      * The name of our connect table.
      */
@@ -61,6 +64,19 @@ class course extends data
      */
     protected static function immutable_fields() {
         return array("id", "module_delivery_key", "session_code");
+    }
+
+    /**
+     * Save to the Connect database
+     * 
+     * @return boolean
+     */
+    public function save() {
+        if (!empty($this->mid) && !empty($this->_shortname_extension)) {
+            course_ext::set($this->mid, $this->_shortname_extension);
+        }
+
+        return parent::save();
     }
 
     /**
@@ -93,19 +109,23 @@ class course extends data
     }
 
     public function set_shortname_ext($ext) {
-        course_ext::set($this->mid, $ext);
+        $this->_shortname_extension = $ext;
     }
 
     /**
      * Returns the shortname extension
      */
     public function _get_shortname_ext() {
-        $obj = course_ext::get_by('coursemid', $this->mid);
-        if ($obj) {
-            return $obj->extension;
+        if (!isset($this->_shortname_extension)) {
+            $obj = course_ext::get_by('coursemid', $this->mid);
+            if ($obj) {
+                $this->_shortname_extension = $obj->extension;
+            } else {
+                $this->_shortname_extension = "";
+            }
         }
 
-        return "";
+        return $this->_shortname_extension;
     }
 
     /**
@@ -189,7 +209,7 @@ class course extends data
      * Get enrollments for this Course
      */
     public function _get_enrolments() {
-        return enrolment::get_for_course($this);
+        return enrolment::get_by("courseid", $this->id, true);
     }
 
     /**
@@ -203,7 +223,7 @@ class course extends data
      * Get groups for this Course
      */
     public function _get_groups() {
-        return group::get_for_course($this);
+        return group::get_by("courseid", $this->id, true);
     }
 
     /**
@@ -809,6 +829,7 @@ class course extends data
             // Did we specify a shortname extension?
             if (!empty($course->shortnameext)) {
                 $obj->set_shortname_ext($course->shortnameext);
+                $obj->save();
             }
 
             // Attempt to create in Moodle.

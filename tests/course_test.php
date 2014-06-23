@@ -246,9 +246,11 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         $courseid = $this->generate_course();
         $course = \local_connect\course::get($courseid);
+        $this->assertTrue($course->create_in_moodle());
 
         $this->assertEquals('', $course->shortname_ext);
         $course->set_shortname_ext('TEST');
+        $course->save();
         $this->assertEquals('TEST', $course->shortname_ext);
 
         $course = \local_connect\course::get($courseid);

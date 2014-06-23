@@ -106,23 +106,4 @@ class timetabling extends data
         $date = $this->occurrence_date($occurrence);
         return strtotime("{$this->ends} GMT", $date);
     }
-
-    /**
-     * Get all events for a course.
-     */
-    public static function get_for_course($course) {
-        global $DB;
-
-        $objs = $DB->get_records('connect_timetabling', array(
-            'courseid' => $course->id
-        ));
-
-        foreach ($objs as &$data) {
-            $obj = new static();
-            $obj->set_class_data($data);
-            $data = $obj;
-        }
-
-        return $objs;
-    }
 }

@@ -26,6 +26,8 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir . "/accesslib.php");
+
 /**
  * Connect enrolment container
  */
@@ -67,7 +69,7 @@ class enrolment extends data
 
         // Should we be deleting this?
         if ($this->deleted) {
-            if ($this->is_in_moodle()) {
+            if ($this->is_in_moodle_precise() && $this->delete_check()) {
                 if (!$dry) {
                     $this->delete();
                 }
@@ -87,7 +89,37 @@ class enrolment extends data
             return self::STATUS_CREATE;
         }
 
+        // Do we have the correct role id?
+        if (!$this->is_in_moodle_precise()) {
+            if (!$dry) {
+                $this->delete();
+                $this->create_in_moodle();
+            }
+
+            return self::STATUS_MODIFY;
+        }
+
         return self::STATUS_NONE;
+    }
+
+    /**
+     * Ensure we should be deleting this enrolment.
+     * This basically says "Okay, so I am deleted, but are there any other
+     * enrolments for this mid that are not?"
+     *
+     * @return boolean True if it is okay to delete this, false if not.
+     */
+    public function delete_check() {
+        global $DB;
+
+        $enrolments = self::get_by_course_mid($this->course->mid, $this->userid);
+        foreach ($enrolments as $enrolment) {
+            if ($enrolment->deleted == 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -126,9 +158,6 @@ class enrolment extends data
      * Check to see if a user is enrolled on this module in Moodle
      */
     public function is_in_moodle() {
-        global $CFG;
-        require_once($CFG->libdir . "/accesslib.php");
-
         $this->reset_object_cache();
 
         if (!$this->course->is_in_moodle()) {
@@ -144,7 +173,28 @@ class enrolment extends data
         }
 
         // Check enrolment status.
-        return is_enrolled($context, $this->user->mid);// && user_has_role_assignment($this->user->mid, $this->role->mid, $context->id);
+        return is_enrolled($context, $this->user->mid);
+    }
+
+    /**
+     * Check to see if a user is enrolled on this module in Moodle
+     * also checks they have the correct role.
+     */
+    public function is_in_moodle_precise() {
+        if (!$this->is_in_moodle()) {
+            return false;
+        }
+
+        // Get course context.
+        $context = \context_course::instance($this->course->mid, IGNORE_MISSING);
+        if ($context === false) {
+            // The course doesnt exist... it should!..
+            // TODO - fire event on the course to reset mid.
+            return false;
+        }
+
+        // Check enrolment status.
+        return user_has_role_assignment($this->user->mid, $this->role->mid, $context->id);
     }
 
     /**
@@ -192,21 +242,31 @@ class enrolment extends data
     }
 
     /**
-     * Returns all enrolments for a given user
+     * Returns all enrolments for a given course MID.
      * 
-     * @param  string $user A user
      * @return array(local_connect_enrolment) Enrolment objects
      */
-    public static function get_for_user($user) {
+    public static function get_by_course_mid($mid, $userid = null) {
         global $DB;
 
-        if (!isset($user->id)) {
-            return array();
+        $sql = <<<SQL
+            SELECT ce.*
+            FROM {connect_enrolments} ce
+            INNER JOIN {connect_course} c ON c.id=ce.courseid
+            INNER JOIN {connect_user} cu ON cu.id=ce.userid
+            WHERE c.mid = :mid
+SQL;
+
+        $params = array(
+            "mid" => $mid
+        );
+
+        if ($userid !== null) {
+            $sql .= " AND cu.id=:userid";
+            $params["userid"] = $userid;
         }
 
-        $objs = $DB->get_records('connect_enrolments', array(
-            'userid' => $user->id
-        ));
+        $objs = $DB->get_records_sql($sql, $params);
 
         foreach ($objs as &$obj) {
             $enrolment = new enrolment();
@@ -225,30 +285,9 @@ class enrolment extends data
      */
     public static function get_my_enrolments() {
         global $USER;
-        $user = user::get_by('login', $USER->username);
-        return self::get_for_user($user);
-    }
 
-    /**
-     * Returns all enrolments for a given course
-     * 
-     * @param  local_connect_course $course A course
-     * @return local_connect_enrolment Enrolment object
-     */
-    public static function get_for_course($course) {
-        global $DB;
-
-        $objs = $DB->get_records('connect_enrolments', array(
-            'courseid' => $course->id
-        ));
-
-        foreach ($objs as &$obj) {
-            $enrolment = new enrolment();
-            $enrolment->set_class_data($obj);
-            $obj = $enrolment;
-        }
-
-        return $objs;
+        $obj = user::get_by('login', $USER->username);
+        return self::get_by("userid", $obj->id, true);
     }
 
     /**
@@ -268,28 +307,6 @@ SQL;
 
         $objs = $DB->get_records_sql($sql, array(
             'category' => $category->id
-        ));
-
-        foreach ($objs as &$obj) {
-            $enrolment = new enrolment();
-            $enrolment->set_class_data($obj);
-            $obj = $enrolment;
-        }
-
-        return $objs;
-    }
-
-    /**
-     * Returns all enrolments for a given role
-     * 
-     * @param  local_connect_role $role A role
-     * @return local_connect_enrolment Enrolment object
-     */
-    public static function get_for_role($role) {
-        global $DB;
-
-        $objs = $DB->get_records('connect_enrolments', array(
-            'roleid' => $role->id
         ));
 
         foreach ($objs as &$obj) {

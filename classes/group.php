@@ -65,7 +65,7 @@ class group extends data
      * Get enrollments for this Group
      */
     public function _get_enrolments() {
-        return group_enrolment::get_for_group($this);
+        return group_enrolment::get_by("groupid", $this->id, true);
     }
 
     /**
@@ -317,29 +317,5 @@ class group extends data
      */
     public function count_staff() {
         return $this->count_all() - $this->count_students();
-    }
-
-
-    /**
-     * Returns all known groups for a given course.
-     * @param unknown $course
-     * @return unknown
-     */
-    public static function get_for_course($course) {
-        global $DB;
-
-        // Select all our groups.
-        $data = $DB->get_records('connect_group', array(
-            'courseid' => $course->id
-        ));
-
-        // Map to objects.
-        foreach ($data as &$group) {
-            $obj = new group();
-            $obj->set_class_data($group);
-            $group = $obj;
-        }
-
-        return $data;
     }
 }
