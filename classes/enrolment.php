@@ -242,32 +242,6 @@ class enrolment extends data
     }
 
     /**
-     * Returns all enrolments for a given user
-     * 
-     * @param  string $user A user
-     * @return array(local_connect_enrolment) Enrolment objects
-     */
-    public static function get_for_user($user) {
-        global $DB;
-
-        if (!isset($user->id)) {
-            return array();
-        }
-
-        $objs = $DB->get_records('connect_enrolments', array(
-            'userid' => $user->id
-        ));
-
-        foreach ($objs as &$obj) {
-            $enrolment = new enrolment();
-            $enrolment->set_class_data($obj);
-            $obj = $enrolment;
-        }
-
-        return $objs;
-    }
-
-    /**
      * Returns all enrolments for a given course MID.
      * 
      * @return array(local_connect_enrolment) Enrolment objects
@@ -311,30 +285,9 @@ SQL;
      */
     public static function get_my_enrolments() {
         global $USER;
-        $user = user::get_by('login', $USER->username);
-        return self::get_for_user($user);
-    }
 
-    /**
-     * Returns all enrolments for a given course
-     * 
-     * @param  local_connect_course $course A course
-     * @return local_connect_enrolment Enrolment object
-     */
-    public static function get_for_course($course) {
-        global $DB;
-
-        $objs = $DB->get_records('connect_enrolments', array(
-            'courseid' => $course->id
-        ));
-
-        foreach ($objs as &$obj) {
-            $enrolment = new enrolment();
-            $enrolment->set_class_data($obj);
-            $obj = $enrolment;
-        }
-
-        return $objs;
+        $obj = user::get_by('login', $USER->username);
+        return self::get_by("userid", $obj->id);
     }
 
     /**
@@ -354,28 +307,6 @@ SQL;
 
         $objs = $DB->get_records_sql($sql, array(
             'category' => $category->id
-        ));
-
-        foreach ($objs as &$obj) {
-            $enrolment = new enrolment();
-            $enrolment->set_class_data($obj);
-            $obj = $enrolment;
-        }
-
-        return $objs;
-    }
-
-    /**
-     * Returns all enrolments for a given role
-     * 
-     * @param  local_connect_role $role A role
-     * @return local_connect_enrolment Enrolment object
-     */
-    public static function get_for_role($role) {
-        global $DB;
-
-        $objs = $DB->get_records('connect_enrolments', array(
-            'roleid' => $role->id
         ));
 
         foreach ($objs as &$obj) {

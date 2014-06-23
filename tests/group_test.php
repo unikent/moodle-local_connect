@@ -59,11 +59,11 @@ class kent_group_tests extends local_connect\util\connect_testcase
 		$this->generate_groups(20, $course2->id);
 
 		// Test the course count.
-		$groups = \local_connect\group::get_for_course($course);
+		$groups = \local_connect\group::get_by("courseid", $course->id);
 		$this->assertEquals(21, count($groups));
 
 		// Test the course count.
-		$groups = \local_connect\group::get_for_course($course2);
+		$groups = \local_connect\group::get_by("courseid", $course2->id);
 		$this->assertEquals(20, count($groups));
 
 	}

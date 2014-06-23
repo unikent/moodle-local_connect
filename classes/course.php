@@ -209,7 +209,7 @@ class course extends data
      * Get enrollments for this Course
      */
     public function _get_enrolments() {
-        return enrolment::get_for_course($this);
+        return enrolment::get_by("courseid", $this->id);
     }
 
     /**
@@ -223,7 +223,7 @@ class course extends data
      * Get groups for this Course
      */
     public function _get_groups() {
-        return group::get_for_course($this);
+        return group::get_by("courseid", $this->id);
     }
 
     /**

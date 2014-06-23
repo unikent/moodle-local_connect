@@ -204,27 +204,6 @@ class group_enrolment extends data
     }
 
     /**
-     * Returns all known group enrollments for a given group.
-     * @param unknown $group
-     * @return unknown
-     */
-    public static function get_for_group($group) {
-        global $DB;
-
-        $set = $DB->get_records('connect_group_enrolments', array(
-            'groupid' => $group->id
-        ));
-
-        foreach ($set as &$o) {
-            $obj = new group_enrolment();
-            $obj->set_class_data($o);
-            $o = $obj;
-        }
-
-        return $set;
-    }
-
-    /**
      * Returns all group enrolments for a given course
      * 
      * @param  local_connect_course $course A course
@@ -240,25 +219,6 @@ class group_enrolment extends data
 
         $set = $DB->get_records_sql($sql, array(
             'courseid' => $course->id
-        ));
-
-        foreach ($set as &$o) {
-            $obj = new group_enrolment();
-            $obj->set_class_data($o);
-            $o = $obj;
-        }
-
-        return $set;
-    }
-
-    /**
-     * Returns all group enrolments for a given user.
-     */
-    public static function get_for_user($user) {
-        global $DB;
-
-        $set = $DB->get_records('connect_group_enrolments', array(
-            'userid' => $user->id
         ));
 
         foreach ($set as &$o) {
