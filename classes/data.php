@@ -255,7 +255,7 @@ abstract class data {
     /**
      * Get an object by a specified field.
      */
-    public static function get_by($field, $val) {
+    public static function get_by($field, $val, $forcearray = false) {
         global $DB;
 
         if (!in_array($field, static::valid_fields())) {
@@ -267,11 +267,11 @@ abstract class data {
             $field => $val
         ));
 
-        if (!$data) {
-            return null;
-        }
+        if (!$forcearray && count($data) === 1) {
+            if (!$data) {
+                return null;
+            }
 
-        if (count($data) === 1) {
             return static::from_sql_result(array_pop($data));
         }
 
