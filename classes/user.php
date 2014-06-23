@@ -63,14 +63,14 @@ class user extends data
      * Returns all enrolments for this user.
      */
     public function _get_enrolments() {
-        return enrolment::get_by("userid", $this->id);
+        return enrolment::get_by("userid", $this->id, true);
     }
 
     /**
      * Returns all group enrolments for this user.
      */
     public function _get_group_enrolments() {
-        return group_enrolment::get_by("userid", $this->id);
+        return group_enrolment::get_by("userid", $this->id, true);
     }
 
     /**

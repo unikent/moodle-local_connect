@@ -73,7 +73,7 @@ class role extends data
      * Get all enrollments for this role
      */
     public function _get_enrolments() {
-        return enrolment::get_by("roleid", $this->id);
+        return enrolment::get_by("roleid", $this->id, true);
     }
 
     /**

@@ -83,11 +83,11 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 		$this->assertEquals(2, count($enrolments));
 
 		// Make sure it worked.
-		$enrolments = \local_connect\enrolment::get_by("courseid", $course->id);
+		$enrolments = \local_connect\enrolment::get_by("courseid", $course->id, true);
 		$this->assertEquals(1, count($enrolments));
 
 		// Make sure it worked (2).
-		$enrolments = \local_connect\enrolment::get_by("courseid", $course2->id);
+		$enrolments = \local_connect\enrolment::get_by("courseid", $course2->id, true);
 		$this->assertEquals(1, count($enrolments));
 
 	}
@@ -123,7 +123,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 
 		// Make sure it worked.
 		$user = $enrolment->user;
-		$enrolments = \local_connect\enrolment::get_by("userid", $user->id);
+		$enrolments = \local_connect\enrolment::get_by("userid", $user->id, true);
 		$this->assertEquals(1, count($enrolments));
 
 	}
@@ -249,7 +249,7 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 
 		$this->resetAfterTest();
 
-		$this->assertEquals(0, count(\local_connect\enrolment::get_by("userid", null->id)));
+		$this->assertEquals(0, count(\local_connect\enrolment::get_by("userid", null, true)));
 
 	}
 

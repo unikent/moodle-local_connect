@@ -161,17 +161,12 @@ SQL;
         mtrace("Synchronizing enrolments for course: '{$mid}'...");
 
         // Get the connect version of the course.
-        $courses = \local_connect\course::get_by('mid', $mid);
+        $courses = \local_connect\course::get_by('mid', $mid, true);
 
         // Validate the course.
         if (empty($courses)) {
             mtrace("Course does not exist in Moodle: {$mid}");
             return false;
-        }
-
-        // Force array.
-        if (!is_array($courses)) {
-            $courses = array($courses);
         }
 
         // We have a valid course(s)!
@@ -208,17 +203,12 @@ SQL;
         mtrace("Synchronizing groups for course: '{$mid}'...");
 
         // Get the connect version of the course.
-        $courses = \local_connect\course::get_by('mid', $mid);
+        $courses = \local_connect\course::get_by('mid', $mid, true);
 
         // Validate the course.
         if (empty($courses)) {
             mtrace("Course does not exist in Moodle: {$mid}");
             return false;
-        }
-
-        // Force array.
-        if (!is_array($courses)) {
-            $courses = array($courses);
         }
 
         // We have a valid course(s)!
@@ -253,17 +243,12 @@ SQL;
         mtrace("Synchronizing group enrolments for course: '{$mid}'...");
 
         // Get the connect version of the course.
-        $courses = \local_connect\course::get_by('mid', $mid);
+        $courses = \local_connect\course::get_by('mid', $mid, true);
 
         // Validate the course.
         if (empty($courses)) {
             mtrace("Course does not exist in Moodle: {$mid}");
             return false;
-        }
-
-        // Force array.
-        if (!is_array($courses)) {
-            $courses = array($courses);
         }
 
         // We have a valid course!

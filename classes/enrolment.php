@@ -287,7 +287,7 @@ SQL;
         global $USER;
 
         $obj = user::get_by('login', $USER->username);
-        return self::get_by("userid", $obj->id);
+        return self::get_by("userid", $obj->id, true);
     }
 
     /**

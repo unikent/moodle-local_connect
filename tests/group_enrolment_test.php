@@ -55,10 +55,10 @@ class kent_group_enrolment_tests extends local_connect\util\connect_testcase
 
 		// Test the group counter.
 		$obj = \local_connect\group::get($group);
-		$enrolments = \local_connect\group_enrolment::get_by("groupid", $obj->id);
+		$enrolments = \local_connect\group_enrolment::get_by("groupid", $obj->id, true);
 		$this->assertEquals(32, count($enrolments));
 		$obj = \local_connect\group::get($group2);
-		$enrolments = \local_connect\group_enrolment::get_by("groupid", $obj->id);
+		$enrolments = \local_connect\group_enrolment::get_by("groupid", $obj->id, true);
 		$this->assertEquals(21, count($enrolments));
 	}
 

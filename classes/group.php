@@ -65,7 +65,7 @@ class group extends data
      * Get enrollments for this Group
      */
     public function _get_enrolments() {
-        return group_enrolment::get_by("groupid", $this->id);
+        return group_enrolment::get_by("groupid", $this->id, true);
     }
 
     /**

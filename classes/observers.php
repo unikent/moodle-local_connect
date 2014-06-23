@@ -104,13 +104,13 @@ class observers
         // TODO - make this a "task" in 2.7.
 
         // Sync Enrollments.
-        $enrolments = enrolment::get_by("userid", $user->id);
+        $enrolments = enrolment::get_by("userid", $user->id, true);
         foreach ($enrolments as $enrolment) {
             $enrolment->create_in_moodle();
         }
 
         // Sync Group Enrollments.
-        $enrolments = group_enrolment::get_by("userid", $user->id);
+        $enrolments = group_enrolment::get_by("userid", $user->id, true);
         foreach ($enrolments as $enrolment) {
             $enrolment->create_in_moodle();
         }
