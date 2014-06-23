@@ -69,7 +69,7 @@ class enrolment extends data
 
         // Should we be deleting this?
         if ($this->deleted) {
-            if ($this->is_in_moodle()) {
+            if ($this->is_in_moodle_precise() && $this->delete_check()) {
                 if (!$dry) {
                     $this->delete();
                 }
@@ -100,6 +100,26 @@ class enrolment extends data
         }
 
         return self::STATUS_NONE;
+    }
+
+    /**
+     * Ensure we should be deleting this enrolment.
+     * This basically says "Okay, so I am deleted, but are there any other
+     * enrolments for this mid that are not?"
+     *
+     * @return boolean True if it is okay to delete this, false if not.
+     */
+    public function delete_check() {
+        global $DB;
+
+        $enrolments = self::get_by_course_mid($this->course->mid, $this->userid);
+        foreach ($enrolments as $enrolment) {
+            if ($enrolment->deleted == 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -237,6 +257,42 @@ class enrolment extends data
         $objs = $DB->get_records('connect_enrolments', array(
             'userid' => $user->id
         ));
+
+        foreach ($objs as &$obj) {
+            $enrolment = new enrolment();
+            $enrolment->set_class_data($obj);
+            $obj = $enrolment;
+        }
+
+        return $objs;
+    }
+
+    /**
+     * Returns all enrolments for a given course MID.
+     * 
+     * @return array(local_connect_enrolment) Enrolment objects
+     */
+    public static function get_by_course_mid($mid, $userid = null) {
+        global $DB;
+
+        $sql = <<<SQL
+            SELECT ce.*
+            FROM {connect_enrolments} ce
+            INNER JOIN {connect_course} c ON c.id=ce.courseid
+            INNER JOIN {connect_user} cu ON cu.id=ce.userid
+            WHERE c.mid = :mid
+SQL;
+
+        $params = array(
+            "mid" => $mid
+        );
+
+        if ($userid !== null) {
+            $sql .= " AND cu.id=:userid";
+            $params["userid"] = $userid;
+        }
+
+        $objs = $DB->get_records_sql($sql, $params);
 
         foreach ($objs as &$obj) {
             $enrolment = new enrolment();
