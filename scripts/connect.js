@@ -269,15 +269,11 @@ var Connect = (function() {
 			sOut += '<th>Campus</th>';
 			sOut += '<th>Duration</th>';
 			sOut += '<th>Version</th>';
-			sOut += '<th>Department</th>';
-			sOut += '<th></th>';
+			sOut += '<th>Action</th>';
 			sOut += '</tr>';
 
 			$.each(row.children, function(i) {
 				var child = row.children[i];
-				if (window.enableConnectAdvanced) {
-	        		child = _this.json[child];
-	        	}
 				var end = parseInt(child.module_week_beginning, 10) + parseInt(child.module_length, 10) - 1;
 				var duration = child.module_week_beginning + ( isNaN(end) ? '' : '-' + end );
 				sOut += '<tr ident="'+ child.id +'">';
@@ -286,10 +282,9 @@ var Connect = (function() {
 									+ '">' + child.module_code
 									+ '</div></td>';
 				sOut += '<td class="name">'+ child.module_title +'</td>';
-				sOut += '<td class="campus">' + child.campus_desc +'</td>';
+				sOut += '<td class="campus">' + child.campus +'</td>';
 				sOut += '<td class="duration">'+ duration +'</td>';
 				sOut += '<td class="version">'+ child.module_version +'</td>';
-				sOut += '<td class="department">'+ child.delivery_department +'</td>';
 				if(row.children.length > 1) {
 					sOut += '<td class="toolbar"><div class="unlink_child"></div></td>';
 				} else {
@@ -776,7 +771,7 @@ var Connect = (function() {
 				return row;
 			}
 		}).sortBy(function(row) {
-			return [row.module_week_beginning, row.campus_desc, row.module_code];
+			return [row.module_week_beginning, row.campus, row.module_code];
 		}).value();
 
 		//Setting up our vars which control data to be sent and appears in form
@@ -1072,7 +1067,6 @@ var Connect = (function() {
 					$(children).find('tr[ident='+id+'] .campus').text(),
 					$(children).find('tr[ident='+id+'] .duration').text(),
 					$(children).find('tr[ident='+id+'] .version').text(),
-					$(children).find('tr[ident='+id+'] .department').text(),
 					' '
 				];
 				_this.oTable.fnAddData(data);

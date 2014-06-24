@@ -184,10 +184,26 @@ class course extends data
      * Get the name of the campus.
      */
     public function _get_campus_name() {
-        global $DB;
-        return $DB->get_field('connect_campus', 'name', array(
-            'id' => $this->campusid
-        ));
+        // If we are a merged course, we may have more than one campus.
+        $campus = $this->campus->name;
+        if ($this->is_in_moodle()) {
+            $courses = static::get_by('mid', $this->mid);
+            if (is_array($courses)) {
+                $campus = array($campus);
+                foreach ($courses as $course) {
+                    $current = $course->campus->name;
+                    if (!in_array($current, $campus)) {
+                        $campus[] = $current;
+                    }
+                }
+
+                // Sort and implode.
+                sort($campus);
+                $campus = implode('/', $campus);
+            }
+        }
+
+        return $campus;
     }
 
     /**
@@ -243,23 +259,7 @@ class course extends data
         }
 
         // If we are a merged course, we may have more than one campus.
-        $campus = $this->campus->name;
-        if ($this->is_in_moodle()) {
-            $courses = static::get_by('mid', $this->mid);
-            if (is_array($courses)) {
-                $campus = array($campus);
-                foreach ($courses as $course) {
-                    $current = $course->campus->name;
-                    if (!in_array($current, $campus)) {
-                        $campus[] = $current;
-                    }
-                }
-
-                // Sort and implode.
-                sort($campus);
-                $campus = implode('/', $campus);
-            }
-        }
+        $campus = $this->campus_name;
 
         $text = '<div class="synopsistext">' . strip_tags($text) . '</div>';
         $text .= "&nbsp;<p style='margin-top:10px' class='module_summary_extra_info'>";
@@ -440,7 +440,7 @@ class course extends data
         ));
 
         // Add the reading list module to our course if it is based in Canterbury.
-        if ($this->campus_name === 'Canterbury') {
+        if ($this->campus->name === 'Canterbury') {
             $this->create_reading_list();
         }
 

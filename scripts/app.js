@@ -44,7 +44,7 @@ function connect_load(yui, cats) {
 	}
 
 	$.ajax({
-			url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/',
+			url: M.cfg.wwwroot + '/local/connect/ajax/courses.php',
 			type: 'GET',
 			data: data,
 			dataType: 'json',

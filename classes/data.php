@@ -77,7 +77,7 @@ abstract class data {
     /**
      * Get all of our data as an object
      */
-    protected final function get_data() {
+    public final function get_data() {
         return (object)$this->_data;
     }
 
