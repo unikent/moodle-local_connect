@@ -80,9 +80,11 @@ class provisioning
      */
     private function has_enrolments($course) {
         global $DB;
+
         return $DB->count_records('connect_enrolments', array(
-            "courseid" => $course->id
-        ));
+            "courseid" => $course->id,
+            "deleted" => 0
+        )) > 0;
     }
 
     /**
@@ -206,7 +208,14 @@ class provisioning
 
         foreach ($matches as $match) {
             if ($match->mid > 0) {
-                if ($match->campusid === $canterbury || $match->campusid === $medway) {
+                if ($course->campusid === $canterbury || $course->campusid === $medway) {
+                    if ($match->campusid === $canterbury || $match->campusid === $medway) {
+                        // We have a match!
+                        return $match;
+                    }
+                }
+
+                if ($match->campusid === $course->campusid) {
                     // We have a match!
                     return $match;
                 }
