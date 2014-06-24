@@ -45,6 +45,9 @@ class provisioning
      */
     public function go($dry = false) {
         $this->dry = $dry === true;
+        if ($this->dry) {
+            echo "Running in dry mode.\n";
+        }
 
         // First, we grab a list of courses.
         echo "Building Modules...\n";

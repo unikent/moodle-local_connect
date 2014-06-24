@@ -43,6 +43,7 @@ $user = $DB->get_record('user', array(
 
 if ($user) {
     \core\session\manager::set_user($user);
+    echo "Hello {$user->firstname}.\n";
 }
 
 $provisioning = new \local_connect\util\provisioning();
