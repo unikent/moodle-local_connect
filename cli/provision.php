@@ -47,4 +47,4 @@ if ($user) {
 }
 
 $provisioning = new \local_connect\util\provisioning();
-$provisioning->go($options['dry']);
+$provisioning->go($options['dry'] == true);
