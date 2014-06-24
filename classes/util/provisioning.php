@@ -42,22 +42,28 @@ class provisioning
      */
     public function go() {
         // First, we grab a list of courses.
+        echo "Building Modules...\n";
         $this->build_modules();
 
         // Then, we grab a list of mergers from last year.
+        echo "Building Matches...\n";
         $this->build_matches();
 
         // Find matches between the module and merger list.
+        echo "Generating Match List...\n";
         $matches = $this->match_mergers();
 
         // Create it if we can.
+        echo "Processing Match List...\n";
         $this->handle_mergers($matches);
 
         // Right. Now. What's left?
         // We want to start by grabbing everything with a unique shortcode and creating it.
+        echo "Processing Unique Modules...\n";
         $this->handle_unique();
 
         // Right. Now. What's left? #2.
+        echo "Processing Potential Mergers...\n";
         $this->handle_remaining_mergers();
     }
 
@@ -123,19 +129,19 @@ class provisioning
     /**
      * Create a course (also handles automatic shortnameext).
      */
-    private function create_course($course) {
+    private function create_course($course, $strict = true) {
         global $DB;
 
         $shortnameext = "";
 
         if (strpos($course->module_code, "WSHOP") === 0) {
-            if (!$course->is_unique_shortname($course->shortname, true)) {
+            if (!$course->is_unique_shortname($course->shortname, $strict)) {
                 $shortnameext = "(week " . $course->module_week_beginning . ")";
                 $course->set_shortname_ext($shortnameext);
             }
         }
 
-        if (!$course->is_unique_shortname($course->shortname, true)) {
+        if (!$course->is_unique_shortname($course->shortname, $strict)) {
             if ($course->module_week_beginning == 1) {
                 $shortnameext = "AUT";
             }
@@ -155,7 +161,7 @@ class provisioning
         }
 
         // Make sure we are still unique.
-        if (!$course->is_unique_shortname($course->shortname, true)) {
+        if (!$course->is_unique_shortname($course->shortname, $strict)) {
             $canterbury = $this->get_canterbury();
             $medway = $this->get_medway();
 
@@ -295,7 +301,7 @@ SQL;
 
             // Create the primary.
             if (!$primary->is_in_moodle()) {
-                if (!$this->create_course($primary)) {
+                if (!$this->create_course($primary, false)) {
                     continue;
                 }
             }
