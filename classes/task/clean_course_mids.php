@@ -22,13 +22,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_connect\task;
 
-$plugin->version   = 2014062400;
-$plugin->requires  = 2014051200;
-$plugin->cron      = 0;
+/**
+ * Cleans up all connect courses that link to an invalid Moodle course.
+ */
+class clean_course_mids extends \core\task\scheduled_task
+{
+    public function get_name() {
+        return "Clean course mids";
+    }
 
-$plugin->dependencies = array(
-    'local_catman' => 2014022600,
-    'local_hipchat' => 2014043000
-);
+    public function execute() {
+        global $DB;
+
+        $sql = <<<SQL
+        UPDATE {connect_course} cc
+        LEFT OUTER JOIN {course} c ON c.id=cc.mid
+        SET cc.mid = 0
+        WHERE cc.mid > 0 AND c.id IS NULL
+SQL;
+
+        $DB->execute($sql);
+    }
+} 
