@@ -194,10 +194,6 @@ class provisioning
         $canterbury = $this->get_canterbury();
         $medway = $this->get_medway();
 
-        if ($course->campusid !== $canterbury && $course->campusid !== $medway) {
-            return false;
-        }
-
         // We match on everything relevant.
         $matches = $DB->get_records('connect_course', array(
             'module_code' => $course->module_code,
