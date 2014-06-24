@@ -167,8 +167,6 @@ class enrolment extends data
         // Get course context.
         $context = \context_course::instance($this->course->mid, IGNORE_MISSING);
         if ($context === false) {
-            // The course doesnt exist... it should!..
-            // TODO - fire event on the course to reset mid.
             return false;
         }
 
@@ -188,8 +186,6 @@ class enrolment extends data
         // Get course context.
         $context = \context_course::instance($this->course->mid, IGNORE_MISSING);
         if ($context === false) {
-            // The course doesnt exist... it should!..
-            // TODO - fire event on the course to reset mid.
             return false;
         }
 
