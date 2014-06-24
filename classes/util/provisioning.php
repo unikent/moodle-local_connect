@@ -29,6 +29,9 @@ class provisioning
     /** A list of modules that were mergers last year. */
     private $mergers;
 
+    /** Are we in dry mode? */
+    private $dry;
+
     /**
      * Constructor
      */
@@ -40,7 +43,9 @@ class provisioning
     /**
      * The place this all starts.
      */
-    public function go() {
+    public function go($dry = false) {
+        $this->dry = $dry === true;
+
         // First, we grab a list of courses.
         echo "Building Modules...\n";
         $this->build_modules();
@@ -179,7 +184,10 @@ class provisioning
             }
         }
 
-        $result = $course->create_in_moodle();
+        $result = true;
+        if (!$this->dry) {
+            $result = $course->create_in_moodle();
+        }
 
         // Log it.
         if ($result) {
