@@ -249,7 +249,7 @@ class provisioning
                 continue;
             }
 
-            $this->create_course($course);
+            $this->create_course($course, false);
         }
         $rs->close();
     }
