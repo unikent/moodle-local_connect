@@ -93,7 +93,7 @@ class course extends data
         }
 
         // Check our mid is valid (should be o.o).
-        if (!$DB->record_exists('course', array('mid' => $this->mid))) {
+        if (!$DB->record_exists('course', array('id' => $this->mid))) {
             $this->mid = 0;
             if (!$dry) {
                 $this->save();
