@@ -28,6 +28,14 @@ define('CLI_SCRIPT', true);
 require(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
+raise_memory_limit(MEMORY_HUGE);
+
+list($options, $unrecognized) = cli_get_params(
+    array(
+        'dry' => false
+    )
+);
+
 $username = exec('logname');
 $user = $DB->get_record('user', array(
     'username' => $username
@@ -38,4 +46,4 @@ if ($user) {
 }
 
 $provisioning = new \local_connect\util\provisioning();
-$provisioning->go();
+$provisioning->go($options['dry']);
