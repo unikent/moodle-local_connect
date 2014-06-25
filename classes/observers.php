@@ -62,7 +62,7 @@ class observers
         global $DB;
 
         // Update any mids.
-        $DB->set_field('connect_course', 'mid', null, array(
+        $DB->set_field('connect_course', 'mid', 0, array(
             'mid' => $event->objectid
         ));
 
@@ -129,7 +129,7 @@ class observers
         global $DB;
 
         // Update any mids.
-        $DB->set_field('connect_user', 'mid', null, array(
+        $DB->set_field('connect_user', 'mid', 0, array(
             'mid' => $event->objectid
         ));
 
@@ -146,7 +146,7 @@ class observers
         global $DB;
 
         // Update any mids.
-        $DB->set_field('connect_group', 'mid', null, array(
+        $DB->set_field('connect_group', 'mid', 0, array(
             'mid' => $event->objectid
         ));
 
