@@ -186,26 +186,6 @@ class kent_enrolment_tests extends local_connect\util\connect_testcase
 
 		// Did the enrolment get deleted?
 		$this->assertFalse($enrolment->is_in_moodle());
-
-		// Now create the user (properly - otherwise the observer wont be called).
-		user_create_user(array(
-			'username' => $user->username,
-			'password' => 'Moodle2012!',
-			'idnumber' => 'idnumbertest1',
-			'firstname' => 'First Name',
-			'lastname' => 'Last Name',
-			'middlename' => 'Middle Name',
-			'lastnamephonetic' => '',
-			'firstnamephonetic' => '',
-			'alternatename' => 'Alternate Name',
-			'email' => 'usertest1@email.com',
-			'description' => 'This is a description for user 1',
-			'city' => 'Canterbury',
-			'country' => 'uk'
-		));
-
-		// Did the enrolment get created?
-		$this->assertTrue($enrolment->is_in_moodle());
 	}
 
 	/**
