@@ -81,8 +81,6 @@ class role extends data
      * @todo Move this to DB.
      */
     public function get_data_mapping() {
-        global $CFG;
-
         $map = array(
             "student" => array(
                 "name" => "Student (SDS)",
@@ -98,13 +96,24 @@ class role extends data
             ),
             "convenor" => array(
                 "name" => "Convenor (SDS)",
-                "short" => (int)$CFG->kent->distribution >= 2014 ? "sds_convenor" : "convenor",
+                "short" => "sds_convenor",
                 "desc" => "A Convenor has the same permissions as a teacher, but can manually enrol teachers.",
                 "archetype" => "editingteacher"
             )
         );
 
         return isset($map[$this->name]) ? $map[$this->name] : false;
+    }
+
+    /**
+     * Get an object by a specified field.
+     */
+    public static function get_by($field, $val, $forcearray = false) {
+        if ($field == "name" && strpos($val, 'sds_') === 0) {
+            $val = substr($val, 4);
+        }
+
+        return parent::get_by($field, $val, $forcearray);
     }
 
     /**
