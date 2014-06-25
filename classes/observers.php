@@ -98,11 +98,11 @@ class observers
         $DB->update_record('connect_user', $user);
 
         // If we created the user on first login, sync enrolments.
-        $task = new \local_connect\task\user_enrolments();
-        $task->set_custom_data(array(
-            'userid' => $user->id
-        ));
-        \core\task\manager::queue_adhoc_task($task);
+        //$task = new \local_connect\task\user_enrolments();
+        //$task->set_custom_data(array(
+        //    'userid' => $user->id
+        //));
+        //\core\task\manager::queue_adhoc_task($task);
 
         return true;
     }
