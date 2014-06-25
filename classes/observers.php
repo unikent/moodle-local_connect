@@ -62,7 +62,7 @@ class observers
         global $DB;
 
         // Update any mids.
-        $DB->set_field('connect_course', 'mid', null, array(
+        $DB->set_field('connect_course', 'mid', 0, array(
             'mid' => $event->objectid
         ));
 
@@ -101,19 +101,11 @@ class observers
         $user = user::from_sql_result($user);
 
         // If we created the user on first login, sync enrolments.
-        // TODO - make this a "task" in 2.7.
-
-        // Sync Enrollments.
-        $enrolments = enrolment::get_by("userid", $user->id, true);
-        foreach ($enrolments as $enrolment) {
-            $enrolment->create_in_moodle();
-        }
-
-        // Sync Group Enrollments.
-        $enrolments = group_enrolment::get_by("userid", $user->id, true);
-        foreach ($enrolments as $enrolment) {
-            $enrolment->create_in_moodle();
-        }
+        $task = new \local_connect\task\user_enrolments();
+        $task->set_custom_data(array(
+            'userid' => $user->id
+        ));
+        \core\task\manager::queue_adhoc_task($task);
 
         return true;
     }
@@ -129,7 +121,7 @@ class observers
         global $DB;
 
         // Update any mids.
-        $DB->set_field('connect_user', 'mid', null, array(
+        $DB->set_field('connect_user', 'mid', 0, array(
             'mid' => $event->objectid
         ));
 
@@ -146,7 +138,7 @@ class observers
         global $DB;
 
         // Update any mids.
-        $DB->set_field('connect_group', 'mid', null, array(
+        $DB->set_field('connect_group', 'mid', 0, array(
             'mid' => $event->objectid
         ));
 

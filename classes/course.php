@@ -599,7 +599,7 @@ class course extends data
         // Step 3 - Commit to DB.
         update_course($course);
 
-        // Step 4 - Update this entry (TODO - move to observer?).
+        // Step 4 - Update this entry.
         $this->mid = 0;
         $this->save();
 
