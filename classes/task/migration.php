@@ -25,24 +25,15 @@
 namespace local_connect\task;
 
 /**
- * Cleans up all connect courses that link to an invalid Moodle course.
+ * Migrates SDS data from Connect DB to Moodle DB
  */
-class clean_course_mids extends \core\task\scheduled_task
+class migration extends \core\task\scheduled_task
 {
     public function get_name() {
-        return "Clean course mids";
+        return "SDS Data Import";
     }
 
     public function execute() {
-        global $DB;
-
-        $sql = <<<SQL
-        UPDATE {connect_course} cc
-        LEFT OUTER JOIN {course} c ON c.id=cc.mid
-        SET cc.mid = 0
-        WHERE cc.mid > 0 AND c.id IS NULL
-SQL;
-
-        $DB->execute($sql);
+        \local_connect\util\migrate::all();
     }
 } 

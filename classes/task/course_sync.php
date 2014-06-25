@@ -22,13 +22,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_connect\task;
 
-$plugin->version   = 2014062500;
-$plugin->requires  = 2014051200;
-$plugin->cron      = 0;
+/**
+ * Course Sync
+ */
+class course_sync extends task_base
+{
+    public function get_name() {
+        return "SDS Course Sync";
+    }
 
-$plugin->dependencies = array(
-    'local_catman' => 2014022600,
-    'local_hipchat' => 2014043000
-);
+    public function execute() {
+        $self = $this;
+        \local_connect\course::batch_all(function ($obj) use($self) {
+            try {
+                $result = $obj->sync();
+                $self->map_status($result, $obj);
+            } catch (Excepton $e) {
+                $msg = $e->getMessage();
+                echo "  Error: {$msg}\n";
+            }
+        });
+    }
+} 

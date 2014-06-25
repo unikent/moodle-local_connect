@@ -22,13 +22,22 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_connect\task;
 
-$plugin->version   = 2014062500;
-$plugin->requires  = 2014051200;
-$plugin->cron      = 0;
+/**
+ * Enrolment Sync
+ */
+class enrolment_sync extends task_base
+{
+    public function get_name() {
+        return "SDS Enrolment Sync";
+    }
 
-$plugin->dependencies = array(
-    'local_catman' => 2014022600,
-    'local_hipchat' => 2014043000
-);
+    public function execute() {
+        $self = $this;
+        \local_connect\enrolment::batch_all(function ($obj) use($self) {
+            $result = $obj->sync();
+            $self->map_status($result, $obj);
+        });
+    }
+} 

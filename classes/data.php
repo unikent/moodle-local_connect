@@ -34,6 +34,7 @@ abstract class data {
     const STATUS_CREATE = 1;
     const STATUS_MODIFY = 2;
     const STATUS_DELETE = 3;
+    const STATUS_ERROR = 4;
 
     /** Stores all our data */
     private $_data;
