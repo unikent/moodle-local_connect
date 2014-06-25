@@ -22,13 +22,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_connect\task;
 
-$plugin->version   = 2014062501;
-$plugin->requires  = 2014051200;
-$plugin->cron      = 0;
-
-$plugin->dependencies = array(
-    'local_catman' => 2014022600,
-    'local_hipchat' => 2014043000
-);
+/**
+ * Base Task
+ */
+abstract class task_base extends \core\task\scheduled_task
+{
+    /**
+     * Map status to actions.
+     */
+    public function map_status($status, $obj) {
+        switch ($status) {
+            case \local_connect\data::STATUS_CREATE:
+                echo "  Created: " . $obj->id . "\n";
+            break;
+            case \local_connect\data::STATUS_MODIFY:
+                echo "  Modified: " . $obj->id . "\n";
+            break;
+            case \local_connect\data::STATUS_DELETE:
+                echo "  Deleted: " . $obj->id . "\n";
+            break;
+            default:
+            break;
+        }
+    }
+} 

@@ -73,7 +73,7 @@ class meta extends data
     public function sync($dry = false) {
         $context = \context_course::instance($this->courseid, IGNORE_MISSING);
         if ($context === false) {
-            return false;
+            return self::STATUS_ERROR;
         }
 
         foreach ($this->enrolments as $enrolment) {
@@ -86,9 +86,15 @@ class meta extends data
             $uid = $enrolment->user->mid;
 
             if ($uid && !is_enrolled($context, $uid)) {
-                enrol_try_internal_enrol($this->courseid, $uid, $enrolment->role->mid);
+                if (!$dry) {
+                    enrol_try_internal_enrol($this->courseid, $uid, $enrolment->role->mid);
+                }
+
+                return self::STATUS_CREATE;
             }
         }
+
+        return self::STATUS_NONE;
     }
 
     /**

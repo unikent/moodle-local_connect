@@ -92,16 +92,6 @@ class course extends data
             return self::STATUS_NONE;
         }
 
-        // Check our mid is valid (should be o.o).
-        if (!$DB->record_exists('course', array('id' => $this->mid))) {
-            $this->mid = 0;
-            if (!$dry) {
-                $this->save();
-            }
-
-            return self::STATUS_MODIFY;
-        }
-
         // Have we changed at all?
         if (!$this->is_merged() && $this->is_locked() && $this->has_changed()) {
             if (!$dry) {
@@ -568,6 +558,11 @@ class course extends data
         $course = $DB->get_record('course', array(
             'id' => $this->mid
         ));
+
+        // Check this exists o.o I dont know why I'm expecting it not too...
+        if (!$course) {
+            return false;
+        }
 
         // Updates!
         $course->shortname = $this->shortname;

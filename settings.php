@@ -65,6 +65,13 @@ if ($hassiteconfig) {
     ));
 
     $settings->add(new admin_setting_configcheckbox(
+        'local_connect/enable_course_sync',
+        'Enable course syncing',
+        'Allows modules to update their description from SDS (you do not want to enable this for anything prior to 2014).',
+        0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
         'local_connect/strict_sync',
         'Enable stricter SDS sync',
         'Forces modules to update to SDS data, rather than letting convenors modify them Moodle-side.',

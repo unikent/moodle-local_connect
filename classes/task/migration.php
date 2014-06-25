@@ -15,38 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Connect Cron
+ * Local stuff for Moodle Connect
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('CLI_SCRIPT', true);
+namespace local_connect\task;
 
-require(dirname(__FILE__) . '/../../../config.php');
-require_once($CFG->libdir . '/clilib.php');
+/**
+ * Migrates SDS data from Connect DB to Moodle DB
+ */
+class migration extends \core\task\scheduled_task
+{
+    public function get_name() {
+        return "SDS Data Import";
+    }
 
-raise_memory_limit(MEMORY_HUGE);
-
-\local_connect\util\cli::fix_mids();
-
-\local_connect\util\migrate::all();
-sleep($CFG->kent->cluster_sleep);
-
-\local_connect\util\cli::enrolment_sync();
-sleep($CFG->kent->cluster_sleep);
-
-\local_connect\util\cli::group_sync();
-sleep($CFG->kent->cluster_sleep);
-
-\local_connect\util\cli::group_enrolment_sync();
-sleep($CFG->kent->cluster_sleep);
-
-\local_connect\util\cli::meta_sync();
-sleep($CFG->kent->cluster_sleep);
-
-// For 2014, also sync courses.
-if ($CFG->kent->distribution === "2014") {
-    \local_connect\util\cli::course_sync();
-}
+    public function execute() {
+        \local_connect\util\migrate::all();
+    }
+} 
