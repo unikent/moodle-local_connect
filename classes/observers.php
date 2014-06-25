@@ -97,15 +97,13 @@ class observers
         $user->mid = $event->objectid;
         $DB->update_record('connect_user', $user);
 
-        // Grab connect object.
-        $user = user::from_sql_result($user);
-
         // If we created the user on first login, sync enrolments.
         $task = new \local_connect\task\user_enrolments();
         $task->set_custom_data(array(
             'userid' => $user->id
         ));
-        \core\task\manager::queue_adhoc_task($task);
+        // Todo - waiting for MDL-46138
+        //\core\task\manager::queue_adhoc_task($task);
 
         return true;
     }
