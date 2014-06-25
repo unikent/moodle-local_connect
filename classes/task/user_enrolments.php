@@ -33,13 +33,13 @@ class user_enrolments extends \core\task\adhoc_task
         $data = $this->get_custom_data();
 
         // Sync Enrollments.
-        $enrolments = enrolment::get_by("userid", $data['userid'], true);
+        $enrolments = \local_connect\enrolment::get_by("userid", $data['userid'], true);
         foreach ($enrolments as $enrolment) {
             $enrolment->create_in_moodle();
         }
 
         // Sync Group Enrollments.
-        $enrolments = group_enrolment::get_by("userid", $data['userid'], true);
+        $enrolments = \local_connect\group_enrolment::get_by("userid", $data['userid'], true);
         foreach ($enrolments as $enrolment) {
             $enrolment->create_in_moodle();
         }
