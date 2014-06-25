@@ -59,13 +59,6 @@ class kent_course_tests extends local_connect\util\connect_testcase
             "id" => $course->mid
         ), 'id,fullname');
         $this->assertEquals($course->fullname, $mcourse->fullname);
-
-        $id = $this->generate_course();
-        $course = \local_connect\course::get($id);
-        $this->assertEquals(\local_connect\data::STATUS_NONE, $course->sync());
-        $course->mid = 9217;
-        $this->assertEquals(\local_connect\data::STATUS_MODIFY, $course->sync());
-        $this->assertEquals(0, $course->mid);
     }
 
     /**
