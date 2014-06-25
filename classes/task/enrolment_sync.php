@@ -39,5 +39,7 @@ class enrolment_sync extends task_base
             $result = $obj->sync();
             $self->map_status($result, $obj);
         });
+
+        \core\task\manager::clear_static_caches();
     }
 } 
