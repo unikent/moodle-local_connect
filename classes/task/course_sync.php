@@ -34,6 +34,11 @@ class course_sync extends task_base
     }
 
     public function execute() {
+        $enabled = get_config('local_connect', 'enable_course_sync');
+        if (!$enabled) {
+            return;
+        }
+
         $self = $this;
         \local_connect\course::batch_all(function ($obj) use($self) {
             try {
