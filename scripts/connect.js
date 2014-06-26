@@ -593,12 +593,14 @@ var Connect = (function() {
 			var fullname = row[0].module_title + (row[0].module_code.indexOf(date) > 0 ? '' : ' ' + date);
 			var tempshortname = "";
 
-			if(_.find(_this.json, function (r){ 
+			var prod = _.find(_this.json, function (r){ 
 				if(row[0].mid > 0) {
 					tempshortname = r.module_code + (r.module_code.indexOf(date) > 0 ? '' : ' ' + date);
 					return tempshortname === shortname;
 				}
-			}) !== undefined) {
+			});
+
+			if(typeof(prod) !== undefined) {
 				_this.formEl.shrtNmExtTd.html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
 				_this.formEl.notes.removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
 				_this.formEl.shortNameExt.addClass('warn');
