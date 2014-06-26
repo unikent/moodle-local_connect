@@ -44,7 +44,7 @@ var Connect = (function() {
 
 			if (state_zero === 'created_in_moodle') {
 
-				if (val.children !== undefined && val.children.length > 0) {
+				if ((typeof val.children != "undefined") && val.children.length > 0) {
 					sink_deleted = sink_deleted || _.any(val.children, function(i) {
 						return i.sink_deleted;
 					})
@@ -59,7 +59,8 @@ var Connect = (function() {
 				toolbar += '<a href=" '+ window.coursepageUrl + '/course/view.php?id='+ val.mid +'" target="_blank" class="created_link toolbar_link"></a>';
 				
 			} else {
-				same_module_code_created = _.find( existing_courses, function(e) { return e == val.module_code; } ) != undefined;
+				var prod = _.find( existing_courses, function(e) { return e == val.module_code; } );
+				same_module_code_created = typeof(prod) != "undefined";
 			}
 
 			var state = '<div class="status_'+state_zero+' '+(sink_deleted?'sink_deleted':'')+' '+(same_module_code_created?'same_module_code_created':'')+'">'+name+'</div>';
@@ -600,7 +601,7 @@ var Connect = (function() {
 				}
 			});
 
-			if(typeof(prod) !== undefined) {
+			if(typeof prod != "undefined") {
 				_this.formEl.shrtNmExtTd.html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
 				_this.formEl.notes.removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
 				_this.formEl.shortNameExt.addClass('warn');
