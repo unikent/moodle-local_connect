@@ -584,20 +584,20 @@ var Connect = (function() {
 		var row = _.filter(this.json, function (r) { 
 				return r.id === id;
 		});
-		if(row[0].mid === 0 || row[0].mid === null) {
+		if(row[0].mid == 0 || row[0].mid == null) {
 			var row_unprocessed = true;
 			var date = '(' + Date.parse(row[0].session_code).previous().year().toString('yyyy');
 			date += '/' + Date.parse(row[0].session_code).toString('yyyy') + ')';
-			var synopsis = $.trim(row[0].synopsis);//.substring(0,500).split(" ").slice(0, -1).join(" ") + "...";
+			var synopsis = $.trim(row[0].synopsis);
 
-			var shortname = row[0].module_code + (row[0].module_code.indexOf(date) > 0 ? '' : ' ' + date);
+			var shortname = row[0].module_code;
 			var fullname = row[0].module_title + (row[0].module_code.indexOf(date) > 0 ? '' : ' ' + date);
 			var tempshortname = "";
 
-			var prod = _.find(_this.json, function (r){ 
-				if(row[0].mid > 0) {
-					tempshortname = r.module_code + (r.module_code.indexOf(date) > 0 ? '' : ' ' + date);
-					return tempshortname === shortname;
+			var prod = _.find(_this.json, function (r){
+				if(parseInt(r.mid) > 0) {
+					tempshortname = r.module_code;
+					return tempshortname == shortname;
 				}
 			});
 
