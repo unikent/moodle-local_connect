@@ -26,7 +26,7 @@ var Connect = (function() {
     var existing_courses = _.map(
         _.filter( this.json,
           function(e) {
-            return e.mid != null;
+            return e.mid != null && e.mid != 0;
           } ),
         function(e) {
           return e.module_code.replace(/(.*)\s.*/,'$1');
