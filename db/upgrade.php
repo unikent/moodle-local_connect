@@ -672,5 +672,22 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014061601, 'local', 'connect');
     }
 
+    if ($oldversion < 2014062700) {
+        $category = \local_catman\core::get_category();
+
+        $courses = $DB->get_records('course', array(
+            'category' => $category->id
+        ));
+
+        foreach ($courses as $course) {
+            $DB->set_field('connect_course', 'mid', 0, array(
+                'mid' => $course->id
+            ));
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014062700, 'local', 'connect');
+    }
+
     return true;
 }
