@@ -256,4 +256,38 @@ class kent_course_tests extends local_connect\util\connect_testcase
         $course = \local_connect\course::get($courseid);
         $this->assertEquals('TEST', $course->shortname_ext);
     }
+
+    /**
+     * If we move a course to the removed category,
+     * kill its mid.
+     */
+    public function test_course_removed_mid() {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . "/course/lib.php");
+
+        $this->resetAfterTest();
+
+        $id = $this->generate_course();
+        $course = \local_connect\course::get($id);
+
+        // Creates.
+        $this->assertFalse($course->is_in_moodle());
+        $this->assertTrue($course->create_in_moodle());
+        $this->assertTrue($course->is_in_moodle());
+
+        // Move to removed category.
+        $category = \local_catman\core::get_category();
+
+        $obj = $DB->get_record('course', array(
+            'id' => $course->mid
+        ));
+
+        $obj->category = $category->id;
+
+        update_course($obj);
+
+        $course = \local_connect\course::get($id);
+        $this->assertFalse($course->is_in_moodle());
+    }
 }
