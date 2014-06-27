@@ -279,13 +279,13 @@ class kent_course_tests extends local_connect\util\connect_testcase
         // Move to removed category.
         $category = \local_catman\core::get_category();
 
-        $course = $DB->get_record('course', array(
+        $obj = $DB->get_record('course', array(
             'id' => $course->mid
         ));
 
-        $course->category = $category->id;
+        $obj->category = $category->id;
 
-        update_course($course);
+        update_course($obj);
 
         $this->assertFalse($course->is_in_moodle());
     }
