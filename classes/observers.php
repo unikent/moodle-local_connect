@@ -40,20 +40,20 @@ class observers
     public static function course_updated(\core\event\course_updated $event) {
         global $DB, $USER;
 
-        if (!$USER || $USER->id <= 2) {
-            return true;
-        }
-
         $category = \local_catman\core::get_category();
         $course = $DB->get_record('course', array(
             'id' => $event->objectid
-        ));
+        ), 'id,category');
 
         // If this is in the removed category, delete any reference to it.
         if ($course->category == $category->id) {
             $DB->set_field('connect_course', 'mid', 0, array(
                 'mid' => $course->id
             ));
+        }
+
+        if (!$USER || $USER->id <= 2) {
+            return true;
         }
 
         // Set new lock status.
