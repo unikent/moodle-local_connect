@@ -44,6 +44,18 @@ class observers
             return true;
         }
 
+        $category = \local_catman\core::get_category();
+        $course = $DB->get_record('course', array(
+            'id' => $event->objectid
+        ));
+
+        // If this is in the removed category, delete any reference to it.
+        if ($course->category == $category->id) {
+            $DB->set_field('connect_course', 'mid', 0, array(
+                'mid' => $course->id
+            ));
+        }
+
         // Set new lock status.
         $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
             "courseid" => $event->objectid
