@@ -287,6 +287,7 @@ class kent_course_tests extends local_connect\util\connect_testcase
 
         update_course($obj);
 
+        $course = \local_connect\course::get($id);
         $this->assertFalse($course->is_in_moodle());
     }
 }
