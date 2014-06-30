@@ -19,7 +19,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests new Kent course code
  */
-class kent_course_tests extends local_connect\util\connect_testcase
+class kent_course_tests extends \local_connect\tests\connect_testcase
 {
     /**
      * Test we can create a course.

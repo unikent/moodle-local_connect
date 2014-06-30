@@ -19,7 +19,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests new Kent group code
  */
-class kent_group_tests extends local_connect\util\connect_testcase
+class kent_group_tests extends \local_connect\tests\connect_testcase
 {
 	/**
 	 * Make sure we can grab a valid list of groups.

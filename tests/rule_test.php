@@ -19,7 +19,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests new Kent rule code
  */
-class kent_rule_tests extends local_connect\util\connect_testcase
+class kent_rule_tests extends \local_connect\tests\connect_testcase
 {
     /**
      * Create some test rules.
