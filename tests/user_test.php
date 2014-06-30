@@ -19,7 +19,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests new Kent user code
  */
-class kent_user_tests extends local_connect\util\connect_testcase
+class kent_user_tests extends \local_connect\tests\connect_testcase
 {
 	/**
 	 * Make sure we can create a Moodle user.

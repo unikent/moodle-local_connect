@@ -19,7 +19,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests new Kent sync code
  */
-class kent_sync_tests extends local_connect\util\connect_testcase
+class kent_sync_tests extends \local_connect\tests\connect_testcase
 {
     /**
      * Make sure we can grab a valid list of enrolments to be created.

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_connect\util;
+namespace local_connect\tests;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -59,6 +59,7 @@ abstract class connect_testcase extends \advanced_testcase
 
         $SHAREDB->execute("TRUNCATE TABLE {shared_courses}");
         $SHAREDB->execute("TRUNCATE TABLE {shared_course_admins}");
+        $SHAREDB->execute("TRUNCATE TABLE {rollovers}");
 
         // Delete the roles too.
         $DB->delete_records('role', array('shortname' => 'sds_student'));
