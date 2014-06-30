@@ -114,8 +114,7 @@ class observers
         $task->set_custom_data(array(
             'userid' => $user->id
         ));
-        // Todo - waiting for MDL-46138
-        //\core\task\manager::queue_adhoc_task($task);
+        \core\task\manager::queue_adhoc_task($task);
 
         return true;
     }
