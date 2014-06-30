@@ -31,8 +31,6 @@ global $PAGE, $OUTPUT, $USER;
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/ajax/courses.php');
 
-require_capability("local/connect:helpdesk", context_system::instance());
-
 $restrictions = optional_param('category_restrictions', null, PARAM_RAW);
 $restrictions = isset($restrictions) ? json_decode(urldecode($restrictions)) : array();
 
@@ -41,13 +39,26 @@ if (!empty($restrictions)) {
     // Map categories to IDs.
     $categories = array();
     foreach ($restrictions as $category) {
-        if (isset($category[0])) {
-            $categories[] = $category[0];
+        if (!isset($category[0])) {
+            continue;
         }
+
+        $category = $category[0];
+
+        // Do we have access?
+        $context = \context_coursecat::instance($category);
+        if (has_capability('moodle/category:manage', $context)) {
+            $categories[] = $category;
+        }
+    }
+
+    if (empty($categories)) {
+        require_capability("local/connect:helpdesk", \context_system::instance());
     }
 
     $courses = \local_connect\course::get_by_category($categories);
 } else {
+    require_capability("local/connect:helpdesk", context_system::instance());
     $courses = \local_connect\course::get_all();
 }
 
