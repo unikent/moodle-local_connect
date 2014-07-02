@@ -40,26 +40,30 @@ class observers
     public static function course_updated(\core\event\course_updated $event) {
         global $DB, $USER;
 
-        $category = \local_catman\core::get_category();
-        $course = $DB->get_record('course', array(
-            'id' => $event->objectid
-        ), 'id,category');
+        $enabled = get_config("local_catman", "enable");
+        if ($enabled) {
+            // Check we were not moved to the removed category.
+            $category = \local_catman\core::get_category();
+            $course = $DB->get_record('course', array(
+                'id' => $event->objectid
+            ), 'id,category');
 
-        // If this is in the removed category, delete any reference to it.
-        if ($course->category == $category->id) {
-            $DB->set_field('connect_course', 'mid', 0, array(
-                'mid' => $course->id
+            // If this is in the removed category, delete any reference to it.
+            if ($course->category == $category->id) {
+                $DB->set_field('connect_course', 'mid', 0, array(
+                    'mid' => $course->id
+                ));
+
+                return true;
+            }
+        }
+
+        if ($USER && $USER->id > 2) {
+            // Set new lock status.
+            $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
+                "courseid" => $event->objectid
             ));
         }
-
-        if (!$USER || $USER->id <= 2) {
-            return true;
-        }
-
-        // Set new lock status.
-        $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
-            "courseid" => $event->objectid
-        ));
 
         return true;
     }
