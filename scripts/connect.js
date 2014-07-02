@@ -656,7 +656,7 @@ var Connect = (function() {
 						shortnameext: $('#shortname_ext').val(),
 						synopsis: $('#synopsis').val(),
 						category: $('#category').val(),
-					}];console.log(data);
+					}];
 
 					_this.push_selected(data, ui_sub, true, function() {
 
@@ -671,7 +671,6 @@ var Connect = (function() {
 							_this.processRowSelect();
 						}, 3000);
 					}, function(xhr) {
-console.log(xhr.responseText);
 						var problems = JSON.parse(xhr.responseText);
 
 						switch(problems.error_code) {
