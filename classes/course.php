@@ -881,28 +881,19 @@ class course extends data
             }
         }
 
-        $link = new course();
-        $link->set_class_data($primary->get_data());
-        $link->set_class_data(array(
-            'module_code' => $input->code,
-            'module_title' => $input->title,
-            'synopsis' => $input->synopsis,
-            'category' => $input->category,
-        ));
-
         // Create the linked course if it doesnt exist.
-        if (!$link->is_in_moodle()) {
-            if (!$link->create_in_moodle()) {
-                \local_connect\util\helpers::error("Could not create linked course: $link");
+        if (!$primary->is_in_moodle()) {
+            if (!$primary->create_in_moodle()) {
+                \local_connect\util\helpers::error("Could not create linked course: $primary");
             }
         } else {
-            $link->update_moodle();
+            $primary->update_moodle();
         }
 
         // Add children.
         foreach ($courses as $child) {
-            if (!$link->add_child($child)) {
-                \local_connect\util\helpers::error("Could not add child '$child' to course: $link");
+            if (!$primary->add_child($child)) {
+                \local_connect\util\helpers::error("Could not add child '$child' to course: $primary");
             }
         }
 
