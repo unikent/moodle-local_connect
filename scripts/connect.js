@@ -640,24 +640,23 @@ var Connect = (function() {
 					ui_sub.disable($('.ui-dialog-buttonpane').find('button:contains("Push to moodle")'));
 					ui_sub.start();
 
-          if(!_.isEmpty($('#shortname_ext_td').children()) && $('#shortname_ext_td').children().length > 0) {
+          			if (!_.isEmpty($('#shortname_ext_td').children()) && $('#shortname_ext_td').children().length > 0) {
 						if(_.isEmpty($('#shortname_ext').val())) {
 							_this.formEl.notes.removeClass('warn').addClass('error').text('Please provide a three letter identifier');
 							_this.formEl.shortNameExt.addClass('error');
 							ui_sub.stop();
 							return;
 						}
-						shortname += ' ' + $('#shortname_ext').val();
-					}
-
-					if(row_unprocessed === true) {
-            mc = row[0].module_code.replace(/ (.*)/, '');
-						synopsis = $('#synopsis').val();// + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mc +"'>More</a>"
 					}
 
 					var data = [{
-						id: row[0].id
-					}];
+						id: row[0].id,
+						fullname: $('#fullname').val(),
+						shortname: $('#shortname').val(),
+						shortnameext: $('#shortname_ext').val(),
+						synopsis: $('#synopsis').val(),
+						category: $('#category').val(),
+					}];console.log(data);
 
 					_this.push_selected(data, ui_sub, true, function() {
 
@@ -672,10 +671,10 @@ var Connect = (function() {
 							_this.processRowSelect();
 						}, 3000);
 					}, function(xhr) {
-
+console.log(xhr.responseText);
 						var problems = JSON.parse(xhr.responseText);
 
-						switch(problems[0].error_code) {
+						switch(problems.error_code) {
 							case 'duplicate':
 							case 'could_not_schedule':
 								if(_this.formEl.shortNameExt.get(0)) {

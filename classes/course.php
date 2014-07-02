@@ -158,8 +158,9 @@ class course extends data
             }
         }
 
-        if (!empty($this->shortname_ext)) {
-            return $modulecode . " " . $this->shortname_ext;
+        $ext = $this->shortname_ext;
+        if (!empty($ext)) {
+            return $modulecode . " " . $ext;
         }
 
         return $modulecode;
@@ -361,6 +362,13 @@ class course extends data
         ));
     }
 
+    /**
+     * Does this course have a unique shortname?
+     * @return boolean
+     */
+    public function has_unique_shortname($strict = false) {
+        return $this->is_unique_shortname($this->shortname, $strict);
+    }
 
     /**
      * Has this course changed at all?
@@ -822,17 +830,8 @@ class course extends data
             // Try to find the Connect version of the course.
             $obj = self::get($course->id);
             if (!$obj) {
-                $response[] = array(
+                $response = array(
                     'error_code' => 'does_not_exist',
-                    'id' => $course->id
-                );
-                continue;
-            }
-
-            // Make sure we are unique.
-            if (!$obj->is_unique()) {
-                $response[] = array(
-                    'error_code' => 'duplicate',
                     'id' => $course->id
                 );
                 continue;
@@ -841,15 +840,24 @@ class course extends data
             // Did we specify a shortname extension?
             if (!empty($course->shortnameext)) {
                 $obj->set_shortname_ext($course->shortnameext);
-                $obj->save();
+            }
+
+            // Make sure we are unique.
+            if (!$obj->has_unique_shortname()) {
+                $response = array(
+                    'error_code' => 'duplicate',
+                    'id' => $course->id
+                );
+                continue;
             }
 
             // Attempt to create in Moodle.
             if (!$obj->create_in_moodle()) {
-                $response[] = array(
+                $response = array(
                     'error_code' => 'error',
                     'id' => $course->id
                 );
+                continue;
             }
         }
 
