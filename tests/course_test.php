@@ -268,6 +268,9 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
 
         $this->resetAfterTest();
 
+        // Enable the plugin for testing.
+        set_config("enable", true, "local_catman");
+
         $id = $this->generate_course();
         $course = \local_connect\course::get($id);
 
