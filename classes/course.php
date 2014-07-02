@@ -824,6 +824,8 @@ class course extends data
      * @return unknown
      */
     public static function schedule_all($data) {
+        global $DB;
+
         $response = array();
 
         foreach ($data->courses as $course) {
@@ -858,6 +860,37 @@ class course extends data
                     'id' => $course->id
                 );
                 continue;
+            }
+
+            // Update course info.
+            $obj = $DB->get_record('course', array(
+                'id' => $obj->mid
+            ));
+
+            $update = false;
+
+            if (!empty($course->fullname)) {
+                $obj->fullname = $course->fullname;
+                $update = true;
+            }
+
+            if (!empty($course->shortname)) {
+                $obj->shortname = $course->shortname;
+                $update = true;
+            }
+
+            if (!empty($course->synopsis)) {
+                $obj->summary = $course->synopsis;
+                $update = true;
+            }
+
+            if (!empty($course->category)) {
+                $obj->category = $course->category;
+                $update = true;
+            }
+
+            if ($update) {
+                update_course($obj);
             }
         }
 
