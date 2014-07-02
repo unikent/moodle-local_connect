@@ -42,7 +42,7 @@ class observers
 
         $enabled = get_config("local_catman", "enable");
         if ($enabled) {
-
+            // Check we were not moved to the removed category.
             $category = \local_catman\core::get_category();
             $course = $DB->get_record('course', array(
                 'id' => $event->objectid
