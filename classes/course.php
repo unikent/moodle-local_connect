@@ -488,15 +488,21 @@ class course extends data
      * Ensure this course has a manual enrolments plugin.
      */
     public function ensure_manual_enrol() {
-        $enrol = enrol_get_plugin('manual');
-        $instances = $DB->get_records('enrol', array(
-            'enrol' => 'manual',
-            'courseid' => $this->mid,
-            'status' => ENROL_INSTANCE_ENABLED
-        ), 'sortorder, id ASC');
+        global $DB;
 
-        if (empty($instances)) {
-            $enrol->add_instance($this->mid);
+        $enrol = enrol_get_plugin('manual');
+        $course = $DB->get_record('course', array(
+            'id' => $this->mid
+        ));
+
+        $exists = $DB->record_exists('enrol', array(
+            'enrol' => 'manual',
+            'courseid' => $course->id,
+            'status' => ENROL_INSTANCE_ENABLED
+        ));
+
+        if (!$exists) {
+            $enrol->add_default_instance($course);
         }
     }
 
