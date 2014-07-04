@@ -689,5 +689,15 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014062700, 'local', 'connect');
     }
 
+    if ($oldversion < 2014070400) {
+        // Ensure all courses have a manual enrolment plugin.
+        \local_connect\course::batch_all(function($course) {
+            $course->ensure_manual_enrol();
+        });
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014070400, 'local', 'connect');
+    }
+
     return true;
 }
