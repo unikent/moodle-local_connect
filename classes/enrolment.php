@@ -26,6 +26,7 @@ namespace local_connect;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir . "/enrollib.php");
 require_once($CFG->libdir . "/accesslib.php");
 
 /**
