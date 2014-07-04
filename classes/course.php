@@ -490,6 +490,10 @@ class course extends data
     public function ensure_manual_enrol() {
         global $DB;
 
+        if (!$this->is_in_moodle()) {
+            return false;
+        }
+
         $enrol = enrol_get_plugin('manual');
         $course = $DB->get_record('course', array(
             'id' => $this->mid
@@ -504,6 +508,8 @@ class course extends data
         if (!$exists) {
             $enrol->add_default_instance($course);
         }
+
+        return true;
     }
 
 
