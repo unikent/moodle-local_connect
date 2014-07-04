@@ -494,18 +494,18 @@ class course extends data
             return false;
         }
 
-        $enrol = enrol_get_plugin('manual');
-        $course = $DB->get_record('course', array(
-            'id' => $this->mid
-        ));
-
         $exists = $DB->record_exists('enrol', array(
             'enrol' => 'manual',
-            'courseid' => $course->id,
+            'courseid' => $this->mid,
             'status' => ENROL_INSTANCE_ENABLED
         ));
 
         if (!$exists) {
+            $course = $DB->get_record('course', array(
+                'id' => $this->mid
+            ));
+
+            $enrol = enrol_get_plugin('manual');
             $enrol->add_default_instance($course);
         }
 
