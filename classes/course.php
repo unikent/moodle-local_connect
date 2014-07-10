@@ -463,9 +463,6 @@ class course extends data
         // Add a news forum to the course.
         $this->create_forum();
 
-        // Make sure we have the correct enrolment plugins.
-        $this->ensure_manual_enrol();
-
         // Fire the event.
         $params = array(
             'objectid' => $this->id,
@@ -480,34 +477,6 @@ class course extends data
 
         // Sync our groups.
         $this->sync_groups();
-
-        return true;
-    }
-
-    /**
-     * Ensure this course has a manual enrolments plugin.
-     */
-    public function ensure_manual_enrol() {
-        global $DB;
-
-        if (!$this->is_in_moodle()) {
-            return false;
-        }
-
-        $exists = $DB->record_exists('enrol', array(
-            'enrol' => 'manual',
-            'courseid' => $this->mid,
-            'status' => ENROL_INSTANCE_ENABLED
-        ));
-
-        if (!$exists) {
-            $course = $DB->get_record('course', array(
-                'id' => $this->mid
-            ));
-
-            $enrol = enrol_get_plugin('manual');
-            $enrol->add_default_instance($course);
-        }
 
         return true;
     }
