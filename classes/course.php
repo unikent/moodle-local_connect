@@ -406,6 +406,14 @@ class course extends data
     public function get_enrol_instance() {
         global $DB;
 
+        $course = $DB->get_record('course', array(
+            'id' => $this->mid
+        ));
+
+        if (!$course) {
+            return null;
+        }
+
         $instance = $DB->get_record('enrol', array(
             'enrol' => 'connect',
             'courseid' => $this->mid,
@@ -418,7 +426,7 @@ class course extends data
 
         // Create it.
         $enrol = enrol_get_plugin('connect');
-        $id = $enrol->add_instance($this->mid, array(
+        $id = $enrol->add_instance($course, array(
             'customint1' => $this->id
         ));
 
