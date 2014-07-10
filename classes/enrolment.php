@@ -104,37 +104,6 @@ class enrolment extends data
     }
 
     /**
-     * Returns a valid instance of the connect enrolment plugin for this module.
-     */
-    private function get_enrol_instance() {
-        global $DB;
-
-        $instance = $DB->get_record('enrol', array(
-            'enrol' => 'connect',
-            'courseid' => $this->course->mid,
-            'customint1' => $this->course->id
-        ));
-
-        if ($instance) {
-            return $instance;
-        }
-
-        // Create it.
-        $enrol = enrol_get_plugin('connect');
-        $id = $enrol->add_instance($this->course->mid, array(
-            'customint1' => $this->course->id
-        ));
-
-        if (!$id) {
-            return null;
-        }
-
-        return $DB->get_record('enrol', array(
-            'id' => $id
-        ));
-    }
-
-    /**
      * Ensure we should be deleting this enrolment.
      * This basically says "Okay, so I am deleted, but are there any other
      * enrolments for this mid that are not?"
@@ -163,7 +132,7 @@ class enrolment extends data
         global $DB;
         $this->reset_object_cache();
 
-        $instance = $this->get_enrol_instance();
+        $instance = $this->course->get_enrol_instance();
         if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
             $enrol = enrol_get_plugin('connect');
             $enrol->unenrol_user($instance, $this->user->mid);
@@ -245,7 +214,7 @@ class enrolment extends data
         }
 
         // Do the enrolment.
-        $instance = $this->get_enrol_instance();
+        $instance = $this->course->get_enrol_instance();
         if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
             $enrol = enrol_get_plugin('connect');
             $enrol->enrol_user($instance, $this->user->mid, $this->role->mid);

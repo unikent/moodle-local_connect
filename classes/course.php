@@ -27,6 +27,7 @@ namespace local_connect;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . "/enrollib.php");
+require_once($CFG->libdir . "/accesslib.php");
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/mod/aspirelists/lib.php');
 require_once($CFG->dirroot . '/mod/forum/lib.php');
@@ -397,6 +398,37 @@ class course extends data
         return  $course->fullname !== $this->fullname ||
                 $course->summary !== $this->summary ||
                 $course->category !== $this->category;
+    }
+
+    /**
+     * Returns a valid instance of the connect enrolment plugin for this course.
+     */
+    public function get_enrol_instance() {
+        global $DB;
+
+        $instance = $DB->get_record('enrol', array(
+            'enrol' => 'connect',
+            'courseid' => $this->mid,
+            'customint1' => $this->id
+        ));
+
+        if ($instance) {
+            return $instance;
+        }
+
+        // Create it.
+        $enrol = enrol_get_plugin('connect');
+        $id = $enrol->add_instance($this->mid, array(
+            'customint1' => $this->id
+        ));
+
+        if (!$id) {
+            return null;
+        }
+
+        return $DB->get_record('enrol', array(
+            'id' => $id
+        ));
     }
 
     /**
