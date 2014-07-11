@@ -696,11 +696,23 @@ function xmldb_local_connect_upgrade($oldversion) {
         if ($roleids) {
             list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'roleid');
 
+            $coursecount = $DB->count_records('context', array(
+                'contextlevel' => CONTEXT_COURSE
+            ));
+            $currentcount = 0.0;
+            $lastprogress = -1;
+
             $enrol = enrol_get_plugin('manual');
             $rs = $DB->get_recordset('context', array(
                 'contextlevel' => CONTEXT_COURSE
             ));
             foreach ($rs as $ctx) {
+                $progress = floor(($currentcount / $coursecount) * 100);
+                if ($progress != $lastprogress && ($progress % 10 === 0)) {
+                    echo "{$progress}%...";
+                }
+                $lastprogress = $progress;
+
                 $instance = $DB->get_record('enrol', array(
                     'enrol' => 'manual',
                     'courseid' => $ctx->instanceid,
@@ -723,8 +735,11 @@ function xmldb_local_connect_upgrade($oldversion) {
                 foreach ($users as $userid) {
                     $enrol->unenrol_user($instance, $userid);
                 }
+
+                $currentcount++;
             }
             $rs->close();
+            echo "\n";
         }
 
         // Connect savepoint reached.
