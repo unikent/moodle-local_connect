@@ -83,13 +83,26 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $this->generate_enrolments(30, $course, 'student');
         $this->generate_enrolments(2, $course, 'convenor');
         $this->generate_enrolments(1, $course, 'teacher');
+        $course = \local_connect\course::get($course);
+
+        $course2 = $this->generate_course();
+        $this->generate_enrolments(30, $course2, 'student');
+        $course2 = \local_connect\course::get($course2);
 
         $this->assertEquals(0, $DB->count_records('user_enrolments'));
 
-        $course = \local_connect\course::get($course);
         $this->assertTrue($course->create_in_moodle());
-
         $this->assertEquals(33, $DB->count_records('user_enrolments'));
+
+        $course->add_child($course2);
+        $this->assertEquals(63, $DB->count_records('user_enrolments'));
+
+        $course2->unlink();
+        $this->assertEquals(33, $DB->count_records('user_enrolments'));
+
+        $course->delete();
+
+        $this->assertEquals(0, $DB->count_records('user_enrolments'));
     }
 
     /**
