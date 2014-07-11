@@ -689,5 +689,57 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014062700, 'local', 'connect');
     }
 
+    // Delete all manual enrolments.
+    if ($oldversion < 2014071100) {
+        // Get a set of role IDs.
+        $roleids = $DB->get_fieldset_sql("SELECT mid FROM {connect_role} WHERE mid > 0");
+        if ($roleids) {
+            list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'roleid');
+
+            $enrol = enrol_get_plugin('manual');
+            $rs = $DB->get_recordset('context', array(
+                'contextlevel' => CONTEXT_COURSE
+            ));
+            foreach ($rs as $ctx) {
+                $instance = $DB->get_record('enrol', array(
+                    'enrol' => 'manual',
+                    'courseid' => $ctx->instanceid,
+                    'status' => ENROL_INSTANCE_ENABLED
+                ));
+
+                if (!$instance) {
+                    continue;
+                }
+
+                $roleparams['contextid'] = $ctx->id;
+
+                // Get a list of enrolled users.
+                $users = $DB->get_fieldset_sql("SELECT ra.userid
+                    FROM {role_assignments} ra
+                    WHERE ra.contextid=:contextid AND ra.roleid $rolesql
+                    GROUP BY ra.userid
+                ", $roleparams);
+
+                foreach ($users as $userid) {
+                    $enrol->unenrol_user($instance, $userid);
+                }
+            }
+            $rs->close();
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014071100, 'local', 'connect');
+    }
+
+    // Move to the new enrol plugin.
+    if ($oldversion < 2014071101) {
+        \local_connect\connect::batch_all(function($course) {
+            $course->sync_enrolments();
+        });
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014071101, 'local', 'connect');
+    }
+
     return true;
 }
