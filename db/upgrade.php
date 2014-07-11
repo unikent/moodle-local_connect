@@ -748,7 +748,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
     // Move to the new enrol plugin.
     if ($oldversion < 2014071101) {
-        \local_connect\connect::batch_all(function($course) {
+        \local_connect\course::batch_all(function($course) {
             $course->sync_enrolments();
         });
 
