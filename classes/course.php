@@ -674,11 +674,11 @@ class course extends data
      * Delete this course's enrolments.
      */
     public function delete_enrolments() {
-        $todo = array_merge($this->enrolments, $this->group_enrolments);
-        foreach ($todo as $enrolment) {
-            if ($enrolment->is_in_moodle()) {
-                $enrolment->delete();
-            }
+        // Remove our enrolment plugin.
+        $instance = $this->get_enrol_instance();
+        if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
+            $enrol = enrol_get_plugin('connect');
+            $enrol->delete_instance($instance);
         }
     }
 
