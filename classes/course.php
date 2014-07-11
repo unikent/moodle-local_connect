@@ -406,6 +406,7 @@ class course extends data
     public function get_enrol_instance() {
         global $DB;
 
+        // We need a course object for all this.
         $course = $DB->get_record('course', array(
             'id' => $this->mid
         ));
@@ -414,6 +415,7 @@ class course extends data
             return null;
         }
 
+        // Try to grab the enol instance.
         $instance = $DB->get_record('enrol', array(
             'enrol' => 'connect',
             'courseid' => $this->mid,
@@ -424,7 +426,7 @@ class course extends data
             return $instance;
         }
 
-        // Create it.
+        // It doesnt exist? Create it.
         $enrol = enrol_get_plugin('connect');
         $id = $enrol->add_instance($course, array(
             'customint1' => $this->id
@@ -434,6 +436,7 @@ class course extends data
             return null;
         }
 
+        // All went well, grab the object.
         return $DB->get_record('enrol', array(
             'id' => $id
         ));
