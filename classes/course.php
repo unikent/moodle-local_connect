@@ -684,17 +684,16 @@ class course extends data
 
     /**
      * Syncs enrollments for this Course
-     * @todo Updates/Deletions
      */
     public function sync_enrolments() {
         if (!$this->is_in_moodle()) {
             return;
         }
 
-        foreach ($this->enrolments as $enrolment) {
-            if (!$enrolment->is_in_moodle()) {
-                $enrolment->create_in_moodle();
-            }
+        $instance = $this->get_enrol_instance();
+        if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
+            $enrol = enrol_get_plugin('connect');
+            $enrol->sync($this->mid, array($instance));
         }
     }
 
