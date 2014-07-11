@@ -94,7 +94,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
     if ($oldversion < 2014031201) {
         // Connect Campus.
-        {
+        if (true) {
             // Define table connect_campus to be created.
             $table = new xmldb_table('connect_campus');
 
@@ -113,7 +113,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Enrolments.
-        {
+        if (true) {
             // Define table connect_enrolments to be created.
             $table = new xmldb_table('connect_enrolments');
 
@@ -138,7 +138,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Groups.
-        {
+        if (true) {
             // Define table connect_group to be created.
             $table = new xmldb_table('connect_group');
 
@@ -160,7 +160,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Group Enrolments.
-        {
+        if (true) {
             // Define table connect_group_enrolments to be created.
             $table = new xmldb_table('connect_group_enrolments');
 
@@ -184,7 +184,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Roles.
-        {
+        if (true) {
             // Define table connect_role to be created.
             $table = new xmldb_table('connect_role');
 
@@ -203,7 +203,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Users.
-        {
+        if (true) {
             // Define table connect_user to be created.
             $table = new xmldb_table('connect_user');
 
@@ -228,7 +228,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Courses.
-        {
+        if (true) {
             // Define table connect_course to be created.
             $table = new xmldb_table('connect_course');
 
@@ -296,7 +296,7 @@ function xmldb_local_connect_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014031700) {
-        {
+        if (true) {
             // Define table connect_course_chksum to be dropped.
             $table = new xmldb_table('connect_course_chksum');
 
@@ -306,7 +306,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             }
         }
 
-        {
+        if (true) {
             // Define table connect_enrolment_chksum to be dropped.
             $table = new xmldb_table('connect_enrolment_chksum');
 
@@ -316,7 +316,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             }
         }
 
-        {
+        if (true) {
             // Define field mid to be dropped from connect_enrolments.
             $table = new xmldb_table('connect_enrolments');
 
@@ -333,7 +333,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             }
         }
 
-        {
+        if (true) {
             // Define field mid to be dropped from connect_group_enrolments.
             $table = new xmldb_table('connect_group_enrolments');
 
@@ -374,22 +374,22 @@ function xmldb_local_connect_upgrade($oldversion) {
 
         foreach ($remaps as $table => $cols) {
             $table = new xmldb_table($table);
-            foreach ($cols as $col => $col_obj) {
+            foreach ($cols as $col => $colobj) {
                 // If there is an index, drop it.
                 $index = new xmldb_index('index_' . $col, XMLDB_INDEX_NOTUNIQUE, array($col));
-                $index_exists = $dbman->index_exists($table, $index);
-                if ($index_exists) {
+                $indexexists = $dbman->index_exists($table, $index);
+                if ($indexexists) {
                     $dbman->drop_index($table, $index);
                 }
 
                 // Rename the field.
-                $field = $col_obj;
+                $field = $colobj;
                 if ($dbman->field_exists($table, $field)) {
                     $dbman->rename_field($table, $field, $col . 'id');
                 }
 
                 // Create a new index.
-                if ($index_exists) {
+                if ($indexexists) {
                     $index = new xmldb_index('index_' . $col . 'id', XMLDB_INDEX_NOTUNIQUE, array($col . 'id'));
                     if (!$dbman->index_exists($table, $index)) {
                         $dbman->add_index($table, $index);
@@ -405,7 +405,7 @@ function xmldb_local_connect_upgrade($oldversion) {
     if ($oldversion < 2014031801) {
         $table = new xmldb_table("connect_role");
 
-        {
+        if (true) {
             $field = new xmldb_field('mid', XMLDB_TYPE_INTEGER, '11', null, null, null, '0', 'id');
 
             // Conditionally launch add field mid.
@@ -414,7 +414,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             }
         }
 
-        {
+        if (true) {
             $index = new xmldb_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
 
             // Conditionally launch add index index_mid.
