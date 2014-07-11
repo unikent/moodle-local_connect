@@ -716,7 +716,7 @@ function xmldb_local_connect_upgrade($oldversion) {
                 // Get a list of enrolled users.
                 $users = $DB->get_fieldset_sql("SELECT ra.userid
                     FROM {role_assignments} ra
-                    WHERE ra.contextid=:contextid AND ra.roleid $rolesql
+                    WHERE ra.contextid=:contextid AND (ra.roleid $rolesql)
                     GROUP BY ra.userid
                 ", $roleparams);
 
