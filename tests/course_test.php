@@ -62,6 +62,28 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
     }
 
     /**
+     * Test we can sync a course's enrolments.
+     */
+    public function test_course_enrol_sync() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->enable_enrol_plugin();
+
+        $course = $this->generate_course();
+        $this->generate_enrolments(30, $course, 'student');
+        $this->generate_enrolments(2, $course, 'convenor');
+        $this->generate_enrolments(1, $course, 'teacher');
+
+        $this->assertEquals(0, $DB->count_records('user_enrolments'));
+
+        $course = \local_connect\course::get($course);
+        $this->assertTrue($course->create_in_moodle());
+
+        $this->assertEquals(33, $DB->count_records('user_enrolments'));
+    }
+
+    /**
      * Test shortnames are always unique.
      */
     public function test_course_shortname_check() {
