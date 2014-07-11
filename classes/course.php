@@ -648,12 +648,12 @@ class course extends data
         // Step 3 - Commit to DB.
         update_course($course);
 
-        // Step 4 - Update this entry.
+        // Step 4 - Delete enrolments.
+        $this->delete_enrolments();
+
+        // Step 5 - Update this entry.
         $this->mid = 0;
         $this->save();
-
-        // Step 5 - Delete enrolments.
-        $this->delete_enrolments();
 
         return true;
     }
