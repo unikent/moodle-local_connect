@@ -94,7 +94,7 @@ function xmldb_local_connect_upgrade($oldversion) {
 
     if ($oldversion < 2014031201) {
         // Connect Campus.
-        {
+        if (true) {
             // Define table connect_campus to be created.
             $table = new xmldb_table('connect_campus');
 
@@ -113,7 +113,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Enrolments.
-        {
+        if (true) {
             // Define table connect_enrolments to be created.
             $table = new xmldb_table('connect_enrolments');
 
@@ -138,7 +138,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Groups.
-        {
+        if (true) {
             // Define table connect_group to be created.
             $table = new xmldb_table('connect_group');
 
@@ -160,7 +160,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Group Enrolments.
-        {
+        if (true) {
             // Define table connect_group_enrolments to be created.
             $table = new xmldb_table('connect_group_enrolments');
 
@@ -184,7 +184,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Roles.
-        {
+        if (true) {
             // Define table connect_role to be created.
             $table = new xmldb_table('connect_role');
 
@@ -203,7 +203,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Users.
-        {
+        if (true) {
             // Define table connect_user to be created.
             $table = new xmldb_table('connect_user');
 
@@ -228,7 +228,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect Courses.
-        {
+        if (true) {
             // Define table connect_course to be created.
             $table = new xmldb_table('connect_course');
 
@@ -296,7 +296,7 @@ function xmldb_local_connect_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014031700) {
-        {
+        if (true) {
             // Define table connect_course_chksum to be dropped.
             $table = new xmldb_table('connect_course_chksum');
 
@@ -306,7 +306,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             }
         }
 
-        {
+        if (true) {
             // Define table connect_enrolment_chksum to be dropped.
             $table = new xmldb_table('connect_enrolment_chksum');
 
@@ -316,7 +316,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             }
         }
 
-        {
+        if (true) {
             // Define field mid to be dropped from connect_enrolments.
             $table = new xmldb_table('connect_enrolments');
 
@@ -333,7 +333,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             }
         }
 
-        {
+        if (true) {
             // Define field mid to be dropped from connect_group_enrolments.
             $table = new xmldb_table('connect_group_enrolments');
 
@@ -374,22 +374,22 @@ function xmldb_local_connect_upgrade($oldversion) {
 
         foreach ($remaps as $table => $cols) {
             $table = new xmldb_table($table);
-            foreach ($cols as $col => $col_obj) {
+            foreach ($cols as $col => $colobj) {
                 // If there is an index, drop it.
                 $index = new xmldb_index('index_' . $col, XMLDB_INDEX_NOTUNIQUE, array($col));
-                $index_exists = $dbman->index_exists($table, $index);
-                if ($index_exists) {
+                $indexexists = $dbman->index_exists($table, $index);
+                if ($indexexists) {
                     $dbman->drop_index($table, $index);
                 }
 
                 // Rename the field.
-                $field = $col_obj;
+                $field = $colobj;
                 if ($dbman->field_exists($table, $field)) {
                     $dbman->rename_field($table, $field, $col . 'id');
                 }
 
                 // Create a new index.
-                if ($index_exists) {
+                if ($indexexists) {
                     $index = new xmldb_index('index_' . $col . 'id', XMLDB_INDEX_NOTUNIQUE, array($col . 'id'));
                     if (!$dbman->index_exists($table, $index)) {
                         $dbman->add_index($table, $index);
@@ -405,7 +405,7 @@ function xmldb_local_connect_upgrade($oldversion) {
     if ($oldversion < 2014031801) {
         $table = new xmldb_table("connect_role");
 
-        {
+        if (true) {
             $field = new xmldb_field('mid', XMLDB_TYPE_INTEGER, '11', null, null, null, '0', 'id');
 
             // Conditionally launch add field mid.
@@ -414,7 +414,7 @@ function xmldb_local_connect_upgrade($oldversion) {
             }
         }
 
-        {
+        if (true) {
             $index = new xmldb_index('index_mid', XMLDB_INDEX_NOTUNIQUE, array('mid'));
 
             // Conditionally launch add index index_mid.
@@ -689,14 +689,71 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014062700, 'local', 'connect');
     }
 
-    if ($oldversion < 2014070400) {
-        // Ensure all courses have a manual enrolment plugin.
+    // Delete all manual enrolments.
+    if ($oldversion < 2014071100) {
+        // Get a set of role IDs.
+        $roleids = $DB->get_fieldset_sql("SELECT mid FROM {connect_role} WHERE mid > 0");
+        if ($roleids) {
+            list($rolesql, $roleparams) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'roleid');
+
+            $coursecount = $DB->count_records('context', array(
+                'contextlevel' => CONTEXT_COURSE
+            ));
+            $currentcount = 0.0;
+            $lastprogress = -1;
+
+            $enrol = enrol_get_plugin('manual');
+            $rs = $DB->get_recordset('context', array(
+                'contextlevel' => CONTEXT_COURSE
+            ));
+            foreach ($rs as $ctx) {
+                $progress = floor(($currentcount / $coursecount) * 100);
+                if ($progress != $lastprogress && ($progress % 10 === 0)) {
+                    echo "{$progress}%...";
+                }
+                $lastprogress = $progress;
+
+                $instance = $DB->get_record('enrol', array(
+                    'enrol' => 'manual',
+                    'courseid' => $ctx->instanceid,
+                    'status' => ENROL_INSTANCE_ENABLED
+                ));
+
+                if (!$instance) {
+                    continue;
+                }
+
+                $roleparams['contextid'] = $ctx->id;
+
+                // Get a list of enrolled users.
+                $users = $DB->get_fieldset_sql("SELECT ra.userid
+                    FROM {role_assignments} ra
+                    WHERE ra.contextid=:contextid AND (ra.roleid $rolesql)
+                    GROUP BY ra.userid
+                ", $roleparams);
+
+                foreach ($users as $userid) {
+                    $enrol->unenrol_user($instance, $userid);
+                }
+
+                $currentcount++;
+            }
+            $rs->close();
+            echo "\n";
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014071100, 'local', 'connect');
+    }
+
+    // Move to the new enrol plugin.
+    if ($oldversion < 2014071101) {
         \local_connect\course::batch_all(function($course) {
-            $course->ensure_manual_enrol();
+            $course->sync_enrolments();
         });
 
         // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2014070400, 'local', 'connect');
+        upgrade_plugin_savepoint(true, 2014071101, 'local', 'connect');
     }
 
     return true;

@@ -42,15 +42,6 @@ $tasks = array(
         'month' => '*'
     ),
     array(
-        'classname' => 'local_connect\task\enrolment_sync',
-        'blocking' => 0,
-        'minute' => '20',
-        'hour' => '3',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
         'classname' => 'local_connect\task\group_sync',
         'blocking' => 0,
         'minute' => '30',
