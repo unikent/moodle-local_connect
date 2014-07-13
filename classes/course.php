@@ -27,6 +27,7 @@ namespace local_connect;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . "/enrollib.php");
+require_once($CFG->libdir . "/accesslib.php");
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/mod/aspirelists/lib.php');
 require_once($CFG->dirroot . '/mod/forum/lib.php');
@@ -400,6 +401,48 @@ class course extends data
     }
 
     /**
+     * Returns a valid instance of the connect enrolment plugin for this course.
+     */
+    public function get_enrol_instance() {
+        global $DB;
+
+        // We need a course object for all this.
+        $course = $DB->get_record('course', array(
+            'id' => $this->mid
+        ));
+
+        if (!$course) {
+            return null;
+        }
+
+        // Try to grab the enol instance.
+        $instance = $DB->get_record('enrol', array(
+            'enrol' => 'connect',
+            'courseid' => $this->mid,
+            'customint1' => $this->id
+        ));
+
+        if ($instance) {
+            return $instance;
+        }
+
+        // It doesnt exist? Create it.
+        $enrol = enrol_get_plugin('connect');
+        $id = $enrol->add_instance($course, array(
+            'customint1' => $this->id
+        ));
+
+        if (!$id) {
+            return null;
+        }
+
+        // All went well, grab the object.
+        return $DB->get_record('enrol', array(
+            'id' => $id
+        ));
+    }
+
+    /**
      * Create this course in Moodle
      * @param string $shortnameext (optional)
      * @return boolean
@@ -463,9 +506,6 @@ class course extends data
         // Add a news forum to the course.
         $this->create_forum();
 
-        // Make sure we have the correct enrolment plugins.
-        $this->ensure_manual_enrol();
-
         // Fire the event.
         $params = array(
             'objectid' => $this->id,
@@ -480,34 +520,6 @@ class course extends data
 
         // Sync our groups.
         $this->sync_groups();
-
-        return true;
-    }
-
-    /**
-     * Ensure this course has a manual enrolments plugin.
-     */
-    public function ensure_manual_enrol() {
-        global $DB;
-
-        if (!$this->is_in_moodle()) {
-            return false;
-        }
-
-        $exists = $DB->record_exists('enrol', array(
-            'enrol' => 'manual',
-            'courseid' => $this->mid,
-            'status' => ENROL_INSTANCE_ENABLED
-        ));
-
-        if (!$exists) {
-            $course = $DB->get_record('course', array(
-                'id' => $this->mid
-            ));
-
-            $enrol = enrol_get_plugin('manual');
-            $enrol->add_default_instance($course);
-        }
 
         return true;
     }
@@ -639,12 +651,12 @@ class course extends data
         // Step 3 - Commit to DB.
         update_course($course);
 
-        // Step 4 - Update this entry.
+        // Step 4 - Delete enrolments.
+        $this->delete_enrolments();
+
+        // Step 5 - Update this entry.
         $this->mid = 0;
         $this->save();
-
-        // Step 5 - Delete enrolments.
-        $this->delete_enrolments();
 
         return true;
     }
@@ -665,27 +677,35 @@ class course extends data
      * Delete this course's enrolments.
      */
     public function delete_enrolments() {
-        $todo = array_merge($this->enrolments, $this->group_enrolments);
-        foreach ($todo as $enrolment) {
-            if ($enrolment->is_in_moodle()) {
-                $enrolment->delete();
-            }
+        // Remove our enrolment plugin.
+        $instance = $this->get_enrol_instance();
+        if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
+            $enrol = enrol_get_plugin('connect');
+            $enrol->delete_instance($instance);
         }
     }
 
     /**
-     * Syncs enrollments for this Course
-     * @todo Updates/Deletions
+     * Syncs enrolments for this Course
      */
     public function sync_enrolments() {
         if (!$this->is_in_moodle()) {
             return;
         }
 
-        foreach ($this->enrolments as $enrolment) {
-            if (!$enrolment->is_in_moodle()) {
-                $enrolment->create_in_moodle();
+        $instances = array();
+
+        $courses = self::get_by('mid', $this->mid, true);
+        foreach ($courses as $course) {
+            $instance = $course->get_enrol_instance();
+            if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
+                $instances[] = $instance;
             }
+        }
+
+        if (!empty($instances)) {
+            $enrol = enrol_get_plugin('connect');
+            $enrol->sync($this->mid, $instances);
         }
     }
 

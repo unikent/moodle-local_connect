@@ -132,14 +132,11 @@ class enrolment extends data
         global $DB;
         $this->reset_object_cache();
 
-        $enrol = enrol_get_plugin('manual');
-        $instances = $DB->get_records('enrol', array(
-            'enrol' => 'manual',
-            'courseid' => $this->course->mid,
-            'status' => ENROL_INSTANCE_ENABLED
-        ), 'sortorder, id ASC');
-        $instance = reset($instances);
-        $enrol->unenrol_user($instance, $this->user->mid);
+        $instance = $this->course->get_enrol_instance();
+        if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
+            $enrol = enrol_get_plugin('connect');
+            $enrol->unenrol_user($instance, $this->user->mid);
+        }
     }
 
     /**
@@ -216,7 +213,14 @@ class enrolment extends data
             return false;
         }
 
-        if (!enrol_try_internal_enrol($this->course->mid, $this->user->mid, $this->role->mid)) {
+        // Do the enrolment.
+        $instance = $this->course->get_enrol_instance();
+        if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
+            $enrol = enrol_get_plugin('connect');
+            $enrol->enrol_user($instance, $this->user->mid, $this->role->mid);
+        }
+
+        if (!$this->is_in_moodle()) {
             $msg = "Enrol '{$this->user->mid}' on '{$this->course->mid}' as a '{$this->role->name}' failed.";
             \local_connect\util\helpers::error($msg);
             return false;

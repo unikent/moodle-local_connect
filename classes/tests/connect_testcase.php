@@ -243,4 +243,24 @@ abstract class connect_testcase extends \advanced_testcase
             $this->generate_course();
         }
     }
+
+    /**
+     * Enable the connect enrol plugin
+     */
+    protected function enable_enrol_plugin() {
+        $enabled = enrol_get_plugins(true);
+        $enabled['connect'] = true;
+        $enabled = array_keys($enabled);
+        set_config('enrol_plugins_enabled', implode(',', $enabled));
+    }
+
+    /**
+     * Disable the connect enrol plugin
+     */
+    protected function disable_enrol_plugin() {
+        $enabled = enrol_get_plugins(true);
+        unset($enabled['connect']);
+        $enabled = array_keys($enabled);
+        set_config('enrol_plugins_enabled', implode(',', $enabled));
+    }
 }
