@@ -56,4 +56,4 @@ class user_enrolments extends \core\task\adhoc_task
 
         return parent::set_custom_data($customdata);
     }
-} 
+}
