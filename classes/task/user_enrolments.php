@@ -30,7 +30,7 @@ namespace local_connect\task;
 class user_enrolments extends \core\task\adhoc_task
 {
     public function execute() {
-        $data = $this->get_custom_data();
+        $data = (array)$this->get_custom_data();
 
         // Sync Enrollments.
         $enrolments = \local_connect\enrolment::get_by("userid", $data['userid'], true);
