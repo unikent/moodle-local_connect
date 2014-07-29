@@ -29,6 +29,10 @@ namespace local_connect\task;
  */
 class user_enrolments extends \core\task\adhoc_task
 {
+    public function get_component() {
+        return 'local_connect';
+    }
+
     public function execute() {
         $data = (array)$this->get_custom_data();
 
