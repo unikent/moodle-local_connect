@@ -82,6 +82,11 @@ class observers
             'mid' => $event->objectid
         ));
 
+        // Clear out our ext.
+        $DB->delete_records('connect_course_exts', array(
+            'coursemid' => $event->objectid
+        ));
+
         return true;
     }
 
