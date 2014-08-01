@@ -314,7 +314,13 @@ class course extends data
                 "mid" => $this->mid
             ));
 
-            $this->_locked = $locked != "0";
+            $this->_locked = $locked === false || (bool)$locked;
+
+            // We are not locked if not in strict mode.
+            $strict = get_config('local_connect', 'strict_sync');
+            if (!$strict) {
+                $this->_locked = false;
+            }
         }
 
         return $this->_locked;
@@ -388,12 +394,6 @@ class course extends data
         $course = $DB->get_record('course', array(
             'id' => $this->mid
         ), 'id, shortname, fullname, category, summary');
-
-        // Courses do not sync unless in strict mode.
-        $strict = get_config('local_connect', 'strict_sync');
-        if (!$strict) {
-            return false;
-        }
 
         return  $course->fullname !== $this->fullname ||
                 $course->summary !== $this->summary ||
