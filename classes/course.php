@@ -314,7 +314,7 @@ class course extends data
                 "mid" => $this->mid
             ));
 
-            $this->_locked = $locked !== 0;
+            $this->_locked = $locked != "0";
         }
 
         return $this->_locked;
