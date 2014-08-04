@@ -51,20 +51,6 @@ if ($hassiteconfig) {
     ));
 
     $settings->add(new admin_setting_configcheckbox(
-        'local_connect_enable_new_features',
-        get_string('new_feature_toggle', 'local_connect'),
-        get_string('new_feature_toggle_desc', 'local_connect'),
-        0
-    ));
-
-    $settings->add(new admin_setting_configcheckbox(
-        'local_connect_enable_cron',
-        get_string('cron_toggle', 'local_connect'),
-        get_string('cron_toggle_desc', 'local_connect'),
-        0
-    ));
-
-    $settings->add(new admin_setting_configcheckbox(
         'local_connect/enable_course_sync',
         'Enable course syncing',
         'Allows modules to update their description from SDS (you do not want to enable this for anything prior to 2014).',

@@ -51,31 +51,6 @@ class helpers {
     }
 
     /**
-     * Enable the fancy new connect features?
-     */
-    public static function enable_new_features() {
-        global $CFG;
-        return static::is_enabled() && isset($CFG->local_connect_enable_new_features) && $CFG->local_connect_enable_new_features;
-    }
-
-    /**
-     * Enable the fancy new connect observers?
-     */
-    public static function enable_new_observers() {
-        global $CFG;
-        return static::is_enabled() && isset($CFG->local_connect_enable_observers) && $CFG->local_connect_enable_observers;
-    }
-
-    /**
-     * Enable the cron?
-     */
-    public static function enable_cron() {
-        global $CFG;
-        return static::is_enabled() && isset($CFG->local_connect_enable_cron) && $CFG->local_connect_enable_cron;
-    }
-
-
-    /**
      * Is this user allowed to manage courses?
      * @return boolean
      */
