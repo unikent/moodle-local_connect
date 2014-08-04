@@ -32,12 +32,15 @@ class course {
      * Grab out of SDS.
      */
     public static function get_all($sessioncode) {
-        $db = db::obtain();
+        global $SDSDB;
+
+        db::obtain();
+
         $sql = <<<SQL
     SELECT DISTINCT
+        ltrim(rtrim(dmd.module_delivery_key)) as module_delivery_key,
         ltrim(rtrim(dmds.session_code)) as session_code,
         ltrim(rtrim(dmd.delivery_department)) as delivery_department,
-        ltrim(rtrim(dmd.module_delivery_key)) as module_delivery_key,
       ltrim(rtrim(cmd.module_version)) as module_version,
       ltrim(rtrim(cc.campus)) as campus,
       ltrim(rtrim(cc.campus_desc)) as campus_desc,
@@ -85,12 +88,6 @@ class course {
     WHERE dmd.delivery_faculty IN ('A','H','S','U')
 SQL;
 
-        $result = mssql_query($sql, $db);
-        while ($row = mssql_fetch_row($result)) {
-        	print_r($row);
-        }
-        mssql_free_result($result);
-
-        mssql_close($db);
+		print_r($SDSDB->get_records_sql($sql));
     }
 }

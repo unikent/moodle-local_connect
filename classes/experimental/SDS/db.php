@@ -32,17 +32,27 @@ class db {
      * Obtain the connector.
      */
     public static function obtain() {
-        global $CFG;
+        global $CFG, $SDSDB;
 
-        $mssql = mssql_connect($CFG->kent->sdsdb['host'], $CFG->kent->sdsdb['username'], $CFG->kent->sdsdb['password'], true);
-        mssql_select_db('studb', $mssql);
+        if (isset($SDSDB)) {
+            return;
+        }
 
-        $sql = "SET ANSI_NULLS ON";
-        $result = mssql_query($sql, $mssql);
+        if (!$SDSDB = \moodle_database::get_driver_instance($CFG->kent->sdsdb['driver'],
+                                                            $CFG->kent->sdsdb['library'],
+                                                            true)) {
+            throw new \dml_exception('dbdriverproblem', "Unknown driver for SDS");
+        }
 
-        $sql = "SET ANSI_WARNINGS ON";
-        $result = mssql_query($sql, $mssql);
+        $SDSDB->connect(
+            $CFG->kent->sdsdb['host'],
+            $CFG->kent->sdsdb['user'],
+            $CFG->kent->sdsdb['pass'],
+            $CFG->kent->sdsdb['name'],
+            $CFG->kent->sdsdb['prefix'],
+            $CFG->kent->sdsdb['options']
+        );
 
-        return $mssql;
+        return $SDSDB;
     }
 }
