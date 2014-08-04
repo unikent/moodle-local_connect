@@ -2,4 +2,4 @@
 
 require_once('../../../../config.php');
 
-\local_connect\experimental\SDS\groups::get_all(2015);
+//\local_connect\experimental\SDS\enrolments::get_all_students(2015);
