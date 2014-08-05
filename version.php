@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2014071101;
 $plugin->requires  = 2014051200;
-$plugin->cron      = 0;
 
 $plugin->dependencies = array(
     'local_catman' => 2014022600,
