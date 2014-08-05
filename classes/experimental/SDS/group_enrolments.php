@@ -25,9 +25,9 @@
 namespace local_connect\experimental\SDS;
 
 /**
- * Grabs all groups out of SDS.
+ * Grabs all group enrolments out of SDS.
  */
-class groups {
+class group_enrolments {
     /**
      * Grab out of SDS.
      */
@@ -38,10 +38,12 @@ class groups {
 
         $sql = <<<SQL
             SELECT DISTINCT
+              ltrim(rtrim(dgm.session_code)) + '|' + ltrim(rtrim(cg.group_id)) + '|' + ltrim(rtrim(bd.email_address)) AS chksum,
               ltrim(rtrim(cg.group_id)) AS group_id,
               ltrim(rtrim(cg.group_desc)) AS group_desc,
               ltrim(rtrim(dgm.module_delivery_key)) AS module_delivery_key,
-              ltrim(rtrim(dgm.session_code)) AS session_code
+              ltrim(rtrim(dgm.session_code)) AS session_code,
+              lug.ukc
             FROM d_group_module AS dgm
               INNER JOIN c_groups AS cg ON cg.parent_group = dgm.group_id
               LEFT JOIN l_ukc_group AS lug on lug.group_id = cg.group_id
@@ -51,6 +53,12 @@ class groups {
               AND bd.email_address != ''
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        $objects = $SDSDB->get_records_sql($sql);
+
+        foreach ($objects as $object) {
+            $object->chksum = md5($object->chksum);
+        }
+
+        return $objects;
     }
 }
