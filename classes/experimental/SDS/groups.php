@@ -56,6 +56,6 @@ class groups {
 			WHERE (dgm.session_code = $sessioncode) AND (cg.group_type = 'S') AND bd.email_address != ''
 SQL;
 
-		print_r($SDSDB->get_records_sql($sql));
+        return $SDSDB->get_records_sql($sql);
     }
 }

@@ -37,26 +37,65 @@ class enrolments {
         db::obtain();
 
         $sql = <<<SQL
-SELECT DISTINCT
-   lower(CAST(master.dbo.fn_varbintohexsubstring( 0,
-      hashbytes('md5',
-        ltrim(rtrim(session_code)) + '|' + ltrim(rtrim(mdk)) + '|'
-        + ltrim(rtrim(lecturerid)) + '|teacher'
-    ), 1, 0) as char(32))) as id_chksum
-  , ltrim(rtrim(lecturerid)) as login
-  , ltrim(rtrim(title)) as title
-  , ltrim(rtrim(initials)) as initials
-  , ltrim(rtrim(surname)) as family_name
-  , ltrim(rtrim(mdk)) as module_delivery_key
-  , ltrim(rtrim(session_code)) as session_code
-  , CAST(lower(master.dbo.fn_varbintohexsubstring( 0, hashbytes('md5',
-    lecturerid + isnull(title, '') + isnull(initials, '') + isnull(surname, '') + cast(mdk as varchar) + cast(session_code as varchar)
-    ), 1, 0)) as char(32)) as chksum
-FROM v_moodle_data_export
-WHERE (session_code = $sessioncode) and lecturerid is not null and lecturerid != ''
+          SELECT DISTINCT
+            (
+                ltrim(rtrim(session_code)) + '|' +
+                ltrim(rtrim(module_delivery_key)) + '|' +
+                ltrim(rtrim(login))
+            ) as chksum
+            , ltrim(rtrim(login)) as login
+            , ltrim(rtrim(staff)) as staff
+            , ltrim(rtrim(module_delivery_key)) as module_delivery_key
+            , ltrim(rtrim(session_code)) as session_code
+          FROM d_timetable
+          WHERE (session_code = $sessioncode) and login is not null and login != ''
 SQL;
 
-		print_r($SDSDB->get_records_sql($sql));
+        $teachers = array();
+
+        $objects = $SDSDB->get_records_sql($sql);
+        foreach ($objects as $teacher) {
+            $logins = explode(',', $teacher->login);
+            $names = explode(',', $teacher->staff);
+
+            if (count($names) != count($logins)) {
+                continue;
+            }
+
+            for ($i = 0; $i < count($logins); $i++) {
+                $login = $logins[$i];
+                $name = $names[$i];
+                $name = explode(' ', $name, 3);
+
+                $chksum = md5("{$teacher->session_code}|{$teacher->module_delivery_key}|{$login}|teacher");
+
+                $data = array(
+                    'chksum' => $chksum,
+                    'login' => $login,
+                    'module_delivery_key' => $teacher->module_delivery_key,
+                    'session_code' => $teacher->session_code,
+                    'title' => '',
+                    'surname' => '',
+                    'givenname' => ''
+                );
+
+                if (isset($name[0])) {
+                    $data['surname'] = $name[0];
+                }
+
+                if (isset($name[1])) {
+                    $data['title'] = $name[1];
+                }
+
+                if (isset($name[2])) {
+                    $data['givenname'] = $name[2];
+                }
+
+                $teachers[] = (object)$data;
+            }
+        }
+
+        return $teachers;
     }
     /**
      * Grab out of SDS.
@@ -67,36 +106,40 @@ SQL;
         db::obtain();
 
         $sql = <<<SQL
-SELECT distinct
-  lower(CAST(master.dbo.fn_varbintohexsubstring( 0,
-      hashbytes('md5',
-        '$sessioncode|' + ltrim(rtrim(dmc.module_delivery_key)) + '|'
-        + ltrim(rtrim(cs.login)) + '|convenor'
-    ), 1, 0) as char(32))) as id_chksum
-  , ltrim(rtrim(cs.login)) as login
-  , ltrim(rtrim(cs.title)) as title
-  , ltrim(rtrim(cs.initials)) as initials
-  , ltrim(rtrim(cs.family_name)) as family_name
-  , '' as ukc
-  , ltrim(rtrim(dmc.module_delivery_key)) as module_delivery_key
-  , 'convenor' as role
-  , '$sessioncode' as session_code
-  , CAST(lower(master.dbo.fn_varbintohexsubstring( 0, hashbytes('md5',
-    cs.family_name + cs.title + cs.initials + cs.login + cast(dmc.module_delivery_key as varchar) + cast(csd.session_code as varchar)
-    ), 1, 0)) as char(32)) as chksum
-FROM d_module_convener AS dmc
-  INNER JOIN c_staff AS cs ON dmc.staff = cs.staff
-  INNER JOIN m_current_values mcv ON 1=1
-  INNER JOIN c_session_dates csd ON csd.session_code = $sessioncode + 1
-WHERE (dmc.staff_function_end_date IS NULL 
-        OR dmc.staff_function_end_date > CURRENT_TIMESTAMP
-        OR (mcv.session_code > $sessioncode
-          and dmc.staff_function_end_date >= mcv.rollover_date 
-          and CURRENT_TIMESTAMP < csd.session_start))
-      AND cs.login != ''
+            SELECT DISTINCT
+              (
+                '$sessioncode|' +
+                ltrim(rtrim(dmc.module_delivery_key)) + '|' +
+                ltrim(rtrim(cs.login)) + '|convenor'
+              )  as chksum
+              , ltrim(rtrim(cs.login)) as login
+              , ltrim(rtrim(cs.title)) as title
+              , ltrim(rtrim(cs.initials)) as initials
+              , ltrim(rtrim(cs.family_name)) as family_name
+              , '' as ukc
+              , ltrim(rtrim(dmc.module_delivery_key)) as module_delivery_key
+              , 'convenor' as role
+              , '$sessioncode' as session_code
+            FROM d_module_convener AS dmc
+              INNER JOIN c_staff AS cs ON dmc.staff = cs.staff
+              INNER JOIN m_current_values mcv ON 1=1
+              INNER JOIN c_session_dates csd ON csd.session_code = $sessioncode + 1
+            WHERE (
+                dmc.staff_function_end_date IS NULL
+                OR dmc.staff_function_end_date > CURRENT_TIMESTAMP
+                OR (mcv.session_code > $sessioncode
+                AND dmc.staff_function_end_date >= mcv.rollover_date
+                AND CURRENT_TIMESTAMP < csd.session_start)
+            ) AND cs.login != ''
 SQL;
 
-		print_r($SDSDB->get_records_sql($sql));
+        $objects = $SDSDB->get_records_sql($sql);
+
+        foreach ($objects as $convenor) {
+            $convenor->chksum = md5($convenor->chksum);
+        }
+
+        return $objects;
     }
     /**
      * Grab out of SDS.
@@ -107,30 +150,33 @@ SQL;
         db::obtain();
 
         $sql = <<<SQL
-SELECT DISTINCT
-  lower(CAST(master.dbo.fn_varbintohexsubstring( 0,
-      hashbytes('md5',
-        ltrim(rtrim(bm.session_taught)) + '|' + ltrim(rtrim(cast(bm.module_delivery_key as varchar))) + '|'
-        + ltrim(rtrim(bd.email_address)) + '|student'
-    ), 1, 0) as char(32))) as id_chksum
-  , ltrim(rtrim(bd.email_address)) as login
-  , '' as title
-  , ltrim(rtrim(bd.initials)) as initials
-  , ltrim(rtrim(bd.family_name)) as family_name
-  , ltrim(rtrim(bd.ukc)) as ukc
-  , ltrim(rtrim(bm.module_delivery_key)) as module_delivery_key
-  , ltrim(rtrim(bm.session_taught)) as session_code
-  , CAST(lower(master.dbo.fn_varbintohexsubstring( 0, hashbytes('md5',
-      cast(bd.ukc as varchar) + bd.email_address + bd.initials + bd.family_name + cast(bm.session_taught as varchar)
-      + cast(bm.module_delivery_key as varchar)), 1, 0)) as char(32)) as chksum
-FROM b_details AS bd
-  INNER JOIN b_module AS bm ON bd.ukc = bm.ukc
-    AND bd.academic IN ('A','J','P','R','T','W','Y','H')
-    AND bd.email_address <> ''
-    AND (bm.session_taught = '$sessioncode') AND (bm.module_registration_status IN ('R','U'))
-    AND bd.email_address != ''
+            SELECT DISTINCT
+              (
+                ltrim(rtrim(bm.session_taught)) + '|' +
+                ltrim(rtrim(cast(bm.module_delivery_key as varchar))) + '|' +
+                ltrim(rtrim(bd.email_address)) + '|student'
+              ) as chksum
+              , ltrim(rtrim(bd.email_address)) as login
+              , '' as title
+              , ltrim(rtrim(bd.initials)) as initials
+              , ltrim(rtrim(bd.family_name)) as family_name
+              , ltrim(rtrim(bd.ukc)) as ukc
+              , ltrim(rtrim(bm.module_delivery_key)) as module_delivery_key
+              , ltrim(rtrim(bm.session_taught)) as session_code
+            FROM b_details AS bd
+              INNER JOIN b_module AS bm ON bd.ukc = bm.ukc
+                AND bd.academic IN ('A','J','P','R','T','W','Y','H')
+                AND bd.email_address <> ''
+                AND (bm.session_taught = '$sessioncode') AND (bm.module_registration_status IN ('R','U'))
+                AND bd.email_address != ''
 SQL;
 
-		print_r($SDSDB->get_records_sql($sql));
+        $objects = $SDSDB->get_records_sql($sql);
+
+        foreach ($objects as $student) {
+            $student->chksum = md5($student->chksum);
+        }
+
+        return $objects;
     }
 }
