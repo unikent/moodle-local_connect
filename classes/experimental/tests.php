@@ -2,5 +2,5 @@
 
 require_once('../../../../config.php');
 
-$objs = \local_connect\experimental\SDS\group_enrolments::get_all(2014);
-print_r(count($objs));
+$objs = \local_connect\experimental\SDS\enrolments::get_all_teachers(2015);
+print_r(($objs));
