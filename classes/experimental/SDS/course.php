@@ -153,7 +153,7 @@ SQL;
                 SELECT id_chksum, chksum, module_delivery_key, session_code, delivery_department, module_version,
                 campus, campus_desc, module_week_beginning, week_beginning_date, module_length, module_title,
                 module_code, synopsis FROM {tmp_connect_courses}
-        );');
+        )');
 
         // Mark old ones as deleted.
         $SHAREDB->execute('UPDATE {courses} SET sink_deleted=1 WHERE chksum IN (
@@ -161,7 +161,7 @@ SQL;
             FROM {courses} c
             LEFT OUTER JOIN {tmp_connect_courses} tcc ON c.id_chksum=tcc.id_chksum
             WHERE tcc.id_chksum IS NULL
-        );');
+        )');
 
         // Test.
         print_r($SHAREDB->get_records_sql('SELECT c.id_chksum, tcc.id_chksum as tccchksum, tcc.synopsis tccsyn, c.synopsis csyn

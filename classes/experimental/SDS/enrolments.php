@@ -37,62 +37,21 @@ class enrolments {
         db::obtain();
 
         $sql = <<<SQL
-          SELECT DISTINCT
-            (
-                ltrim(rtrim(session_code)) + '|' +
-                ltrim(rtrim(module_delivery_key)) + '|' +
-                ltrim(rtrim(login))
-            ) as chksum
-            , ltrim(rtrim(login)) as login
-            , ltrim(rtrim(staff)) as staff
-            , ltrim(rtrim(module_delivery_key)) as module_delivery_key
-            , ltrim(rtrim(session_code)) as session_code
-          FROM d_timetable
-          WHERE (session_code = $sessioncode) and login is not null and login != ''
+            SELECT DISTINCT
+              (ltrim(rtrim(session_code)) + '|' + ltrim(rtrim(mdk)) + '|' + ltrim(rtrim(lecturerid)) + '|teacher') as chksum
+              , ltrim(rtrim(lecturerid)) as login
+              , ltrim(rtrim(title)) as title
+              , ltrim(rtrim(initials)) as initials
+              , ltrim(rtrim(surname)) as family_name
+              , ltrim(rtrim(mdk)) as module_delivery_key
+              , ltrim(rtrim(session_code)) as session_code
+            FROM v_moodle_data_export_new
+            WHERE (session_code = $sessioncode) and lecturerid is not null and lecturerid != ''
 SQL;
 
-        $teachers = array();
-
-        $objects = $SDSDB->get_records_sql($sql);
-        foreach ($objects as $teacher) {
-            $logins = explode(',', $teacher->login);
-            $names = explode(',', $teacher->staff);
-
-            if (count($names) != count($logins)) {
-                continue;
-            }
-
-            for ($i = 0; $i < count($logins); $i++) {
-                $login = $logins[$i];
-                $name = $names[$i];
-                $name = explode(' ', $name, 3);
-
-                $chksum = md5("{$teacher->session_code}|{$teacher->module_delivery_key}|{$login}|teacher");
-
-                $data = array(
-                    'chksum' => $chksum,
-                    'login' => $login,
-                    'module_delivery_key' => $teacher->module_delivery_key,
-                    'session_code' => $teacher->session_code,
-                    'title' => '',
-                    'surname' => '',
-                    'givenname' => ''
-                );
-
-                if (isset($name[0])) {
-                    $data['surname'] = $name[0];
-                }
-
-                if (isset($name[1])) {
-                    $data['title'] = $name[1];
-                }
-
-                if (isset($name[2])) {
-                    $data['givenname'] = $name[2];
-                }
-
-                $teachers[] = (object)$data;
-            }
+        $teachers = $SDSDB->get_records_sql($sql);
+        foreach ($teachers as $teacher) {
+            $teacher->chksum = md5($teacher->chksum);
         }
 
         return $teachers;
