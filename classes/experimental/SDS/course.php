@@ -99,6 +99,10 @@ SQL;
      * Get a temptable for the sync.
      */
     private function get_temp_table() {
+        global $CFG;
+
+        require_once($CFG->libdir . '/ddllib.php');
+
         $table = new \xmldb_table('tmp_connect_courses');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('id_chksum', XMLDB_TYPE_CHAR, '36', null, XMLDB_NOTNULL, null, null);
@@ -126,7 +130,7 @@ SQL;
      * Sync with the SHAREDB.
      */
     public function sync() {
-        global $SHAREDB;
+        global $CFG, $SHAREDB;
 
         // Create a temp table.
         $table = $this->get_temp_table();
@@ -159,7 +163,7 @@ SQL;
             SELECT c.chksum
             FROM {courses} c
             LEFT OUTER JOIN {tmp_connect_courses} tcc ON c.id_chksum=tcc.id_chksum
-            WHERE tcc.id_chksum IS NULL
+            WHERE tcc.id_chksum IS NULL AND c.session_code = {$CFG->connect->session_code}
         )');
 
         // Drop the temp table.
