@@ -147,6 +147,10 @@ SQL;
      * Get a temptable for the enrolments sync.
      */
     private function get_temp_table() {
+        global $CFG;
+
+        require_once($CFG->libdir . '/ddllib.php');
+
         $table = new \xmldb_table('tmp_connect_enrolments');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('chksum', XMLDB_TYPE_CHAR, '36', null, XMLDB_NOTNULL, null, null);
@@ -161,15 +165,69 @@ SQL;
 
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_index('chksum', XMLDB_INDEX_UNIQUE, array('chksum'));
+        $table->add_index('role', XMLDB_INDEX_NOTUNIQUE, array('role'));
+        $table->add_index('module_delivery_key', XMLDB_INDEX_NOTUNIQUE, array('module_delivery_key'));
+        $table->add_index('session_code', XMLDB_INDEX_NOTUNIQUE, array('session_code'));
 
         return $table;
+    }
+
+    /**
+     * Get some sync stats.
+     */
+    public function print_stats() {
+        global $CFG, $SHAREDB;
+
+        $convenors = $SHAREDB->count_records('tmp_connect_enrolments', array(
+            'role' => 'convenor'
+        ));
+
+        $teachers = $SHAREDB->count_records('tmp_connect_enrolments', array(
+            'role' => 'teacher'
+        ));
+
+        $students = $SHAREDB->count_records('tmp_connect_enrolments', array(
+            'role' => 'student'
+        ));
+
+        $new = $SHAREDB->count_records_sql('
+            SELECT COUNT(tce.id)
+            FROM {tmp_connect_enrolments} tce
+            LEFT OUTER JOIN {enrollments} e ON e.chksum = tce.chksum
+            WHERE e.chksum IS NULL
+        ', array('session' => $CFG->connect->session_code));
+
+        $changed = $SHAREDB->count_records_sql('
+            SELECT COUNT(tce.id)
+            FROM {tmp_connect_enrolments} tce
+            INNER JOIN {enrollments} e
+                ON e.login=tce.login
+                AND e.module_delivery_key=tce.module_delivery_key
+                AND e.session_code=tce.session_code
+            WHERE e.role <> tce.role AND e.session_code = :session
+        ', array('session' => $CFG->connect->session_code));
+
+        $removed = $SHAREDB->count_records_sql('
+            SELECT COUNT(e.chksum)
+            FROM {enrollments} e
+            LEFT OUTER JOIN {tmp_connect_enrolments} tce ON e.chksum=tce.chksum
+            WHERE tce.chksum IS NULL AND e.session_code = :session
+        ', array('session' => $CFG->connect->session_code));
+
+        echo ($convenors + $teachers + $students) . " enrolments found.\n";
+        echo " -> $convenors convenors\n";
+        echo " -> $teachers teachers\n";
+        echo " -> $students students\n";
+        echo "$new new enrolments.\n";
+        echo "$changed changed enrolments.\n";
+        echo "$removed removed enrolments.\n";
     }
 
     /**
      * Sync with the SHAREDB.
      */
     public function sync() {
-        global $SHAREDB;
+        global $CFG, $SHAREDB;
 
         // Create a temp table.
         $table = $this->get_temp_table();
@@ -177,9 +235,16 @@ SQL;
         $dbman->create_temp_table($table);
 
         // Load data into the temp table.
+        echo "Loading teacher data from SDS...\n";
         $SHAREDB->insert_records('tmp_connect_enrolments', $this->get_all_teachers());
+        echo "Loading convenor data from SDS...\n";
         $SHAREDB->insert_records('tmp_connect_enrolments', $this->get_all_convenors());
+        echo "Loading student data from SDS...\n";
         $SHAREDB->insert_records('tmp_connect_enrolments', $this->get_all_students());
+
+        $this->print_stats();
+        $dbman->drop_table($table);
+        return;
 
         // Move data over.
         $SHAREDB->execute('
@@ -192,9 +257,9 @@ SQL;
         $SHAREDB->execute('UPDATE {enrollments} SET sink_deleted=1 WHERE chksum IN (
             SELECT e.chksum
             FROM {enrollments} e
-            LEFT OUTER JOIN {tmp_connect_enrolments} tce ON c.chksum=tce.chksum
-            WHERE tce.chksum IS NULL
-        )');
+            LEFT OUTER JOIN {tmp_connect_enrolments} tce ON e.chksum=tce.chksum
+            WHERE tce.chksum IS NULL AND e.session_code = :session
+        )', array('session' => $CFG->connect->session_code));
 
         // Drop the temp table.
         $dbman->drop_table($table);
