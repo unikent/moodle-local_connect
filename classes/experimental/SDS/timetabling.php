@@ -31,8 +31,8 @@ class timetabling {
     /**
      * Grab out of SDS.
      */
-    public static function get_week_sessions($sessioncode) {
-        global $SDSDB;
+    public static function get_week_sessions() {
+        global $CFG, $SDSDB;
 
         db::obtain();
 
@@ -44,7 +44,7 @@ class timetabling {
               ltrim(rtrim(cast(cswb.week_beginning_date as varchar))) as week_beginning_date,
               ltrim(rtrim(cast(cswb.week_number as varchar))) as week_number
             FROM c_session_week_beginning cswb
-            WHERE cswb.session_code = $sessioncode
+            WHERE cswb.session_code = {$CFG->connect->session_code}
 SQL;
 
         return $SDSDB->get_records_sql($sql);

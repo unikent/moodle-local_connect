@@ -31,8 +31,8 @@ class group_enrolments {
     /**
      * Grab out of SDS.
      */
-    public static function get_all($sessioncode) {
-        global $SDSDB;
+    public static function get_all() {
+        global $CFG, $SDSDB;
 
         db::obtain();
 
@@ -48,7 +48,7 @@ class group_enrolments {
               INNER JOIN c_groups AS cg ON cg.parent_group = dgm.group_id
               LEFT JOIN l_ukc_group AS lug on lug.group_id = cg.group_id
               LEFT JOIN b_details AS bd on bd.ukc = lug.ukc
-            WHERE (dgm.session_code = $sessioncode)
+            WHERE (dgm.session_code = {$CFG->connect->session_code})
               AND (cg.group_type = 'S')
               AND bd.email_address != ''
 SQL;

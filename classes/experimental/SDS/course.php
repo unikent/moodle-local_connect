@@ -37,8 +37,6 @@ class course {
     public function get_all() {
         global $CFG, $SDSDB;
 
-        $sessioncode = 2015;
-
         db::obtain();
 
         $sql = <<<SQL
@@ -70,7 +68,7 @@ class course {
               INNER JOIN d_module_delivery_session AS dmds
                   ON dmds.module_delivery_key = dmd.module_delivery_key
                   AND dmds.module_status = 'ACTIVE'
-              AND dmds.session_code = $sessioncode
+              AND dmds.session_code = {$CFG->connect->session_code}
               INNER JOIN c_campus AS cc ON dmd.delivery_campus = cc.campus
               INNER JOIN c_module_details AS cmd
                   ON cmd.module_code = dmd.module_code AND cmd.module_version = dmd.module_version
@@ -84,13 +82,13 @@ class course {
                   WHERE hee_1.isactive = 1
                       AND hee_1.display_order = 1
                       AND entry_type = 'S'
-                      AND session_code = $sessioncode
+                      AND session_code = {$CFG->connect->session_code}
                       AND hee_1.module_code = he_1.module_code
                 )
               ) AS syn ON syn.module_code=cmd.module_code AND syn.module_version=cmd.module_version
               INNER JOIN c_session_week_beginning AS swb
                   ON swb.week_beginning = dmd.module_week_beginning
-                  AND swb.session_code = $sessioncode
+                  AND swb.session_code = {$CFG->connect->session_code}
             WHERE dmd.delivery_faculty IN ('A','H','S','U')
 SQL;
 
@@ -147,7 +145,8 @@ SQL;
         unset($data);
 
         // Move data over.
-        $SHAREDB->execute('REPLACE INTO {courses} (id_chksum, chksum, module_delivery_key, session_code, delivery_department, module_version,
+        $SHAREDB->execute('
+            REPLACE INTO {courses} (id_chksum, chksum, module_delivery_key, session_code, delivery_department, module_version,
             campus, campus_desc, module_week_beginning, week_beginning_date, module_length, module_title,
             module_code, synopsis) (
                 SELECT id_chksum, chksum, module_delivery_key, session_code, delivery_department, module_version,

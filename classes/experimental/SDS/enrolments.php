@@ -31,8 +31,8 @@ class enrolments {
     /**
      * Grab out of SDS.
      */
-    public static function get_all_teachers($sessioncode) {
-        global $SDSDB;
+    public static function get_all_teachers() {
+        global $CFG, $SDSDB;
 
         db::obtain();
 
@@ -46,7 +46,7 @@ class enrolments {
               , ltrim(rtrim(mdk)) as module_delivery_key
               , ltrim(rtrim(session_code)) as session_code
             FROM v_moodle_data_export_new
-            WHERE (session_code = $sessioncode) and lecturerid is not null and lecturerid != ''
+            WHERE (session_code = {$CFG->connect->session_code}) and lecturerid is not null and lecturerid != ''
 SQL;
 
         $teachers = $SDSDB->get_records_sql($sql);
@@ -59,15 +59,15 @@ SQL;
     /**
      * Grab out of SDS.
      */
-    public static function get_all_convenors($sessioncode) {
-        global $SDSDB;
+    public static function get_all_convenors() {
+        global $CFG, $SDSDB;
 
         db::obtain();
 
         $sql = <<<SQL
             SELECT DISTINCT
               (
-                '$sessioncode|' +
+                '{$CFG->connect->session_code}|' +
                 ltrim(rtrim(dmc.module_delivery_key)) + '|' +
                 ltrim(rtrim(cs.login)) + '|convenor'
               )  as chksum
@@ -78,15 +78,15 @@ SQL;
               , '' as ukc
               , ltrim(rtrim(dmc.module_delivery_key)) as module_delivery_key
               , 'convenor' as role
-              , '$sessioncode' as session_code
+              , '{$CFG->connect->session_code}' as session_code
             FROM d_module_convener AS dmc
               INNER JOIN c_staff AS cs ON dmc.staff = cs.staff
               INNER JOIN m_current_values mcv ON 1=1
-              INNER JOIN c_session_dates csd ON csd.session_code = $sessioncode + 1
+              INNER JOIN c_session_dates csd ON csd.session_code = {$CFG->connect->session_code} + 1
             WHERE (
                 dmc.staff_function_end_date IS NULL
                 OR dmc.staff_function_end_date > CURRENT_TIMESTAMP
-                OR (mcv.session_code > $sessioncode
+                OR (mcv.session_code > {$CFG->connect->session_code}
                 AND dmc.staff_function_end_date >= mcv.rollover_date
                 AND CURRENT_TIMESTAMP < csd.session_start)
             ) AND cs.login != ''
@@ -103,8 +103,8 @@ SQL;
     /**
      * Grab out of SDS.
      */
-    public static function get_all_students($sessioncode) {
-        global $SDSDB;
+    public static function get_all_students() {
+        global $CFG, $SDSDB;
 
         db::obtain();
 
@@ -126,7 +126,7 @@ SQL;
               INNER JOIN b_module AS bm ON bd.ukc = bm.ukc
                 AND bd.academic IN ('A','J','P','R','T','W','Y','H')
                 AND bd.email_address <> ''
-                AND (bm.session_taught = '$sessioncode') AND (bm.module_registration_status IN ('R','U'))
+                AND (bm.session_taught = '{$CFG->connect->session_code}') AND (bm.module_registration_status IN ('R','U'))
                 AND bd.email_address != ''
 SQL;
 
