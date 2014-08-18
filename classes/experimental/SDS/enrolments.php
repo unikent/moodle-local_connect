@@ -29,7 +29,7 @@ namespace local_connect\experimental\SDS;
  */
 class enrolments {
     /**
-     * Grab out of SDS.
+     * Grab teachers out of SDS.
      */
     public static function get_all_teachers() {
         global $CFG, $SDSDB;
@@ -45,6 +45,7 @@ class enrolments {
               , ltrim(rtrim(surname)) as family_name
               , ltrim(rtrim(mdk)) as module_delivery_key
               , ltrim(rtrim(session_code)) as session_code
+              , 'teacher' as role
             FROM v_moodle_data_export_new
             WHERE (session_code = {$CFG->connect->session_code}) and lecturerid is not null and lecturerid != ''
 SQL;
@@ -56,8 +57,9 @@ SQL;
 
         return $teachers;
     }
+
     /**
-     * Grab out of SDS.
+     * Grab convenors out of SDS.
      */
     public static function get_all_convenors() {
         global $CFG, $SDSDB;
@@ -77,8 +79,8 @@ SQL;
               , ltrim(rtrim(cs.family_name)) as family_name
               , '' as ukc
               , ltrim(rtrim(dmc.module_delivery_key)) as module_delivery_key
-              , 'convenor' as role
               , '{$CFG->connect->session_code}' as session_code
+              , 'convenor' as role
             FROM d_module_convener AS dmc
               INNER JOIN c_staff AS cs ON dmc.staff = cs.staff
               INNER JOIN m_current_values mcv ON 1=1
@@ -100,8 +102,9 @@ SQL;
 
         return $objects;
     }
+
     /**
-     * Grab out of SDS.
+     * Grab students out of SDS.
      */
     public static function get_all_students() {
         global $CFG, $SDSDB;
@@ -122,6 +125,7 @@ SQL;
               , ltrim(rtrim(bd.ukc)) as ukc
               , ltrim(rtrim(bm.module_delivery_key)) as module_delivery_key
               , ltrim(rtrim(bm.session_taught)) as session_code
+              , 'student' as role
             FROM b_details AS bd
               INNER JOIN b_module AS bm ON bd.ukc = bm.ukc
                 AND bd.academic IN ('A','J','P','R','T','W','Y','H')
@@ -137,5 +141,62 @@ SQL;
         }
 
         return $objects;
+    }
+
+    /**
+     * Get a temptable for the enrolments sync.
+     */
+    private function get_temp_table() {
+        $table = new \xmldb_table('tmp_connect_enrolments');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('chksum', XMLDB_TYPE_CHAR, '36', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('login', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('initials', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('family_name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('ukc', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('role', XMLDB_TYPE_CHAR, '15', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('module_delivery_key', XMLDB_TYPE_CHAR, '36', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('session_code', XMLDB_TYPE_CHAR, '4', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_index('chksum', XMLDB_INDEX_UNIQUE, array('chksum'));
+
+        return $table;
+    }
+
+    /**
+     * Sync with the SHAREDB.
+     */
+    public function sync() {
+        global $SHAREDB;
+
+        // Create a temp table.
+        $table = $this->get_temp_table();
+        $dbman = $SHAREDB->get_manager();
+        $dbman->create_temp_table($table);
+
+        // Load data into the temp table.
+        $SHAREDB->insert_records('tmp_connect_enrolments', $this->get_all_teachers());
+        $SHAREDB->insert_records('tmp_connect_enrolments', $this->get_all_convenors());
+        $SHAREDB->insert_records('tmp_connect_enrolments', $this->get_all_students());
+
+        // Move data over.
+        $SHAREDB->execute('
+            REPLACE INTO {enrollments} (id,chksum,login,title,initials,family_name,ukc,role,module_delivery_key,session_code) (
+                SELECT id,chksum,login,title,initials,family_name,ukc,role,module_delivery_key,session_code
+                FROM {tmp_connect_enrolments}
+        )');
+
+        // Mark old ones as deleted.
+        $SHAREDB->execute('UPDATE {enrollments} SET sink_deleted=1 WHERE chksum IN (
+            SELECT e.chksum
+            FROM {enrollments} e
+            LEFT OUTER JOIN {tmp_connect_enrolments} tce ON c.chksum=tce.chksum
+            WHERE tce.chksum IS NULL
+        )');
+
+        // Drop the temp table.
+        $dbman->drop_table($table);
     }
 }
