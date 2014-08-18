@@ -123,7 +123,7 @@ SQL;
     }
 
     /**
-     * Sync with the DB.
+     * Sync with the SHAREDB.
      */
     public function sync() {
         global $SHAREDB;
@@ -161,13 +161,6 @@ SQL;
             LEFT OUTER JOIN {tmp_connect_courses} tcc ON c.id_chksum=tcc.id_chksum
             WHERE tcc.id_chksum IS NULL
         )');
-
-        // Test.
-        print_r($SHAREDB->get_records_sql('SELECT c.id_chksum, tcc.id_chksum as tccchksum, tcc.synopsis tccsyn, c.synopsis csyn
-            FROM {tmp_connect_courses} tcc
-            LEFT OUTER JOIN {courses} c ON c.id_chksum=tcc.id_chksum
-            WHERE tcc.chksum <> c.chksum OR c.id IS NULL
-        '));
 
         // Drop the temp table.
         $dbman->drop_table($table);
