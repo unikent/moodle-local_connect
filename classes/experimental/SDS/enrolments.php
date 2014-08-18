@@ -190,12 +190,20 @@ SQL;
             'role' => 'student'
         ));
 
-        $new = $SHAREDB->count_records_sql('
-            SELECT COUNT(tce.id)
+        echo ($convenors + $teachers + $students) . " enrolments found.\n";
+        echo "  - $convenors convenors\n";
+        echo "  - $teachers teachers\n";
+        echo "  - $students students\n";
+
+        $new = $SHAREDB->get_records_sql('
+            SELECT tce.id
             FROM {tmp_connect_enrolments} tce
-            LEFT OUTER JOIN {enrollments} e ON e.chksum = tce.chksum
+            LEFT OUTER JOIN {enrollments} e
+                ON e.chksum = tce.chksum
             WHERE e.chksum IS NULL
-        ', array('session' => $CFG->connect->session_code));
+        ');
+
+        echo "$new new enrolments.\n";
 
         $changed = $SHAREDB->count_records_sql('
             SELECT COUNT(tce.id)
@@ -207,6 +215,8 @@ SQL;
             WHERE e.role <> tce.role AND e.session_code = :session
         ', array('session' => $CFG->connect->session_code));
 
+        echo "$changed changed enrolments.\n";
+
         $removed = $SHAREDB->count_records_sql('
             SELECT COUNT(e.chksum)
             FROM {enrollments} e
@@ -214,12 +224,6 @@ SQL;
             WHERE tce.chksum IS NULL AND e.session_code = :session
         ', array('session' => $CFG->connect->session_code));
 
-        echo ($convenors + $teachers + $students) . " enrolments found.\n";
-        echo " -> $convenors convenors\n";
-        echo " -> $teachers teachers\n";
-        echo " -> $students students\n";
-        echo "$new new enrolments.\n";
-        echo "$changed changed enrolments.\n";
         echo "$removed removed enrolments.\n";
     }
 
