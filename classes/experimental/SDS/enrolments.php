@@ -194,37 +194,6 @@ SQL;
         echo "  - $convenors convenors\n";
         echo "  - $teachers teachers\n";
         echo "  - $students students\n";
-
-        $new = $SHAREDB->get_records_sql('
-            SELECT tce.id
-            FROM {tmp_connect_enrolments} tce
-            LEFT OUTER JOIN {enrollments} e
-                ON e.chksum = tce.chksum
-            WHERE e.chksum IS NULL
-        ');
-
-        echo "$new new enrolments.\n";
-
-        $changed = $SHAREDB->count_records_sql('
-            SELECT COUNT(tce.id)
-            FROM {tmp_connect_enrolments} tce
-            INNER JOIN {enrollments} e
-                ON e.login=tce.login
-                AND e.module_delivery_key=tce.module_delivery_key
-                AND e.session_code=tce.session_code
-            WHERE e.role <> tce.role AND e.session_code = :session
-        ', array('session' => $CFG->connect->session_code));
-
-        echo "$changed changed enrolments.\n";
-
-        $removed = $SHAREDB->count_records_sql('
-            SELECT COUNT(e.chksum)
-            FROM {enrollments} e
-            LEFT OUTER JOIN {tmp_connect_enrolments} tce ON e.chksum=tce.chksum
-            WHERE tce.chksum IS NULL AND e.session_code = :session
-        ', array('session' => $CFG->connect->session_code));
-
-        echo "$removed removed enrolments.\n";
     }
 
     /**
@@ -247,8 +216,6 @@ SQL;
         $SHAREDB->insert_records('tmp_connect_enrolments', $this->get_all_students());
 
         $this->print_stats();
-        $dbman->drop_table($table);
-        return;
 
         // Move data over.
         $SHAREDB->execute('
@@ -258,12 +225,17 @@ SQL;
         )');
 
         // Mark old ones as deleted.
-        $SHAREDB->execute('UPDATE {enrollments} SET sink_deleted=1 WHERE chksum IN (
+        $deleted = $SHAREDB->get_fieldset_sql('
             SELECT e.chksum
             FROM {enrollments} e
             LEFT OUTER JOIN {tmp_connect_enrolments} tce ON e.chksum=tce.chksum
             WHERE tce.chksum IS NULL AND e.session_code = :session
-        )', array('session' => $CFG->connect->session_code));
+        ', array('session' => $CFG->connect->session_code));
+
+        if (!empty($deleted)) {
+            list($sql, $params) = $SHAREDB->get_in_or_equal($deleted);
+            $SHAREDB->set_field_select('enrollments', 'sink_deleted', 1, "chksum $sql", $params);
+        }
 
         // Drop the temp table.
         $dbman->drop_table($table);
