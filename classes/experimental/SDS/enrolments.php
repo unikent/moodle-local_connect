@@ -176,17 +176,17 @@ SQL;
      * Get some sync stats.
      */
     public function print_stats() {
-        global $CFG, $SHAREDB;
+        global $CFG, $DB;
 
-        $convenors = $SHAREDB->count_records('tmp_connect_enrolments', array(
+        $convenors = $DB->count_records('tmp_connect_enrolments', array(
             'role' => 'convenor'
         ));
 
-        $teachers = $SHAREDB->count_records('tmp_connect_enrolments', array(
+        $teachers = $DB->count_records('tmp_connect_enrolments', array(
             'role' => 'teacher'
         ));
 
-        $students = $SHAREDB->count_records('tmp_connect_enrolments', array(
+        $students = $DB->count_records('tmp_connect_enrolments', array(
             'role' => 'student'
         ));
 
@@ -197,43 +197,25 @@ SQL;
     }
 
     /**
-     * Sync with the SHAREDB.
+     * Sync enrolments with Moodle.
      */
     public function sync() {
-        global $CFG, $SHAREDB;
+        global $CFG, $DB;
 
         // Create a temp table.
         $table = $this->get_temp_table();
-        $dbman = $SHAREDB->get_manager();
+        $dbman = $DB->get_manager();
         $dbman->create_temp_table($table);
 
         // Load data into the temp table.
         echo "Loading teacher data from SDS...\n";
-        $SHAREDB->insert_records('tmp_connect_enrolments', $this->get_all_teachers());
+        $DB->insert_records('tmp_connect_enrolments', $this->get_all_teachers());
         echo "Loading convenor data from SDS...\n";
-        $SHAREDB->insert_records('tmp_connect_enrolments', $this->get_all_convenors());
+        $DB->insert_records('tmp_connect_enrolments', $this->get_all_convenors());
         echo "Loading student data from SDS...\n";
-        $SHAREDB->insert_records('tmp_connect_enrolments', $this->get_all_students());
+        $DB->insert_records('tmp_connect_enrolments', $this->get_all_students());
 
         $this->print_stats();
-
-        // Move data over.
-        $SHAREDB->execute('
-            REPLACE INTO {enrollments}
-                (id,id_chksum,chksum,login,title,initials,family_name,ukc,role,module_delivery_key,session_code)
-            (
-                SELECT id,chksum,chksum,login,title,initials,family_name,ukc,role,module_delivery_key,session_code
-                FROM {tmp_connect_enrolments}
-            )
-        ');
-
-        // Mark old ones as deleted.
-        $SHAREDB->execute('
-            UPDATE enrollments e
-            LEFT OUTER JOIN {tmp_connect_enrolments} tce ON e.chksum=tce.chksum
-            SET e.sink_deleted=1
-            WHERE tce.chksum IS NULL AND e.session_code = :session
-        ', array('session' => $CFG->connect->session_code));
 
         // Drop the temp table.
         $dbman->drop_table($table);
