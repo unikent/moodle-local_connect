@@ -50,12 +50,7 @@ class enrolments {
             WHERE (session_code = {$CFG->connect->session_code}) and lecturerid is not null and lecturerid != ''
 SQL;
 
-        $teachers = $SDSDB->get_records_sql($sql);
-        foreach ($teachers as $teacher) {
-            $teacher->chksum = md5($teacher->chksum);
-        }
-
-        return $teachers;
+        return $SDSDB->get_records_sql($sql);
     }
 
     /**
@@ -94,13 +89,7 @@ SQL;
             ) AND cs.login != ''
 SQL;
 
-        $objects = $SDSDB->get_records_sql($sql);
-
-        foreach ($objects as $convenor) {
-            $convenor->chksum = md5($convenor->chksum);
-        }
-
-        return $objects;
+        return $SDSDB->get_records_sql($sql);
     }
 
     /**
@@ -134,13 +123,7 @@ SQL;
                 AND bd.email_address != ''
 SQL;
 
-        $objects = $SDSDB->get_records_sql($sql);
-
-        foreach ($objects as $student) {
-            $student->chksum = md5($student->chksum);
-        }
-
-        return $objects;
+        return $SDSDB->get_records_sql($sql);
     }
 
     /**
@@ -153,7 +136,6 @@ SQL;
 
         $table = new \xmldb_table('tmp_connect_enrolments');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('chksum', XMLDB_TYPE_CHAR, '36', null, XMLDB_NOTNULL, null, null);
         $table->add_field('login', XMLDB_TYPE_CHAR, '255', null, null, null, null);
         $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, null, null, null);
         $table->add_field('initials', XMLDB_TYPE_CHAR, '255', null, null, null, null);
@@ -286,7 +268,7 @@ SQL;
 
         return $DB->execute("UPDATE {connect_enrolments} ce
         LEFT OUTER JOIN (
-            SELECT e.chksum, c.id as courseid, u.id as userid, r.id as roleid
+            SELECT e.id, c.id as courseid, u.id as userid, r.id as roleid
             FROM {tmp_connect_enrolments} e
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key
             INNER JOIN {connect_user} u ON u.login=e.login
@@ -296,7 +278,7 @@ SQL;
             AND it.userid=ce.userid
             AND it.roleid=ce.roleid
         SET ce.deleted=1
-        WHERE it.chksum IS NULL");
+        WHERE it.id IS NULL");
     }
 
     /**
