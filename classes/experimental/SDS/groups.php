@@ -24,6 +24,9 @@
 
 namespace local_connect\experimental\SDS;
 
+global $CFG;
+require_once($CFG->libdir . '/ddllib.php');
+
 /**
  * Grabs all groups out of SDS.
  */
@@ -31,7 +34,7 @@ class groups {
     /**
      * Grab out of SDS.
      */
-    public static function get_all() {
+    private function get_all() {
         global $CFG, $SDSDB;
 
         db::obtain();
@@ -40,8 +43,7 @@ class groups {
             SELECT DISTINCT
               ltrim(rtrim(cg.group_id)) AS group_id,
               ltrim(rtrim(cg.group_desc)) AS group_desc,
-              ltrim(rtrim(dgm.module_delivery_key)) AS module_delivery_key,
-              ltrim(rtrim(dgm.session_code)) AS session_code
+              ltrim(rtrim(dgm.module_delivery_key)) AS module_delivery_key
             FROM d_group_module AS dgm
               INNER JOIN c_groups AS cg ON cg.parent_group = dgm.group_id
               LEFT JOIN l_ukc_group AS lug on lug.group_id = cg.group_id
@@ -52,5 +54,87 @@ class groups {
 SQL;
 
         return $SDSDB->get_records_sql($sql);
+    }
+
+    /**
+     * Get a temptable for the sync.
+     */
+    private function get_temp_table() {
+        global $CFG;
+
+        require_once($CFG->libdir . '/ddllib.php');
+
+        $table = new \xmldb_table('tmp_connect_groups');
+        $table->add_field('group_id', XMLDB_TYPE_INTEGER, '18', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('group_desc', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('module_delivery_key', XMLDB_TYPE_CHAR, '36', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('group_id'));
+
+        return $table;
+    }
+
+    /**
+     * Updated Groups
+     */
+    private function updated_groups() {
+        global $DB;
+
+        echo "  - Migrating updated groups\n";
+
+        return $DB->execute("
+            REPLACE INTO {connect_group} (id, courseid, name, mid)
+            (
+                SELECT g.group_id, c.id, g.group_desc, cg.mid
+                FROM {tmp_connect_groups} g
+                INNER JOIN {connect_course} c ON c.module_delivery_key=g.module_delivery_key
+                INNER JOIN {connect_group} cg ON cg.id=g.group_id
+                WHERE g.group_desc <> cg.name
+                GROUP BY g.group_id
+            )
+        ");
+    }
+
+    /**
+     * New Groups
+     */
+    private function new_groups() {
+        global $DB;
+
+        echo "  - Migrating new groups\n";
+
+        return $DB->execute("
+            INSERT INTO {connect_group} (id, courseid, name, mid)
+            (
+                SELECT g.group_id, c.id, g.group_desc, 0
+                FROM {tmp_connect_groups} g
+                INNER JOIN {connect_course} c ON c.module_delivery_key=g.module_delivery_key
+                LEFT OUTER JOIN {connect_group} cg ON cg.id=g.group_id
+                WHERE cg.id IS NULL
+                GROUP BY g.group_id
+            )
+        ");
+    }
+
+    /**
+     * Sync groups with Moodle.
+     */
+    public function sync() {
+        global $CFG, $DB;
+
+        // Create a temp table.
+        $table = $this->get_temp_table();
+        $dbman = $DB->get_manager();
+        $dbman->create_temp_table($table);
+
+        // Load data into the temp table.
+        $DB->insert_records('tmp_connect_groups', $this->get_all());
+
+        // Move data over.
+        $this->updated_groups();
+        $this->new_groups();
+
+        // Drop the temp table.
+        $dbman->drop_table($table);
     }
 }
