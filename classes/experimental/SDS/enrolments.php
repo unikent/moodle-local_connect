@@ -223,6 +223,46 @@ SQL;
     }
 
     /**
+     * Sync New Users
+     */
+    private function sync_new_users() {
+        global $DB;
+
+        echo "  - Migrating new users\n";
+
+        $sql = "INSERT INTO {connect_user} (ukc, login, title, initials, family_name) (
+            SELECT e.ukc, e.login, COALESCE(e.title, ''), COALESCE(e.initials, ''), COALESCE(e.family_name, '')
+            FROM {tmp_connect_enrolments} e
+            LEFT OUTER JOIN {connect_user} u
+                ON u.login=e.login
+            WHERE u.id IS NULL
+            GROUP BY e.login
+        )";
+
+        return $DB->execute($sql);
+    }
+
+    /**
+     * Sync Updated Users
+     */
+    private function sync_updated_users() {
+        global $DB;
+
+        echo "  - Migrating updated users\n";
+
+        $sql = "REPLACE INTO {connect_user} (id, ukc, login, title, initials, family_name) (
+            SELECT u.id, e.ukc, u.login, COALESCE(e.title, ''), COALESCE(e.initials, ''), COALESCE(e.family_name, '')
+            FROM {tmp_connect_enrolments} e
+            INNER JOIN {connect_user} u
+                ON u.login=e.login
+            WHERE u.id IS NULL
+            GROUP BY e.login
+        )";
+
+        return $DB->execute($sql);
+    }
+
+    /**
      * Sync enrolments with Moodle.
      */
     public function sync() {
@@ -245,6 +285,10 @@ SQL;
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_students());
 
         $this->print_stats();
+
+        // Sync.
+        $this->sync_updated_users();
+        $this->sync_new_users();
 
         // Drop the temp table.
         $dbman->drop_table($table);
