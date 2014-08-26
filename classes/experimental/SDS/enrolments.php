@@ -46,7 +46,7 @@ class enrolments {
               , ltrim(rtrim(mdk)) as module_delivery_key
               , ltrim(rtrim(session_code)) as session_code
               , 'teacher' as role
-            FROM v_moodle_data_export_new
+            FROM v_moodle_data_export
             WHERE (session_code = {$CFG->connect->session_code}) and lecturerid is not null and lecturerid != ''
 SQL;
 
