@@ -127,14 +127,91 @@ SQL;
     }
 
     /**
-     * Sync with the SHAREDB.
+     * New Campuses
+     */
+    private function sync_new_campus() {
+        global $DB;
+
+        echo "  - Migrating new campus\n";
+
+        $sql = "
+            INSERT INTO {connect_campus} (id, name)
+            (
+                SELECT c.campus, c.campus_desc
+                FROM {tmp_connect_courses} c
+                LEFT OUTER JOIN {connect_campus} cc
+                    ON cc.id = c.campus
+                WHERE cc.id IS NULL
+                GROUP BY c.campus
+            )
+        ";
+
+        return $DB->execute($sql);
+    }
+
+    /**
+     * Updated Courses
+     */
+    private function sync_updated_courses() {
+        global $DB;
+
+        echo "  - Migrating updated courses\n";
+
+        return $DB->execute("
+            REPLACE INTO {connect_course} (id,module_delivery_key,session_code,module_version,campusid,module_week_beginning,
+                                           module_length,week_beginning_date,module_title,module_code,synopsis,category,mid)
+            (
+                SELECT cc.id, c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),
+                       c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,
+                       c.module_title,c.module_code,COALESCE(c.synopsis, ''),cc.category,COALESCE(cc.mid,0)
+                FROM {tmp_connect_courses} c
+                INNER JOIN {connect_course} cc
+                    ON cc.module_delivery_key = c.module_delivery_key
+                WHERE (
+                    c.module_title <> cc.module_title
+                    OR c.module_code <> cc.module_code
+                    OR c.synopsis <> cc.synopsis
+                )
+                GROUP BY c.module_delivery_key, c.module_version
+            )
+        ");
+    }
+
+    /**
+     * New Courses
+     */
+    private function sync_new_courses() {
+        global $DB;
+
+        echo "  - Migrating new courses\n";
+
+        return $DB->execute("
+            INSERT INTO {connect_course} (module_delivery_key,session_code,module_version,campusid,module_week_beginning,
+                                          module_length,week_beginning_date,module_title,module_code,synopsis,category,mid)
+            (
+                SELECT c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),
+                       c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,
+                       c.module_title,c.module_code,COALESCE(c.synopsis, ''),COALESCE(cr.category, 1),0
+                FROM {tmp_connect_courses} c
+                LEFT OUTER JOIN {connect_course} cc
+                    ON cc.module_delivery_key = c.module_delivery_key
+                LEFT OUTER JOIN {connect_rules} cr
+                    ON c.module_code LIKE CONCAT(cr.prefix, '%')
+                WHERE cc.id IS NULL
+                GROUP BY c.module_delivery_key, c.module_version
+            )
+        ");
+    }
+
+    /**
+     * Sync courses with Moodle.
      */
     public function sync() {
-        global $CFG, $SHAREDB;
+        global $CFG, $DB;
 
         // Create a temp table.
         $table = $this->get_temp_table();
-        $dbman = $SHAREDB->get_manager();
+        $dbman = $DB->get_manager();
         $dbman->create_temp_table($table);
 
         // Grab data and map times.
@@ -145,26 +222,13 @@ SQL;
         }
 
         // Load data into the temp table.
-        $SHAREDB->insert_records('tmp_connect_courses', $data);
+        $DB->insert_records('tmp_connect_courses', $data);
         unset($data);
 
         // Move data over.
-        $SHAREDB->execute('
-            REPLACE INTO {courses} (id_chksum, chksum, module_delivery_key, session_code, delivery_department, module_version,
-            campus, campus_desc, module_week_beginning, week_beginning_date, module_length, module_title,
-            module_code, synopsis) (
-                SELECT id_chksum, chksum, module_delivery_key, session_code, delivery_department, module_version,
-                campus, campus_desc, module_week_beginning, week_beginning_date, module_length, module_title,
-                module_code, synopsis FROM {tmp_connect_courses}
-        )');
-
-        // Mark old ones as deleted.
-        $SHAREDB->execute('UPDATE {courses} SET sink_deleted=1 WHERE chksum IN (
-            SELECT c.chksum
-            FROM {courses} c
-            LEFT OUTER JOIN {tmp_connect_courses} tcc ON c.id_chksum=tcc.id_chksum
-            WHERE tcc.id_chksum IS NULL AND c.session_code = {$CFG->connect->session_code}
-        )');
+        $this->sync_new_campus();
+        $this->sync_updated_courses();
+        $this->sync_new_courses();
 
         // Drop the temp table.
         $dbman->drop_table($table);
