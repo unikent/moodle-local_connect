@@ -263,6 +263,49 @@ SQL;
     }
 
     /**
+     * Updated Enrolments
+     */
+    public static function updated_enrolments() {
+        global $DB;
+
+        echo "  - Migrating updated enrolments\n";
+
+        $sql = "REPLACE INTO {connect_enrolments} (id, courseid, userid, roleid, deleted) (
+            SELECT ce.id, c.id, u.id, r.id, e.sink_deleted
+            FROM {tmp_connect_enrolments} e
+            INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key
+            INNER JOIN {connect_user} u ON u.login=e.login
+            INNER JOIN {connect_role} r ON r.name=e.role
+            INNER JOIN {connect_enrolments} ce ON ce.courseid=c.id AND ce.userid=u.id AND ce.roleid=r.id
+            WHERE e.sink_deleted <> ce.deleted
+            GROUP BY ce.id
+        )";
+
+        return $DB->execute($sql);
+    }
+
+    /**
+     * New Enrolments
+     */
+    public static function new_enrolments() {
+        global $DB;
+
+        echo "  - Migrating new enrolments\n";
+
+        $sql = "INSERT INTO {connect_enrolments} (courseid, userid, roleid, deleted) (
+            SELECT c.id, u.id, r.id, e.sink_deleted
+            FROM {tmp_connect_enrolments} e
+            INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key
+            INNER JOIN {connect_user} u ON u.login=e.login
+            INNER JOIN {connect_role} r ON r.name=e.role
+            LEFT OUTER JOIN {connect_enrolments} ce ON ce.courseid=c.id AND ce.userid=u.id AND ce.roleid=r.id
+            WHERE ce.id IS NULL
+        )";
+
+        return $DB->execute($sql);
+    }
+
+    /**
      * Sync enrolments with Moodle.
      */
     public function sync() {
@@ -289,6 +332,8 @@ SQL;
         // Sync.
         $this->sync_updated_users();
         $this->sync_new_users();
+        $this->updated_enrolments();
+        $this->new_enrolments();
 
         // Drop the temp table.
         $dbman->drop_table($table);
