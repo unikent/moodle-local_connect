@@ -80,7 +80,7 @@ SQL;
     private function sync_deleted_group_enrolments() {
         global $DB;
 
-        echo "  - Migrating updated group enrolments\n";
+        echo "  - Migrating deleted group enrolments\n";
 
         return $DB->execute("
             REPLACE INTO {connect_group_enrolments} (id, groupid, userid, deleted)
