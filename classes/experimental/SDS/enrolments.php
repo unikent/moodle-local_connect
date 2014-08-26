@@ -249,7 +249,7 @@ SQL;
         echo "  - Migrating new users\n";
 
         return $DB->execute("INSERT INTO {connect_user} (ukc, login, title, initials, family_name) (
-            SELECT e.ukc, e.login, COALESCE(e.title, ''), COALESCE(e.initials, ''), COALESCE(e.family_name, '')
+            SELECT COALESCE(e.ukc, ''), e.login, COALESCE(e.title, ''), COALESCE(e.initials, ''), COALESCE(e.family_name, '')
             FROM {tmp_connect_enrolments} e
             LEFT OUTER JOIN {connect_user} u
                 ON u.login=e.login
@@ -267,7 +267,7 @@ SQL;
         echo "  - Migrating updated users\n";
 
         return $DB->execute("REPLACE INTO {connect_user} (id, ukc, login, title, initials, family_name) (
-            SELECT u.id, e.ukc, u.login, COALESCE(e.title, ''), COALESCE(e.initials, ''), COALESCE(e.family_name, '')
+            SELECT u.id, COALESCE(e.ukc, ''), u.login, COALESCE(e.title, ''), COALESCE(e.initials, ''), COALESCE(e.family_name, '')
             FROM {tmp_connect_enrolments} e
             INNER JOIN {connect_user} u
                 ON u.login=e.login
@@ -277,23 +277,26 @@ SQL;
     }
 
     /**
-     * Updated Enrolments
+     * Deleted Enrolments
      */
-    private function sync_updated_enrolments() {
+    private function sync_deleted_enrolments() {
         global $DB;
 
-        echo "  - Migrating updated enrolments\n";
+        echo "  - Migrating deleted enrolments\n";
 
-        return $DB->execute("REPLACE INTO {connect_enrolments} (id, courseid, userid, roleid, deleted) (
-            SELECT ce.id, c.id, u.id, r.id, e.sink_deleted
+        return $DB->execute("UPDATE {connect_enrolments} ce
+        LEFT OUTER JOIN (
+            SELECT e.chksum, c.id as courseid, u.id as userid, r.id as roleid
             FROM {tmp_connect_enrolments} e
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key
             INNER JOIN {connect_user} u ON u.login=e.login
             INNER JOIN {connect_role} r ON r.name=e.role
-            INNER JOIN {connect_enrolments} ce ON ce.courseid=c.id AND ce.userid=u.id AND ce.roleid=r.id
-            WHERE e.sink_deleted <> ce.deleted
-            GROUP BY ce.id
-        )");
+        ) it
+            ON it.courseid=ce.courseid
+            AND it.userid=ce.userid
+            AND it.roleid=ce.roleid
+        SET ce.deleted=1
+        WHERE it.chksum IS NULL");
     }
 
     /**
@@ -305,7 +308,7 @@ SQL;
         echo "  - Migrating new enrolments\n";
 
         return $DB->execute("INSERT INTO {connect_enrolments} (courseid, userid, roleid, deleted) (
-            SELECT c.id, u.id, r.id, e.sink_deleted
+            SELECT c.id, u.id, r.id, 0
             FROM {tmp_connect_enrolments} e
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key
             INNER JOIN {connect_user} u ON u.login=e.login
@@ -343,7 +346,7 @@ SQL;
         $this->sync_new_roles();
         $this->sync_updated_users();
         $this->sync_new_users();
-        $this->sync_updated_enrolments();
+        $this->sync_deleted_enrolments();
         $this->sync_new_enrolments();
 
         // Drop the temp table.
