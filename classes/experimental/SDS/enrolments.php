@@ -136,6 +136,7 @@ SQL;
 
         $table = new \xmldb_table('tmp_connect_enrolments');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('chksum', XMLDB_TYPE_CHAR, '36', null, null, null, null);
         $table->add_field('login', XMLDB_TYPE_CHAR, '255', null, null, null, null);
         $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, null, null, null);
         $table->add_field('initials', XMLDB_TYPE_CHAR, '255', null, null, null, null);
