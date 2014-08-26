@@ -223,6 +223,24 @@ SQL;
     }
 
     /**
+     * New Roles
+     */
+    private function sync_new_roles() {
+        global $DB;
+
+        echo "  - Migrating new roles\n";
+
+        return $DB->execute("INSERT INTO {connect_role} (name) (
+            SELECT e.role
+            FROM {tmp_connect_enrolments} e
+            LEFT OUTER JOIN {connect_role} cr
+                ON cr.name=e.role
+            WHERE cr.id IS NULL
+            GROUP BY e.role
+        )");
+    }
+
+    /**
      * Sync New Users
      */
     private function sync_new_users() {
@@ -265,7 +283,7 @@ SQL;
     /**
      * Updated Enrolments
      */
-    public static function updated_enrolments() {
+    private function sync_updated_enrolments() {
         global $DB;
 
         echo "  - Migrating updated enrolments\n";
@@ -287,7 +305,7 @@ SQL;
     /**
      * New Enrolments
      */
-    public static function new_enrolments() {
+    private function sync_new_enrolments() {
         global $DB;
 
         echo "  - Migrating new enrolments\n";
@@ -330,10 +348,11 @@ SQL;
         $this->print_stats();
 
         // Sync.
+        $this->sync_new_roles();
         $this->sync_updated_users();
         $this->sync_new_users();
-        $this->updated_enrolments();
-        $this->new_enrolments();
+        $this->sync_updated_enrolments();
+        $this->sync_new_enrolments();
 
         // Drop the temp table.
         $dbman->drop_table($table);
