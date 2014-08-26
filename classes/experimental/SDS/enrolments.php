@@ -31,7 +31,7 @@ class enrolments {
     /**
      * Grab teachers out of SDS.
      */
-    public static function get_all_teachers() {
+    private function get_all_teachers() {
         global $CFG, $SDSDB;
 
         db::obtain();
@@ -56,7 +56,7 @@ SQL;
     /**
      * Grab convenors out of SDS.
      */
-    public static function get_all_convenors() {
+    private function get_all_convenors() {
         global $CFG, $SDSDB;
 
         db::obtain();
@@ -95,7 +95,7 @@ SQL;
     /**
      * Grab students out of SDS.
      */
-    public static function get_all_students() {
+    private function get_all_students() {
         global $CFG, $SDSDB;
 
         db::obtain();
@@ -302,6 +302,55 @@ SQL;
     }
 
     /**
+     * Map old roles to connect
+     */
+    private function map_roles() {
+        global $DB;
+
+        echo "  - Mapping new roles\n";
+
+        $roles = $DB->get_records('connect_role', array("mid" => 0));
+        foreach ($roles as $role) {
+            $obj = \local_connect\role::get($role->id);
+            $data = $obj->get_data_mapping();
+
+            // Try to find a matching role.
+            $mid = $DB->get_field('role', 'id', array(
+                'shortname' => $data['short']
+            ));
+
+            if ($mid !== false) {
+                $role->mid = $mid;
+                $DB->update_record('connect_role', $role);
+                print "    - Mapped role {$role->name} to {$role->mid}.\n";
+            }
+        }
+    }
+
+    /**
+     * Map old users to connect
+     */
+    private function map_users() {
+        global $DB;
+
+        echo "  - Mapping new users\n";
+
+        $users = $DB->get_records('connect_user', array("mid" => 0));
+        foreach ($users as $user) {
+            // Try to find a matching user.
+            $mid = $DB->get_field('user', 'id', array(
+                'username' => $user->login
+            ));
+
+            if ($mid !== false) {
+                $user->mid = $mid;
+                $DB->update_record('connect_user', $user);
+                echo "    - Mapped user {$user->login} to {$user->mid}.\n";
+            }
+        }
+    }
+
+    /**
      * Sync enrolments with Moodle.
      */
     public function sync() {
@@ -327,8 +376,10 @@ SQL;
 
         // Sync.
         $this->sync_new_roles();
+        $this->map_roles();
         $this->sync_updated_users();
         $this->sync_new_users();
+        $this->map_users();
         $this->sync_deleted_enrolments();
         $this->sync_new_enrolments();
 
