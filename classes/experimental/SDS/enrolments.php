@@ -197,6 +197,32 @@ SQL;
     }
 
     /**
+     * Delete all teachers who are also a convenor.
+     */
+    private function clean_tmp() {
+        global $DB;
+
+        $objs = $DB->get_records_sql('
+            SELECT t.id, t.login, t.module_delivery_key
+            FROM {tmp_connect_enrolments} t
+            WHERE t.role IN (:teacher, :convenor)
+            GROUP BY t.login, t.module_delivery_key
+            HAVING COUNT(role) > 1
+        ', array(
+            'teacher' => 'teacher',
+            'convenor' => 'convenor'
+        ));
+
+        foreach ($objs as $obj) {
+            $DB->delete_records('tmp_connect_enrolments', array(
+                'login' => $obj->login,
+                'module_delivery_key' => $obj->module_delivery_key,
+                'role' => 'teacher'
+            ));
+        }
+    }
+
+    /**
      * Sync enrolments with Moodle.
      */
     public function sync() {
@@ -212,6 +238,9 @@ SQL;
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_teachers());
         echo "Loading convenor data from SDS...\n";
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_convenors());
+        echo "Cleaning duplicates...\n";
+        $this->clean_tmp();
+
         echo "Loading student data from SDS...\n";
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_students());
 
