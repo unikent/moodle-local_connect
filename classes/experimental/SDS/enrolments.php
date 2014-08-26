@@ -219,10 +219,13 @@ SQL;
 
         // Move data over.
         $SHAREDB->execute('
-            REPLACE INTO {enrollments} (id,chksum,login,title,initials,family_name,ukc,role,module_delivery_key,session_code) (
-                SELECT id,chksum,login,title,initials,family_name,ukc,role,module_delivery_key,session_code
+            REPLACE INTO {enrollments}
+                (id,id_chksum,chksum,login,title,initials,family_name,ukc,role,module_delivery_key,session_code)
+            (
+                SELECT id,chksum,chksum,login,title,initials,family_name,ukc,role,module_delivery_key,session_code
                 FROM {tmp_connect_enrolments}
-        )');
+            )
+        ');
 
         // Mark old ones as deleted.
         $deleted = $SHAREDB->get_fieldset_sql('

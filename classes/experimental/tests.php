@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-define("CLI_SCRIPT", true);
+//define("CLI_SCRIPT", true);
 
 require_once(dirname(__FILE__) . '/../../../../config.php');
 
-//$obj = new \local_connect\experimental\SDS\enrolments();
-//$obj->sync();
+$obj = new \local_connect\experimental\SDS\enrolments();
+$obj->sync();
