@@ -116,7 +116,7 @@ SQL;
     }
 
     /**
-     * Sync groups with Moodle.
+     * Sync group enrolments with Moodle.
      */
     public function sync() {
         global $CFG, $DB;
