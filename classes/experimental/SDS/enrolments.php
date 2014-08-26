@@ -248,16 +248,14 @@ SQL;
 
         echo "  - Migrating new users\n";
 
-        $sql = "INSERT INTO {connect_user} (ukc, login, title, initials, family_name) (
+        return $DB->execute("INSERT INTO {connect_user} (ukc, login, title, initials, family_name) (
             SELECT e.ukc, e.login, COALESCE(e.title, ''), COALESCE(e.initials, ''), COALESCE(e.family_name, '')
             FROM {tmp_connect_enrolments} e
             LEFT OUTER JOIN {connect_user} u
                 ON u.login=e.login
             WHERE u.id IS NULL
             GROUP BY e.login
-        )";
-
-        return $DB->execute($sql);
+        )");
     }
 
     /**
@@ -268,16 +266,14 @@ SQL;
 
         echo "  - Migrating updated users\n";
 
-        $sql = "REPLACE INTO {connect_user} (id, ukc, login, title, initials, family_name) (
+        return $DB->execute("REPLACE INTO {connect_user} (id, ukc, login, title, initials, family_name) (
             SELECT u.id, e.ukc, u.login, COALESCE(e.title, ''), COALESCE(e.initials, ''), COALESCE(e.family_name, '')
             FROM {tmp_connect_enrolments} e
             INNER JOIN {connect_user} u
                 ON u.login=e.login
             WHERE u.id IS NULL
             GROUP BY e.login
-        )";
-
-        return $DB->execute($sql);
+        )");
     }
 
     /**
@@ -288,7 +284,7 @@ SQL;
 
         echo "  - Migrating updated enrolments\n";
 
-        $sql = "REPLACE INTO {connect_enrolments} (id, courseid, userid, roleid, deleted) (
+        return $DB->execute("REPLACE INTO {connect_enrolments} (id, courseid, userid, roleid, deleted) (
             SELECT ce.id, c.id, u.id, r.id, e.sink_deleted
             FROM {tmp_connect_enrolments} e
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key
@@ -297,9 +293,7 @@ SQL;
             INNER JOIN {connect_enrolments} ce ON ce.courseid=c.id AND ce.userid=u.id AND ce.roleid=r.id
             WHERE e.sink_deleted <> ce.deleted
             GROUP BY ce.id
-        )";
-
-        return $DB->execute($sql);
+        )");
     }
 
     /**
@@ -310,7 +304,7 @@ SQL;
 
         echo "  - Migrating new enrolments\n";
 
-        $sql = "INSERT INTO {connect_enrolments} (courseid, userid, roleid, deleted) (
+        return $DB->execute("INSERT INTO {connect_enrolments} (courseid, userid, roleid, deleted) (
             SELECT c.id, u.id, r.id, e.sink_deleted
             FROM {tmp_connect_enrolments} e
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key
@@ -318,9 +312,7 @@ SQL;
             INNER JOIN {connect_role} r ON r.name=e.role
             LEFT OUTER JOIN {connect_enrolments} ce ON ce.courseid=c.id AND ce.userid=u.id AND ce.roleid=r.id
             WHERE ce.id IS NULL
-        )";
-
-        return $DB->execute($sql);
+        )");
     }
 
     /**
