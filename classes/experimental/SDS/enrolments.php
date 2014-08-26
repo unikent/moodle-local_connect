@@ -228,17 +228,12 @@ SQL;
         ');
 
         // Mark old ones as deleted.
-        $deleted = $SHAREDB->get_fieldset_sql('
-            SELECT e.chksum
-            FROM {enrollments} e
+        $SHAREDB->execute('
+            UPDATE enrollments e
             LEFT OUTER JOIN {tmp_connect_enrolments} tce ON e.chksum=tce.chksum
+            SET e.sink_deleted=1
             WHERE tce.chksum IS NULL AND e.session_code = :session
         ', array('session' => $CFG->connect->session_code));
-
-        if (!empty($deleted)) {
-            list($sql, $params) = $SHAREDB->get_in_or_equal($deleted);
-            $SHAREDB->set_field_select('enrollments', 'sink_deleted', 1, "chksum $sql", $params);
-        }
 
         // Drop the temp table.
         $dbman->drop_table($table);
