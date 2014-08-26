@@ -77,7 +77,7 @@ SQL;
     /**
      * Updated Groups
      */
-    private function updated_groups() {
+    private function sync_updated_groups() {
         global $DB;
 
         echo "  - Migrating updated groups\n";
@@ -98,7 +98,7 @@ SQL;
     /**
      * New Groups
      */
-    private function new_groups() {
+    private function sync_new_groups() {
         global $DB;
 
         echo "  - Migrating new groups\n";
@@ -131,8 +131,8 @@ SQL;
         $DB->insert_records('tmp_connect_groups', $this->get_all());
 
         // Move data over.
-        $this->updated_groups();
-        $this->new_groups();
+        $this->sync_updated_groups();
+        $this->sync_new_groups();
 
         // Drop the temp table.
         $dbman->drop_table($table);
