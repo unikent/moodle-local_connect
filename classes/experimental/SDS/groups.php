@@ -24,9 +24,6 @@
 
 namespace local_connect\experimental\SDS;
 
-global $CFG;
-require_once($CFG->libdir . '/ddllib.php');
-
 /**
  * Grabs all groups out of SDS.
  */
