@@ -203,6 +203,17 @@ SQL;
     }
 
     /**
+     * Get some sync stats.
+     */
+    public function get_stats() {
+        global $DB;
+
+        $total = $DB->count_records('tmp_connect_courses');
+        echo "  - $total courses found.\n";
+        return $total;
+    }
+
+    /**
      * Sync courses with Moodle.
      */
     public function sync() {
@@ -223,11 +234,14 @@ SQL;
         // Load data into the temp table.
         $DB->insert_records('tmp_connect_courses', $data);
         unset($data);
+        $stats = $this->get_stats();
 
         // Move data over.
-        $this->sync_new_campus();
-        $this->sync_updated_courses();
-        $this->sync_new_courses();
+        if ($stats > 50) {
+            $this->sync_new_campus();
+            $this->sync_updated_courses();
+            $this->sync_new_courses();
+        }
 
         // Drop the temp table.
         $dbman->drop_table($table);

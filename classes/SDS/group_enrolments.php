@@ -113,6 +113,17 @@ SQL;
     }
 
     /**
+     * Get some sync stats.
+     */
+    public function get_stats() {
+        global $DB;
+
+        $total = $DB->count_records('tmp_connect_group_enrolments');
+        echo "  - $total group enrolments found.\n";
+        return $total;
+    }
+
+    /**
      * Sync group enrolments with Moodle.
      */
     public function sync() {
@@ -125,10 +136,13 @@ SQL;
 
         // Load data into the temp table.
         $DB->insert_records('tmp_connect_group_enrolments', $this->get_all());
+        $stats = $this->get_stats();
 
         // Move data over.
-        $this->sync_deleted_group_enrolments();
-        $this->sync_new_group_enrolments();
+        if ($stats > 50) {
+            $this->sync_deleted_group_enrolments();
+            $this->sync_new_group_enrolments();
+        }
 
         // Drop the temp table.
         $dbman->drop_table($table);

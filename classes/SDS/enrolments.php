@@ -157,30 +157,6 @@ SQL;
     }
 
     /**
-     * Get some sync stats.
-     */
-    public function print_stats() {
-        global $CFG, $DB;
-
-        $convenors = $DB->count_records('tmp_connect_enrolments', array(
-            'role' => 'convenor'
-        ));
-
-        $teachers = $DB->count_records('tmp_connect_enrolments', array(
-            'role' => 'teacher'
-        ));
-
-        $students = $DB->count_records('tmp_connect_enrolments', array(
-            'role' => 'student'
-        ));
-
-        echo "    - " . ($convenors + $teachers + $students) . " enrolments found.\n";
-        echo "    - $convenors convenors\n";
-        echo "    - $teachers teachers\n";
-        echo "    - $students students\n";
-    }
-
-    /**
      * Delete all teachers who are also a convenor.
      */
     private function clean_tmp() {
@@ -352,6 +328,34 @@ SQL;
     }
 
     /**
+     * Get some sync stats.
+     */
+    public function get_stats() {
+        global $CFG, $DB;
+
+        $convenors = $DB->count_records('tmp_connect_enrolments', array(
+            'role' => 'convenor'
+        ));
+
+        $teachers = $DB->count_records('tmp_connect_enrolments', array(
+            'role' => 'teacher'
+        ));
+
+        $students = $DB->count_records('tmp_connect_enrolments', array(
+            'role' => 'student'
+        ));
+
+        $total = ($convenors + $teachers + $students);
+
+        echo "  - $total enrolments found.\n";
+        echo "    - $convenors convenors\n";
+        echo "    - $teachers teachers\n";
+        echo "    - $students students\n";
+
+        return array($total, $convenors, $teachers, $students);
+    }
+
+    /**
      * Sync enrolments with Moodle.
      */
     public function sync() {
@@ -373,16 +377,18 @@ SQL;
         echo "  - Loading student data from SDS...\n";
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_students());
 
-        $this->print_stats();
+        list($total, $convenors, $teachers, $students) = $this->get_stats();
 
         // Sync.
-        $this->sync_new_roles();
-        $this->map_roles();
-        $this->sync_updated_users();
-        $this->sync_new_users();
-        $this->map_users();
-        $this->sync_deleted_enrolments();
-        $this->sync_new_enrolments();
+        if ($convenors > 50 && $teachers > 50 && $students > 50) {
+            $this->sync_new_roles();
+            $this->map_roles();
+            $this->sync_updated_users();
+            $this->sync_new_users();
+            $this->map_users();
+            $this->sync_deleted_enrolments();
+            $this->sync_new_enrolments();
+        }
 
         // Drop the temp table.
         $dbman->drop_table($table);
