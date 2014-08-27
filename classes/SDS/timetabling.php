@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Moodle Connect Experimental Files
+ * Moodle-SDS Sync Stack
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect\experimental\SDS;
+namespace local_connect\SDS;
 
 /**
  * Grabs all timetabling information out of SDS.
@@ -34,8 +34,6 @@ class timetabling {
     private function get_week_sessions() {
         global $CFG, $SDSDB;
 
-        db::obtain();
-
         $sql = <<<SQL
             SELECT DISTINCT
               ltrim(rtrim(cast(cswb.session_code as varchar))) + '|' + ltrim(rtrim(cast(cswb.week_beginning as varchar))) as chksum,
@@ -43,10 +41,12 @@ class timetabling {
               ltrim(rtrim(cast(cswb.week_beginning_date as varchar))) as week_beginning_date,
               ltrim(rtrim(cast(cswb.week_number as varchar))) as week_number
             FROM c_session_week_beginning cswb
-            WHERE cswb.session_code = {$CFG->connect->session_code}
+            WHERE cswb.session_code = :sesscode
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode' => $CFG->connect->session_code
+        ));
     }
 
     /**

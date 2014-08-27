@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Moodle Connect Experimental Files
+ * Moodle-SDS Sync Stack
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect\experimental\SDS;
+namespace local_connect\SDS;
 
 /**
  * Grabs all enrolments out of SDS.
@@ -33,8 +33,6 @@ class enrolments {
      */
     private function get_all_teachers() {
         global $CFG, $SDSDB;
-
-        db::obtain();
 
         $sql = <<<SQL
             SELECT DISTINCT
@@ -47,10 +45,12 @@ class enrolments {
               , ltrim(rtrim(session_code)) as session_code
               , 'teacher' as role
             FROM v_moodle_data_export
-            WHERE (session_code = {$CFG->connect->session_code}) and lecturerid is not null and lecturerid != ''
+            WHERE (session_code = :sesscode) and lecturerid is not null and lecturerid != ''
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode' => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -58,8 +58,6 @@ SQL;
      */
     private function get_all_convenors() {
         global $CFG, $SDSDB;
-
-        db::obtain();
 
         $sql = <<<SQL
             SELECT DISTINCT
@@ -79,17 +77,20 @@ SQL;
             FROM d_module_convener AS dmc
               INNER JOIN c_staff AS cs ON dmc.staff = cs.staff
               INNER JOIN m_current_values mcv ON 1=1
-              INNER JOIN c_session_dates csd ON csd.session_code = {$CFG->connect->session_code} + 1
+              INNER JOIN c_session_dates csd ON csd.session_code = :sesscode1
             WHERE (
                 dmc.staff_function_end_date IS NULL
                 OR dmc.staff_function_end_date > CURRENT_TIMESTAMP
-                OR (mcv.session_code > {$CFG->connect->session_code}
+                OR (mcv.session_code > :sesscode2
                 AND dmc.staff_function_end_date >= mcv.rollover_date
                 AND CURRENT_TIMESTAMP < csd.session_start)
             ) AND cs.login != ''
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode1' => ((int)$CFG->connect->session_code) + 1,
+            'sesscode2' => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -97,8 +98,6 @@ SQL;
      */
     private function get_all_students() {
         global $CFG, $SDSDB;
-
-        db::obtain();
 
         $sql = <<<SQL
             SELECT DISTINCT
@@ -119,11 +118,13 @@ SQL;
               INNER JOIN b_module AS bm ON bd.ukc = bm.ukc
                 AND bd.academic IN ('A','J','P','R','T','W','Y','H')
                 AND bd.email_address <> ''
-                AND (bm.session_taught = '{$CFG->connect->session_code}') AND (bm.module_registration_status IN ('R','U'))
+                AND (bm.session_taught = :sesscode) AND (bm.module_registration_status IN ('R','U'))
                 AND bd.email_address != ''
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode' => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -153,30 +154,6 @@ SQL;
         $table->add_index('session_code', XMLDB_INDEX_NOTUNIQUE, array('session_code'));
 
         return $table;
-    }
-
-    /**
-     * Get some sync stats.
-     */
-    public function print_stats() {
-        global $CFG, $DB;
-
-        $convenors = $DB->count_records('tmp_connect_enrolments', array(
-            'role' => 'convenor'
-        ));
-
-        $teachers = $DB->count_records('tmp_connect_enrolments', array(
-            'role' => 'teacher'
-        ));
-
-        $students = $DB->count_records('tmp_connect_enrolments', array(
-            'role' => 'student'
-        ));
-
-        echo ($convenors + $teachers + $students) . " enrolments found.\n";
-        echo "  - $convenors convenors\n";
-        echo "  - $teachers teachers\n";
-        echo "  - $students students\n";
     }
 
     /**
@@ -351,6 +328,34 @@ SQL;
     }
 
     /**
+     * Get some sync stats.
+     */
+    public function get_stats() {
+        global $CFG, $DB;
+
+        $convenors = $DB->count_records('tmp_connect_enrolments', array(
+            'role' => 'convenor'
+        ));
+
+        $teachers = $DB->count_records('tmp_connect_enrolments', array(
+            'role' => 'teacher'
+        ));
+
+        $students = $DB->count_records('tmp_connect_enrolments', array(
+            'role' => 'student'
+        ));
+
+        $total = ($convenors + $teachers + $students);
+
+        echo "  - $total enrolments found.\n";
+        echo "    - $convenors convenors\n";
+        echo "    - $teachers teachers\n";
+        echo "    - $students students\n";
+
+        return array($total, $convenors, $teachers, $students);
+    }
+
+    /**
      * Sync enrolments with Moodle.
      */
     public function sync() {
@@ -362,26 +367,28 @@ SQL;
         $dbman->create_temp_table($table);
 
         // Load data into the temp table.
-        echo "Loading teacher data from SDS...\n";
+        echo "  - Loading teacher data from SDS...\n";
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_teachers());
-        echo "Loading convenor data from SDS...\n";
+        echo "  - Loading convenor data from SDS...\n";
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_convenors());
-        echo "Cleaning duplicates...\n";
+        echo "  - Cleaning duplicates...\n";
         $this->clean_tmp();
 
-        echo "Loading student data from SDS...\n";
+        echo "  - Loading student data from SDS...\n";
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_students());
 
-        $this->print_stats();
+        list($total, $convenors, $teachers, $students) = $this->get_stats();
 
         // Sync.
-        $this->sync_new_roles();
-        $this->map_roles();
-        $this->sync_updated_users();
-        $this->sync_new_users();
-        $this->map_users();
-        $this->sync_deleted_enrolments();
-        $this->sync_new_enrolments();
+        if ($convenors > 50 && $teachers > 50 && $students > 50) {
+            $this->sync_new_roles();
+            $this->map_roles();
+            $this->sync_updated_users();
+            $this->sync_new_users();
+            $this->map_users();
+            $this->sync_deleted_enrolments();
+            $this->sync_new_enrolments();
+        }
 
         // Drop the temp table.
         $dbman->drop_table($table);

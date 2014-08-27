@@ -15,17 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Moodle Connect Experimental Files
+ * Moodle-SDS Sync Stack
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect\experimental\SDS;
-
-global $CFG;
-require_once($CFG->libdir . '/ddllib.php');
+namespace local_connect\SDS;
 
 /**
  * Grabs all groups out of SDS.
@@ -37,8 +34,6 @@ class groups {
     private function get_all() {
         global $CFG, $SDSDB;
 
-        db::obtain();
-
         $sql = <<<SQL
             SELECT DISTINCT
               ltrim(rtrim(cg.group_id)) AS group_id,
@@ -48,12 +43,14 @@ class groups {
               INNER JOIN c_groups AS cg ON cg.parent_group = dgm.group_id
               LEFT JOIN l_ukc_group AS lug on lug.group_id = cg.group_id
               LEFT JOIN b_details AS bd on bd.ukc = lug.ukc
-            WHERE (dgm.session_code = {$CFG->connect->session_code})
+            WHERE (dgm.session_code = :sesscode)
               AND (cg.group_type = 'S')
               AND bd.email_address != ''
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode' => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -72,6 +69,23 @@ SQL;
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('group_id'));
 
         return $table;
+    }
+
+    /**
+     * Deleted Groups
+     */
+    private function sync_deleted_groups() {
+        global $DB;
+
+        echo "  - Migrating deleted groups\n";
+
+        return $DB->execute("
+            DELETE cg.* FROM {connect_group} cg
+            LEFT OUTER JOIN {tmp_connect_groups} tmp
+                ON cg.module_delivery_key = tmp.module_delivery_key
+                    AND cg.group_id = tmp.group_id
+            WHERE tmp.group_id IS NULL
+        ");
     }
 
     /**
@@ -117,6 +131,17 @@ SQL;
     }
 
     /**
+     * Get some sync stats.
+     */
+    public function get_stats() {
+        global $DB;
+
+        $total = $DB->count_records('tmp_connect_groups');
+        echo "  - $total groups found.\n";
+        return $total;
+    }
+
+    /**
      * Sync groups with Moodle.
      */
     public function sync() {
@@ -129,10 +154,14 @@ SQL;
 
         // Load data into the temp table.
         $DB->insert_records('tmp_connect_groups', $this->get_all());
+        $stats = $this->get_stats();
 
         // Move data over.
-        $this->sync_updated_groups();
-        $this->sync_new_groups();
+        if ($stats > 50) {
+            $this->sync_deleted_groups();
+            $this->sync_updated_groups();
+            $this->sync_new_groups();
+        }
 
         // Drop the temp table.
         $dbman->drop_table($table);

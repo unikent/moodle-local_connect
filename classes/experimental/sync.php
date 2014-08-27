@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect\util;
+namespace local_connect\experimental;
 
 defined('MOODLE_INTERNAL') || die();
 

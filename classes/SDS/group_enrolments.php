@@ -15,17 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Moodle Connect Experimental Files
+ * Moodle-SDS Sync Stack
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect\experimental\SDS;
-
-global $CFG;
-require_once($CFG->libdir . '/ddllib.php');
+namespace local_connect\SDS;
 
 /**
  * Grabs all group enrolments out of SDS.
@@ -37,8 +34,6 @@ class group_enrolments {
     private function get_all() {
         global $CFG, $SDSDB;
 
-        db::obtain();
-
         $sql = <<<SQL
             SELECT DISTINCT
               ltrim(rtrim(cg.group_id)) + '|' + ltrim(rtrim(bd.email_address)) AS chksum,
@@ -48,12 +43,14 @@ class group_enrolments {
               INNER JOIN c_groups AS cg ON cg.parent_group = dgm.group_id
               LEFT JOIN l_ukc_group AS lug on lug.group_id = cg.group_id
               LEFT JOIN b_details AS bd on bd.ukc = lug.ukc
-            WHERE (dgm.session_code = {$CFG->connect->session_code})
+            WHERE (dgm.session_code = :sesscode)
               AND (cg.group_type = 'S')
               AND bd.email_address != ''
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode' => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -116,6 +113,17 @@ SQL;
     }
 
     /**
+     * Get some sync stats.
+     */
+    public function get_stats() {
+        global $DB;
+
+        $total = $DB->count_records('tmp_connect_group_enrolments');
+        echo "  - $total group enrolments found.\n";
+        return $total;
+    }
+
+    /**
      * Sync group enrolments with Moodle.
      */
     public function sync() {
@@ -128,10 +136,13 @@ SQL;
 
         // Load data into the temp table.
         $DB->insert_records('tmp_connect_group_enrolments', $this->get_all());
+        $stats = $this->get_stats();
 
         // Move data over.
-        $this->sync_deleted_group_enrolments();
-        $this->sync_new_group_enrolments();
+        if ($stats > 50) {
+            $this->sync_deleted_group_enrolments();
+            $this->sync_new_group_enrolments();
+        }
 
         // Drop the temp table.
         $dbman->drop_table($table);
