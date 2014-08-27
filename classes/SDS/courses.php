@@ -27,7 +27,7 @@ namespace local_connect\SDS;
 /**
  * Grabs all courses out of SDS.
  */
-class course {
+class courses {
     /**
      * Grab out of SDS.
      */

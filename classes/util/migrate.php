@@ -28,6 +28,9 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Connect migration scripts
+ * 
+ * @deprecated in favour of \SDS classes
+ * This still contains a lot of timetabling stuff that lot doesnt, though.
  */
 class migrate
 {
