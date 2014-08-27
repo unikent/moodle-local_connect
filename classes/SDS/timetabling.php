@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Moodle Connect Experimental Files
+ * Moodle-SDS Sync Stack
  *
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect\experimental\SDS;
+namespace local_connect\SDS;
 
 /**
  * Grabs all timetabling information out of SDS.

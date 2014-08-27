@@ -1,1 +1,0 @@
-This is a PHP replacement of the jRuby MSSQL->MySQL sync stack.
