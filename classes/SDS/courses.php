@@ -149,6 +149,23 @@ SQL;
     }
 
     /**
+     * Deleted Courses
+     */
+    private function sync_deleted_courses() {
+        global $DB;
+
+        echo "  - Migrating deleted courses\n";
+
+        return $DB->execute("
+            DELETE cc.* FROM {connect_course} cc
+            LEFT OUTER JOIN {tmp_connect_courses} tmp
+                ON cc.module_delivery_key = tmp.module_delivery_key
+                    AND cc.module_version = tmp.module_version
+            WHERE tmp.id IS NULL
+        ");
+    }
+
+    /**
      * Updated Courses
      */
     private function sync_updated_courses() {
@@ -239,6 +256,7 @@ SQL;
         // Move data over.
         if ($stats > 50) {
             $this->sync_new_campus();
+            $this->sync_deleted_courses();
             $this->sync_updated_courses();
             $this->sync_new_courses();
         }

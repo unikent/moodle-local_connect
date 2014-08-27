@@ -72,6 +72,23 @@ SQL;
     }
 
     /**
+     * Deleted Groups
+     */
+    private function sync_deleted_groups() {
+        global $DB;
+
+        echo "  - Migrating deleted groups\n";
+
+        return $DB->execute("
+            DELETE cg.* FROM {connect_group} cg
+            LEFT OUTER JOIN {tmp_connect_groups} tmp
+                ON cg.module_delivery_key = tmp.module_delivery_key
+                    AND cg.group_id = tmp.group_id
+            WHERE tmp.group_id IS NULL
+        ");
+    }
+
+    /**
      * Updated Groups
      */
     private function sync_updated_groups() {
@@ -141,6 +158,7 @@ SQL;
 
         // Move data over.
         if ($stats > 50) {
+            $this->sync_deleted_groups();
             $this->sync_updated_groups();
             $this->sync_new_groups();
         }

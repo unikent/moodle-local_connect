@@ -41,7 +41,7 @@ class migration extends \core\task\scheduled_task
 
         // Run migrations.
         $obj = new \local_connect\SDS\courses();
-        $obj->sync();
+        $obj->sync();return;
         $obj = new \local_connect\SDS\enrolments();
         $obj->sync();
         $obj = new \local_connect\SDS\groups();
