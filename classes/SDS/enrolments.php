@@ -363,14 +363,14 @@ SQL;
         $dbman->create_temp_table($table);
 
         // Load data into the temp table.
-        echo "Loading teacher data from SDS...\n";
+        echo "  - Loading teacher data from SDS...\n";
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_teachers());
-        echo "Loading convenor data from SDS...\n";
+        echo "  - Loading convenor data from SDS...\n";
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_convenors());
-        echo "Cleaning duplicates...\n";
+        echo "  - Cleaning duplicates...\n";
         $this->clean_tmp();
 
-        echo "Loading student data from SDS...\n";
+        echo "  - Loading student data from SDS...\n";
         $DB->insert_records('tmp_connect_enrolments', $this->get_all_students());
 
         $this->print_stats();
