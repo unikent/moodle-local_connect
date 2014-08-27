@@ -34,8 +34,6 @@ class enrolments {
     private function get_all_teachers() {
         global $CFG, $SDSDB;
 
-        db::obtain();
-
         $sql = <<<SQL
             SELECT DISTINCT
               (ltrim(rtrim(session_code)) + '|' + ltrim(rtrim(mdk)) + '|' + ltrim(rtrim(lecturerid)) + '|teacher') as chksum
@@ -47,10 +45,12 @@ class enrolments {
               , ltrim(rtrim(session_code)) as session_code
               , 'teacher' as role
             FROM v_moodle_data_export
-            WHERE (session_code = {$CFG->connect->session_code}) and lecturerid is not null and lecturerid != ''
+            WHERE (session_code = :sesscode) and lecturerid is not null and lecturerid != ''
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode' => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -58,8 +58,6 @@ SQL;
      */
     private function get_all_convenors() {
         global $CFG, $SDSDB;
-
-        db::obtain();
 
         $sql = <<<SQL
             SELECT DISTINCT
@@ -79,17 +77,20 @@ SQL;
             FROM d_module_convener AS dmc
               INNER JOIN c_staff AS cs ON dmc.staff = cs.staff
               INNER JOIN m_current_values mcv ON 1=1
-              INNER JOIN c_session_dates csd ON csd.session_code = {$CFG->connect->session_code} + 1
+              INNER JOIN c_session_dates csd ON csd.session_code = :sesscode1
             WHERE (
                 dmc.staff_function_end_date IS NULL
                 OR dmc.staff_function_end_date > CURRENT_TIMESTAMP
-                OR (mcv.session_code > {$CFG->connect->session_code}
+                OR (mcv.session_code > :sesscode2
                 AND dmc.staff_function_end_date >= mcv.rollover_date
                 AND CURRENT_TIMESTAMP < csd.session_start)
             ) AND cs.login != ''
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode1' => ((int)$CFG->connect->session_code) + 1,
+            'sesscode2' => $CFG->connect->session_code
+        ));
     }
 
     /**
@@ -97,8 +98,6 @@ SQL;
      */
     private function get_all_students() {
         global $CFG, $SDSDB;
-
-        db::obtain();
 
         $sql = <<<SQL
             SELECT DISTINCT
@@ -119,11 +118,13 @@ SQL;
               INNER JOIN b_module AS bm ON bd.ukc = bm.ukc
                 AND bd.academic IN ('A','J','P','R','T','W','Y','H')
                 AND bd.email_address <> ''
-                AND (bm.session_taught = '{$CFG->connect->session_code}') AND (bm.module_registration_status IN ('R','U'))
+                AND (bm.session_taught = :sesscode) AND (bm.module_registration_status IN ('R','U'))
                 AND bd.email_address != ''
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode' => $CFG->connect->session_code
+        ));
     }
 
     /**

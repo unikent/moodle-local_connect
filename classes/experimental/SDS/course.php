@@ -34,8 +34,6 @@ class course {
     public function get_all() {
         global $CFG, $SDSDB;
 
-        db::obtain();
-
         $sql = <<<SQL
             SELECT DISTINCT
               lower(CAST(master.dbo.fn_varbintohexsubstring( 0,
@@ -63,9 +61,9 @@ class course {
               syn.data as synopsis
             FROM d_module_delivery dmd
               INNER JOIN d_module_delivery_session AS dmds
-                  ON dmds.module_delivery_key = dmd.module_delivery_key
-                  AND dmds.module_status = 'ACTIVE'
-              AND dmds.session_code = {$CFG->connect->session_code}
+                ON dmds.module_delivery_key = dmd.module_delivery_key
+                AND dmds.module_status = 'ACTIVE'
+                AND dmds.session_code = :sesscode1
               INNER JOIN c_campus AS cc ON dmd.delivery_campus = cc.campus
               INNER JOIN c_module_details AS cmd
                   ON cmd.module_code = dmd.module_code AND cmd.module_version = dmd.module_version
@@ -79,17 +77,21 @@ class course {
                   WHERE hee_1.isactive = 1
                       AND hee_1.display_order = 1
                       AND entry_type = 'S'
-                      AND session_code = {$CFG->connect->session_code}
+                      AND session_code = :sesscode2
                       AND hee_1.module_code = he_1.module_code
                 )
               ) AS syn ON syn.module_code=cmd.module_code AND syn.module_version=cmd.module_version
               INNER JOIN c_session_week_beginning AS swb
                   ON swb.week_beginning = dmd.module_week_beginning
-                  AND swb.session_code = {$CFG->connect->session_code}
+                  AND swb.session_code = :sesscode3
             WHERE dmd.delivery_faculty IN ('A','H','S','U')
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode1' => $CFG->connect->session_code,
+            'sesscode2' => $CFG->connect->session_code,
+            'sesscode3' => $CFG->connect->session_code
+        ));
     }
 
     /**

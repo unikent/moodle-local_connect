@@ -34,8 +34,6 @@ class group_enrolments {
     private function get_all() {
         global $CFG, $SDSDB;
 
-        db::obtain();
-
         $sql = <<<SQL
             SELECT DISTINCT
               ltrim(rtrim(cg.group_id)) + '|' + ltrim(rtrim(bd.email_address)) AS chksum,
@@ -45,12 +43,14 @@ class group_enrolments {
               INNER JOIN c_groups AS cg ON cg.parent_group = dgm.group_id
               LEFT JOIN l_ukc_group AS lug on lug.group_id = cg.group_id
               LEFT JOIN b_details AS bd on bd.ukc = lug.ukc
-            WHERE (dgm.session_code = {$CFG->connect->session_code})
+            WHERE (dgm.session_code = :sesscode)
               AND (cg.group_type = 'S')
               AND bd.email_address != ''
 SQL;
 
-        return $SDSDB->get_records_sql($sql);
+        return $SDSDB->get_records_sql($sql, array(
+            'sesscode' => $CFG->connect->session_code
+        ));
     }
 
     /**
