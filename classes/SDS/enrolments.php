@@ -174,10 +174,10 @@ SQL;
             'role' => 'student'
         ));
 
-        echo ($convenors + $teachers + $students) . " enrolments found.\n";
-        echo "  - $convenors convenors\n";
-        echo "  - $teachers teachers\n";
-        echo "  - $students students\n";
+        echo "    - " . ($convenors + $teachers + $students) . " enrolments found.\n";
+        echo "    - $convenors convenors\n";
+        echo "    - $teachers teachers\n";
+        echo "    - $students students\n";
     }
 
     /**
