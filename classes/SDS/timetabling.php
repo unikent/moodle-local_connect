@@ -31,7 +31,7 @@ class timetabling {
     /**
      * Grab out of SDS.
      */
-    public function get_week_sessions() {
+    public function get_weeks() {
         global $CFG, $SDSDB;
 
         $sql = <<<SQL
@@ -57,7 +57,8 @@ SQL;
 
         require_once($CFG->libdir . '/ddllib.php');
 
-        $table = new \xmldb_table('tmp_connect_weeeks');
+        $table = new \xmldb_table('tmp_connect_weeks');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('week_beginning', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
         $table->add_field('week_beginning_date', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
         $table->add_field('week_number', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
@@ -79,7 +80,7 @@ SQL;
             INSERT INTO {connect_weeks} (week_beginning, week_beginning_date, week_number)
             (
                 SELECT cwb.week_beginning, STR_TO_DATE(cwb.week_beginning_date, '%b %e %Y %H:%iAM'), cwb.week_number
-                FROM {tmp_connect_weeeks} cwb
+                FROM {tmp_connect_weeks} cwb
                 LEFT OUTER JOIN {connect_weeks} cw ON cw.week_beginning=cwb.week_beginning
                 WHERE cw.id IS NULL
             )
@@ -98,7 +99,7 @@ SQL;
             REPLACE INTO {connect_weeks} (id, week_beginning, week_beginning_date, week_number)
             (
                 SELECT cw.id, cwb.week_beginning, STR_TO_DATE(cwb.week_beginning_date, '%b %e %Y %H:%iAM'), cwb.week_number
-                FROM {tmp_connect_weeeks} cwb
+                FROM {tmp_connect_weeks} cwb
                 INNER JOIN {connect_weeks} cw ON cw.week_beginning=cwb.week_beginning
                 WHERE
                     cw.week_beginning_date <> STR_TO_DATE(cwb.week_beginning_date, '%b %e %Y %H:%iAM')
@@ -119,7 +120,7 @@ SQL;
         $dbman->create_temp_table($table);
 
         // Load data into the temp table.
-        $DB->insert_records('tmp_connect_weeeks', $this->get_all());
+        $DB->insert_records('tmp_connect_weeks', $this->get_weeks());
 
         // Move data over.
         $this->sync_updated_weeks();
