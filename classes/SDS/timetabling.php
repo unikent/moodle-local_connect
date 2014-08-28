@@ -31,7 +31,7 @@ class timetabling {
     /**
      * Grab out of SDS.
      */
-    private function get_week_sessions() {
+    public function get_week_sessions() {
         global $CFG, $SDSDB;
 
         $sql = <<<SQL

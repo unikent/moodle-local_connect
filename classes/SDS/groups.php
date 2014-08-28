@@ -31,7 +31,7 @@ class groups {
     /**
      * Grab out of SDS.
      */
-    private function get_all() {
+    public function get_all() {
         global $CFG, $SDSDB;
 
         $sql = <<<SQL

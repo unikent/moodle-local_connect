@@ -31,7 +31,7 @@ class enrolments {
     /**
      * Grab teachers out of SDS.
      */
-    private function get_all_teachers() {
+    public function get_all_teachers() {
         global $CFG, $SDSDB;
 
         $sql = <<<SQL
@@ -56,7 +56,7 @@ SQL;
     /**
      * Grab convenors out of SDS.
      */
-    private function get_all_convenors() {
+    public function get_all_convenors() {
         global $CFG, $SDSDB;
 
         $sql = <<<SQL
@@ -96,7 +96,7 @@ SQL;
     /**
      * Grab students out of SDS.
      */
-    private function get_all_students() {
+    public function get_all_students() {
         global $CFG, $SDSDB;
 
         $sql = <<<SQL
