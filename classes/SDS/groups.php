@@ -81,10 +81,12 @@ SQL;
 
         return $DB->execute("
             DELETE cg.* FROM {connect_group} cg
+            LEFT OUTER JOIN {connect_course} c
+                ON c.id = cg.courseid
             LEFT OUTER JOIN {tmp_connect_groups} tmp
-                ON cg.module_delivery_key = tmp.module_delivery_key
-                    AND cg.group_id = tmp.group_id
-            WHERE tmp.group_id IS NULL
+                ON tmp.module_delivery_key = c.module_delivery_key
+                    AND cg.id = tmp.group_id
+            WHERE c.id IS NULL OR tmp.group_id IS NULL
         ");
     }
 
