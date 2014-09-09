@@ -164,7 +164,8 @@ class group_enrolment extends data
         }
 
         if (!groups_add_member($this->group->mid, $this->user->mid, 'enrol_connect')) {
-            \local_connect\util\helpers::error("Failed to enrol '{$this->user->mid}' in '{$this->group->mid}'. Sorry :(((");
+            $msg = "Failed to enrol '{$this->user->mid}' in group '{$this->group->mid}'. Course: '{$this->course->mid}'";
+            \local_connect\util\helpers::error($msg);
             return false;
         }
 
