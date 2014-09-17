@@ -92,7 +92,10 @@ class group extends data
 
         // On sync we can be a bit slower... check the mid is valid.
         if ($this->is_in_moodle()) {
-            $group = $DB->record_exists('groups', array('id' => $this->mid));
+            $group = $DB->get_record('groups', array(
+                'id' => $this->mid
+            ));
+
             // Do we *definately* exist?
             if (!$group || ($group->courseid != $this->course->mid)) {
                 $this->mid = 0;
