@@ -1,5 +1,6 @@
+
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/connect/db" VERSION="20140616" COMMENT="XMLDB file for Connect module"
+<XMLDB PATH="local/connect/db" VERSION="20140921" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -220,6 +221,10 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="k_week_beginning" TYPE="unique" FIELDS="week_beginning"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="i_week_beginning_date" UNIQUE="false" FIELDS="week_beginning_date"/>
+        <INDEX NAME="i_week_number" UNIQUE="false" FIELDS="week_number"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="connect_course_exts" COMMENT="Shortname extensions for courses">
       <FIELDS>
