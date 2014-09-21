@@ -689,5 +689,33 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014062700, 'local', 'connect');
     }
 
+    if ($oldversion < 2014092100) {
+        // Define index i_week_beginning_date (not unique) to be added to connect_weeks.
+        $table = new xmldb_table('connect_weeks');
+        $index = new xmldb_index('i_week_beginning_date', XMLDB_INDEX_NOTUNIQUE, array('week_beginning_date'));
+
+        // Conditionally launch add index i_week_beginning_date.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014092100, 'local', 'connect');
+    }
+
+    if ($oldversion < 2014092101) {
+        // Define index i_week_number (not unique) to be added to connect_weeks.
+        $table = new xmldb_table('connect_weeks');
+        $index = new xmldb_index('i_week_number', XMLDB_INDEX_NOTUNIQUE, array('week_number'));
+
+        // Conditionally launch add index i_week_number.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014092101, 'local', 'connect');
+    }
+
     return true;
 }
