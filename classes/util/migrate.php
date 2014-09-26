@@ -68,15 +68,13 @@ class migrate
         self::new_courses();
         self::updated_groups();
         self::new_groups();
-        self::updated_enrolments();
+        self::deleted_enrolments();
         self::new_enrolments();
         self::clean_enrolments();
         self::updated_group_enrolments();
         self::new_group_enrolments();
         self::new_weeks();
         self::updated_weeks();
-
-        sleep($CFG->kent->cluster_sleep);
 
         // Timetabling.
         self::new_rooms();
@@ -321,24 +319,27 @@ class migrate
     }
 
     /**
-     * Updated Enrolments
+     * Deleted Enrolments
      */
-    public static function updated_enrolments() {
+    public static function deleted_enrolments() {
         global $DB, $CFG;
 
         $connectdb = $CFG->kent->sharedb["name"];
 
-        echo "Migrating updated enrolments\n";
+        echo "Migrating deleted enrolments\n";
 
-        $sql = "REPLACE INTO {connect_enrolments} (`id`, `courseid`, `userid`, `roleid`,`deleted`) (
-            SELECT ce.id, c.id, u.id, r.id, e.sink_deleted
-            FROM `$connectdb`.`enrollments` e
-            INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key AND c.session_code=e.session_code
-            INNER JOIN {connect_user} u ON u.login=e.login
-            INNER JOIN {connect_role} r ON r.name=e.role
-            INNER JOIN {connect_enrolments} ce ON ce.courseid=c.id AND ce.userid=u.id AND ce.roleid=r.id
-            WHERE e.sink_deleted <> ce.deleted AND e.session_code=:session_code
-            GROUP BY ce.id
+        $sql = "DELETE FROM {connect_enrolments} WHERE id IN (
+            SELECT ce.id
+            FROM {connect_enrolments} ce
+            INNER JOIN {connect_course} c ON c.id=ce.courseid
+            INNER JOIN {connect_user} u ON u.id=ce.userid
+            INNER JOIN {connect_role} r ON r.id=ce.roleid
+            LEFT OUTER JOIN `$connectdb`.`enrollments` e
+                ON e.login = u.login
+                AND e.role = r.name
+                AND e.module_delivery_key = c.module_delivery_key
+                AND e.session_code = c.session_code
+            WHERE e.chksum IS NULL OR e.sink_deleted = 1
         )";
 
         return $DB->execute($sql, array(
