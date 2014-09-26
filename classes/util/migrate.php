@@ -328,9 +328,7 @@ class migrate
 
         echo "Migrating deleted enrolments\n";
 
-        $sql = "DELETE FROM {connect_enrolments} WHERE id IN (
-            SELECT ce.id
-            FROM {connect_enrolments} ce
+        $sql = "DELETE FROM {connect_enrolments} ce
             INNER JOIN {connect_course} c ON c.id=ce.courseid
             INNER JOIN {connect_user} u ON u.id=ce.userid
             INNER JOIN {connect_role} r ON r.id=ce.roleid
@@ -340,7 +338,7 @@ class migrate
                 AND e.module_delivery_key = c.module_delivery_key
                 AND e.session_code = c.session_code
             WHERE e.chksum IS NULL OR e.sink_deleted = 1
-        )";
+        ";
 
         return $DB->execute($sql, array(
             "session_code" => $CFG->connect->session_code
