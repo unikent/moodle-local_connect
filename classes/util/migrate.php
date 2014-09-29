@@ -355,14 +355,14 @@ class migrate
 
         echo "Migrating new enrolments\n";
 
-        $sql = "INSERT INTO {connect_enrolments} (`courseid`, `userid`, `roleid`,`deleted`) (
-            SELECT c.id, u.id, r.id, e.sink_deleted
+        $sql = "INSERT INTO {connect_enrolments} (`courseid`, `userid`, `roleid`) (
+            SELECT c.id, u.id, r.id
             FROM `$connectdb`.`enrollments` e
             INNER JOIN {connect_course} c ON c.module_delivery_key=e.module_delivery_key AND c.session_code=e.session_code
             INNER JOIN {connect_user} u ON u.login=e.login
             INNER JOIN {connect_role} r ON r.name=e.role
             LEFT OUTER JOIN {connect_enrolments} ce ON ce.courseid=c.id AND ce.userid=u.id AND ce.roleid=r.id
-            WHERE ce.id IS NULL AND e.session_code=:session_code
+            WHERE ce.id IS NULL AND e.session_code=:session_code AND e.sink_deleted = 0
         )";
 
         return $DB->execute($sql, array(
