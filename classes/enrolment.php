@@ -45,7 +45,7 @@ class enrolment extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "userid", "courseid", "roleid", "deleted");
+        return array("id", "userid", "courseid", "roleid");
     }
 
     /**
@@ -66,61 +66,7 @@ class enrolment extends data
      * Here is the big sync method.
      */
     public function sync($dry = false) {
-        $this->reset_object_cache();
-
-        // Should we be deleting this?
-        if ($this->deleted) {
-            if ($this->is_in_moodle_precise() && $this->delete_check()) {
-                if (!$dry) {
-                    $this->delete();
-                }
-
-                return self::STATUS_DELETE;
-            }
-
-            return self::STATUS_NONE;
-        }
-
-        // Or creating it?
-        if (!$this->is_in_moodle() && $this->course->is_in_moodle()) {
-            if (!$dry) {
-                $this->create_in_moodle();
-            }
-
-            return self::STATUS_CREATE;
-        }
-
-        // Do we have the correct role id?
-        if (!$this->is_in_moodle_precise()) {
-            if (!$dry) {
-                $this->delete();
-                $this->create_in_moodle();
-            }
-
-            return self::STATUS_MODIFY;
-        }
-
-        return self::STATUS_NONE;
-    }
-
-    /**
-     * Ensure we should be deleting this enrolment.
-     * This basically says "Okay, so I am deleted, but are there any other
-     * enrolments for this mid that are not?"
-     *
-     * @return boolean True if it is okay to delete this, false if not.
-     */
-    public function delete_check() {
-        global $DB;
-
-        $enrolments = self::get_by_course_mid($this->course->mid, $this->userid);
-        foreach ($enrolments as $enrolment) {
-            if ($enrolment->deleted == 0) {
-                return false;
-            }
-        }
-
-        return true;
+        debugging("You should not be using this! The enrol sync does this now.");
     }
 
     /**
@@ -129,14 +75,7 @@ class enrolment extends data
      * @return boolean
      */
     public function delete() {
-        global $DB;
-        $this->reset_object_cache();
-
-        $instance = $this->course->get_enrol_instance();
-        if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
-            $enrol = enrol_get_plugin('connect');
-            $enrol->unenrol_user($instance, $this->user->mid);
-        }
+        debugging("You should not be using this! The enrol sync does this now.");
     }
 
     /**

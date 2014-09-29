@@ -63,61 +63,6 @@ unset($creates);
 
 /*
  * --------------------------------------------------------
- * Enrolments
- * --------------------------------------------------------
- */
-
-// First, deletes.
-$deletes = \local_connect\util\sync::get_deleted_enrolments();
-$count = count($deletes);
-echo "   Deleting ($count) enrolments...\n";
-
-foreach ($deletes as $delete) {
-    $obj = \local_connect\enrolment::get($delete);
-    echo "      -> {$obj->userid} on course {$obj->courseid} (was {$obj->roleid})\n";
-
-    if (!$options['dry']) {
-        $obj->delete();
-    }
-}
-
-unset($deletes);
-
-// Then, odd changes.
-$changes = \local_connect\util\sync::get_changed_enrolments();
-$count = count($changes);
-echo "   Changing ($count) enrolments...\n";
-
-foreach ($changes as $change) {
-    $obj = \local_connect\enrolment::get($change);
-    echo "      -> {$obj->userid} on course {$obj->courseid} as {$obj->roleid}\n";
-
-    if (!$options['dry']) {
-        $obj->delete();
-        $obj->create_in_moodle();
-    }
-}
-
-unset($changes);
-
-// Then, creates.
-$creates = \local_connect\util\sync::get_new_enrolments();
-$count = count($creates);
-echo "   Creating ($count) enrolments...\n";
-
-foreach ($creates as $create) {
-    $obj = \local_connect\enrolment::get($create);
-    echo "      -> {$obj->userid} on course {$obj->courseid} as {$obj->roleid}\n";
-
-    if (!$options['dry']) {
-        $obj->create_in_moodle();
-    }
-}
-
-unset($creates);
-
-/*
- * --------------------------------------------------------
  * Group enrolments!
  * --------------------------------------------------------
  */
