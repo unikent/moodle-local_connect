@@ -112,7 +112,7 @@ class migrate
     public static function all_updated() {
         self::updated_courses();
         self::updated_groups();
-        self::updated_enrolments();
+        self::deleted_enrolments();
         self::clean_enrolments();
         self::updated_group_enrolments();
         self::updated_weeks();
