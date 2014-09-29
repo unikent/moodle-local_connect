@@ -336,7 +336,7 @@ class migrate
                 ON e.login = u.login
                 AND e.role = r.name
                 AND e.module_delivery_key = c.module_delivery_key
-                AND e.session_code = c.session_code
+                AND e.session_code = :session_code
             WHERE e.chksum IS NULL OR e.sink_deleted = 1
         ";
 
