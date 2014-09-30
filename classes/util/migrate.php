@@ -328,7 +328,7 @@ class migrate
 
         echo "Migrating deleted enrolments\n";
 
-        $sql = "DELETE FROM {connect_enrolments} ce
+        $sql = "DELETE ce.* FROM {connect_enrolments} ce
             INNER JOIN {connect_course} c ON c.id=ce.courseid
             INNER JOIN {connect_user} u ON u.id=ce.userid
             INNER JOIN {connect_role} r ON r.id=ce.roleid
