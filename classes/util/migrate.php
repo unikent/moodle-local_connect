@@ -326,6 +326,11 @@ class migrate
 
         $connectdb = $CFG->kent->sharedb["name"];
 
+        if ($CFG->kent->distribution != '2014') {
+            echo "NOT Migrating deleted enrolments\n";
+            return false;
+        }
+
         echo "Migrating deleted enrolments\n";
 
         $sql = "DELETE ce.* FROM {connect_enrolments} ce
