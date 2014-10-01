@@ -732,14 +732,6 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014092600, 'local', 'connect');
     }
 
-    if ($oldversion < 2014100100) {
-        $table = new xmldb_table('connect_course');
-        $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, 0);
-
-        // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2014100100, 'local', 'connect');
-    }
-
     if ($oldversion < 2014100101) {
         $table = new xmldb_table('connect_course');
 
@@ -753,6 +745,18 @@ function xmldb_local_connect_upgrade($oldversion) {
 
         // Connect savepoint reached.
         upgrade_plugin_savepoint(true, 2014100101, 'local', 'connect');
+    }
+
+    if ($oldversion < 2014100102) {
+        $table = new xmldb_table('connect_course');
+        $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, 0, 'category');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014100102, 'local', 'connect');
     }
 
     return true;
