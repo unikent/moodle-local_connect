@@ -366,7 +366,7 @@ class migrate
 
         $connectdb = $CFG->kent->sharedb["name"];
 
-        if ($CFG->kent->distribution != '2014') {
+        if ($CFG->kent->environment == 'live' && $CFG->kent->distribution != '2014') {
             echo "NOT Migrating deleted enrolments\n";
             return false;
         }
