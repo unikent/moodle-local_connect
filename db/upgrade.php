@@ -689,5 +689,56 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014062700, 'local', 'connect');
     }
 
+    if ($oldversion < 2014092100) {
+        // Define index i_week_beginning_date (not unique) to be added to connect_weeks.
+        $table = new xmldb_table('connect_weeks');
+        $index = new xmldb_index('i_week_beginning_date', XMLDB_INDEX_NOTUNIQUE, array('week_beginning_date'));
+
+        // Conditionally launch add index i_week_beginning_date.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014092100, 'local', 'connect');
+    }
+
+    if ($oldversion < 2014092101) {
+        // Define index i_week_number (not unique) to be added to connect_weeks.
+        $table = new xmldb_table('connect_weeks');
+        $index = new xmldb_index('i_week_number', XMLDB_INDEX_NOTUNIQUE, array('week_number'));
+
+        // Conditionally launch add index i_week_number.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014092101, 'local', 'connect');
+    }
+
+    if ($oldversion < 2014092600) {
+        $table = new xmldb_table('connect_enrolments');
+
+        // Define field deleted to be dropped from connect_enrolments.
+        $field = new xmldb_field('deleted');
+
+        // Conditionally launch drop field deleted.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014092600, 'local', 'connect');
+    }
+
+    if ($oldversion < 2014100100) {
+        $table = new xmldb_table('connect_course');
+        $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, 0);
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014100100, 'local', 'connect');
+    }
+
     return true;
 }

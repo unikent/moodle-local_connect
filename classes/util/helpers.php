@@ -36,7 +36,7 @@ class helpers {
      */
     public static function error($message) {
         if (get_config("local_connect", "enable_hipchat")) {
-            \local_hipchat\Message::send($message, "red", "text", "Connect");
+            \local_hipchat\Message::send($message, "red", "text");
         } else {
             debugging($message, DEBUG_DEVELOPER);
         }

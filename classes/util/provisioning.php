@@ -96,8 +96,7 @@ class provisioning
         global $DB;
 
         return $DB->count_records('connect_enrolments', array(
-            "courseid" => $course->id,
-            "deleted" => 0
+            "courseid" => $course->id
         )) > 0;
     }
 

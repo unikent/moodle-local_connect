@@ -189,39 +189,6 @@ class kent_enrolment_tests extends \local_connect\tests\connect_testcase
 	}
 
 	/**
-	 * Test an enrolment deletion.
-	 */
-	public function test_deletion() {
-		global $CFG;
-
-		$this->resetAfterTest();
-
-		// First, create a course.
-		$course = $this->generate_course();
-		$course_obj = \local_connect\course::get($course);
-		$course_obj->create_in_moodle();
-
-		// Create an enrolment.
-		$this->generate_enrolments(10, $course, 'student');
-
-		// Make sure it worked.
-		$enrolments = \local_connect\enrolment::get_all();
-		$this->assertEquals(10, count($enrolments));
-
-		$enrolment = array_pop($enrolments);
-		$this->assertFalse($enrolment->is_in_moodle());
-		$this->assertTrue($enrolment->create_in_moodle());
-		$this->assertTrue($enrolment->is_in_moodle());
-		$enrolment->delete();
-		$this->assertFalse($enrolment->is_in_moodle());
-
-		// Re-test counts to make sure connect wasnt affected.
-		$enrolments = \local_connect\enrolment::get_all();
-		$this->assertEquals(10, count($enrolments));
-
-	}
-
-	/**
 	 * Test we can still work with non-connect users.
 	 */
 	public function test_non_connect_users() {
@@ -231,32 +198,6 @@ class kent_enrolment_tests extends \local_connect\tests\connect_testcase
 
 		$this->assertEquals(0, count(\local_connect\enrolment::get_by("userid", null, true)));
 
-	}
-
-	/**
-	 * Make sure we can sync properly.
-	 */
-	public function test_enrolment_sync() {
-		global $CFG;
-
-		$this->resetAfterTest();
-
-		// First, create a course.
-		$course = $this->generate_course();
-		$course_obj = \local_connect\course::get($course);
-		$course_obj->create_in_moodle();
-
-		// Create an enrolment.
-		$this->generate_enrolment($course, 'teacher');
-
-		// Make sure it worked.
-		$enrolments = \local_connect\enrolment::get_all();
-		$this->assertEquals(1, count($enrolments));
-
-		$enrolment = array_pop($enrolments);
-		$this->assertFalse($enrolment->is_in_moodle());
-		$this->assertEquals(\local_connect\data::STATUS_CREATE, $enrolment->sync());
-		$this->assertTrue($enrolment->is_in_moodle());
 	}
 
     /**
@@ -291,33 +232,5 @@ class kent_enrolment_tests extends \local_connect\tests\connect_testcase
 
         // Check that the event data is valid.
         $this->assertInstanceOf('\local_connect\event\enrolment_created', $event);
-    }
-
-    /**
-     * Test enrolment delete check
-     */
-    public function test_enrolment_delete_check() {
-        $this->resetAfterTest();
-
-        $course = \local_connect\course::get($this->generate_course());
-        $this->assertTrue($course->create_in_moodle());
-
-        $enrolment = $this->generate_enrolment($course->id, 'student');
-        $enrolment = \local_connect\enrolment::get($enrolment);
-
-        $course2 = \local_connect\course::get($this->generate_course());
-        $enrolment2 = $this->generate_enrolment($course2->id, 'student');
-        $enrolment2 = \local_connect\enrolment::get($enrolment2);
-
-        $enrolment2->userid = $enrolment->userid;
-        $enrolment2->deleted = 1;
-        $enrolment2->save();
-
-        $course2->mid = $course->mid;
-        $course2->save();
-
-        $this->assertEquals(\local_connect\data::STATUS_CREATE, $enrolment->sync());
-        $this->assertEquals(\local_connect\data::STATUS_NONE, $enrolment->sync());
-        $this->assertEquals(\local_connect\data::STATUS_NONE, $enrolment2->sync());
     }
 }
