@@ -732,5 +732,13 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014092600, 'local', 'connect');
     }
 
+    if ($oldversion < 2014100100) {
+        $table = new xmldb_table('connect_course');
+        $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, 0);
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014100100, 'local', 'connect');
+    }
+
     return true;
 }
