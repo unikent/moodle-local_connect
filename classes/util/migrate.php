@@ -66,6 +66,7 @@ class migrate
         self::new_campus();
         self::updated_courses();
         self::new_courses();
+        self::map_courses();
         self::updated_groups();
         self::new_groups();
         self::deleted_enrolments();
@@ -94,6 +95,7 @@ class migrate
         self::new_users();
         self::new_campus();
         self::new_courses();
+        self::map_courses();
         self::new_groups();
         self::new_enrolments();
         self::clean_enrolments();
@@ -268,6 +270,41 @@ class migrate
         return $DB->execute($sql, array(
             "session_code" => $CFG->connect->session_code
         ));
+    }
+
+    /**
+     * Maps courses, if a new course is just a version bump
+     * attach it.
+     */
+    public static function map_courses() {
+        global $DB;
+
+        echo "Mapping new courses\n";
+
+        $sql = "SELECT c.id, cc.id AS primaryid
+            FROM {connect_course} c
+            INNER JOIN {connect_course} cc
+                ON cc.module_code = c.module_code
+                AND cc.module_length = c.module_length
+                AND cc.module_week_beginning = c.module_week_beginning
+                AND cc.campusid = c.campusid
+                AND cc.module_version < c.module_version
+            WHERE cc.mid > 0 AND (c.mid = 0 OR c.mid IS NULL)
+            GROUP BY c.id, cc.mid";
+
+        $results = $DB->get_records_sql($sql);
+        foreach ($results as $result) {
+            // We need to map this.
+            $primary = \local_connect\course::get($result->primaryid);
+            $child = \local_connect\course::get($result->id);
+
+            echo "  Mapping {$child->id} to {$primary->id}..\n";
+
+            // Map it.
+            $primary->add_child($child);
+        }
+
+        return true;
     }
 
     /**
