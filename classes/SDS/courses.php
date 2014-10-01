@@ -157,10 +157,11 @@ SQL;
         echo "  - Migrating deleted courses\n";
 
         return $DB->execute("
-            DELETE cc.* FROM {connect_course} cc
+            UPDATE {connect_course} cc
             LEFT OUTER JOIN {tmp_connect_courses} tmp
                 ON cc.module_delivery_key = tmp.module_delivery_key
                     AND cc.module_version = tmp.module_version
+            SET cc.deleted=1
             WHERE tmp.id IS NULL
         ");
     }
@@ -175,11 +176,11 @@ SQL;
 
         return $DB->execute("
             REPLACE INTO {connect_course} (id,module_delivery_key,session_code,module_version,campusid,module_week_beginning,
-                                           module_length,week_beginning_date,module_title,module_code,synopsis,category,mid)
+                                           module_length,week_beginning_date,module_title,module_code,synopsis,category,mid,deleted)
             (
                 SELECT cc.id, c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),
                        c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,
-                       c.module_title,c.module_code,COALESCE(c.synopsis, ''),cc.category,COALESCE(cc.mid,0)
+                       c.module_title,c.module_code,COALESCE(c.synopsis, ''),cc.category,COALESCE(cc.mid,0),0
                 FROM {tmp_connect_courses} c
                 INNER JOIN {connect_course} cc
                     ON cc.module_delivery_key = c.module_delivery_key
@@ -203,11 +204,11 @@ SQL;
 
         return $DB->execute("
             INSERT INTO {connect_course} (module_delivery_key,session_code,module_version,campusid,module_week_beginning,
-                                          module_length,week_beginning_date,module_title,module_code,synopsis,category,mid)
+                                          module_length,week_beginning_date,module_title,module_code,synopsis,category,mid,deleted)
             (
                 SELECT c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),
                        c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,
-                       c.module_title,c.module_code,COALESCE(c.synopsis, ''),COALESCE(cr.category, 1),0
+                       c.module_title,c.module_code,COALESCE(c.synopsis, ''),COALESCE(cr.category, 1),0,0
                 FROM {tmp_connect_courses} c
                 LEFT OUTER JOIN {connect_course} cc
                     ON cc.module_delivery_key = c.module_delivery_key
