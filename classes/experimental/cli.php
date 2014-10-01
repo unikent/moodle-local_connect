@@ -46,7 +46,7 @@ echo "Beginning Connect Sync...\n";
  * --------------------------------------------------------
  */
 
-$creates = \local_connect\util\sync::get_new_groups();
+$creates = \local_connect\experimental\sync::get_new_groups();
 $count = count($creates);
 echo "   Creating ($count) groups...\n";
 
@@ -68,7 +68,7 @@ unset($creates);
  */
 
 // First, deletes.
-$deletes = \local_connect\util\sync::get_deleted_group_enrolments();
+$deletes = \local_connect\experimental\sync::get_deleted_group_enrolments();
 $count = count($deletes);
 echo "   Deleting ($count) group enrolments...\n";
 
@@ -84,7 +84,7 @@ foreach ($deletes as $delete) {
 unset($deletes);
 
 // Then, creates.
-$creates = \local_connect\util\sync::get_new_group_enrolments();
+$creates = \local_connect\experimental\sync::get_new_group_enrolments();
 $count = count($creates);
 echo "   Creating ($count) group enrolments...\n";
 

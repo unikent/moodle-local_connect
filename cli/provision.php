@@ -15,13 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This script is still under development, it will provision
- * Moodle 2014/2015.
- *
+ * Moodle provisioner.
+ * 
  * @package    local_connect
  * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+die("I am not expecting this to be run.");
 
 define('CLI_SCRIPT', true);
 
