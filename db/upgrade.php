@@ -740,5 +740,20 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014100100, 'local', 'connect');
     }
 
+    if ($oldversion < 2014100101) {
+        $table = new xmldb_table('connect_course');
+
+        // Define field deleted to be dropped from connect_course.
+        $field = new xmldb_field('shortname_ext');
+
+        // Conditionally launch drop field deleted.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2014100101, 'local', 'connect');
+    }
+
     return true;
 }
