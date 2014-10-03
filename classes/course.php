@@ -57,7 +57,7 @@ class course extends data
         return array(
             "id", "mid", "module_delivery_key", "session_code", "module_version",
             "campusid", "module_week_beginning", "module_length", "week_beginning_date",
-            "module_title", "module_code", "synopsis", "category"
+            "module_title", "module_code", "synopsis", "category", "deleted"
         );
     }
 
@@ -65,7 +65,7 @@ class course extends data
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
-        return array("id", "module_delivery_key", "session_code");
+        return array("id", "module_delivery_key", "session_code", "deleted");
     }
 
     /**

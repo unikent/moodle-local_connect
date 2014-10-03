@@ -34,6 +34,25 @@ class migration extends \core\task\scheduled_task
     }
 
     public function execute() {
+        // We dont have PHP 5.5 MSSQL yet.
         \local_connect\util\migrate::all();
+        return;
+
+        global $SDSDB;
+
+        // Setup the SDS database.
+        $SDSDB = new \local_connect\util\sdsdb();
+
+        // Run migrations.
+        $obj = new \local_connect\SDS\courses();
+        $obj->sync();
+        $obj = new \local_connect\SDS\enrolments();
+        $obj->sync();
+        $obj = new \local_connect\SDS\groups();
+        $obj->sync();
+        $obj = new \local_connect\SDS\group_enrolments();
+        $obj->sync();
+        $obj = new \local_connect\SDS\timetabling();
+        $obj->sync();
     }
 } 

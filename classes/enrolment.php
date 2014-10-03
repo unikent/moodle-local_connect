@@ -278,4 +278,25 @@ SQL;
 
         return $enrolment;
     }
+
+    /**
+     * Returns an enrolment, given a course and a role
+     */
+    public static function get_for_course_and_role($course, $role) {
+        global $DB;
+
+        $obj = $DB->get_record('connect_enrolments', array(
+            "courseid" => $course->id,
+            "roleid" => $role->id
+        ));
+
+        if (!$obj) {
+            return null;
+        }
+
+        $enrolment = new enrolment();
+        $enrolment->set_class_data($obj);
+
+        return $enrolment;
+    }
 }
