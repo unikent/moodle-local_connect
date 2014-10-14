@@ -38,7 +38,7 @@ var Connect = (function() {
 			var end = parseInt(val.module_week_beginning, 10) + parseInt(val.module_length, 10) - 1;
 			var duration = val.module_week_beginning + '-' + end;
 			var name = state_zero.split('_').join(' ');
-			var sink_deleted = val.deleted;
+			var sink_deleted = val.deleted == '1';
 			var toolbar = ' ';
 			var same_module_code_created = false;
 
@@ -279,7 +279,7 @@ var Connect = (function() {
 				var duration = child.module_week_beginning + ( isNaN(end) ? '' : '-' + end );
 				sOut += '<tr ident="'+ child.id +'">';
 				sOut += '<td class="code"><div class="'
-									+ (child.sink_deleted ? 'sink_deleted' : '' )
+									+ (child.deleted == '1' ? 'sink_deleted' : '' )
 									+ '">' + child.module_code
 									+ '</div></td>';
 				sOut += '<td class="name">'+ child.module_title +'</td>';
