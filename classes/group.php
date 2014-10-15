@@ -139,7 +139,7 @@ class group extends data
 
         $grouping = $DB->get_record('groupings', array(
             'name' => $name,
-            'courseid' => $this->mid
+            'courseid' => $this->course->mid
         ), 'id', IGNORE_MULTIPLE);
 
         // Create?
