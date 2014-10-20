@@ -139,15 +139,7 @@ class user extends data
             return false;
         }
 
-        $user = new \stdClass();
-        $user->username = \core_text::convert($this->login, 'utf-8', 'utf-8');
-        $user->email = $user->username . "@kent.ac.uk";
-        $user->auth = "kentsaml";
-        $user->password = "not cached";
-        $user->confirmed = 1;
-        $user->mnethostid = $CFG->mnet_localhost_id;
-        $user->firstname = $this->initials;
-        $user->lastname = $this->family_name;
+        $user = self::get_user_object($this->login, $this->initials, $this->family_name);
 
         try {
             $this->mid = user_create_user($user, false);
@@ -161,6 +153,25 @@ class user extends data
         }
 
         return true;
+    }
+
+    /**
+     * Given a (username, firstname and lastname) create a user object.
+     */
+    public static function get_user_object($username, $firstname, $lastname) {
+        global $CFG;
+
+        $user = new \stdClass();
+        $user->username = \core_text::convert($username, 'utf-8', 'utf-8');
+        $user->email = $user->username . "@kent.ac.uk";
+        $user->auth = "kentsaml";
+        $user->password = "not cached";
+        $user->confirmed = 1;
+        $user->mnethostid = $CFG->mnet_localhost_id;
+        $user->firstname = $firstname;
+        $user->lastname = $lastname;
+
+        return $user;
     }
 
     /**
