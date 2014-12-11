@@ -208,7 +208,6 @@ abstract class connect_testcase extends \advanced_testcase
 
     /**
      * Returns a valid course module key for testing against.
-     * @todo Extend to support extra campuses and categories.
      */
     protected function generate_course() {
         global $CFG, $DB;
