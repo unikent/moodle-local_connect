@@ -222,8 +222,6 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
 
         // Unlink!
         $this->assertTrue($course1->unlink());
-
-        // TODO - test more stuff, enrolments etc.
     }
 
     /**

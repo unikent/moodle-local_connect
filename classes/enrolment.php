@@ -285,18 +285,20 @@ SQL;
     public static function get_for_course_and_role($course, $role) {
         global $DB;
 
-        $obj = $DB->get_record('connect_enrolments', array(
+        $records = $DB->get_records('connect_enrolments', array(
             "courseid" => $course->id,
             "roleid" => $role->id
         ));
 
-        if (!$obj) {
-            return null;
+        $enrolments = array();
+
+        foreach ($records as $record) {
+            $enrolment = new enrolment();
+            $enrolment->set_class_data($record);
+
+            $enrolments[] = $enrolment;
         }
 
-        $enrolment = new enrolment();
-        $enrolment->set_class_data($obj);
-
-        return $enrolment;
+        return $enrolments;
     }
 }
