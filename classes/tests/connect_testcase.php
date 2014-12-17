@@ -23,6 +23,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 abstract class connect_testcase extends \advanced_testcase
 {
+    private $_campus_ids;
+
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
@@ -34,8 +36,9 @@ abstract class connect_testcase extends \advanced_testcase
         $CFG->local_connect_enable_observers = true;
 
         // Create new campus records.
-        $DB->insert_record("connect_campus", array("name" => "Canterbury"));
-        $DB->insert_record("connect_campus", array("name" => "Medway"));
+        $this->_campus_ids = array();
+        $this->_campus_ids["Canterbury"] = $DB->insert_record("connect_campus", array("name" => "Canterbury"));
+        $this->_campus_ids["Medway"] = $DB->insert_record("connect_campus", array("name" => "Medway"));
 
         // Create new role records.
         $DB->insert_record("connect_role", array("mid" => 0, "name" => "student"));
@@ -219,7 +222,7 @@ abstract class connect_testcase extends \advanced_testcase
             "module_delivery_key" => $key++,
             "session_code" => $CFG->connect->session_code,
             "module_version" => 1,
-            "campusid" => 1,
+            "campusid" => $this->_campus_ids["Canterbury"],
             "module_week_beginning" => 1,
             "module_length" => 12,
             "week_beginning_date" => strftime('%Y-%m-%d %H:%M:%S'),
