@@ -261,17 +261,16 @@ class course extends data
             $code = substr($code, 0, strpos($code, " "));
         }
 
-        $more = "<a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/{$code}'>more</a>";
-
-        $text = $this->synopsis;
+        $text = strip_tags($this->synopsis);
         if (strlen($text) > 250) {
+            $more = "<a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/{$code}'>more</a>";
             $text = substr($text, 0, 247) . "... " . $more;
         }
 
         // If we are a merged course, we may have more than one campus.
         $campus = $this->campus_name;
 
-        $text = '<div class="synopsistext">' . strip_tags($text) . '</div>';
+        $text = '<div class="synopsistext">' . $text . '</div>';
         $text .= "&nbsp;<p style='margin-top:10px' class='module_summary_extra_info'>";
         $text .= $campus . ", ";
         $text .= "week " . $this->duration;
