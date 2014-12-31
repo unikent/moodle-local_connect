@@ -164,7 +164,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
 
         $expected = "<div class=\"synopsistext\">";
         $expected .= $synopsis;
-        $expected .= "... more</div>&nbsp;<p style='margin-top:10px' class='module_summary_extra_info'>Canterbury, week 1-13</p>";
+        $expected .= "... <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/{$course->shortname}'>more</a></div>&nbsp;<p style='margin-top:10px' class='module_summary_extra_info'>Canterbury, week 1-13</p>";
 
         for ($i = 0; $i < 53; $i++) {
             $synopsis .= ":";
