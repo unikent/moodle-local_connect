@@ -759,5 +759,15 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014100102, 'local', 'connect');
     }
 
+    if ($oldversion < 2015010500) {
+        $table = new xmldb_table('connect_meta');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2015010500, 'local', 'connect');
+    }
+
     return true;
 }
