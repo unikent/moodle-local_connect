@@ -44,7 +44,7 @@ class course_sync extends task_base
             try {
                 $result = $obj->sync();
                 $self->map_status($result, $obj);
-            } catch (Excepton $e) {
+            } catch (\Excepton $e) {
                 $msg = $e->getMessage();
                 echo "  Error: {$msg}\n";
             }
