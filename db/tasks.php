@@ -60,15 +60,6 @@ $tasks = array(
         'month' => '*'
     ),
     array(
-        'classname' => 'local_connect\task\meta_sync',
-        'blocking' => 0,
-        'minute' => '50',
-        'hour' => '3',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
         'classname' => 'local_connect\task\course_sync',
         'blocking' => 0,
         'minute' => '0',

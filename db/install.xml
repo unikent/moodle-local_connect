@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/connect/db" VERSION="20141001" COMMENT="XMLDB file for Connect module"
+<XMLDB PATH="local/connect/db" VERSION="20150105" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -132,21 +132,6 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="index_category" UNIQUE="false" FIELDS="category"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="connect_meta" COMMENT="Connect Meta Enrolments">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="objectid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="objecttype" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="i_object" UNIQUE="false" FIELDS="objectid, objecttype"/>
-        <INDEX NAME="i_courseid" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="connect_course_locks" COMMENT="Course lock status for Connect">

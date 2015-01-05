@@ -35,10 +35,6 @@ if ($hassiteconfig) {
         'moodle/site:config');
     $ADMIN->add('localplugins', $rules);
 
-    $meta = new admin_externalpage('reportconnectmeta', "Connect Meta Manager", "$CFG->wwwroot/local/connect/meta/index.php",
-        'moodle/site:config');
-    $ADMIN->add('localplugins', $meta);
-
     $cdb = new admin_externalpage('connectdatabrowse', "Connect Data Browser", "$CFG->wwwroot/local/connect/browse/index.php",
         'local/connect:helpdesk');
     $ADMIN->add('localplugins', $cdb);
