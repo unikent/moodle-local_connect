@@ -60,7 +60,7 @@ class observers
 
         if ($USER && $USER->id > 2) {
             // Check the shortname and summary, etc, dont match.
-            $courses = \local_connect\course::get_by('mid', $event->objectid);
+            $courses = \local_connect\course::get_by('mid', $event->objectid, true);
             foreach ($courses as $connectcourse) {
                 if ($connectcourse->has_changed()) {
                     // Set new lock status.
