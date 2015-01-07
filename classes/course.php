@@ -389,15 +389,14 @@ class course extends data
             return false;
         }
 
-        // Basically we just need to check: category, shortname, fullname and summary.
+        // Basically we just need to check: shortname, fullname and summary.
         $course = $DB->get_record('course', array(
             'id' => $this->mid
-        ), 'id, shortname, fullname, category, summary');
+        ), 'id, shortname, fullname, summary');
 
         return  $course->shortname !== $this->shortname ||
                 $course->fullname !== $this->fullname ||
-                $course->summary !== $this->summary ||
-                $course->category !== $this->category;
+                $course->summary !== $this->summary;
     }
 
     /**
@@ -615,7 +614,6 @@ class course extends data
         // Updates!
         $course->shortname = $this->shortname;
         $course->fullname = $this->fullname;
-        $course->category = $this->category;
         $course->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
 
         // Update this course in Moodle.
