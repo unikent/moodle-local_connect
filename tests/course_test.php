@@ -346,4 +346,41 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $course = \local_connect\course::get($id);
         $this->assertFalse($course->is_in_moodle());
     }
+
+    /**
+     * Make sure we lock courses properly.
+     */
+    public function test_course_lock() {
+        global $CFG, $DB, $USER;
+
+        require_once($CFG->dirroot . "/course/lib.php");
+
+        $this->resetAfterTest();
+
+        // We can't be admin
+        $user = $this->getDataGenerator()->create_user(array(
+            'email' => 'user1@example.com',
+            'username' => 'user1'
+        ));
+        $this->setUser($user);
+
+        // Enable strict sync.
+        set_config('strict_sync', true, 'local_connect');
+
+        $id = $this->generate_course();
+        $course = \local_connect\course::get($id);
+        $course->create_in_moodle();
+
+        $this->assertTrue($course->is_locked());
+
+        $moodle = $DB->get_record('course', array(
+            'id' => $course->mid
+        ));
+        $moodle->shortname = 'blahlol';
+        update_course($moodle);
+
+        $this->assertFalse($course->is_locked());
+
+        $this->setUser(null);
+    }
 }

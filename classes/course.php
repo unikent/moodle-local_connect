@@ -37,9 +37,6 @@ require_once($CFG->dirroot . '/mod/forum/lib.php');
  */
 class course extends data
 {
-    /** Have we been locked? */
-    private $_locked;
-
     /** Shortname Extension Cache */
     private $_shortname_extension;
 
@@ -308,21 +305,17 @@ class course extends data
             return true;
         }
 
-        if (!isset($this->_locked)) {
-            $locked = $DB->get_field('connect_course_locks', 'locked', array(
-                "mid" => $this->mid
-            ));
-
-            $this->_locked = $locked === false || (bool)$locked;
-
-            // We are not locked if not in strict mode.
-            $strict = get_config('local_connect', 'strict_sync');
-            if (!$strict) {
-                $this->_locked = false;
-            }
+        // We are not locked if not in strict mode.
+        $strict = get_config('local_connect', 'strict_sync');
+        if (!$strict) {
+            return false;
         }
 
-        return $this->_locked;
+        $locked = $DB->get_field('connect_course_locks', 'locked', array(
+            "mid" => $this->mid
+        ));
+
+        return $locked === false || $locked !== '0';
     }
 
     /**
@@ -389,14 +382,14 @@ class course extends data
             return false;
         }
 
-        // Basically we just need to check: category, shortname, fullname and summary.
+        // Basically we just need to check: shortname, fullname and summary.
         $course = $DB->get_record('course', array(
             'id' => $this->mid
-        ), 'id, shortname, fullname, category, summary');
+        ), 'id, shortname, fullname, summary');
 
-        return  $course->fullname !== $this->fullname ||
-                $course->summary !== $this->summary ||
-                $course->category !== $this->category;
+        return  $course->shortname !== $this->shortname ||
+                $course->fullname !== $this->fullname ||
+                $course->summary !== $this->summary;
     }
 
     /**
@@ -602,10 +595,6 @@ class course extends data
     public function update_moodle() {
         global $DB;
 
-        if (!$this->is_locked()) {
-            return false;
-        }
-
         $course = $DB->get_record('course', array(
             'id' => $this->mid
         ));
@@ -618,7 +607,6 @@ class course extends data
         // Updates!
         $course->shortname = $this->shortname;
         $course->fullname = $this->fullname;
-        $course->category = $this->category;
         $course->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
 
         // Update this course in Moodle.

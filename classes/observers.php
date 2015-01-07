@@ -59,10 +59,17 @@ class observers
         }
 
         if ($USER && $USER->id > 2) {
-            // Set new lock status.
-            $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
-                "courseid" => $event->objectid
-            ));
+            // Check the shortname and summary, etc, dont match.
+            $courses = \local_connect\course::get_by('mid', $event->objectid, true);
+            foreach ($courses as $connectcourse) {
+                if ($connectcourse->has_changed()) {
+                    // Set new lock status.
+                    $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
+                        "courseid" => $event->objectid
+                    ));
+                }
+                break;
+            }
         }
 
         return true;
