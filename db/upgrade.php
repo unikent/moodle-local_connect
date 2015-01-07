@@ -769,5 +769,13 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015010500, 'local', 'connect');
     }
 
+    if ($oldversion < 2015010700) {
+        // Delete all locks.
+        $DB->delete_records('connect_course_locks');
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2015010700, 'local', 'connect');
+    }
+
     return true;
 }
