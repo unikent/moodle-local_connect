@@ -394,7 +394,8 @@ class course extends data
             'id' => $this->mid
         ), 'id, shortname, fullname, category, summary');
 
-        return  $course->fullname !== $this->fullname ||
+        return  $course->shortname !== $this->shortname ||
+                $course->fullname !== $this->fullname ||
                 $course->summary !== $this->summary ||
                 $course->category !== $this->category;
     }
