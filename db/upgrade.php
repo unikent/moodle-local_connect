@@ -777,7 +777,30 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015010700, 'local', 'connect');
     }
 
-    if ($oldversion < 2015011400) {
+    if ($oldversion < 2015011401) {
+        $roles = $DB->get_records('connect_role');
+        foreach ($roles as $role) {
+            // Re-map any new sds_ ones to old.
+            if (substr($role->name, 0, 4) == 'sds_') {
+                $oldname = substr($role->name, 4);
+                $oldrole = $DB->get_record('connect_role', array(
+                    'name' => $oldname
+                ));
+                if ($oldrole) {
+                    $DB->execute("UPDATE {conect_enrolments} SET roleid=:newid WHERE roleid=:oldid", array(
+                        'newid' => $oldrole->id,
+                        'oldid' => $role->id
+                    ));
+                    
+                    // Delete the "new" one.
+                    $DB->delete_records('connect_role', array(
+                        'id' => $role->id
+                    ));
+                }
+            }
+        }
+
+        // Now rename.
         $roles = $DB->get_records('connect_role');
         foreach ($roles as $role) {
             if (substr($role->name, 0, 4) != 'sds_') {
@@ -787,7 +810,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2015011400, 'local', 'connect');
+        upgrade_plugin_savepoint(true, 2015011401, 'local', 'connect');
     }
 
     return true;
