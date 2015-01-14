@@ -41,9 +41,9 @@ abstract class connect_testcase extends \advanced_testcase
         $this->_campus_ids["Medway"] = $DB->insert_record("connect_campus", array("name" => "Medway"));
 
         // Create new role records.
-        $DB->insert_record("connect_role", array("mid" => 0, "name" => "student"));
-        $DB->insert_record("connect_role", array("mid" => 0, "name" => "teacher"));
-        $DB->insert_record("connect_role", array("mid" => 0, "name" => "convenor"));
+        $DB->insert_record("connect_role", array("mid" => 0, "name" => "sds_student"));
+        $DB->insert_record("connect_role", array("mid" => 0, "name" => "sds_teacher"));
+        $DB->insert_record("connect_role", array("mid" => 0, "name" => "sds_convenor"));
     }
 
     /**
@@ -64,7 +64,6 @@ abstract class connect_testcase extends \advanced_testcase
         $DB->delete_records('role', array('shortname' => 'sds_student'));
         $DB->delete_records('role', array('shortname' => 'sds_teacher'));
         $DB->delete_records('role', array('shortname' => 'sds_convenor'));
-        $DB->delete_records('role', array('shortname' => 'convenor'));
     }
 
     /**
