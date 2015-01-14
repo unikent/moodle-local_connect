@@ -787,7 +787,7 @@ function xmldb_local_connect_upgrade($oldversion) {
                     'name' => $oldname
                 ));
                 if ($oldrole) {
-                    $DB->execute("UPDATE {conect_enrolments} SET roleid=:newid WHERE roleid=:oldid", array(
+                    $DB->execute("UPDATE {connect_enrolments} SET roleid=:newid WHERE roleid=:oldid", array(
                         'newid' => $oldrole->id,
                         'oldid' => $role->id
                     ));
