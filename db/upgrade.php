@@ -777,5 +777,18 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015010700, 'local', 'connect');
     }
 
+    if ($oldversion < 2015011400) {
+        $roles = $DB->get_records('connect_role');
+        foreach ($roles as $role) {
+            if (substr($role->name, 0, 4) != 'sds_') {
+                $role->name = 'sds_' . $role->name;
+                $DB->update_record('connect_role', $role);
+            }
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2015011400, 'local', 'connect');
+    }
+
     return true;
 }
