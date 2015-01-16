@@ -106,17 +106,6 @@ class role extends data
     }
 
     /**
-     * Get an object by a specified field.
-     */
-    public static function get_by($field, $val, $forcearray = false) {
-        if ($field == "name" && strpos($val, 'sds_') === 0) {
-            $val = substr($val, 4);
-        }
-
-        return parent::get_by($field, $val, $forcearray);
-    }
-
-    /**
      * Create this role in Moodle.
      */
     public function create_in_moodle() {
