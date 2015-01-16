@@ -82,19 +82,19 @@ class role extends data
      */
     public function get_data_mapping() {
         $map = array(
-            "student" => array(
+            "sds_student" => array(
                 "name" => "Student (SDS)",
                 "short" => "sds_student",
                 "desc" => "Students generally have fewer privileges within a course.",
                 "archetype" => "student"
             ),
-            "teacher" => array(
+            "sds_teacher" => array(
                 "name" => "Teacher (SDS)",
                 "short" => "sds_teacher",
                 "desc" => "Teachers can do anything within a course, including changing the activities and grading students.",
                 "archetype" => "editingteacher"
             ),
-            "convenor" => array(
+            "sds_convenor" => array(
                 "name" => "Convenor (SDS)",
                 "short" => "sds_convenor",
                 "desc" => "A Convenor has the same permissions as a teacher, but can manually enrol teachers.",
@@ -103,17 +103,6 @@ class role extends data
         );
 
         return isset($map[$this->name]) ? $map[$this->name] : false;
-    }
-
-    /**
-     * Get an object by a specified field.
-     */
-    public static function get_by($field, $val, $forcearray = false) {
-        if ($field == "name" && strpos($val, 'sds_') === 0) {
-            $val = substr($val, 4);
-        }
-
-        return parent::get_by($field, $val, $forcearray);
     }
 
     /**

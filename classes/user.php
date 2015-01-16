@@ -197,7 +197,7 @@ class user extends data
         $selector = '=';
         if ($role === 'staff') {
             $selector = '<>';
-            $role = 'student';
+            $role = 'sds_student';
         }
 
         $roleid = $DB->get_field('connect_role', 'id', array(
@@ -230,7 +230,7 @@ class user extends data
      * Returns a list of all known students.
      */
     public static function get_students() {
-        return static::get_by_role('student');
+        return static::get_by_role('sds_student');
     }
 
     /**

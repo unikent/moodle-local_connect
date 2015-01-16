@@ -33,15 +33,6 @@ $tasks = array(
         'month' => '*'
     ),
     array(
-        'classname' => 'local_connect\task\migration',
-        'blocking' => 0,
-        'minute' => '10',
-        'hour' => '2',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
         'classname' => 'local_connect\task\group_sync',
         'blocking' => 0,
         'minute' => '30',

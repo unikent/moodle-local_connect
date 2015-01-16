@@ -111,13 +111,13 @@ class kent_group_tests extends \local_connect\tests\connect_testcase
 		$group = \local_connect\group::get($group);
 
 		// Set some enrolments and test.
-		$this->generate_group_enrolments(30, $group->id, 'student');
-		$this->generate_group_enrolments(2, $group->id, 'teacher');
+		$this->generate_group_enrolments(30, $group->id, 'sds_student');
+		$this->generate_group_enrolments(2, $group->id, 'sds_teacher');
 
 		$this->assertEquals(30, $group->count_students());
 		$this->assertEquals(2, $group->count_staff());
 
-		$this->generate_group_enrolments(2, $group->id, 'teacher');
+		$this->generate_group_enrolments(2, $group->id, 'sds_teacher');
 
 		$this->assertEquals(30, $group->count_students());
 		$this->assertEquals(4, $group->count_staff());
@@ -129,9 +129,9 @@ class kent_group_tests extends \local_connect\tests\connect_testcase
 		$group2 = \local_connect\group::get($group2);
 
 		// Set some enrolments and test.
-		$this->generate_group_enrolments(10, $group2->id, 'student');
-		$this->generate_group_enrolments(1, $group2->id, 'convenor');
-		$this->generate_group_enrolments(1, $group2->id, 'teacher');
+		$this->generate_group_enrolments(10, $group2->id, 'sds_student');
+		$this->generate_group_enrolments(1, $group2->id, 'sds_convenor');
+		$this->generate_group_enrolments(1, $group2->id, 'sds_teacher');
 
 		$this->assertEquals(12, $group2->count_all());
 		$this->assertEquals(10, $group2->count_students());

@@ -41,9 +41,9 @@ abstract class connect_testcase extends \advanced_testcase
         $this->_campus_ids["Medway"] = $DB->insert_record("connect_campus", array("name" => "Medway"));
 
         // Create new role records.
-        $DB->insert_record("connect_role", array("mid" => 0, "name" => "student"));
-        $DB->insert_record("connect_role", array("mid" => 0, "name" => "teacher"));
-        $DB->insert_record("connect_role", array("mid" => 0, "name" => "convenor"));
+        $DB->insert_record("connect_role", array("mid" => 0, "name" => "sds_student"));
+        $DB->insert_record("connect_role", array("mid" => 0, "name" => "sds_teacher"));
+        $DB->insert_record("connect_role", array("mid" => 0, "name" => "sds_convenor"));
     }
 
     /**
@@ -64,7 +64,6 @@ abstract class connect_testcase extends \advanced_testcase
         $DB->delete_records('role', array('shortname' => 'sds_student'));
         $DB->delete_records('role', array('shortname' => 'sds_teacher'));
         $DB->delete_records('role', array('shortname' => 'sds_convenor'));
-        $DB->delete_records('role', array('shortname' => 'convenor'));
     }
 
     /**
@@ -147,7 +146,7 @@ abstract class connect_testcase extends \advanced_testcase
     /**
      * Returns a valid group enrolment for testing.
      */
-    protected function generate_group_enrolment($groupid, $role = 'student') {
+    protected function generate_group_enrolment($groupid, $role = 'sds_student') {
         global $DB;
 
         $courseid = $DB->get_field('connect_group', 'courseid', array(
@@ -170,7 +169,7 @@ abstract class connect_testcase extends \advanced_testcase
     /**
      * Creates a bunch of group enrolments.
      */
-    protected function generate_group_enrolments($count, $group, $role = 'student') {
+    protected function generate_group_enrolments($count, $group, $role = 'sds_student') {
         global $DB;
 
         if (is_string($role)) {

@@ -88,23 +88,23 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $this->resetAfterTest();
         $this->enable_enrol_plugin();
 
-        $role = \local_connect\role::get_by('name', 'student');
+        $role = \local_connect\role::get_by('name', 'sds_student');
         $role->create_in_moodle();
 
-        $role = \local_connect\role::get_by('name', 'convenor');
+        $role = \local_connect\role::get_by('name', 'sds_convenor');
         $role->create_in_moodle();
 
-        $role = \local_connect\role::get_by('name', 'teacher');
+        $role = \local_connect\role::get_by('name', 'sds_teacher');
         $role->create_in_moodle();
 
         $course = $this->generate_course();
-        $this->generate_enrolments(30, $course, 'student');
-        $this->generate_enrolments(2, $course, 'convenor');
-        $this->generate_enrolments(1, $course, 'teacher');
+        $this->generate_enrolments(30, $course, 'sds_student');
+        $this->generate_enrolments(2, $course, 'sds_convenor');
+        $this->generate_enrolments(1, $course, 'sds_teacher');
         $course = \local_connect\course::get($course);
 
         $course2 = $this->generate_course();
-        $this->generate_enrolments(30, $course2, 'student');
+        $this->generate_enrolments(30, $course2, 'sds_student');
         $course2 = \local_connect\course::get($course2);
 
         $this->assertEquals(0, $DB->count_records('user_enrolments'));
@@ -233,25 +233,25 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $this->resetAfterTest();
 
         $course1 = \local_connect\course::get($this->generate_course());
-        $this->generate_enrolments(100, $course1->id, 'student');
-        $this->generate_enrolments(1, $course1->id, 'convenor');
-        $this->generate_enrolments(2, $course1->id, 'teacher');
+        $this->generate_enrolments(100, $course1->id, 'sds_student');
+        $this->generate_enrolments(1, $course1->id, 'sds_convenor');
+        $this->generate_enrolments(2, $course1->id, 'sds_teacher');
         $this->assertEquals(103, $course1->count_all());
         $this->assertEquals(100, $course1->count_students());
         $this->assertEquals(3, $course1->count_staff());
 
         $course2 = \local_connect\course::get($this->generate_course());
-        $this->generate_enrolments(70, $course2->id, 'student');
-        $this->generate_enrolments(1, $course2->id, 'convenor');
-        $this->generate_enrolments(1, $course2->id, 'teacher');
+        $this->generate_enrolments(70, $course2->id, 'sds_student');
+        $this->generate_enrolments(1, $course2->id, 'sds_convenor');
+        $this->generate_enrolments(1, $course2->id, 'sds_teacher');
         $this->assertEquals(72, $course2->count_all());
         $this->assertEquals(70, $course2->count_students());
         $this->assertEquals(2, $course2->count_staff());
 
         $course3 = \local_connect\course::get($this->generate_course());
-        $this->generate_enrolments(700, $course3->id, 'student');
-        $this->generate_enrolments(10, $course3->id, 'convenor');
-        $this->generate_enrolments(10, $course3->id, 'teacher');
+        $this->generate_enrolments(700, $course3->id, 'sds_student');
+        $this->generate_enrolments(10, $course3->id, 'sds_convenor');
+        $this->generate_enrolments(10, $course3->id, 'sds_teacher');
 
         // And all together.
         $this->assertEquals(100, $course1->count_students());

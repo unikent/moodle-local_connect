@@ -44,10 +44,10 @@ class kent_group_enrolment_tests extends \local_connect\tests\connect_testcase
 		$this->assertEquals(0, count($enrolments));
 
 		// Generate a few enrolments.
-		$this->generate_group_enrolments(30, $group, 'student');
-		$this->generate_group_enrolments(2, $group, 'teacher');
-		$this->generate_group_enrolments(20, $group2, 'student');
-		$this->generate_group_enrolments(1, $group2, 'teacher');
+		$this->generate_group_enrolments(30, $group, 'sds_student');
+		$this->generate_group_enrolments(2, $group, 'sds_teacher');
+		$this->generate_group_enrolments(20, $group2, 'sds_student');
+		$this->generate_group_enrolments(1, $group2, 'sds_teacher');
 
 		// Test the global count.
 		$enrolments = \local_connect\group_enrolment::get_all();
@@ -86,7 +86,7 @@ class kent_group_enrolment_tests extends \local_connect\tests\connect_testcase
 			$obj->create_in_moodle();
 		}
 
-		$ge = $this->generate_group_enrolment($group, 'teacher');
+		$ge = $this->generate_group_enrolment($group, 'sds_teacher');
 
 		$obj = \local_connect\group_enrolment::get($ge);
 		$this->assertFalse($obj->is_in_moodle());
@@ -117,7 +117,7 @@ class kent_group_enrolment_tests extends \local_connect\tests\connect_testcase
 			$obj->create_in_moodle();
 		}
 
-		$ge = $this->generate_group_enrolment($group, 'teacher');
+		$ge = $this->generate_group_enrolment($group, 'sds_teacher');
 
 		$obj = \local_connect\group_enrolment::get($ge);
 		$this->assertFalse($obj->is_in_moodle());
@@ -138,12 +138,12 @@ class kent_group_enrolment_tests extends \local_connect\tests\connect_testcase
 		$courseobj = \local_connect\course::get($course);
 
 		$group = $this->generate_group($course);
-		$this->generate_group_enrolments(40, $group, 'student');
+		$this->generate_group_enrolments(40, $group, 'sds_student');
 
 		$this->assertEquals(40, count(\local_connect\group_enrolment::get_for_course($courseobj)));
 
 		$group = $this->generate_group($course);
-		$this->generate_group_enrolments(20, $group, 'student');
+		$this->generate_group_enrolments(20, $group, 'sds_student');
 
 		$this->assertEquals(60, count(\local_connect\group_enrolment::get_for_course($courseobj)));
 
@@ -152,7 +152,7 @@ class kent_group_enrolment_tests extends \local_connect\tests\connect_testcase
 
 		$group = $this->generate_group($course2);
 
-		$this->generate_group_enrolments(20, $group, 'student');
+		$this->generate_group_enrolments(20, $group, 'sds_student');
 
 		$this->assertEquals(60, count(\local_connect\group_enrolment::get_for_course($courseobj)));
 		$this->assertEquals(20, count(\local_connect\group_enrolment::get_for_course($course2obj)));
@@ -181,7 +181,7 @@ class kent_group_enrolment_tests extends \local_connect\tests\connect_testcase
 			$obj->create_in_moodle();
 		}
 
-		$ge = $this->generate_group_enrolment($group, 'teacher');
+		$ge = $this->generate_group_enrolment($group, 'sds_teacher');
 
 		$obj = \local_connect\group_enrolment::get($ge);
 		$this->assertFalse($obj->is_in_moodle());
