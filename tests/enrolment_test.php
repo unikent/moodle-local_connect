@@ -39,16 +39,16 @@ class kent_enrolment_tests extends \local_connect\tests\connect_testcase
 		$this->assertEquals(0, count($enrolments));
 
 		// Next insert a couple of enrolments on this course.
-		$this->generate_enrolments(30, $course, 'student');
-		$this->generate_enrolments(2, $course, 'convenor');
-		$this->generate_enrolments(1, $course, 'teacher');
+		$this->generate_enrolments(30, $course, 'sds_student');
+		$this->generate_enrolments(2, $course, 'sds_convenor');
+		$this->generate_enrolments(1, $course, 'sds_teacher');
 
 		// Test the global count.
 		$enrolments = \local_connect\enrolment::get_all();
 		$this->assertEquals(33, count($enrolments));
 
 		// Add more.
-		$this->generate_enrolments(30, $course, 'student');
+		$this->generate_enrolments(30, $course, 'sds_student');
 
 		// Test the global count.
 		$enrolments = \local_connect\enrolment::get_all();
@@ -75,8 +75,8 @@ class kent_enrolment_tests extends \local_connect\tests\connect_testcase
 		$course2->create_in_moodle();
 
 		// Create an enrolment.
-		$this->generate_enrolments(1, $course->id, 'teacher');
-		$this->generate_enrolments(1, $course2->id, 'teacher');
+		$this->generate_enrolments(1, $course->id, 'sds_teacher');
+		$this->generate_enrolments(1, $course2->id, 'sds_teacher');
 
 		// Make sure we have two total
 		$enrolments = \local_connect\enrolment::get_all();
@@ -111,8 +111,8 @@ class kent_enrolment_tests extends \local_connect\tests\connect_testcase
 		$course_obj->create_in_moodle();
 
 		// Create an enrolment.
-		$this->generate_enrolments(10, $course, 'student');
-		$this->generate_enrolments(15, $course2, 'student');
+		$this->generate_enrolments(10, $course, 'sds_student');
+		$this->generate_enrolments(15, $course2, 'sds_student');
 
 		// Make sure we have two total
 		$enrolments = \local_connect\enrolment::get_all();
@@ -142,7 +142,7 @@ class kent_enrolment_tests extends \local_connect\tests\connect_testcase
 		$course_obj->create_in_moodle();
 
 		// Create an enrolment.
-		$this->generate_enrolment($course, 'teacher');
+		$this->generate_enrolment($course, 'sds_teacher');
 
 		// Make sure it worked.
 		$enrolments = \local_connect\enrolment::get_all();
@@ -170,7 +170,7 @@ class kent_enrolment_tests extends \local_connect\tests\connect_testcase
 		$course_obj->create_in_moodle();
 
 		// Create an enrolment without a user, create the user, check they were enrolled.
-		$enrolment = $this->generate_enrolment($course, 'student');
+		$enrolment = $this->generate_enrolment($course, 'sds_student');
 		$enrolment = \local_connect\enrolment::get($enrolment);
 		$user = $DB->get_record('user', array(
 			"id" => $enrolment->user->mid
@@ -209,7 +209,7 @@ class kent_enrolment_tests extends \local_connect\tests\connect_testcase
         $course = \local_connect\course::get($this->generate_course());
         $this->assertTrue($course->create_in_moodle());
 
-		$enrolment = $this->generate_enrolment($course->id, 'student');
+		$enrolment = $this->generate_enrolment($course->id, 'sds_student');
 		$enrolment = \local_connect\enrolment::get($enrolment);
 		$enrolment->create_in_moodle();
 

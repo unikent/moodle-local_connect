@@ -301,7 +301,7 @@ class group extends data
     public function count_students() {
         global $DB;
 
-        $role = $DB->get_field('connect_role', 'id', array('name' => 'student'));
+        $role = $DB->get_field('connect_role', 'id', array('name' => 'sds_student'));
 
         $sql = "SELECT COUNT(cge.id) as count
         FROM {connect_group_enrolments} cge

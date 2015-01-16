@@ -146,7 +146,7 @@ abstract class connect_testcase extends \advanced_testcase
     /**
      * Returns a valid group enrolment for testing.
      */
-    protected function generate_group_enrolment($groupid, $role = 'student') {
+    protected function generate_group_enrolment($groupid, $role = 'sds_student') {
         global $DB;
 
         $courseid = $DB->get_field('connect_group', 'courseid', array(
@@ -169,7 +169,7 @@ abstract class connect_testcase extends \advanced_testcase
     /**
      * Creates a bunch of group enrolments.
      */
-    protected function generate_group_enrolments($count, $group, $role = 'student') {
+    protected function generate_group_enrolments($count, $group, $role = 'sds_student') {
         global $DB;
 
         if (is_string($role)) {

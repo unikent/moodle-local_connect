@@ -745,7 +745,7 @@ class course extends data
     public function count_students() {
         global $DB;
 
-        $role = $DB->get_field('connect_role', 'id', array('name' => 'student'));
+        $role = $DB->get_field('connect_role', 'id', array('name' => 'sds_student'));
         return $DB->count_records('connect_enrolments', array(
             'courseid' => $this->id,
             'roleid' => $role
