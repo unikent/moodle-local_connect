@@ -139,7 +139,7 @@ if (strpos($node, "c_") === 0) {
 	$out = grab_set("course", $node, $raw_node_data, "connect_course", "module_code", "c", strlen($raw_node_data));
 }
 
-if ($node == 'teachers' || $node == 'convenors' || $node == 'students') {
+if ($node == 'sds_teachers' || $node == 'sds_convenors' || $node == 'sds_students') {
 	// Basically the alphabet...
 	$role = substr($node, 0, -1);
 	$roleid = $DB->get_field('connect_role', 'id', array(
