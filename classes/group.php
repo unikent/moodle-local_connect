@@ -65,10 +65,7 @@ class group extends data
      * Get enrollments for this Group
      */
     public function _get_enrolments() {
-        $enrolments = group_enrolment::get_by("groupid", $this->id, true);
-        return array_filter($enrolments, function($v) {
-            return $v->deleted == '0';
-        });
+        return group_enrolment::get_by("groupid", $this->id, true);
     }
 
     /**
@@ -80,7 +77,7 @@ class group extends data
         $this->reset_object_cache();
 
         // Is our course in Moodle?
-        if (!$this->course->is_in_moodle()) {
+        if (!$this->course || !$this->course->is_in_moodle()) {
             if (!empty($this->mid)) {
                 $this->mid = 0;
                 $this->save();
@@ -113,21 +110,21 @@ class group extends data
                 $this->create_in_moodle();
             }
 
-            return self::STATUS_CREATE;
-        }
+            $status = self::STATUS_CREATE;
+        } else {
+            // We are currently in Moodle!
+            $group = $DB->get_record('groups', array(
+                'id' => $this->mid
+            ), 'id,courseid,name');
 
-        // We are currently in Moodle!
-        $group = $DB->get_record('groups', array(
-            'id' => $this->mid
-        ), 'id,courseid,name');
+            // Does our data match up?
+            if ($group->name !== $this->name) {
+                if (!$dry) {
+                    $this->update_in_moodle();
+                }
 
-        // Does our data match up?
-        if ($group->name !== $this->name) {
-            if (!$dry) {
-                $this->update_in_moodle();
+                $status = self::STATUS_MODIFY;
             }
-
-            return self::STATUS_MODIFY;
         }
 
         return $status;
