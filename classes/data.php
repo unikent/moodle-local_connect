@@ -268,12 +268,14 @@ abstract class data {
             $field => $val
         ));
 
-        if (!$forcearray && count($data) === 1) {
+        if (!$forcearray) {
             if (!$data) {
                 return null;
             }
 
-            return static::from_sql_result(array_pop($data));
+            if (count($data) === 1) {
+                return static::from_sql_result(array_pop($data));
+            }
         }
 
         $ret = array();
