@@ -92,7 +92,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_group', 'local_connect') . $grou
 	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/group.php');
 	$table->setup();
 
-	foreach ($group->enrolments as $enrolment) {
+	foreach ($group->active_enrolments as $enrolment) {
 		$user_url = new \moodle_url("/local/connect/browse/user.php", array("id" => $enrolment->userid));
 		$user_link = \html_writer::link($user_url->out(false), $enrolment->user->login);
 

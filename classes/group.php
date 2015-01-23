@@ -69,6 +69,15 @@ class group extends data
     }
 
     /**
+     * Get active enrollments for this Group
+     */
+    public function _get_active_enrolments() {
+        return array_filter($this->enrolments, function($v) {
+            return $v->deleted == '0';
+        });
+    }
+
+    /**
      * The big sync method.
      */
     public function sync($dry = false) {
