@@ -104,7 +104,7 @@ class group extends data
             }
         }
 
-        // The easiest path!
+        // Create if we aren't in Moodle, update if we are.
         if (!$this->is_in_moodle()) {
             if (!$dry) {
                 $this->create_in_moodle();
@@ -127,7 +127,51 @@ class group extends data
             }
         }
 
+        // Sync enrolments.
+        if ($this->is_in_moodle()) {
+            $this->sync_enrolments($dry);
+        }
+
         return $status;
+    }
+
+    /**
+     * Take full ownership of the group, trash any extra enrolments.
+     */
+    private function sync_enrolments($dry) {
+        global $DB;
+
+        // Grab a list of Moodle enrolments.
+        $members = $DB->get_records('groups_members', array(
+            'groupid' => $this->mid
+        ));
+
+        // Grab a list of Connect enrolments.
+        $enrolments = $this->enrolments;
+
+        // Deletions.
+        foreach ($members as $member) {
+            $found = false;
+
+            // Is there a matching enrolment?
+            foreach ($enrolments as $enrolment) {
+                if ($enrolment->user->mid == $member->userid) {
+                    $found = true;
+                }
+            }
+
+            if (!$found) {
+                echo "   Removing {$member->userid} from group {$this->mid}.\n";
+                if (!$dry) {
+                    groups_remove_member($this->mid, $member->userid);
+                }
+            }
+        }
+
+        // Creations.
+        foreach ($enrolments as $enrolment) {
+            $enrolment->sync($dry);
+        }
     }
 
     /**
