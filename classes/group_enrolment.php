@@ -44,7 +44,7 @@ class group_enrolment extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "groupid", "userid", "deleted");
+        return array("id", "groupid", "userid");
     }
 
     /**
@@ -76,24 +76,9 @@ class group_enrolment extends data
      * Sync method
      */
     public function sync($dry = false) {
-        $this->reset_object_cache();
-
-        // Should we be deleting this?
-        if ($this->deleted) {
-            if ($this->is_in_moodle()) {
-                if (!$dry) {
-                    $this->delete();
-                }
-
-                return self::STATUS_DELETE;
-            }
-
-            return self::STATUS_NONE;
-        }
-
         // If our group doesn't exist, or is not in Moodle,
         // we cannot continue.
-        if (!$this->group || !$this->is_valid()) {
+        if (!$this->is_valid()) {
             return self::STATUS_NONE;
         }
 
@@ -129,8 +114,6 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_in_moodle() {
-        $this->reset_object_cache();
-
         if (!$this->is_valid()) {
             return false;
         }
@@ -144,8 +127,6 @@ class group_enrolment extends data
      * @return unknown
      */
     public function create_in_moodle() {
-        $this->reset_object_cache();
-
         if (!$this->is_valid()) {
             return false;
         }

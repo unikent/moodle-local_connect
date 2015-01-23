@@ -65,10 +65,7 @@ class group extends data
      * Get enrollments for this Group
      */
     public function _get_enrolments() {
-        $enrolments = group_enrolment::get_by("groupid", $this->id, true);
-        return array_filter($enrolments, function($v) {
-            return $v->deleted == '0';
-        });
+        return group_enrolment::get_by("groupid", $this->id, true);
     }
 
     /**
@@ -80,7 +77,7 @@ class group extends data
         $this->reset_object_cache();
 
         // Is our course in Moodle?
-        if (!$this->course->is_in_moodle()) {
+        if (!$this->course || !$this->course->is_in_moodle()) {
             if (!empty($this->mid)) {
                 $this->mid = 0;
                 $this->save();
@@ -107,30 +104,74 @@ class group extends data
             }
         }
 
-        // The easiest path!
+        // Create if we aren't in Moodle, update if we are.
         if (!$this->is_in_moodle()) {
             if (!$dry) {
                 $this->create_in_moodle();
             }
 
-            return self::STATUS_CREATE;
+            $status = self::STATUS_CREATE;
+        } else {
+            // We are currently in Moodle!
+            $group = $DB->get_record('groups', array(
+                'id' => $this->mid
+            ), 'id,courseid,name');
+
+            // Does our data match up?
+            if ($group->name !== $this->name) {
+                if (!$dry) {
+                    $this->update_in_moodle();
+                }
+
+                $status = self::STATUS_MODIFY;
+            }
         }
 
-        // We are currently in Moodle!
-        $group = $DB->get_record('groups', array(
-            'id' => $this->mid
-        ), 'id,courseid,name');
-
-        // Does our data match up?
-        if ($group->name !== $this->name) {
-            if (!$dry) {
-                $this->update_in_moodle();
-            }
-
-            return self::STATUS_MODIFY;
+        // Sync enrolments.
+        if ($this->is_in_moodle()) {
+            $this->sync_enrolments($dry);
         }
 
         return $status;
+    }
+
+    /**
+     * Take full ownership of the group, trash any extra enrolments.
+     */
+    private function sync_enrolments($dry) {
+        global $DB;
+
+        // Grab a list of Moodle enrolments.
+        $members = $DB->get_records('groups_members', array(
+            'groupid' => $this->mid
+        ));
+
+        // Grab a list of Connect enrolments.
+        $enrolments = $this->enrolments;
+
+        // Deletions.
+        foreach ($members as $member) {
+            $found = false;
+
+            // Is there a matching enrolment?
+            foreach ($enrolments as $enrolment) {
+                if ($enrolment->user->mid == $member->userid) {
+                    $found = true;
+                }
+            }
+
+            if (!$found) {
+                echo "   Removing {$member->userid} from group {$this->mid}.\n";
+                if (!$dry) {
+                    groups_remove_member($this->mid, $member->userid);
+                }
+            }
+        }
+
+        // Creations.
+        foreach ($enrolments as $enrolment) {
+            $enrolment->sync($dry);
+        }
     }
 
     /**
