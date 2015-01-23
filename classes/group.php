@@ -65,14 +65,8 @@ class group extends data
      * Get enrollments for this Group
      */
     public function _get_enrolments() {
-        return group_enrolment::get_by("groupid", $this->id, true);
-    }
-
-    /**
-     * Get active enrollments for this Group
-     */
-    public function _get_active_enrolments() {
-        return array_filter($this->enrolments, function($v) {
+        $enrolments = group_enrolment::get_by("groupid", $this->id, true);
+        return array_filter($enrolments, function($v) {
             return $v->deleted == '0';
         });
     }
