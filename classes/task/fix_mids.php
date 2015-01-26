@@ -30,7 +30,7 @@ namespace local_connect\task;
 class fix_mids extends \core\task\scheduled_task
 {
     public function get_name() {
-        return "Fix course mids";
+        return "Fix Moodle IDs";
     }
 
     public function execute() {

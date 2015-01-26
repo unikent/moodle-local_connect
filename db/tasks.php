@@ -26,6 +26,15 @@ $tasks = array(
     array(
         'classname' => 'local_connect\task\fix_mids',
         'blocking' => 0,
+        'minute' => '0',
+        'hour' => '*/2',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+    array(
+        'classname' => 'local_connect\task\course_sync',
+        'blocking' => 0,
         'minute' => '15',
         'hour' => '*/4',
         'day' => '*',
@@ -36,25 +45,7 @@ $tasks = array(
         'classname' => 'local_connect\task\group_sync',
         'blocking' => 0,
         'minute' => '30',
-        'hour' => '3',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
-        'classname' => 'local_connect\task\group_enrolment_sync',
-        'blocking' => 0,
-        'minute' => '40',
-        'hour' => '3',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
-        'classname' => 'local_connect\task\course_sync',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '4',
+        'hour' => '*/4',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'

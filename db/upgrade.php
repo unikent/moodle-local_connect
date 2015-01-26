@@ -813,5 +813,19 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015011401, 'local', 'connect');
     }
 
+    if ($oldversion < 2015012300) {
+        // Define field deleted to be dropped from connect_group_enrolments.
+        $table = new xmldb_table('connect_group_enrolments');
+        $field = new xmldb_field('deleted');
+
+        // Conditionally launch drop field deleted.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2015012300, 'local', 'connect');
+    }
+
     return true;
 }
