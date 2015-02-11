@@ -96,7 +96,8 @@ class course extends data
 
         // Only sync primaries.
         if ($this->is_version_merged()) {
-            if ($this->get_primary_version() !== $this) {
+            $primary = $this->get_primary_version();
+            if ($primary->id !== $this->id) {
                 return self::STATUS_NONE;
             }
         }
@@ -154,7 +155,7 @@ class course extends data
 
         $courses = $this->get_siblings();
         foreach ($courses as $course) {
-            if ($course->module_version > $primary->module_version) {
+            if ((int)$course->module_version > (int)$primary->module_version) {
                 $primary = $course;
             }
         }
@@ -200,7 +201,7 @@ class course extends data
         // Are we a version-only course?
         if ($this->is_version_merged()) {
             $primary = $this->get_primary_version();
-            if ($primary !== $this) {
+            if ($primary->id !== $this->id) {
                 return $primary->shortname;
             }
         }
@@ -238,7 +239,7 @@ class course extends data
     public function _get_fullname() {
         if ($this->is_version_merged()) {
             $primary = $this->get_primary_version();
-            if ($primary !== $this) {
+            if ($primary->id !== $this->id) {
                 return $primary->fullname;
             }
         }
@@ -329,7 +330,7 @@ class course extends data
     public function _get_summary() {
         if ($this->is_version_merged()) {
             $primary = $this->get_primary_version();
-            if ($primary !== $this) {
+            if ($primary->id !== $this->id) {
                 return $primary->summary;
             }
         }
@@ -384,12 +385,6 @@ class course extends data
 
         if (empty($this->mid)) {
             return true;
-        }
-
-        // We are not locked if not in strict mode.
-        $strict = get_config('local_connect', 'strict_sync');
-        if (!$strict) {
-            return false;
         }
 
         $locked = $DB->get_field('connect_course_locks', 'locked', array(
@@ -604,6 +599,10 @@ class course extends data
      * @return unknown
      */
     public function add_child($target) {
+        // Reset required.
+        $this->_siblings = null;
+        $target->_siblings = null;
+
         // Add a link.
         $target->mid = $this->mid;
         $target->save();
