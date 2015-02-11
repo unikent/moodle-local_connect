@@ -50,29 +50,26 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         // Updates.
         $course->module_title = "TESTING NAME CHANGE";
 
-        $this->assertFalse($course->is_locked());
-        $this->assertEquals(\local_connect\data::STATUS_NONE, $course->sync());
-        $this->assertFalse($course->is_locked());
+        $user1 = $this->getDataGenerator()->create_user();
+        $this->setUser($user1);
 
-        // Update with strict sync on.
-        set_config('strict_sync', true, 'local_connect');
-        $course = \local_connect\course::get($id);
-        $course->module_title = "TESTING NAME CHANGE";
         $this->assertTrue($course->is_locked());
+        $this->assertEquals(\local_connect\data::STATUS_MODIFY, $course->sync());
+        $this->assertFalse($course->is_locked());
 
+        $this->setUser(null);
+
+        // Re-test.
+        $id = $this->generate_course();
+        $course = \local_connect\course::get($id);
+        $course->create_in_moodle();
+        $course->module_title = "TESTING NAME CHANGE 2";
+        $course->save();
+
+        $this->assertTrue($course->is_locked());
         $this->assertEquals(\local_connect\data::STATUS_MODIFY, $course->sync());
         $this->assertTrue($course->is_locked());
 
-        // Modify as a user.
-        $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
-            "courseid" => $course->mid
-        ));
-
-        $course = \local_connect\course::get($id);
-        $course->module_title = "TESTING NAME CHANGE";
-        $this->assertFalse($course->is_locked());
-
-        $this->assertTrue($course->is_in_moodle());
         $mcourse = $DB->get_record('course', array(
             "id" => $course->mid
         ), 'id,fullname');
