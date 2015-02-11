@@ -40,6 +40,9 @@ class course extends data
     /** Shortname Extension Cache */
     private $_shortname_extension;
 
+    /** Sibling cache */
+    private $_siblings;
+
     /**
      * The name of our connect table.
      */
@@ -91,8 +94,15 @@ class course extends data
             return self::STATUS_NONE;
         }
 
+        // Only sync primaries.
+        if ($this->is_version_merged()) {
+            if ($this->get_primary_version() !== $this) {
+                return self::STATUS_NONE;
+            }
+        }
+
         // Have we changed at all?
-        if (!$this->is_merged() && $this->is_locked() && $this->has_changed()) {
+        if ($this->is_locked() && $this->has_changed()) {
             if (!$dry) {
                 $this->update_moodle();
             }
@@ -101,6 +111,55 @@ class course extends data
         }
 
         return self::STATUS_NONE;
+    }
+
+    /**
+     * Get my siblings.
+     */
+    public function get_siblings() {
+        if (!isset($this->_siblings)) {
+            $this->_siblings = static::get_by('mid', $this->mid, true);
+        }
+
+        return $this->_siblings;
+    }
+
+    /**
+     * Are we only merged with different versions of the same course?
+     */
+    public function is_version_merged() {
+        $courses = $this->get_siblings();
+        if (is_array($courses)) {
+            foreach ($courses as $course) {
+                if ($course->module_delivery_key !== $this->module_delivery_key) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the latest version of a course if we are version merged.
+     */
+    public function get_primary_version() {
+        if (!$this->is_version_merged()) {
+            throw new \moodle_exception("get_primary_version called on un-versioned course.");
+        }
+
+        $primary = $this;
+
+        $courses = $this->get_siblings();
+        foreach ($courses as $course) {
+            if ($course->module_version > $primary->module_version) {
+                $primary = $course;
+            }
+        }
+
+        return $primary;
     }
 
     /**
@@ -138,10 +197,18 @@ class course extends data
      * Returns the shortname
      */
     public function _get_shortname() {
+        // Are we a version-only course?
+        if ($this->is_version_merged()) {
+            $primary = $this->get_primary_version();
+            if ($primary !== $this) {
+                return $primary->shortname;
+            }
+        }
+
         // If we are a merged course, we may have more than one module_code.
         $modulecode = $this->module_code;
-        if ($this->is_in_moodle()) {
-            $courses = static::get_by('mid', $this->mid);
+        if ($this->is_in_moodle() && !$this->is_version_merged()) {
+            $courses = $this->get_siblings();
             if (is_array($courses)) {
                 $modulecode = array($modulecode);
                 foreach ($courses as $course) {
@@ -169,6 +236,13 @@ class course extends data
      * Returns the fullname
      */
     public function _get_fullname() {
+        if ($this->is_version_merged()) {
+            $primary = $this->get_primary_version();
+            if ($primary !== $this) {
+                return $primary->fullname;
+            }
+        }
+
         return $this->append_date($this->module_title);
     }
 
@@ -194,7 +268,7 @@ class course extends data
         // If we are a merged course, we may have more than one campus.
         $campus = $this->campus->name;
         if ($this->is_in_moodle()) {
-            $courses = static::get_by('mid', $this->mid);
+            $courses = $this->get_siblings();
             if (is_array($courses)) {
                 $campus = array($campus);
                 foreach ($courses as $course) {
@@ -253,6 +327,13 @@ class course extends data
      * Get the summary, based on the synopsis
      */
     public function _get_summary() {
+        if ($this->is_version_merged()) {
+            $primary = $this->get_primary_version();
+            if ($primary !== $this) {
+                return $primary->summary;
+            }
+        }
+
         $code = $this->module_code;
         if (strpos($code, " ") !== false) {
             $code = substr($code, 0, strpos($code, " "));
