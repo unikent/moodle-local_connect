@@ -66,7 +66,6 @@ $PAGE->requires->js_init_call('connect_load', array(
 ));
 
 // Our CSS.
-$PAGE->requires->css('/local/connect/styles/demo_table.css');
 $PAGE->requires->css('/local/connect/styles/styles.min.css');
 
 // Our categories.
