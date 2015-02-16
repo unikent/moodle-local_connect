@@ -39,7 +39,6 @@ class kent_user_tests extends \local_connect\tests\connect_testcase
 		$this->assertFalse($user->is_in_moodle());
 		$user->create_in_moodle();
 		$this->assertTrue($user->is_in_moodle());
-
 	}
 
 	/**
@@ -76,7 +75,6 @@ class kent_user_tests extends \local_connect\tests\connect_testcase
 		$this->assertEquals(18, count(\local_connect\user::get_by_role("staff")));
 		$this->assertEquals(6, count(\local_connect\user::get_by_role("sds_teacher")));
 		$this->assertEquals(12, count(\local_connect\user::get_by_role("sds_convenor")));
-
 	}
 
 	/**
@@ -117,6 +115,5 @@ class kent_user_tests extends \local_connect\tests\connect_testcase
 
 		$user = \local_connect\user::get($user->id);
 		$this->assertTrue($user->is_in_moodle());
-
 	}
 }

@@ -58,7 +58,7 @@ abstract class connect_testcase extends \advanced_testcase
 
         $SHAREDB->execute("TRUNCATE TABLE {shared_courses}");
         $SHAREDB->execute("TRUNCATE TABLE {shared_course_admins}");
-        $SHAREDB->execute("TRUNCATE TABLE {rollovers}");
+        $SHAREDB->execute("TRUNCATE TABLE {shared_rollovers}");
 
         // Delete the roles too.
         $DB->delete_records('role', array('shortname' => 'sds_student'));

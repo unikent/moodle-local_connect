@@ -50,33 +50,76 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         // Updates.
         $course->module_title = "TESTING NAME CHANGE";
 
-        $this->assertFalse($course->is_locked());
-        $this->assertEquals(\local_connect\data::STATUS_NONE, $course->sync());
-        $this->assertFalse($course->is_locked());
+        $user1 = $this->getDataGenerator()->create_user();
+        $this->setUser($user1);
 
-        // Update with strict sync on.
-        set_config('strict_sync', true, 'local_connect');
-        $course = \local_connect\course::get($id);
-        $course->module_title = "TESTING NAME CHANGE";
         $this->assertTrue($course->is_locked());
+        $this->assertEquals(\local_connect\data::STATUS_MODIFY, $course->sync());
+        $this->assertFalse($course->is_locked());
 
+        $this->setUser(null);
+
+        // Re-test.
+        $id = $this->generate_course();
+        $course = \local_connect\course::get($id);
+        $course->create_in_moodle();
+        $course->module_title = "TESTING NAME CHANGE 2";
+        $course->save();
+
+        $this->assertTrue($course->is_locked());
         $this->assertEquals(\local_connect\data::STATUS_MODIFY, $course->sync());
         $this->assertTrue($course->is_locked());
 
-        // Modify as a user.
-        $DB->execute("REPLACE INTO {connect_course_locks} (mid, locked) VALUES (:courseid, 0)", array(
-            "courseid" => $course->mid
-        ));
-
-        $course = \local_connect\course::get($id);
-        $course->module_title = "TESTING NAME CHANGE";
-        $this->assertFalse($course->is_locked());
-
-        $this->assertTrue($course->is_in_moodle());
         $mcourse = $DB->get_record('course', array(
             "id" => $course->mid
         ), 'id,fullname');
         $this->assertEquals($course->fullname, $mcourse->fullname);
+    }
+
+    /**
+     * Test we can sync a merged course.
+     */
+    public function test_merged_course_sync() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $id = $this->generate_course();
+        $course = \local_connect\course::get($id);
+        $course->create_in_moodle();
+        $this->assertEquals(\local_connect\data::STATUS_NONE, $course->sync());
+
+        // Make sure we sync merged modules properly.
+        $id2 = $this->generate_course();
+        $DB->update_record('connect_course', array(
+            'id' => $id2,
+            'module_delivery_key' => $course->module_delivery_key,
+            'module_version' => 2
+        ));
+        $course2 = \local_connect\course::get($id2);
+        $course->add_child($course2);
+        $course2->module_title = "TESTING SYNC";
+        $course2->save();
+
+        $this->assertTrue($course2->is_version_merged());
+        $this->assertTrue($course2->is_locked());
+        $this->assertTrue($course2->has_changed());
+
+        $this->assertEquals($course2->id, $course->get_primary_version()->id);
+        $this->assertEquals($course2->id, $course2->get_primary_version()->id);
+
+        $course = \local_connect\course::get($id);
+        $course2 = \local_connect\course::get($id2);
+
+        $this->assertEquals($course->shortname, $course2->shortname);
+        $this->assertEquals($course->fullname, $course2->fullname);
+        $this->assertEquals($course->summary, $course2->summary);
+
+        // Annndd if we sync?
+        $this->assertEquals(\local_connect\data::STATUS_NONE, $course->sync());
+        $this->assertEquals(\local_connect\data::STATUS_MODIFY, $course2->sync());
+        $this->assertEquals(\local_connect\data::STATUS_NONE, $course2->sync());
+        $this->assertEquals(\local_connect\data::STATUS_NONE, $course->sync());
     }
 
     /**
@@ -178,29 +221,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
     /**
      * Test we can create a linked course.
      */
-    public function test_linked_course() {
-        $this->resetAfterTest();
-
-        // Create two courses.
-        $course1 = \local_connect\course::get($this->generate_course());
-        $course2 = \local_connect\course::get($this->generate_course());
-        $this->assertEquals(2, count(\local_connect\course::get_all()));
-
-        $result = \local_connect\course::process_merge((object)array(
-            'code' => "TST",
-            'title' => "TEST MERGE",
-            'synopsis' => "This is a test",
-            'category' => 1,
-            'link_courses' => array($course1->id, $course2->id)
-        ));
-
-        $this->assertEquals(array(), $result);
-    }
-
-    /**
-     * Test we can create a linked course and then unlink it.
-     */
-    public function test_unlink_course() {
+    public function test_linked_courses() {
         global $DB;
 
         $this->resetAfterTest();
@@ -260,16 +281,6 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $this->assertEquals(2, $course2->count_staff());
         $this->assertEquals(103, $course1->count_all());
         $this->assertEquals(72, $course2->count_all());
-    }
-
-    /**
-     * Test campus_name.
-     */
-    public function test_campus_name() {
-        $this->resetAfterTest();
-
-        $course = \local_connect\course::get($this->generate_course());
-        $this->assertTrue(in_array($course->campus_name, array("Canterbury", "Medway")), $course->campus_name);
     }
 
     /**
