@@ -81,10 +81,14 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('connectreport', 'local_connect'));
 
-echo <<< HEREDOC
-<div id="key_button" class="show_key"><div id="key_button_wrap">Show key</div></div>
-<div id="key">
-    <div id="key_wrap">
+echo <<<HTML5
+<p>
+    <button class="btn btn-default" type="button" data-toggle="collapse" data-target="#key" aria-expanded="false" aria-controls="key">
+        Show Key
+    </button>
+</p>
+<div id="key" class="collapse">
+    <div id="key_wrap" class="well">
         <ul>
             <li class="status_key key_item">= Status indicator (normaly coloured)</li>
             <li class="warning_key key_item">= Delivery is no longer in sds</li>
@@ -95,7 +99,10 @@ echo <<< HEREDOC
         </ul>
     </div>
 </div>
-<div id="key_margin"></div>
+
+HTML5;
+
+echo <<< HEREDOC
 <div id="da_wrapper">
     <div id= "dapage_app">
         <div id="options_bar">

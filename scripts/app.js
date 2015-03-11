@@ -86,19 +86,6 @@ function connect_load(yui, cats) {
 	});
 }
 
- $('#key_button').click(function() {
- 	if($(this).hasClass('show_key')) {
- 		$(this).removeClass().addClass('hide_key');
- 		$('#key_button_wrap', this).html('Hide key')
- 		$('#key').stop(true, true).slideDown();
- 	} else {
- 		$('#key_button_wrap', this).html('Show key');
- 		$('#key').stop(true, true).slideUp('fast', function() {
- 			$('#key_button').removeClass().addClass('show_key');
- 		});
- 	}
- });
-
- $('.data_refresh').click(function() {
- 	location.reload(true);
- });
+$('.data_refresh').click(function() {
+	location.reload(true);
+});
