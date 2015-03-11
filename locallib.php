@@ -36,7 +36,7 @@ function kent_get_connect_course_categories() {
     foreach ($cats as $cat) {
         $context = context_coursecat::instance($cat->id);
         if (has_capability('moodle/category:manage', $context)) {
-            array_push($catpermissions, array($cat->id, $cat->name));
+            $catpermissions[$cat->id] = $cat->name;
         }
     }
 

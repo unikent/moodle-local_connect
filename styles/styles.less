@@ -277,7 +277,6 @@ h2.main {
 
 	/*==== KEY
 	==================================================*/
-
 #key_margin {
 	margin-bottom: 25px;
 }
@@ -343,49 +342,48 @@ h2.main {
 		background: #eee;
 		padding: 10px;
 		.border-radius(0, 5px, 5px, 5px);
+	}
+		
+	ul {
+		margin: 5px;
 
-		ul {
+		li {
+			display: inline;
+			display: inline-block;
+			padding-left: 35px;
+			margin-bottom: 10px;
+			color: #6f6f6f;
+			text-shadow: 1px 1px 0px #fff;
+		}
 
-			margin: 5px;
+		.key_item {
+			background-position: 15px 1px;
+			background-repeat: no-repeat;
+		}
 
-			li {
-				display: inline;
-				display: inline-block;
-				padding-left: 35px;
-				margin-bottom: 10px;
-				color: #6f6f6f;
-				text-shadow: 1px 1px 0px #fff;
-			}
+		.status_key {
+			background-image: url(../images/status_active.png);
+		}
 
-			.key_item {
-				background-position: 15px 1px;
-				background-repeat: no-repeat;
-			}
+		.warning_key {
+			background-image: url(../images/warning.png);
+		}
 
-			.status_key {
-				background-image: url(../images/status_active.png);
-			}
+		.link_key {
+			background-image: url(../images/web.png);
+		}
 
-			.warning_key {
-				background-image: url(../images/warning.png);
-			}
+		.delete_key {
+			background-image: url(../images/cross_red_big.png);
+		}
 
-			.link_key {
-				background-image: url(../images/web.png);
-			}
+		.flag_key {
+			background-image: url(../images/flagged.png);
+		}
 
-			.delete_key {
-				background-image: url(../images/cross_red_big.png);
-			}
-
-			.flag_key {
-				background-image: url(../images/flagged.png);
-			}
-
-			.unlink_key {
-				background-image: url(../images/unlink.png);
-				margin-bottom: 0px;
-			}
+		.unlink_key {
+			background-image: url(../images/unlink.png);
+			margin-bottom: 0px;
 		}
 	}
 }
@@ -413,10 +411,6 @@ h2.main {
 	clear: both;
 
 	#dapage_app {
-		width: 82%;
-		border: 1px solid #e3e3e3;
-		.border-radius(5px, 0px, 5px, 5px);
-		float:left;
 		margin-bottom: 60px;
 
 		/*==== OPTIONS BAR
@@ -951,133 +945,6 @@ h2.main {
 	/*==== RIGHT BAR WRAPPER
 	==================================================*/
 	#right_bar_wrap {
-		float: right;
-		width: 15%;
-
-		/*===== PAGE REFRESH
-		==================================================*/
-
-		.data_refresh {
-			/*.gradient(#F5F5F5, #ddd, #f5f5f5);*/
-			background: #F5F5F5;
-  			background: url(../images/reload.png), -webkit-gradient(linear,
-                               left bottom,
-                               left top,
-                               color-stop(0, #ddd),
-                               color-stop(1, #f5f5f5));
- 			background: url(../images/reload.png), -ms-linear-gradient(bottom,
-                                  #ddd,
-                                  #f5f5f5);
-  			background: url(../images/reload.png), -moz-linear-gradient(center bottom,
-                                   #ddd 0%,
-                                   #f5f5f5 100%);
-  			background-repeat: no-repeat;
-  			background-position: 130px center, 0 0;
-			.rounded(5px);
-			padding: 10px;
-			margin-bottom: 10px;
-			font-size: 12px;
-			color: #999;
-			border: 1px solid #E3E3E3;
-			cursor: pointer;
-		}
-
-		.data_refresh:hover {
-			color: #fff;
-			border: 1px solid #214587;
-			background: #27519f;
-  			background: url(../images/reload-hover.png), -webkit-gradient(linear,
-                               left bottom,
-                               left top,
-                               color-stop(0, #214587),
-                               color-stop(1, #27519f));
- 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
-                                  #214587,
-                                  #27519f);
-  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
-                                   #214587 0%,
-                                   #27519f 100%);
-  			background-repeat: no-repeat;
-  			background-position: 130px center, 0 0;
-		}
-
-		.data_refresh:active {
-			color: #fff;
-			border: 1px solid #1C3B74;
-			background: #1E3E7A;
-			background: url(../images/reload-hover.png), -webkit-gradient(linear,
-                               left bottom,
-                               left top,
-                               color-stop(0, #1C3B74),
-                               color-stop(1, #1E3E7A));
- 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
-                                  #1C3B74,
-                                  #1E3E7A);
-  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
-                                   #1C3B74 0%,
-                                   #1E3E7A 100%);
-  			background-repeat: no-repeat;
-  			background-position: 130px center, 0 0;
-		}
-
-		.data_refresh.highlight {
-			color: #fff;
-			padding: 10px 30px 10px 10px;
-			border: 1px solid #214587;
-			background: #27519f;
-  			background: url(../images/reload-hover.png), -webkit-gradient(linear,
-                               left bottom,
-                               left top,
-                               color-stop(0, #214587),
-                               color-stop(1, #27519f));
- 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
-                                  #214587,
-                                  #27519f);
-  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
-                                   #214587 0%,
-                                   #27519f 100%);
-  			background-repeat: no-repeat;
-  			background-position: 130px center, 0 0;
-		}
-
-		.data_refresh.highlight:hover {
-			color: #fff;
-			border: 1px solid #1C3B74;
-			background: #1E3E7A;
-			background: url(../images/reload-hover.png), -webkit-gradient(linear,
-                               left bottom,
-                               left top,
-                               color-stop(0, #1C3B74),
-                               color-stop(1, #1E3E7A));
- 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
-                                  #1C3B74,
-                                  #1E3E7A);
-  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
-                                   #1C3B74 0%,
-                                   #1E3E7A 100%);
-  			background-repeat: no-repeat;
-  			background-position: 130px center, 0 0;
-		}
-		
-		.data_refresh.highlight:active {
-			color: #fff;
-			border: 1px solid #1C3B74;
-			background: #193467;
-			background: url(../images/reload-hover.png), -webkit-gradient(linear,
-                               left bottom,
-                               left top,
-                               color-stop(0, #183262),
-                               color-stop(1, #1A3568));
- 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
-                                  #183262,
-                                  #1A3568);
-  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
-                                   #183262 0%,
-                                   #1A3568 100%);
-  			background-repeat: no-repeat;
-  			background-position: 130px center, 0 0;
-		}
-
 		/*===== JOBS CART
 		==================================================*/
 
@@ -1308,6 +1175,150 @@ h2.main {
 					cursor: default;
 				} 
 			}
+		}
+	}
+}
+
+
+body.kent-current-theme {
+	#da_wrapper {
+		border: 1px solid #e3e3e3;
+		.border-radius(5px, 0px, 5px, 5px);
+		
+		#dapage_app {
+			width: 82%;
+			float:left;
+		}
+
+		#right_bar_wrap {
+			float: right;
+			width: 15%;
+		}
+	}
+
+	#right_bar_wrap {
+		/*===== PAGE REFRESH
+		==================================================*/
+
+		.data_refresh {
+			/*.gradient(#F5F5F5, #ddd, #f5f5f5);*/
+			background: #F5F5F5;
+  			background: url(../images/reload.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #ddd),
+                               color-stop(1, #f5f5f5));
+ 			background: url(../images/reload.png), -ms-linear-gradient(bottom,
+                                  #ddd,
+                                  #f5f5f5);
+  			background: url(../images/reload.png), -moz-linear-gradient(center bottom,
+                                   #ddd 0%,
+                                   #f5f5f5 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+			.rounded(5px);
+			padding: 10px;
+			margin-bottom: 10px;
+			font-size: 12px;
+			color: #999;
+			border: 1px solid #E3E3E3;
+			cursor: pointer;
+		}
+
+		.data_refresh:hover {
+			color: #fff;
+			border: 1px solid #214587;
+			background: #27519f;
+  			background: url(../images/reload-hover.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #214587),
+                               color-stop(1, #27519f));
+ 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
+                                  #214587,
+                                  #27519f);
+  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
+                                   #214587 0%,
+                                   #27519f 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+		}
+
+		.data_refresh:active {
+			color: #fff;
+			border: 1px solid #1C3B74;
+			background: #1E3E7A;
+			background: url(../images/reload-hover.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #1C3B74),
+                               color-stop(1, #1E3E7A));
+ 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
+                                  #1C3B74,
+                                  #1E3E7A);
+  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
+                                   #1C3B74 0%,
+                                   #1E3E7A 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+		}
+
+		.data_refresh.highlight {
+			color: #fff;
+			padding: 10px 30px 10px 10px;
+			border: 1px solid #214587;
+			background: #27519f;
+  			background: url(../images/reload-hover.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #214587),
+                               color-stop(1, #27519f));
+ 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
+                                  #214587,
+                                  #27519f);
+  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
+                                   #214587 0%,
+                                   #27519f 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+		}
+
+		.data_refresh.highlight:hover {
+			color: #fff;
+			border: 1px solid #1C3B74;
+			background: #1E3E7A;
+			background: url(../images/reload-hover.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #1C3B74),
+                               color-stop(1, #1E3E7A));
+ 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
+                                  #1C3B74,
+                                  #1E3E7A);
+  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
+                                   #1C3B74 0%,
+                                   #1E3E7A 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
+		}
+		
+		.data_refresh.highlight:active {
+			color: #fff;
+			border: 1px solid #1C3B74;
+			background: #193467;
+			background: url(../images/reload-hover.png), -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, #183262),
+                               color-stop(1, #1A3568));
+ 			background: url(../images/reload-hover.png), -ms-linear-gradient(bottom,
+                                  #183262,
+                                  #1A3568);
+  			background: url(../images/reload-hover.png), -moz-linear-gradient(center bottom,
+                                   #183262 0%,
+                                   #1A3568 100%);
+  			background-repeat: no-repeat;
+  			background-position: 130px center, 0 0;
 		}
 	}
 }

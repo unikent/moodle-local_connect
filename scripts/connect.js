@@ -100,7 +100,7 @@ var Connect = (function() {
 			"oLanguage": {
 				"sSearch": "Search all columns:"
 			},
-			"iDisplayLength": 50,
+			"iDisplayLength": 20,
 			"bPaginate" : true,
 			"sPaginationType": "full_numbers",
 			"fnCreatedRow": function( nRow, aData, iDataIndex ) {

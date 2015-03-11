@@ -31,22 +31,17 @@ global $PAGE, $OUTPUT, $USER;
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/ajax/courses.php');
 
-$restrictions = optional_param('category_restrictions', null, PARAM_RAW);
-$restrictions = isset($restrictions) ? json_decode(urldecode($restrictions)) : array();
+$restrictions = optional_param('category_restrictions', '', PARAM_RAW);
 
 $courses = array();
 if (!empty($restrictions)) {
-    // Map categories to IDs.
+    $restrictions = explode(',', $restrictions);
+
+    // Check which categories we have permissions for.
     $categories = array();
     foreach ($restrictions as $category) {
-        if (!isset($category[0])) {
-            continue;
-        }
-
-        $category = $category[0];
-
         // Do we have access?
-        $context = \context_coursecat::instance($category);
+        $context = \context_coursecat::instance((int)$category);
         if (has_capability('moodle/category:manage', $context)) {
             $categories[] = $category;
         }
