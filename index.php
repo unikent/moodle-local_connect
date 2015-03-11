@@ -72,6 +72,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('connectreport', 'local_connect'));
 
 $renderer = $PAGE->get_renderer('local_connect');
-$renderer->render_index($catpermissions);
+$renderer->render_index();
+$renderer->render_index_js($catpermissions);
 
 echo $OUTPUT->footer();

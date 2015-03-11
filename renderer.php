@@ -35,18 +35,7 @@ class local_connect_renderer extends plugin_renderer_base
 	/**
 	 * Render the index page.
 	 */
-	public function render_index($categories) {
-		global $CFG;
-
-		// Our categories.
-		$catoptions = '';
-		foreach ($categories as $perm) {
-		    list($id, $name) = $perm;
-		    $catoptions .= '<option value="'.$id.'">'.$name.'</option>';
-		}
-
-		$connecterror = get_string('connect_error', 'local_connect');
-
+	public function render_index() {
 		echo <<<HTML5
 		<div id="key_button" class="show_key"><div id="key_button_wrap">Show key</div></div>
 		<div id="key">
@@ -145,6 +134,26 @@ class local_connect_renderer extends plugin_renderer_base
 		        </div>
 		    </div>
 		</div>
+HTML5;
+	}
+
+	/**
+	 * Render the index page JS helpers.
+	 */
+	public function render_index_js($categories) {
+		global $CFG;
+
+		// Our categories.
+		$catoptions = '';
+		foreach ($categories as $perm) {
+		    list($id, $name) = $perm;
+		    $catoptions .= '<option value="'.$id.'">'.$name.'</option>';
+		}
+
+		$connecterror = get_string('connect_error', 'local_connect');
+
+		echo <<<HTML5
+
 		<div id="dialog-form" title="Edit details">
 		    <div id="edit_notifications"></div>
 		    <form>

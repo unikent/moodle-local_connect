@@ -411,10 +411,6 @@ h2.main {
 	clear: both;
 
 	#dapage_app {
-		width: 82%;
-		border: 1px solid #e3e3e3;
-		.border-radius(5px, 0px, 5px, 5px);
-		float:left;
 		margin-bottom: 60px;
 
 		/*==== OPTIONS BAR
@@ -949,9 +945,6 @@ h2.main {
 	/*==== RIGHT BAR WRAPPER
 	==================================================*/
 	#right_bar_wrap {
-		float: right;
-		width: 15%;
-
 		/*===== PAGE REFRESH
 		==================================================*/
 
@@ -1306,6 +1299,24 @@ h2.main {
 					cursor: default;
 				} 
 			}
+		}
+	}
+}
+
+
+body.kent-current-theme {
+	#da_wrapper {
+		border: 1px solid #e3e3e3;
+		.border-radius(5px, 0px, 5px, 5px);
+		
+		#dapage_app {
+			width: 82%;
+			float:left;
+		}
+
+		#right_bar_wrap {
+			float: right;
+			width: 15%;
 		}
 	}
 }
