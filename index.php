@@ -60,7 +60,7 @@ $PAGE->requires->js('/local/connect/scripts/date-en-GB.js');
 $PAGE->requires->js('/local/connect/scripts/button-loader.js');
 $PAGE->requires->js('/local/connect/scripts/connect.js');
 $PAGE->requires->js('/local/connect/scripts/app.js');
-$cats = has_capability('local/connect:manage', $sitecontext) ? "" : json_encode($catpermissions);
+$cats = has_capability('local/connect:manage', $sitecontext) ? "" : implode(',', array_keys($catpermissions));
 $PAGE->requires->js_init_call('connect_load', array(
     $cats
 ));

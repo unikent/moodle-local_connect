@@ -45,7 +45,7 @@ function connect_load(yui, cats) {
 
 	$.ajax({
 			url: M.cfg.wwwroot + '/local/connect/ajax/courses.php',
-			type: 'GET',
+			type: 'POST',
 			data: data,
 			dataType: 'json',
 			success: function(json) {
