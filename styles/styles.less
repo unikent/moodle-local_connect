@@ -277,14 +277,73 @@ h2.main {
 
 	/*==== KEY
 	==================================================*/
+#key_margin {
+	margin-bottom: 25px;
+}
+
+		/*===== KEY BUTTON
+		==================================================*/
+
+#key_button {
+	
+	position: absolute;
+	right: 25px;
+	top: 14px;
+	height: 35px;
+	width: 160px;
+	text-align: center;
+	font-size: 12px;
+	color: #6f6f6f;
+	text-shadow: 1px 1px 0px #fff;
+	border: 1px solid #E3E3E3;
+	.border-radius(5px, 5px, 5px, 5px);
+	cursor: pointer;
+
+	#key_button_wrap {
+		padding-top: 9px;
+		height: 24px;
+		border: 1px solid #fff;
+		.gradient(#f5f5f5, #eee, #f5f5f5);
+		.border-radius(5px, 5px, 5px, 5px);
+	}
+}
+
+#key_button:hover {
+
+	#key_button_wrap {
+		.gradient(#efefef, #e9e9e9, #efefef);
+	}	
+}
+
+#key_button.hide_key {
+	border-bottom: none;
+	.border-radius(5px, 0, 0, 5px);
+
+	#key_button_wrap {
+		padding-top: 9px;
+		height: 26px;
+		border: 1px solid #fff;
+		border-bottom: none;
+		.gradient(#f5f5f5, #eee, #f5f5f5);
+		.border-radius(5px, 0, 0, 5px);
+	}
+}
 
 		/*===== KEY CONTENT
 		==================================================*/
 
 #key {
+	display: none;
+	border: 1px solid #E3E3E3;
+	.border-radius(0, 5px, 5px, 5px);
 	margin-bottom: 25px;
 
 	#key_wrap {
+		border: 1px solid #fff;
+		background: #eee;
+		padding: 10px;
+		.border-radius(0, 5px, 5px, 5px);
+		
 		ul {
 			margin: 5px;
 
