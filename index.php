@@ -75,6 +75,8 @@ foreach ($catpermissions as $perm) {
     $catoptions .= '<option value="'.$id.'">'.$name.'</option>';
 }
 
+$connecterror = get_string('connect_error', 'local_connect');
+
 // And the page itself.
 
 echo $OUTPUT->header();
@@ -100,9 +102,6 @@ echo <<<HTML5
     </div>
 </div>
 
-HTML5;
-
-echo <<< HEREDOC
 <div id="da_wrapper">
     <div id= "dapage_app">
         <div id="options_bar">
@@ -224,17 +223,12 @@ echo <<< HEREDOC
         These deliveries will be pushed as-is. If you want to edit a module's information, please push it separately.
     </p>
 </div>
-
-HEREDOC;
-
-echo '<div id="dialog_error">'.get_string('connect_error', 'local_connect').'</div>';
-
-echo <<<HERE
-       <script type="text/javascript">
-               window.dapageUrl = '$CFG->wwwroot/local/connect/proxy.php';
-               window.coursepageUrl = '$CFG->wwwroot';
-               window.enableConnectAdvanced = true;
-       </script>
-HERE;
+<div id="dialog_error">$connecterror</div>
+<script type="text/javascript">
+       window.dapageUrl = '$CFG->wwwroot/local/connect/proxy.php';
+       window.coursepageUrl = '$CFG->wwwroot';
+       window.enableConnectAdvanced = true;
+</script>
+HTML5;
 
 echo $OUTPUT->footer();
