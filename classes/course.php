@@ -359,6 +359,22 @@ class course extends data
     }
 
     /**
+     * Is this course (probably) postgraduate?
+     * @return boolean
+     */
+    public function is_postgrad() {
+        return $this->credit_level == 'M' || $this->credit_level == 'D';
+    }
+
+    /**
+     * Is this course (probably) undergraduate?
+     * @return boolean
+     */
+    public function is_undergrad() {
+        return !$this->is_postgrad();
+    }
+
+    /**
      * Is this course unique?
      * @return boolean
      */
