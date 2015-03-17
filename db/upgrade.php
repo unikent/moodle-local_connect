@@ -827,5 +827,19 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015012300, 'local', 'connect');
     }
 
+    if ($oldversion < 2015031700) {
+        // Define field credit_level to be added to connect_course.
+        $table = new xmldb_table('connect_course');
+        $field = new xmldb_field('credit_level', XMLDB_TYPE_CHAR, '3', null, null, null, null, 'module_code');
+
+        // Conditionally launch add field credit_level.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2015031700, 'local', 'connect');
+    }
+
     return true;
 }

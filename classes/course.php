@@ -55,7 +55,7 @@ class course extends data
      */
     protected final static function valid_fields() {
         return array(
-            "id", "mid", "module_delivery_key", "session_code", "module_version",
+            "id", "mid", "module_delivery_key", "session_code", "module_version", "credit_level",
             "campusid", "module_week_beginning", "module_length", "week_beginning_date",
             "module_title", "module_code", "synopsis", "category", "deleted"
         );
@@ -65,7 +65,7 @@ class course extends data
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
-        return array("id", "module_delivery_key", "session_code", "deleted");
+        return array("id", "module_delivery_key", "session_code", "credit_level", "deleted");
     }
 
     /**
@@ -356,6 +356,22 @@ class course extends data
         $text .= "</p>";
 
         return $text;
+    }
+
+    /**
+     * Is this course (probably) postgraduate?
+     * @return boolean
+     */
+    public function is_postgrad() {
+        return $this->credit_level == 'M' || $this->credit_level == 'D';
+    }
+
+    /**
+     * Is this course (probably) undergraduate?
+     * @return boolean
+     */
+    public function is_undergrad() {
+        return !$this->is_postgrad();
     }
 
     /**
