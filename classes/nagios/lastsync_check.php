@@ -18,16 +18,24 @@
  * Local stuff for Moodle Connect
  *
  * @package    local_connect
- * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2015 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_connect\nagios;
 
-$plugin->version   = 2015033000;
-$plugin->requires  = 2014051200;
+/**
+ * Checks cache.
+ */
+class lastsync_check extends \local_nagios\base_check
+{
+    public function execute() {
+    	$lastrun = get_config('local_connect', 'lastsync');
 
-$plugin->dependencies = array(
-    'local_catman' => 2014022600,
-    'local_hipchat' => 2014043000
-);
+    	if (!$lastrun) {
+    		$this->error("Connect has not yet run.");
+    	} elseif ((time() - $lastrun) > 90000) {
+    		$this->error("Connect has not run for more than 25 hours.");
+    	}
+    }
+}
