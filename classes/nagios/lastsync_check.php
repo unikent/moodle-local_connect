@@ -31,11 +31,14 @@ class lastsync_check extends \local_nagios\base_check
 {
     public function execute() {
     	$lastrun = get_config('local_connect', 'lastsync');
+    	$delta = time() - $lastrun;
 
     	if (!$lastrun) {
-    		$this->error("Connect has not yet run.");
-    	} elseif ((time() - $lastrun) > 90000) {
-    		$this->error("Connect has not run for more than 25 hours.");
+    		$this->warning("Connect has not yet run.");
+    	} elseif ($delta > 90000) {
+    		$this->warning("Connect has not run for more than 25 hours.");
+    	} elseif ($delta > 172800) {
+    		$this->error("Connect has not run for more than 48 hours.");
     	}
     }
 }
