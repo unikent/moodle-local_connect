@@ -30,7 +30,13 @@ namespace local_connect\nagios;
 class lastsync_check extends \local_nagios\base_check
 {
     public function execute() {
-    	$lastrun = get_config('local_connect', 'lastsync');
+        global $DB;
+
+        $lastrun = $DB->get_field('config_plugins', 'value', array(
+                'name' => 'lastsync',
+                'plugin' => 'local_connect'
+        ));
+
     	$delta = time() - $lastrun;
 
     	if (!$lastrun) {
