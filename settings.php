@@ -31,10 +31,6 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage('local_connect', get_string('pluginname', 'local_connect'));
     $ADMIN->add('localplugins', $settings);
 
-    $rules = new admin_externalpage('connectrules', "Category Rules", "$CFG->wwwroot/local/connect/rules.php",
-        'moodle/site:config');
-    $ADMIN->add('localplugins', $rules);
-
     $cdb = new admin_externalpage('connectdatabrowse', "Connect Data Browser", "$CFG->wwwroot/local/connect/browse/index.php",
         'local/connect:helpdesk');
     $ADMIN->add('localplugins', $cdb);
