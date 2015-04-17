@@ -34,9 +34,15 @@ class course_sorter
 {
 	/**
 	 * Course list.
-	 * module_code => (module_delivery_key,..)
+	 * module_delivery_key => course
 	 */
 	private $_courses;
+
+	/**
+	 * Course list.
+	 * module_code => (module_delivery_key,..)
+	 */
+	private $_codes;
 
 	/**
 	 * Categorised list.
@@ -45,26 +51,93 @@ class course_sorter
 		'unique' => array(),
 		'term-span' => array(),
 		'campus-span' => array(),
-		'full-span' => array()
+		'full-span' => array(),
+		'uncategorised' => array()
 	);
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
+		$this->grab_courses();
+		$this->sort_lists();
+	}
+
+	/**
+	 * Return the lists.
+	 */
+	public function get_lists() {
+		$array = array();
+		foreach ($this->_categories as $category => $list) {
+			$array[$category] = array();
+			foreach ($list as $mdk) {
+				$array[$category][] = $this->_courses[$mdk];
+			}
+		}
+		return $array;
+	}
+
+	/**
+	 * Grab courses.
+	 */
+	private function grab_courses() {
 		global $DB;
 
 		$this->_courses = array();
+		$this->_codes = array();
 
 		$rs = $DB->get_recordset('connect_course');
+		foreach ($rs as $course) {
+			if (isset($this->_courses[$course->module_delivery_key])) {
+				debugging("Course is not unique: " . $this->_courses[$course->module_delivery_key]);
+			}
+
+			$this->_courses[$course->module_delivery_key] = $course;
+
+			// Add to keys list.
+			$k = $course->module_code;
+			if (!isset($this->_codes[$k])) {
+				$this->_codes[$k] = array();
+			}
+			$this->_codes[$k][] = $course->module_delivery_key;
+		}
 		$rs->close();
+	}
+
+	/**
+	 * Sort the lists.
+	 */
+	private function sort_lists() {
+		foreach ($this->_codes as $key => $array) {
+			foreach ($array as $mdk) {
+				$this->_categories['uncategorised'][] = $mdk;
+			}
+		}
+
+		$this->sort_unique();
+	}
+
+	/**
+	 * Sort all unique courses.
+	 */
+	private function sort_unique() {
+		foreach ($this->_codes as $key => $array) {
+			if (count($array) <= 1) {
+				$this->move($key, 'unique');
+				continue;
+			}
+
+			foreach ($array as $mdk) {
+				$course = $this->_courses[$mdk];
+			}
+		}
 	}
 
 	/**
 	 * Move all courses matching a shortcode to a list.
 	 */
 	private function move($code, $list) {
-		foreach ($this->_courses[$code] as $mdk) {
+		foreach ($this->_codes[$code] as $mdk) {
 			$this->unlist($mdk);
 			$this->_categories[$list][] = $mdk;
 		}
