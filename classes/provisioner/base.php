@@ -60,7 +60,11 @@ class base
 		// Create simple build actions for all courses that are unique.
 		foreach ($lists['unique'] as $course) {
 			$course = \local_connect\course::from_sql_result($course);
-			$this->_tree->add_child(new actions\course_create($course));
+	        if ($course->is_unique_shortname($course->shortname, true)) {
+				$this->_tree->add_child(new actions\course_create($course));
+			} else {
+				debugging("{$course->id} was marked as unique.. but wasnt.");
+			}
 		}
 		
 		// Create mostly-simple build actions for all courses that are term-spanned.
