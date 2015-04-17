@@ -62,10 +62,46 @@ class base
 			$course = \local_connect\course::from_sql_result($course);
 			$this->_tree->add_child(new actions\course_create($course));
 		}
+		
+		// Create mostly-simple build actions for all courses that are term-spanned.
+		foreach ($lists['term-span'] as $course) {
+			$course = \local_connect\course::from_sql_result($course);
+			$shortnameext = $this->get_shortnameext($course);
+            $course->set_shortname_ext($shortnameext);
+
+	        if ($course->is_unique_shortname($course->shortname, true)) {
+				$this->_tree->add_child(new actions\course_create($course));
+			}
+		}
 
 		gc_enable();
 		gc_collect_cycles();
 	}
+
+	/**
+	 * Build a shortnameext.
+	 */
+	private function get_shortnameext($course) {
+        if (strpos($course->module_code, "WSHOP") === 0) {
+            return "(week " . $course->module_week_beginning . ")";
+        }
+
+        if ($course->module_week_beginning == 1) {
+            return "AUT";
+        }
+
+        if ($course->module_week_beginning >= 12) {
+            return "SPR";
+        }
+
+        if ($course->module_week_beginning >= 24) {
+            return "SUM";
+        }
+
+        $start = $course->module_week_beginning;
+        $end = (int)$start + (int)$course->module_length;
+        return "(week {$start}-$end)";
+    }
 
 	/**
 	 * Execute this plan.
