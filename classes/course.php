@@ -57,7 +57,7 @@ class course extends data
         return array(
             "id", "mid", "module_delivery_key", "session_code", "module_version", "credit_level",
             "campusid", "module_week_beginning", "module_length", "week_beginning_date",
-            "module_title", "module_code", "synopsis", "category", "deleted"
+            "module_title", "module_code", "synopsis", "category", "department", "deleted"
         );
     }
 
@@ -65,7 +65,7 @@ class course extends data
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
-        return array("id", "module_delivery_key", "session_code", "credit_level", "deleted");
+        return array("id", "module_delivery_key", "session_code", "credit_level", "department", "deleted");
     }
 
     /**
@@ -595,12 +595,11 @@ class course extends data
         $this->create_forum();
 
         // Fire the event.
-        $params = array(
+        $event = \local_connect\event\course_created::create(array(
             'objectid' => $this->id,
             'courseid' => $this->mid,
             'context' => \context_course::instance($this->mid)
-        );
-        $event = \local_connect\event\course_created::create($params);
+        ));
         $event->trigger();
 
         // Sync our enrolments.
@@ -610,6 +609,35 @@ class course extends data
         $this->sync_groups();
 
         return true;
+    }
+
+    /**
+     * Map this course to a category.
+     */
+    public function map_category() {
+        global $DB;
+
+        $map = category::get_map_table();
+        foreach ($map as $entry) {
+            if ($entry['department'] != $this->department) {
+                continue;
+            }
+
+            if (isset($entry['rule']) && !strpos($this->module_code, $entry['rule']) !== 0) {
+                continue;
+            }
+
+            // Yes please :)
+            $category = $DB->get_record('course_categories', array(
+                'idnumber' => $entry['idnumber']
+            ));
+            if ($category) {
+                $this->category = $category->id;
+                break;
+            }
+        }
+
+        $this->category = 1;
     }
 
     /**

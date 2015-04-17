@@ -57,62 +57,258 @@ class category
      */
     public static function get_map_table() {
         return array(
-            array('75', '10'),
-            array('6', '49'),
-            array('11', '33'),
-            array('48', '22'),
-            array('8', '32'),
-            array('47', '30'),
-            array('61', '26'),
-            array('10', '23'),
-            array('35', '27'),
-            array('28', '9'),
-            array('37', '16', 'LW8'),
-            array('37', '16', 'LW9'),
-            array('37', '18'),
-            array('37', '19', 'WSHOP'),
-            array('45', '29'),
-            array('9', '34'),
-            array('1', '50'),
-            array('1', '51', 'DR'),
-            array('1', '53', 'CR'),
-            array('1', '54', 'FI'),
-            array('1', '56', 'FA'),
-            array('1', '55', 'HA'),
-            array('1', '52', 'MU'),
-            array('25', '7'),
-            array('15', '3'),
-            array('36', '12'),
-            array('16', '8'),
-            array('3', '57'),
-            array('4', '37'),
-            array('4', '41', 'CL'),
-            array('4', '42', 'CP'),
-            array('4', '38', 'LZ'),
-            array('4', '38', 'LL'),
-            array('4', '48', 'FR'),
-            array('4', '45', 'GE'),
-            array('4', '47', 'LS'),
-            array('4', '46', 'IT'),
-            array('4', '44', 'LA'),
-            array('4', '39', 'PL'),
-            array('4', '40', 'TH'),
-            array('5', '35'),
-            array('5', '36', 'HI8'),
-            array('5', '36', 'HI9'),
-            array('17', '6'),
-            array('24', '4'),
-            array('26', '5'),
-            array('38', '21'),
-            array('39', '28'),
-            array('40', '13'),
-            array('40', '14', 'TZ'),
-            array('60', '23'),
-            array('60', '25', 'UN8'),
-            array('60', '24', 'WSHOP'),
-            array('12', '53', 'CR'),
-            array('12', '56', 'FA'),
-            array('12', '52', 'MU')
+            array(
+                'department' => '75',
+                'idnumber' => '10'
+            ),
+            array(
+                'department' => '6',
+                'idnumber' => '49'
+            ),
+            array(
+                'department' => '11',
+                'idnumber' => '33'
+            ),
+            array(
+                'department' => '48',
+                'idnumber' => '22'
+            ),
+            array(
+                'department' => '8',
+                'idnumber' => '32'
+            ),
+            array(
+                'department' => '47',
+                'idnumber' => '30'
+            ),
+            array(
+                'department' => '61',
+                'idnumber' => '26'
+            ),
+            array(
+                'department' => '10',
+                'idnumber' => '23'
+            ),
+            array(
+                'department' => '35',
+                'idnumber' => '27'
+            ),
+            array(
+                'department' => '28',
+                'idnumber' => '9'
+            ),
+            array(
+                'department' => '37',
+                'idnumber' => '16',
+                'rule' => 'LW8'
+            ),
+            array(
+                'department' => '37',
+                'idnumber' => '16',
+                'rule' => 'LW9'
+            ),
+            array(
+                'department' => '37',
+                'idnumber' => '18'
+            ),
+            array(
+                'department' => '37',
+                'idnumber' => '19',
+                'rule' => 'WSHOP'
+            ),
+            array(
+                'department' => '45',
+                'idnumber' => '29'
+            ),
+            array(
+                'department' => '9',
+                'idnumber' => '34'
+            ),
+            array(
+                'department' => '1',
+                'idnumber' => '50'
+            ),
+            array(
+                'department' => '1',
+                'idnumber' => '51',
+                'rule' => 'DR'
+            ),
+            array(
+                'department' => '1',
+                'idnumber' => '53',
+                'rule' => 'CR'
+            ),
+            array(
+                'department' => '1',
+                'idnumber' => '54',
+                'rule' => 'FI'
+            ),
+            array(
+                'department' => '1',
+                'idnumber' => '56',
+                'rule' => 'FA'
+            ),
+            array(
+                'department' => '1',
+                'idnumber' => '55',
+                'rule' => 'HA'
+            ),
+            array(
+                'department' => '1',
+                'idnumber' => '52',
+                'rule' => 'MU'
+            ),
+            array(
+                'department' => '25',
+                'idnumber' => '7'
+            ),
+            array(
+                'department' => '15',
+                'idnumber' => '3'
+            ),
+            array(
+                'department' => '36',
+                'idnumber' => '12'
+            ),
+            array(
+                'department' => '16',
+                'idnumber' => '8'
+            ),
+            array(
+                'department' => '3',
+                'idnumber' => '57'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '37'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '41',
+                'rule' => 'CL'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '42',
+                'rule' => 'CP'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '38',
+                'rule' => 'LZ'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '38',
+                'rule' => 'LL'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '48',
+                'rule' => 'FR'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '45',
+                'rule' => 'GE'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '47',
+                'rule' => 'LS'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '46',
+                'rule' => 'IT'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '44',
+                'rule' => 'LA'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '39',
+                'rule' => 'PL'
+            ),
+            array(
+                'department' => '4',
+                'idnumber' => '40',
+                'rule' => 'TH'
+            ),
+            array(
+                'department' => '5',
+                'idnumber' => '35'
+            ),
+            array(
+                'department' => '5',
+                'idnumber' => '36',
+                'rule' => 'HI8'
+            ),
+            array(
+                'department' => '5',
+                'idnumber' => '36',
+                'rule' => 'HI9'
+            ),
+            array(
+                'department' => '17',
+                'idnumber' => '6'
+            ),
+            array(
+                'department' => '24',
+                'idnumber' => '4'
+            ),
+            array(
+                'department' => '26',
+                'idnumber' => '5'
+            ),
+            array(
+                'department' => '38',
+                'idnumber' => '21'
+            ),
+            array(
+                'department' => '39',
+                'idnumber' => '28'
+            ),
+            array(
+                'department' => '40',
+                'idnumber' => '13'
+            ),
+            array(
+                'department' => '40',
+                'idnumber' => '14',
+                'rule' => 'TZ'
+            ),
+            array(
+                'department' => '60',
+                'idnumber' => '23'
+            ),
+            array(
+                'department' => '60',
+                'idnumber' => '25',
+                'rule' => 'UN8'
+            ),
+            array(
+                'department' => '60',
+                'idnumber' => '24',
+                'rule' => 'WSHOP'
+            ),
+            array(
+                'department' => '12',
+                'idnumber' => '53',
+                'rule' => 'CR'
+            ),
+            array(
+                'department' => '12',
+                'idnumber' => '56',
+                'rule' => 'FA'
+            ),
+            array(
+                'department' => '12',
+                'idnumber' => '52',
+                'rule' => 'MU'
+            )
         );
     }
 }
