@@ -78,6 +78,6 @@ class base
 	 * toString override.
 	 */
 	public function __toString() {
-		return implode('then ', $this->get_children());
+		return implode(' then ', $this->get_children());
 	}
 }

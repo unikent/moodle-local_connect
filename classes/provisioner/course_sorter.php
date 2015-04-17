@@ -86,7 +86,7 @@ class course_sorter
 		$this->_courses = array();
 		$this->_codes = array();
 
-		$rs = $DB->get_recordset('connect_course');
+		$rs = $DB->get_recordset('connect_course', array('mid' => 0));
 		foreach ($rs as $course) {
 			if (isset($this->_courses[$course->module_delivery_key])) {
 				debugging("Course is not unique: " . $this->_courses[$course->module_delivery_key]);

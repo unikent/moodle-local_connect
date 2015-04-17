@@ -52,13 +52,19 @@ class base
 	 * This is the main method.
 	 */
 	private function build_tree() {
+		gc_disable();
+
 		$sorter = new course_sorter();
 		$lists = $sorter->get_lists();
 		
 		// Create simple build actions for all courses that are unique.
 		foreach ($lists['unique'] as $course) {
+			$course = \local_connect\course::from_sql_result($course);
 			$this->_tree->add_child(new actions\course_create($course));
 		}
+
+		gc_enable();
+		gc_collect_cycles();
 	}
 
 	/**

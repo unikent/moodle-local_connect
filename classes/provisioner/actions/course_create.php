@@ -26,22 +26,22 @@ defined('MOODLE_INTERNAL') || die();
  */
 class course_create extends base
 {
-	private $_data;
+	private $_course;
 
 	/**
 	 * Constructor.
 	 */
-	public function __construct($data) {
+	public function __construct($course) {
 		parent::__construct();
 
-		$this->_data = $data;
+		$this->_course = $course;
 	}
 
 	/**
 	 * Execute this action.
 	 */
 	public function execute() {
-		// TODO.
+		$this->_course->create_in_moodle();
 		parent::execute();
 	}
 
@@ -49,6 +49,6 @@ class course_create extends base
 	 * toString override.
 	 */
 	public function __toString() {
-		return "create course '" . $this->_data->module_code . "'" . parent::__toString();
+		return "create course '" . $this->_course->module_code . "'" . parent::__toString();
 	}
 }
