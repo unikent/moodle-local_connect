@@ -118,6 +118,10 @@ class course extends data
      * Get my siblings.
      */
     public function get_siblings() {
+        if (empty($this->mid)) {
+            return array();
+        }
+
         if (!isset($this->_siblings)) {
             $this->_siblings = static::get_by('mid', $this->mid, true);
         }
