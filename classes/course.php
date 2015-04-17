@@ -540,8 +540,7 @@ class course extends data
 
         // Check we have a category.
         if (empty($this->category)) {
-            \local_connect\util\helpers::error("No category set for course: '{$this->id}'!");
-            return false;
+            $this->map_category();
         }
 
         // Grab shortname.
@@ -633,7 +632,7 @@ class course extends data
             ));
             if ($category) {
                 $this->category = $category->id;
-                break;
+                return;
             }
         }
 
