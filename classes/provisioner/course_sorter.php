@@ -115,6 +115,7 @@ class course_sorter
 		}
 
 		$this->sort_unique();
+		$this->sort_spans();
 	}
 
 	/**
@@ -124,11 +125,42 @@ class course_sorter
 		foreach ($this->_codes as $key => $array) {
 			if (count($array) <= 1) {
 				$this->move($key, 'unique');
+			}
+		}
+	}
+
+	/**
+	 * Sort all spanned courses.
+	 */
+	private function sort_spans() {
+		foreach ($this->_codes as $key => $array) {
+			if (count($array) <= 1) {
 				continue;
 			}
 
+			$campuses = $terms = array();
 			foreach ($array as $mdk) {
 				$course = $this->_courses[$mdk];
+				$campuses[] = $course->campusid;
+				$terms[] = $course->module_week_beginning;
+			}
+
+			$campuses = count(array_unique($campuses));
+			$terms = count(array_unique($terms));
+
+			if ($campuses > 1 && $terms > 1) {
+				$this->move($key, 'full-span');
+				continue;
+			}
+
+			if ($campuses > 1) {
+				$this->move($key, 'campus-span');
+				continue;
+			}
+
+			if ($terms > 1) {
+				$this->move($key, 'term-span');
+				continue;
 			}
 		}
 	}

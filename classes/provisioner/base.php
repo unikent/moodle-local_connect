@@ -54,7 +54,15 @@ class base
 	private function build_tree() {
 		$sorter = new course_sorter();
 		$lists = $sorter->get_lists();
-		print_r($lists['unique']);
+		
+		foreach ($lists as $key => $array) {
+			$cnt = count($array);
+			echo "<p>$key has $cnt items.</p>";
+
+			if ($key == 'uncategorised') {
+				print_r($array);
+			}
+		}
 	}
 
 	/**
