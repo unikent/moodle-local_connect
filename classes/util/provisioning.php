@@ -41,6 +41,13 @@ class provisioning
     }
 
     /**
+     * Returns a list of all actions.
+     */
+    public function get_actions() {
+        
+    }
+
+    /**
      * The place this all starts.
      */
     public function go($dry = false) {
@@ -73,6 +80,51 @@ class provisioning
         // Right. Now. What's left? #2.
         echo "Processing Potential Mergers...\n";
         $this->handle_remaining_mergers();
+    }
+
+    /**
+     * Grabs a list of courses.
+     */
+    private function build_modules() {
+        global $DB;
+
+        $rs = $DB->get_recordset('connect_course');
+        foreach ($rs as $record) {
+            $uid = $this->get_uid($record->module_code, $record->module_version, $record->module_week_beginning,
+                                  $record->module_length, $record->campusid);
+            if (isset($this->modules[$uid])) {
+                $this->error("Duplicate module found: '{$record->id}' - '{$uid}'!");
+                continue;
+            }
+
+            $this->modules[$uid] = $record;
+        }
+        $rs->close();
+    }
+
+    /**
+     * Grabs a list of matches from last year.
+     */
+    private function build_matches() {
+        $mergers = $this->get_csv_data();
+
+        foreach ($mergers as $merger) {
+            $code = $merger[0];
+            $version = $merger[1];
+            $weekbeginning = $merger[2];
+            $length = $merger[3];
+            $campusid = $merger[4];
+            $parentid = $merger[5];
+
+            $uid = $this->get_uid($code, $version, $weekbeginning, $length, $campusid);
+
+            if (isset($this->mergers[$uid])) {
+                $this->error("Error: duplicate module '{$uid}'!");
+                continue;
+            }
+
+            $this->mergers[$uid] = $parentid;
+        }
     }
 
     /**
@@ -355,51 +407,6 @@ SQL;
      */
     private function get_uid($code, $version, $weekbeginning, $length, $campusid) {
         return $code . "_" . $version . "_" . $weekbeginning . "_" . $length . "_" . $campusid;
-    }
-
-    /**
-     * Grabs a list of courses.
-     */
-    private function build_modules() {
-        global $DB;
-
-        $rs = $DB->get_recordset('connect_course');
-        foreach ($rs as $record) {
-            $uid = $this->get_uid($record->module_code, $record->module_version, $record->module_week_beginning,
-                                  $record->module_length, $record->campusid);
-            if (isset($this->modules[$uid])) {
-                $this->error("Duplicate module found: '{$record->id}' - '{$uid}'!");
-                continue;
-            }
-
-            $this->modules[$uid] = $record;
-        }
-        $rs->close();
-    }
-
-    /**
-     * Grabs a list of matches from last year.
-     */
-    private function build_matches() {
-        $mergers = $this->get_csv_data();
-
-        foreach ($mergers as $merger) {
-            $code = $merger[0];
-            $version = $merger[1];
-            $weekbeginning = $merger[2];
-            $length = $merger[3];
-            $campusid = $merger[4];
-            $parentid = $merger[5];
-
-            $uid = $this->get_uid($code, $version, $weekbeginning, $length, $campusid);
-
-            if (isset($this->mergers[$uid])) {
-                $this->error("Error: duplicate module '{$uid}'!");
-                continue;
-            }
-
-            $this->mergers[$uid] = $parentid;
-        }
     }
 
     /**
