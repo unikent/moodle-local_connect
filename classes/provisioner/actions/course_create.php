@@ -49,6 +49,6 @@ class course_create extends base
 	 * toString override.
 	 */
 	public function __toString() {
-		return "Create course: " . $this->_data['shortname'] . ".\n" . parent::__toString();
+		return "create course '" . $this->_data->module_code . "'" . parent::__toString();
 	}
 }

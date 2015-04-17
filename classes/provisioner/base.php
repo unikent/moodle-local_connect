@@ -55,13 +55,9 @@ class base
 		$sorter = new course_sorter();
 		$lists = $sorter->get_lists();
 		
-		foreach ($lists as $key => $array) {
-			$cnt = count($array);
-			echo "<p>$key has $cnt items.</p>";
-
-			if ($key == 'uncategorised') {
-				print_r($array);
-			}
+		// Create simple build actions for all courses that are unique.
+		foreach ($lists['unique'] as $course) {
+			$this->_tree->add_child(new actions\course_create($course));
 		}
 	}
 
