@@ -612,7 +612,6 @@ class course extends data
         return true;
     }
 
-
     /**
      * Link a course to this course
      * @param unknown $target
