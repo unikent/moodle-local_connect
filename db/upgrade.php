@@ -841,5 +841,27 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015031700, 'local', 'connect');
     }
 
+    if ($oldversion < 2015041700) {
+        // Define table connect_rules to be dropped.
+        $table = new xmldb_table('connect_rules');
+
+        // Conditionally launch drop table for connect_rules.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Define field department to be added to connect_course.
+        $table = new xmldb_table('connect_course');
+        $field = new xmldb_field('department', XMLDB_TYPE_INTEGER, '11', null, null, null, null, 'category');
+
+        // Conditionally launch add field department.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2015041700, 'local', 'connect');
+    }
+
     return true;
 }

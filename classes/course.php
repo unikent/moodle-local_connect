@@ -57,7 +57,7 @@ class course extends data
         return array(
             "id", "mid", "module_delivery_key", "session_code", "module_version", "credit_level",
             "campusid", "module_week_beginning", "module_length", "week_beginning_date",
-            "module_title", "module_code", "synopsis", "category", "deleted"
+            "module_title", "module_code", "synopsis", "category", "department", "deleted"
         );
     }
 
@@ -65,7 +65,7 @@ class course extends data
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
-        return array("id", "module_delivery_key", "session_code", "credit_level", "deleted");
+        return array("id", "module_delivery_key", "session_code", "credit_level", "department", "deleted");
     }
 
     /**
@@ -118,6 +118,10 @@ class course extends data
      * Get my siblings.
      */
     public function get_siblings() {
+        if (empty($this->mid)) {
+            return array();
+        }
+
         if (!isset($this->_siblings)) {
             $this->_siblings = static::get_by('mid', $this->mid, true);
         }
@@ -536,8 +540,7 @@ class course extends data
 
         // Check we have a category.
         if (empty($this->category)) {
-            \local_connect\util\helpers::error("No category set for course: '{$this->id}'!");
-            return false;
+            $this->map_category();
         }
 
         // Grab shortname.
@@ -591,12 +594,11 @@ class course extends data
         $this->create_forum();
 
         // Fire the event.
-        $params = array(
+        $event = \local_connect\event\course_created::create(array(
             'objectid' => $this->id,
             'courseid' => $this->mid,
             'context' => \context_course::instance($this->mid)
-        );
-        $event = \local_connect\event\course_created::create($params);
+        ));
         $event->trigger();
 
         // Sync our enrolments.
@@ -608,6 +610,34 @@ class course extends data
         return true;
     }
 
+    /**
+     * Map this course to a category.
+     */
+    public function map_category() {
+        global $DB;
+
+        $map = category::get_map_table();
+        foreach ($map as $entry) {
+            if ($entry['department'] != $this->department) {
+                continue;
+            }
+
+            if (isset($entry['rule']) && !strpos($this->module_code, $entry['rule']) !== 0) {
+                continue;
+            }
+
+            // Yes please :)
+            $category = $DB->get_record('course_categories', array(
+                'idnumber' => $entry['idnumber']
+            ));
+            if ($category) {
+                $this->category = $category->id;
+                return;
+            }
+        }
+
+        $this->category = 1;
+    }
 
     /**
      * Link a course to this course

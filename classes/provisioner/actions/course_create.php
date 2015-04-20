@@ -14,31 +14,41 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_connect\provisioner\actions;
+
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * Moodle provisioner.
- * 
- * @package    local_connect
- * @copyright  2015 Skylar Kelty <S.Kelty@kent.ac.uk>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Moodle provisioning toolkit.
+ * Create course action.
+ *
+ * @since Moodle 2015
  */
+class course_create extends base
+{
+	private $_course;
 
-define('CLI_SCRIPT', true);
+	/**
+	 * Constructor.
+	 */
+	public function __construct($course) {
+		parent::__construct();
 
-require(dirname(__FILE__) . '/../../../config.php');
-require_once($CFG->libdir . '/clilib.php');
+		$this->_course = $course;
+	}
 
-raise_memory_limit(MEMORY_HUGE);
+	/**
+	 * Execute this action.
+	 */
+	public function execute() {
+		$this->_course->create_in_moodle();
+		parent::execute();
+	}
 
-$username = exec('logname');
-$user = $DB->get_record('user', array(
-    'username' => $username
-));
-
-if (!$user) {
-	$user = get_admin();
+	/**
+	 * toString override.
+	 */
+	public function __toString() {
+		return "create course '" . $this->_course->module_code . "'" . parent::__toString();
+	}
 }
-
-\core\session\manager::set_user($user);
-
-$provisioner = new \local_connect\provisioner\base();
-$provisioner->execute();

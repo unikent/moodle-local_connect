@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/connect/db" VERSION="20150317" COMMENT="XMLDB file for Connect module"
+<XMLDB PATH="local/connect/db" VERSION="20150417" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -74,6 +74,7 @@
         <FIELD NAME="credit_level" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="synopsis" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="category" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="department" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -117,21 +118,6 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="connect_rules" COMMENT="Connect Rulesets">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="prefix" TYPE="char" LENGTH="25" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="category" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="weight" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="50" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="prefix" TYPE="unique" FIELDS="prefix"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="index_category" UNIQUE="false" FIELDS="category"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="connect_course_locks" COMMENT="Course lock status for Connect">
