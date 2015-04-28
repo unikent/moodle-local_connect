@@ -709,10 +709,10 @@ var Connect = (function() {
 
 		$.ajax({
 			type: 'POST',
-			url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/schedule/',
+			url: M.cfg.wwwroot + '/local/connect/proxy.php',
 			contentType: 'application/json',
 			dataType: 'json',
-			data: JSON.stringify({'courses': data }),
+			data: JSON.stringify({'courses': data, 'action': 'schedule' }),
 			success: function (data, status, xhr) {
 				button.stop();
 				_this.buttons.rowsEl.removeClass('row_selected');
@@ -888,17 +888,18 @@ var Connect = (function() {
           }
 
 					var data = {
-						link_courses: _this.selectedDeliveries,
-						code: short_name,
-						title: full_name,
-						synopsis: synopsis,// + " <a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/"+ mod_code +"'>More</a>",
-						category: _this.formEl.cat.val(),
-						primary_child: _this.formEl.primary_child.val()
+						'action': 'merge',
+						'link_courses': _this.selectedDeliveries,
+						'code': short_name,
+						'title': full_name,
+						'synopsis': synopsis,
+						'category': _this.formEl.cat.val(),
+						'primary_child': _this.formEl.primary_child.val()
 					};
 
 					$.ajax({
 						type: 'POST',
-						url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/merge/',
+						url: M.cfg.wwwroot + '/local/connect/proxy.php',
 						contentType: 'json',
 						dataType: 'json',
 						data: JSON.stringify(data),
@@ -997,10 +998,10 @@ var Connect = (function() {
 		$(el).removeClass('unlink_row').addClass('ajax_loading');
 		$.ajax({
 			type: 'POST',
-			url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/disengage/',
+			url: M.cfg.wwwroot + '/local/connect/proxy.php',
 			dataType: 'json',
 			contentType: 'json',
-			data: JSON.stringify({ 'courses' : course_data }),
+			data: JSON.stringify({ 'courses' : course_data, 'action': 'disengage' }),
 			success: function (data, status, xhr) {
 				if(_this.oTable.fnIsOpen(row[0])) {
 					row.removeClass('close').addClass('open');
@@ -1054,10 +1055,10 @@ var Connect = (function() {
 
 		$.ajax({
 			type: 'POST',
-			url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/unlink/',
+			url: M.cfg.wwwroot + '/local/connect/proxy.php',
 			dataType: 'json',
 			contentType: 'json',
-			data: JSON.stringify({ 'courses' : [ id ] }),
+			data: JSON.stringify({ 'courses' : [ id ], 'action': 'unlink' }),
 			success: function () {
 
 				var data = [
