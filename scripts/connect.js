@@ -56,7 +56,7 @@ var Connect = (function() {
 
 				toolbar += '<div class="unlink_row toolbar_link"></div>'
 				//toolbar += '<div class="edit_row toolbar_link"></div>'
-				toolbar += '<a href=" '+ window.coursepageUrl + '/course/view.php?id='+ val.mid +'" target="_blank" class="created_link toolbar_link"></a>';
+				toolbar += '<a href=" '+ M.cfg.wwwroot + '/course/view.php?id='+ val.mid +'" target="_blank" class="created_link toolbar_link"></a>';
 				
 			} else {
 				var prod = _.find( existing_courses, function(e) { return e == val.module_code; } );
@@ -709,7 +709,7 @@ var Connect = (function() {
 
 		$.ajax({
 			type: 'POST',
-			url: window.dapageUrl + '/courses/schedule/',
+			url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/schedule/',
 			contentType: 'application/json',
 			dataType: 'json',
 			data: JSON.stringify({'courses': data }),
@@ -898,7 +898,7 @@ var Connect = (function() {
 
 					$.ajax({
 						type: 'POST',
-						url: window.dapageUrl + '/courses/merge/',
+						url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/merge/',
 						contentType: 'json',
 						dataType: 'json',
 						data: JSON.stringify(data),
@@ -997,7 +997,7 @@ var Connect = (function() {
 		$(el).removeClass('unlink_row').addClass('ajax_loading');
 		$.ajax({
 			type: 'POST',
-			url: window.dapageUrl + '/courses/disengage/',
+			url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/disengage/',
 			dataType: 'json',
 			contentType: 'json',
 			data: JSON.stringify({ 'courses' : course_data }),
@@ -1054,7 +1054,7 @@ var Connect = (function() {
 
 		$.ajax({
 			type: 'POST',
-			url: window.dapageUrl + '/courses/unlink/',
+			url: M.cfg.wwwroot + '/local/connect/proxy.php/courses/unlink/',
 			dataType: 'json',
 			contentType: 'json',
 			data: JSON.stringify({ 'courses' : [ id ] }),

@@ -183,11 +183,6 @@ HTML5;
 		    </p>
 		</div>
 		<div id="dialog_error">$connecterror</div>
-		<script type="text/javascript">
-		       window.dapageUrl = '$CFG->wwwroot/local/connect/proxy.php';
-		       window.coursepageUrl = '$CFG->wwwroot';
-		       window.enableConnectAdvanced = true;
-		</script>
 HTML5;
 	}
 }
