@@ -145,15 +145,13 @@ HTML5;
 
 		// Our categories.
 		$catoptions = '';
-		foreach ($categories as $perm) {
-		    list($id, $name) = $perm;
+		foreach ($categories as $id => $name) {
 		    $catoptions .= '<option value="'.$id.'">'.$name.'</option>';
 		}
 
 		$connecterror = get_string('connect_error', 'local_connect');
 
 		echo <<<HTML5
-
 		<div id="dialog-form" title="Edit details">
 		    <div id="edit_notifications"></div>
 		    <form>
