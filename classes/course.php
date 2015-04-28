@@ -884,43 +884,6 @@ class course extends data
         return $result;
     }
 
-
-    /**
-     * Disenguage a list of courses.
-     * This is a hangover from the old UI.
-     * 
-     * @param unknown $data
-     * @return unknown
-     */
-    public static function disengage_all($data) {
-        $response = array();
-
-        foreach ($data->courses as $course) {
-            // Try to find the Connect version of the course.
-            $obj = self::get($course);
-            if (!$obj) {
-                $response[] = array(
-                    'error_code' => 'does_not_exist',
-                    'id' => $course
-                );
-                continue;
-            }
-
-            // Make sure this was in Moodle.
-            if (!$obj->is_in_moodle()) {
-                $response[] = array(
-                    'error_code' => 'not_created_in_moodle',
-                    'id' => $course
-                );
-                continue;
-            }
-
-            $obj->delete();
-        }
-
-        return $response;
-    }
-
     /**
      * Schedule a group of courses.
      * This is a hangover from the old UI.
@@ -928,12 +891,12 @@ class course extends data
      * @param unknown $data
      * @return unknown
      */
-    public static function schedule_all($data) {
+    public static function schedule_all($courses) {
         global $DB;
 
         $response = array();
 
-        foreach ($data->courses as $course) {
+        foreach ($courses as $course) {
             // Try to find the Connect version of the course.
             $obj = self::get($course->id);
             if (!$obj) {
@@ -1009,16 +972,10 @@ class course extends data
      * @param unknown $input
      * @return unknown
      */
-    public static function process_merge($input) {
-        $courses = array();
-        foreach ($input->link_courses as $lc) {
-            $course = self::get($lc);
-            if ($course) {
-                $courses[] = $course;
-            } else {
-                return array('error_code' => 'invalid_course');
-            }
-        }
+    public static function process_merge($courses) {
+        $courses = array_map(function($course) {
+            return self::get($course);
+        }, $courses);
 
         $primary = $courses[0];
         foreach ($courses as $course) {
@@ -1040,23 +997,6 @@ class course extends data
         foreach ($courses as $child) {
             if (!$primary->add_child($child)) {
                 \local_connect\util\helpers::error("Could not add child '$child' to course: $primary");
-            }
-        }
-
-        return array();
-    }
-
-    /**
-     *
-     * @param unknown $in
-     * @return unknown
-     */
-    public static function process_unlink($in) {
-        foreach ($in as $c) {
-            $course = self::get($c);
-            // All good!
-            if (!$course->unlink()) {
-                \local_connect\util\helpers::error("Could not remove child '$course'!");
             }
         }
 

@@ -36,33 +36,33 @@ if (!\local_connect\util\helpers::can_course_manage()) {
 }
 
 $action = required_param('action', PARAM_ALPHA);
-
-$input = json_decode(file_get_contents('php://input'));
-if ($input == null) {
-    header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Entity');
-    die;
-}
-
 switch ($action) {
     case 'schedule':
-        $result = \local_connect\course::schedule_all($input);
-        if (is_array($result) && isset($result['error_code'])) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 422');
-        } else {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 204 Created');
-        }
+        $courses = required_param('courses', PARAM_RAW);
+        $courses = json_decode($courses);
+
+        $result = \local_connect\course::schedule_all($courses);
+
         echo $OUTPUT->header();
         echo json_encode($result);
     break;
 
     case 'disengage':
-        $result = \local_connect\course::disengage_all($input);
+        $course = required_param('course', PARAM_INT);
+        $obj = \local_connect\course::get($course);
+        if ($obj) {
+            $obj->delete();
+        }
+
         echo $OUTPUT->header();
-        echo json_encode($result);
+        echo json_encode(array('result' => 'success'));
     break;
 
     case 'merge':
-        $result = \local_connect\course::process_merge($input);
+        $courses = required_param('courses', PARAM_RAW);
+        $courses = json_decode($courses);
+
+        $result = \local_connect\course::process_merge($courses);
         if (is_array($result) && isset($result['error_code'])) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 422');
         } else {
@@ -74,8 +74,13 @@ switch ($action) {
     break;
 
     case 'unlink':
-        $result = \local_connect\course::process_unlink($input->courses);
+        $course = required_param('course', PARAM_INT);
+        $obj = \local_connect\course::get($course);
+        if ($obj) {
+            $obj->unlink();
+        }
+
         echo $OUTPUT->header();
-        echo json_encode($result);
+        echo json_encode(array('result' => 'success'));
     break;
 }

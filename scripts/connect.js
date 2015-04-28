@@ -708,11 +708,14 @@ var Connect = (function() {
 		var _this = this;
 
 		$.ajax({
-			type: 'POST',
+			method: 'POST',
+			cache: false,
 			url: M.cfg.wwwroot + '/local/connect/proxy.php',
-			contentType: 'application/json',
+			data: {
+				action: 'schedule',
+				courses: JSON.stringify(data)
+			},
 			dataType: 'json',
-			data: JSON.stringify({'courses': data, 'action': 'schedule' }),
 			success: function (data, status, xhr) {
 				button.stop();
 				_this.buttons.rowsEl.removeClass('row_selected');
@@ -876,43 +879,35 @@ var Connect = (function() {
 						short_name += ' ' + $('#shortname_ext').val();
 					}
 
-          if(!_.isEmpty($('#shortname_ext').val())) {
+					if (!_.isEmpty($('#shortname_ext').val())) {
 						short_name += ' ' + $('#shortname_ext').val();
-          }
+					}
 
-          // get full name and check it's ok (pretty lame check)
-          full_name = _this.formEl.fullName.val();
+					// get full name and check it's ok (pretty lame check)
+					full_name = _this.formEl.fullName.val();
 
-          if (_.isEmpty(full_name)) {
-          	return alert('Please enter a full name');
-          }
-
-					var data = {
-						'action': 'merge',
-						'link_courses': _this.selectedDeliveries,
-						'code': short_name,
-						'title': full_name,
-						'synopsis': synopsis,
-						'category': _this.formEl.cat.val(),
-						'primary_child': _this.formEl.primary_child.val()
-					};
+					if (_.isEmpty(full_name)) {
+						return alert('Please enter a full name');
+					}
 
 					$.ajax({
 						type: 'POST',
 						url: M.cfg.wwwroot + '/local/connect/proxy.php',
-						contentType: 'json',
 						dataType: 'json',
-						data: JSON.stringify(data),
+						data: {
+							action: 'merge',
+							courses: JSON.stringify(_this.selectedDeliveries)
+						},
 						success: function () {
 							ui_sub.stop();
 							_this.buttons.rowsEl.removeClass('row_selected');
 							_this.buttons.mergeBtn.removeClass('loading');
 							$(_this.selectedDeliveries).each(function(index) {
 								var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[index]+']');
-                if (row.length > 0) {
-                  var aPos = _this.oTable.fnGetPosition(row[0]);
-                  _this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
-                }
+								if (row.length > 0) {
+									var aPos = _this.oTable.fnGetPosition(row[0]);
+									_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
+								}
 							})
 
 							_this.oTable.fnDraw();
@@ -929,22 +924,8 @@ var Connect = (function() {
 
 							_this.clear_ui_form()
 							$("#dialog-form").dialog("close");
-
-							//button.stop();
-							//button.updateText('Success');
-							//_this.buttons.mergeBtn.addClass('success');
-							//clearTimeout(_this.merge_timeout);
-							//_this.merge_timeout = setTimeout(function() {
-							//	_this.buttons.mergeBtn.removeClass('success').prop('disabled', true);
-							//	_this.processRowSelect();
-							//}, 4000);
-
-
 						},
 						error: function(xhr, request, settings) {
-
-							console.log(xhr);
-
 							var problems = xhr.responseText.length == 0 ? null : JSON.parse(xhr.responseText);
 
 							if (problems) {
@@ -967,14 +948,6 @@ var Connect = (function() {
 							}
 
 							ui_sub.stop();
-							// $(ui.element[0]).removeClass('loading');
-							// ui.updateText('Error');
-							// $(ui.element[0]).addClass('error');
-							// clearTimeout(_this.merge_timeout);
-							// _this.merge_timeout = setTimeout(function() {
-							// 	ui_sub.updateText('<span class="ui-button-text">Push to Moodle<span>');
-							// 	$('#merge_deliveries').removeClass('error');
-							// }, 4000);
 						}
 					});								 										 	
 				},
@@ -992,16 +965,16 @@ var Connect = (function() {
 
 		var id = $(el).closest('tr').attr('ident');
 
-		var course_data = [ id ];
-
 		var row = $(el).closest('tr');
 		$(el).removeClass('unlink_row').addClass('ajax_loading');
 		$.ajax({
 			type: 'POST',
 			url: M.cfg.wwwroot + '/local/connect/proxy.php',
 			dataType: 'json',
-			contentType: 'json',
-			data: JSON.stringify({ 'courses' : course_data, 'action': 'disengage' }),
+			data: {
+				action: 'disengage',
+				course: id
+			},
 			success: function (data, status, xhr) {
 				if(_this.oTable.fnIsOpen(row[0])) {
 					row.removeClass('close').addClass('open');
@@ -1057,8 +1030,10 @@ var Connect = (function() {
 			type: 'POST',
 			url: M.cfg.wwwroot + '/local/connect/proxy.php',
 			dataType: 'json',
-			contentType: 'json',
-			data: JSON.stringify({ 'courses' : [ id ], 'action': 'unlink' }),
+			data: {
+				action: 'unlink',
+				course: id,
+			},
 			success: function () {
 
 				var data = [
@@ -1099,11 +1074,7 @@ var Connect = (function() {
 			this.formEl.shortNameExt.val('');
 		}
 	};
-/*
-	Connect.prototype.clear_primary_child = function() {
-		this.formEl.primary_child.val('');
-	};
-*/
+
 	$.fn.dataTableExt.oApi.fnGetFilteredNodes = function ( oSettings )
 	{
 		var anRows = [];
