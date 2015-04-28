@@ -559,6 +559,7 @@ class course extends data
             $obj->category = $this->category;
             $obj->shortname = $shortname;
             $obj->fullname = $this->fullname;
+            $obj->format = 'standardweeks';
             $obj->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
             $obj->visible = 0;
 
@@ -580,18 +581,10 @@ class course extends data
         $this->save();
 
         // Add in sections.
-        $DB->set_field('course_sections', 'name', $this->module_title, array (
+        $DB->set_field('course_sections', 'name', "{$shortname}: {$this->module_title}", array (
             'course' => $this->mid,
             'section' => 0
         ));
-
-        // Add the reading list module to our course if it is based in Canterbury.
-        if ($this->campus->name === 'Canterbury') {
-            $this->create_reading_list();
-        }
-
-        // Add a news forum to the course.
-        $this->create_forum();
 
         // Fire the event.
         $event = \local_connect\event\course_created::create(array(
@@ -661,59 +654,6 @@ class course extends data
 
         return true;
     }
-
-    /**
-     * Add reading list module to this course
-     */
-    private function create_reading_list() {
-        global $DB;
-
-        $module = $DB->get_record('modules', array(
-            'name' => 'aspirelists'
-        ));
-
-        // Create a data container.
-        $rl = new \stdClass();
-        $rl->course     = $this->mid;
-        $rl->name       = 'Reading list';
-        $rl->intro      = '';
-        $rl->introformat  = 1;
-        $rl->category     = 'all';
-        $rl->timemodified = time();
-
-        // Create the instance.
-        $instance = aspirelists_add_instance($rl, new \stdClass());
-
-        // Find the first course section.
-        $section = $DB->get_record_sql("SELECT id, sequence FROM {course_sections} WHERE course=:cid AND section=0", array(
-            'cid' => $this->mid
-        ));
-
-        // Create a module container.
-        $cm = new \stdClass();
-        $cm->course     = $this->mid;
-        $cm->module     = $module->id;
-        $cm->instance   = $instance;
-        $cm->section    = $section->id;
-        $cm->visible    = 1;
-
-        // Create the module.
-        $coursemodule = add_course_module($cm);
-
-        // Add it to the section.
-        $DB->set_field('course_sections', 'sequence', "$coursemodule,$section->sequence", array(
-            'id' => $section->id
-        ));
-    }
-
-
-    /**
-     * Add a forum module to this course
-     */
-    private function create_forum() {
-        forum_get_course_forum($this->mid, 'news');
-    }
-
 
     /**
      * Update this course in Moodle
