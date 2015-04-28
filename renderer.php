@@ -152,37 +152,28 @@ HTML5;
 		$connecterror = get_string('connect_error', 'local_connect');
 
 		echo <<<HTML5
-		<div id="dialog-form" title="Edit details">
+		<div id="dialog-form" class="bootstrap" title="Edit details">
 		    <div id="edit_notifications"></div>
 		    <form>
-		    <fieldset>
-		        <table>
-		            <tr>
-		                <td><label for="shortname">Shortname</label></td>
-		                <td>
-		                	<input type="text" disabled="disabled" name="shortname" id="shortname" class="text ui-widget-content ui-corner-all" />
-		                </td>
-		                <td id="shortname_ext_td"></td>
-		            </tr>
-		            <tr>
-		                <td><label for="fullname">Fullname</label></td>
-		                <td colspan="2">
-		                	<input type="text" name="fullname" id="fullname" value="" class="text ui-widget-content ui-corner-all"/>
-		               	</td>
-		            </tr>
-		            <tr>
-		                <td><label for="synopsis">Synopsis</label></td>
-		                <td colspan="2">
-		                	<textarea maxlength="500" name="synopsis" id="synopsis" class="text ui-widget-content ui-corner-all"></textarea>
-		                </td>
-		            </tr>
-		            <tr>
-		                <td><label for="category">Category</label></td>
-		                <td colspan="2"><select name="category" id="category">$catoptions</select></td>
-		            </tr>
-		        </table>
 		        <input type="hidden" name="primary_child" id="primary_child" value="" />
-		    </fieldset>
+				<div class="form-group">
+					<label for="shortname">Shortname</label>
+					<input type="text" class="form-control" id="shortname" name="shortname" placeholder="Shortname">
+				</div>
+				<div class="form-group">
+					<label for="fullname">Fullname</label>
+					<input type="text" class="form-control" id="fullname" name="fullname" placeholder="Fullname">
+				</div>
+				<div class="form-group">
+					<label for="synopsis">Synopsis</label>
+                	<textarea maxlength="500" name="synopsis" id="synopsis" class="form-control" rows="3"></textarea>
+				</div>
+				<div class="form-group">
+					<label for="category">Category</label>
+					<select name="category" id="category" class="form-control">
+						$catoptions
+					</select>
+				</div>
 		    </form>
 		</div>
 		<div id="dialog-confirm" title="Confirm">
