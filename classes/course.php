@@ -559,6 +559,7 @@ class course extends data
             $obj->category = $this->category;
             $obj->shortname = $shortname;
             $obj->fullname = $this->fullname;
+            $obj->format = 'standardweeks';
             $obj->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
             $obj->visible = 0;
 
@@ -580,18 +581,10 @@ class course extends data
         $this->save();
 
         // Add in sections.
-        $DB->set_field('course_sections', 'name', $this->module_title, array (
+        $DB->set_field('course_sections', 'name', "{$shortname}: {$this->module_title}", array (
             'course' => $this->mid,
             'section' => 0
         ));
-
-        // Add the reading list module to our course if it is based in Canterbury.
-        if ($this->campus->name === 'Canterbury') {
-            $this->create_reading_list();
-        }
-
-        // Add a news forum to the course.
-        $this->create_forum();
 
         // Fire the event.
         $event = \local_connect\event\course_created::create(array(
@@ -661,59 +654,6 @@ class course extends data
 
         return true;
     }
-
-    /**
-     * Add reading list module to this course
-     */
-    private function create_reading_list() {
-        global $DB;
-
-        $module = $DB->get_record('modules', array(
-            'name' => 'aspirelists'
-        ));
-
-        // Create a data container.
-        $rl = new \stdClass();
-        $rl->course     = $this->mid;
-        $rl->name       = 'Reading list';
-        $rl->intro      = '';
-        $rl->introformat  = 1;
-        $rl->category     = 'all';
-        $rl->timemodified = time();
-
-        // Create the instance.
-        $instance = aspirelists_add_instance($rl, new \stdClass());
-
-        // Find the first course section.
-        $section = $DB->get_record_sql("SELECT id, sequence FROM {course_sections} WHERE course=:cid AND section=0", array(
-            'cid' => $this->mid
-        ));
-
-        // Create a module container.
-        $cm = new \stdClass();
-        $cm->course     = $this->mid;
-        $cm->module     = $module->id;
-        $cm->instance   = $instance;
-        $cm->section    = $section->id;
-        $cm->visible    = 1;
-
-        // Create the module.
-        $coursemodule = add_course_module($cm);
-
-        // Add it to the section.
-        $DB->set_field('course_sections', 'sequence', "$coursemodule,$section->sequence", array(
-            'id' => $section->id
-        ));
-    }
-
-
-    /**
-     * Add a forum module to this course
-     */
-    private function create_forum() {
-        forum_get_course_forum($this->mid, 'news');
-    }
-
 
     /**
      * Update this course in Moodle
@@ -944,43 +884,6 @@ class course extends data
         return $result;
     }
 
-
-    /**
-     * Disenguage a list of courses.
-     * This is a hangover from the old UI.
-     * 
-     * @param unknown $data
-     * @return unknown
-     */
-    public static function disengage_all($data) {
-        $response = array();
-
-        foreach ($data->courses as $course) {
-            // Try to find the Connect version of the course.
-            $obj = self::get($course);
-            if (!$obj) {
-                $response[] = array(
-                    'error_code' => 'does_not_exist',
-                    'id' => $course
-                );
-                continue;
-            }
-
-            // Make sure this was in Moodle.
-            if (!$obj->is_in_moodle()) {
-                $response[] = array(
-                    'error_code' => 'not_created_in_moodle',
-                    'id' => $course
-                );
-                continue;
-            }
-
-            $obj->delete();
-        }
-
-        return $response;
-    }
-
     /**
      * Schedule a group of courses.
      * This is a hangover from the old UI.
@@ -988,12 +891,12 @@ class course extends data
      * @param unknown $data
      * @return unknown
      */
-    public static function schedule_all($data) {
+    public static function schedule_all($courses) {
         global $DB;
 
         $response = array();
 
-        foreach ($data->courses as $course) {
+        foreach ($courses as $course) {
             // Try to find the Connect version of the course.
             $obj = self::get($course->id);
             if (!$obj) {
@@ -1069,16 +972,10 @@ class course extends data
      * @param unknown $input
      * @return unknown
      */
-    public static function process_merge($input) {
-        $courses = array();
-        foreach ($input->link_courses as $lc) {
-            $course = self::get($lc);
-            if ($course) {
-                $courses[] = $course;
-            } else {
-                return array('error_code' => 'invalid_course');
-            }
-        }
+    public static function process_merge($courses) {
+        $courses = array_map(function($course) {
+            return self::get($course);
+        }, $courses);
 
         $primary = $courses[0];
         foreach ($courses as $course) {
@@ -1100,23 +997,6 @@ class course extends data
         foreach ($courses as $child) {
             if (!$primary->add_child($child)) {
                 \local_connect\util\helpers::error("Could not add child '$child' to course: $primary");
-            }
-        }
-
-        return array();
-    }
-
-    /**
-     *
-     * @param unknown $in
-     * @return unknown
-     */
-    public static function process_unlink($in) {
-        foreach ($in as $c) {
-            $course = self::get($c);
-            // All good!
-            if (!$course->unlink()) {
-                \local_connect\util\helpers::error("Could not remove child '$course'!");
             }
         }
 
