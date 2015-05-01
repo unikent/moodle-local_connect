@@ -43,6 +43,7 @@ $catpermissions = kent_get_connect_course_categories();
 $PAGE->set_context($sitecontext);
 $PAGE->set_url('/local/connect/index.php');
 $PAGE->set_pagelayout('datool');
+$PAGE->set_title("Departmental administration");
 
 // JQuery.
 $PAGE->requires->jquery();
