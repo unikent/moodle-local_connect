@@ -455,8 +455,7 @@ class course extends data
 
         $expected = $this->is_in_moodle() ? 1 : 0;
         return $expected === $DB->count_records('course', array(
-            'shortname' => $shortname,
-            'deleted' => '0'
+            'shortname' => $shortname
         ));
     }
 
