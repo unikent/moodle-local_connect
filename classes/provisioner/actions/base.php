@@ -69,9 +69,20 @@ class base
 	 * Execute this action.
 	 */
 	public function execute() {
+		$total = count($this->_children);
+		$i = 0;
 		foreach ($this->_children as $child) {
 			$child->execute();
+
+			$percent = ($i / $total) * 100;
+			if ($percent % 10 === 0) {
+				echo "{$percent}%...";
+			}
+
+			$i++;
 		}
+
+		echo "\n";
 	}
 
 	/**
