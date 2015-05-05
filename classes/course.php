@@ -384,7 +384,7 @@ class course extends data
      */
     public function is_unique() {
         global $DB;
-        return $DB->count_records('connect_course', array('module_code' => $this->module_code)) === 1;
+        return $DB->count_records('connect_course', array('module_code' => $this->module_code, 'deleted' => '0')) === 1;
     }
 
     /**
@@ -444,7 +444,8 @@ class course extends data
         // If in strict mode, we check against connect as well.
         if ($strict) {
             $count = $DB->count_records('connect_course', array(
-                "module_code" => $shortname
+                'module_code' => $shortname,
+                'deleted' => '0'
             ));
 
             if ($count > 1) {
@@ -454,7 +455,8 @@ class course extends data
 
         $expected = $this->is_in_moodle() ? 1 : 0;
         return $expected === $DB->count_records('course', array(
-            "shortname" => $shortname
+            'shortname' => $shortname,
+            'deleted' => '0'
         ));
     }
 
@@ -800,7 +802,7 @@ class course extends data
     public function count_all() {
         global $DB;
 
-        return $DB->count_records("connect_enrolments", array(
+        return $DB->count_records('connect_enrolments', array(
             'courseid' => $this->id
         ));
     }
