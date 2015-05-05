@@ -536,7 +536,7 @@ class course extends data
      * @param string $shortnameext (optional)
      * @return boolean
      */
-    public function create_in_moodle() {
+    public function create_in_moodle($fast = false) {
         global $DB, $USER;
 
         // Check we have a category.
@@ -595,11 +595,20 @@ class course extends data
         ));
         $event->trigger();
 
-        // Sync our enrolments.
-        $this->sync_enrolments();
+        if ($fast) {
+            // Schedule an adhoc task to sync this course.
+            $task = new \local_connect\task\course_fast_sync();
+            $task->set_custom_data(array(
+                'courseid' => $this->id
+            ));
+            \core\task\manager::queue_adhoc_task($task);
+        } else {
+            // Sync our enrolments.
+            $this->sync_enrolments();
 
-        // Sync our groups.
-        $this->sync_groups();
+            // Sync our groups.
+            $this->sync_groups();
+        }
 
         return true;
     }
