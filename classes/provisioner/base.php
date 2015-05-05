@@ -52,8 +52,6 @@ class base
 	 * This is the main method.
 	 */
 	private function build_tree() {
-		gc_disable();
-
 		$sorter = new course_sorter();
 		$lists = $sorter->get_lists();
 		
@@ -77,9 +75,6 @@ class base
 				$this->_tree->add_child(new actions\course_create($course));
 			}
 		}
-
-		gc_enable();
-		gc_collect_cycles();
 	}
 
 	/**
