@@ -38,8 +38,10 @@ class course_fast_sync extends \core\task\adhoc_task
 
         // Grab the course.
         $course = \local_connect\course::get($data['courseid']);
-        $course->sync_enrolments();
-        $course->sync_groups();
+        if ($course) {
+            $course->sync_enrolments();
+            $course->sync_groups();
+        }
     }
 
     /**
