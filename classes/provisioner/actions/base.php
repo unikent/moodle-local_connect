@@ -69,8 +69,23 @@ class base
 	 * Execute this action.
 	 */
 	public function execute() {
+		$total = count($this->_children);
+		$i = 0;
+		$lastout = -1;
 		foreach ($this->_children as $child) {
 			$child->execute();
+
+			$percent = floor(($i / $total) * 100);
+			if ($percent % 10 === 0 && $percent != $lastout) {
+				echo "{$percent}%...";
+				$lastout = $percent;
+			}
+
+			$i++;
+		}
+
+		if ($i > 0) {
+			echo "\n";
 		}
 	}
 
