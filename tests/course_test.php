@@ -231,13 +231,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $course2 = \local_connect\course::get($this->generate_course());
         $this->assertEquals(2, count(\local_connect\course::get_all()));
 
-        $result = \local_connect\course::process_merge(array(
-            'code' => "TST",
-            'title' => "TEST MERGE",
-            'synopsis' => "This is a test",
-            'category' => 1,
-            'link_courses' => array($course1->id, $course2->id)
-        ));
+        $result = \local_connect\course::process_merge(array($course1->id, $course2->id));
 
         $this->assertEquals(array(), $result);
 
