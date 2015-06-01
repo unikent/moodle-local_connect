@@ -81,17 +81,33 @@ class base
 	 * Get the term from dates.
 	 */
 	public static function get_term($course) {
-        if ($course->module_week_beginning == 1) {
-            return "AUT";
-        }
+		if ($course->module_length == 12) {
+	        if ($course->module_week_beginning >= 24) {
+	            return "SUM";
+	        }
 
-        if ($course->module_week_beginning >= 12) {
-            return "SPR";
-        }
+	        if ($course->module_week_beginning >= 12) {
+	            return "SPR";
+	        }
 
-        if ($course->module_week_beginning >= 24) {
-            return "SUM";
-        }
+	        if ($course->module_week_beginning >= 1) {
+	            return "AUT";
+	        }
+	    }
+
+		if ($course->module_length == 24) {
+	        if ($course->module_week_beginning >= 24) {
+	            return "SUM/AUT";
+	        }
+
+	        if ($course->module_week_beginning >= 12) {
+	            return "SPR/SUM";
+	        }
+
+	        if ($course->module_week_beginning >= 1) {
+	            return "AUT/SPR";
+	        }
+		}
 
         return "UNK";
 	}
