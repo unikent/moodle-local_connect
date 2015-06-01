@@ -25,104 +25,104 @@ defined('MOODLE_INTERNAL') || die();
  */
 class base
 {
-	/**
-	 * List of actions.
-	 * @internal
-	 */
-	private $_tree;
+    /**
+     * List of actions.
+     * @internal
+     */
+    private $_tree;
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->_tree = new actions\base();
+    /**
+     * Constructor.
+     */
+    public function __construct() {
+        $this->_tree = new actions\base();
 
-		$this->build_tree();
-	}
+        $this->build_tree();
+    }
 
-	/**
-	 * Get a list of actions.
-	 */
-	public function get_actions() {
-		return $this->_tree;
-	}
+    /**
+     * Get a list of actions.
+     */
+    public function get_actions() {
+        return $this->_tree;
+    }
 
-	/**
-	 * Build the action tree.
-	 * This is the main method.
-	 */
-	private function build_tree() {
-		$sorter = new course_sorter();
-		$lists = $sorter->get_lists();
-		
-		// Create simple build actions for all courses that are unique.
-		foreach ($lists['unique'] as $course) {
-			$course = \local_connect\course::from_sql_result($course);
-	        if ($course->is_unique_shortname($course->shortname, true)) {
-				$this->_tree->add_child(new actions\course_create($course));
-			} else {
-				debugging("{$course->id} was marked as unique.. but wasnt.");
-			}
-		}
-		
-		// Create mostly-simple build actions for all courses that are term-spanned.
-		foreach ($lists['term-span'] as $course) {
-			$course = \local_connect\course::from_sql_result($course);
-			$shortnameext = $this->get_shortnameext($course);
+    /**
+     * Build the action tree.
+     * This is the main method.
+     */
+    private function build_tree() {
+        $sorter = new course_sorter();
+        $lists = $sorter->get_lists();
+
+        // Create simple build actions for all courses that are unique.
+        foreach ($lists['unique'] as $course) {
+            $course = \local_connect\course::from_sql_result($course);
+            if ($course->is_unique_shortname($course->shortname, true)) {
+                $this->_tree->add_child(new actions\course_create($course));
+            } else {
+                debugging("{$course->id} was marked as unique.. but wasnt.");
+            }
+        }
+
+        // Create mostly-simple build actions for all courses that are term-spanned.
+        foreach ($lists['term-span'] as $course) {
+            $course = \local_connect\course::from_sql_result($course);
+            $shortnameext = $this->get_shortnameext($course);
             $course->set_shortname_ext($shortnameext);
 
-	        if ($course->is_unique_shortname($course->shortname, true)) {
-				$this->_tree->add_child(new actions\course_create($course));
-			}
-		}
-	}
+            if ($course->is_unique_shortname($course->shortname, true)) {
+                $this->_tree->add_child(new actions\course_create($course));
+            }
+        }
+    }
 
-	/**
-	 * Get the term from dates.
-	 */
-	public static function get_term($course) {
-		if ($course->module_length == 12) {
-	        if ($course->module_week_beginning >= 24) {
-	            return "SUM";
-	        }
+    /**
+     * Get the term from dates.
+     */
+    public static function get_term($course) {
+        if ($course->module_length == 12) {
+            if ($course->module_week_beginning >= 24) {
+                return "SUM";
+            }
 
-	        if ($course->module_week_beginning >= 12) {
-	            return "SPR";
-	        }
+            if ($course->module_week_beginning >= 12) {
+                return "SPR";
+            }
 
-	        if ($course->module_week_beginning >= 1) {
-	            return "AUT";
-	        }
-	    }
+            if ($course->module_week_beginning >= 1) {
+                return "AUT";
+            }
+        }
 
-		if ($course->module_length == 24) {
-	        if ($course->module_week_beginning >= 24) {
-	            return "SUM/AUT";
-	        }
+        if ($course->module_length == 24) {
+            if ($course->module_week_beginning >= 24) {
+                return "SUM/AUT";
+            }
 
-	        if ($course->module_week_beginning >= 12) {
-	            return "SPR/SUM";
-	        }
+            if ($course->module_week_beginning >= 12) {
+                return "SPR/SUM";
+            }
 
-	        if ($course->module_week_beginning >= 1) {
-	            return "AUT/SPR";
-	        }
-		}
+            if ($course->module_week_beginning >= 1) {
+                return "AUT/SPR";
+            }
+        }
 
         return "UNK";
-	}
+    }
 
-	/**
-	 * Build a shortnameext.
-	 */
-	private function get_shortnameext($course) {
+    /**
+     * Build a shortnameext.
+     */
+    private function get_shortnameext($course) {
         if (strpos($course->module_code, "WSHOP") === 0) {
             return "(week " . $course->module_week_beginning . ")";
         }
 
         $term = static::get_term($course);
         if ($term != "UNK") {
-        	return $term;
+            return $term;
         }
 
         $start = $course->module_week_beginning;
@@ -130,10 +130,10 @@ class base
         return "(week {$start}-$end)";
     }
 
-	/**
-	 * Execute this plan.
-	 */
-	public function execute() {
-		$this->_tree->execute();
-	}
+    /**
+     * Execute this plan.
+     */
+    public function execute() {
+        $this->_tree->execute();
+    }
 }
