@@ -56,7 +56,9 @@ class base
         $this->_tree = new actions\base();
         $this->build_tree();
 
-        return true;
+        $this->_prepared = true;
+
+        return $this->_prepared;
     }
 
     /**
