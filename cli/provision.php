@@ -16,7 +16,7 @@
 
 /**
  * Moodle provisioner.
- * 
+ *
  * @package    local_connect
  * @copyright  2015 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -35,10 +35,15 @@ $user = $DB->get_record('user', array(
 ));
 
 if (!$user) {
-	$user = get_admin();
+    $user = get_admin();
 }
 
 \core\session\manager::set_user($user);
 
+echo "Building task tree...";
 $provisioner = new \local_connect\provisioner\base();
-$provisioner->execute();
+if ($provisioner->prepare()) {
+    echo "Done!\nExecuting... ";
+
+    $provisioner->execute();
+}

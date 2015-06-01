@@ -167,7 +167,7 @@ class course_sorter
 
     /**
      * List of MDKs that need to be merged with their parents.
-     * array([parent -> array(child, ...)], ...)
+     * array(array(parent, child), ...)
      */
     public function get_version_merges() {
         $versionspan = array();
@@ -185,7 +185,7 @@ class course_sorter
                     $versions[$id] = array();
                 }
 
-                $versions[$id][$mdk] = $course->version;
+                $versions[$id][$mdk] = $course->module_version;
             }
 
             foreach ($versions as $id => $instanceversions) {
@@ -193,22 +193,28 @@ class course_sorter
                     continue;
                 }
 
-                $parent = null;
+                // Build children.
                 $children = array();
-
                 foreach ($instanceversions as $mdk => $version) {
-                    $category = $this->get_category($mdk);
-                    if ($category !== 'uncategorised') {
-                        if (isset($parent)) {
-                            debugging("Multiple parents for {$id}.");
-                        }
-                        $parent = $this->_courses[$mdk];
-                    } else {
-                        $children[] = $this->_courses[$mdk];
+                    $course = $this->_courses[$mdk];
+                    $children[$course->id] = $course;
+                }
+
+                // Choose a parent.
+                $parent = null;
+                foreach ($children as $child) {
+                    if (!$parent || (int)$child->module_version > (int)$parent->module_version) {
+                        $parent = $child;
                     }
                 }
 
-                $versionspan[$parent] = $children;
+                // Remove parent from children.
+                unset($children[$parent->id]);
+
+                $versionspan[] = array(
+                    'parent' => $parent,
+                    'children' => array_values($children)
+                );
             }
         }
 

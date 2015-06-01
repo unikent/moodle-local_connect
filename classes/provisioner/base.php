@@ -32,12 +32,31 @@ class base
     private $_tree;
 
     /**
+     * Are we prepared?.
+     * @internal
+     */
+    private $_prepared;
+
+    /**
      * Constructor.
      */
     public function __construct() {
-        $this->_tree = new actions\base();
+        $this->_prepared = false;
+    }
 
+    /**
+     * Prepare the provisioner.
+     */
+    public function prepare() {
+        if ($this->_prepared) {
+            debugging("Already prepared provisioner.. why do it twice?");
+            return false;
+        }
+
+        $this->_tree = new actions\base();
         $this->build_tree();
+
+        return true;
     }
 
     /**
@@ -78,7 +97,12 @@ class base
 
         // Merge version-spanned.
         $merges = $sorter->get_version_merges();
-        foreach ($merges as $parent => $children) {
+        foreach ($merges as $merge) {
+            $parent = \local_connect\course::from_sql_result($merge['parent']);
+            $children = array_map(function($child) {
+                return \local_connect\course::from_sql_result($child);
+            }, $merge['children']);
+
             $this->_tree->add_child(new actions\course_merge($parent, $children));
         }
     }
@@ -140,6 +164,10 @@ class base
      * Execute this plan.
      */
     public function execute() {
+        if (!$this->_prepared) {
+            throw new \moodle_exception("Did not prepare provisioner.");
+        }
+
         $this->_tree->execute();
     }
 }

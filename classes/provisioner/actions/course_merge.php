@@ -26,26 +26,30 @@ defined('MOODLE_INTERNAL') || die();
  */
 class course_merge extends base
 {
-    private $_data;
+    private $_parent;
+    private $_children;
 
     /**
      * Constructor.
      */
-    public function __construct($data) {
+    public function __construct($parent, $children) {
         parent::__construct();
 
-        $this->_data = $data;
+        $this->_parent = $parent;
+        $this->_children = $children;
     }
 
     /**
      * Execute this action.
      */
     public function execute() {
-        $parent = $this->_data['parent'];
-        $children = $this->_data['children'];
+        // Is the parent in a thing?
+        if (!$this->_parent->is_in_moodle()) {
+           $this->_parent->create_in_moodle();
+        }
 
-        foreach ($children as $child) {
-            $parent->add_child($child);
+        foreach ($this->_children as $child) {
+            $this->_parent->add_child($child);
         }
 
         parent::execute();
@@ -55,6 +59,12 @@ class course_merge extends base
      * toString override.
      */
     public function __toString() {
-        return "Merge course: " . $this->_data['parent']['shortname'] . ".\n" . parent::__toString();
+        $mdks = array_map(function($course) {
+            return $course->module_delivery_key;
+        }, $this->_children);
+
+        $children = implode(', ', $mdks);
+
+        return "merge course: {$this->_parent->module_delivery_key}->($children).\n" . parent::__toString();
     }
 }
