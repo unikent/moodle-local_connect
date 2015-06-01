@@ -75,6 +75,12 @@ class base
                 $this->_tree->add_child(new actions\course_create($course));
             }
         }
+
+        // Merge version-spanned.
+        $merges = $sorter->get_version_merges();
+        foreach ($merges as $parent => $children) {
+            $this->_tree->add_child(new actions\course_merge($parent, $children));
+        }
     }
 
     /**
@@ -109,7 +115,13 @@ class base
             }
         }
 
-        return "UNK";
+        if ($course->module_length == 1) {
+            return "(week {$course->module_week_beginning})";
+        }
+
+        $start = $course->module_week_beginning;
+        $end = (int)$start + (int)$course->module_length;
+        return "(week {$start}-{$end})";
     }
 
     /**
@@ -121,13 +133,7 @@ class base
         }
 
         $term = static::get_term($course);
-        if ($term != "UNK") {
-            return $term;
-        }
-
-        $start = $course->module_week_beginning;
-        $end = (int)$start + (int)$course->module_length;
-        return "(week {$start}-$end)";
+        return $term;
     }
 
     /**

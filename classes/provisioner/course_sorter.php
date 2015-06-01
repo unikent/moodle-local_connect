@@ -142,7 +142,7 @@ class course_sorter
             foreach ($array as $mdk) {
                 $course = $this->_courses[$mdk];
                 $campuses[] = $course->campusid;
-                $terms[] = $course->module_week_beginning;
+                $terms[] = base::get_term($course);
             }
 
             $campuses = count(array_unique($campuses));
@@ -166,6 +166,83 @@ class course_sorter
     }
 
     /**
+     * List of MDKs that need to be merged with their parents.
+     * array([parent -> array(child, ...)], ...)
+     */
+    public function get_version_merges() {
+        $versionspan = array();
+
+        foreach ($this->_codes as $key => $array) {
+            if (count($array) <= 1) {
+                continue;
+            }
+
+            $versions = array();
+            foreach ($array as $mdk) {
+                $course = $this->_courses[$mdk];
+                $id = "{$course->module_code}_{$course->campusid}_{$course->module_week_beginning}_{$course->module_length}";
+                if (!isset($versions[$id])) {
+                    $versions[$id] = array();
+                }
+
+                $versions[$id][$mdk] = $course->version;
+            }
+
+            foreach ($versions as $id => $instanceversions) {
+                if (count($instanceversions) <= 1) {
+                    continue;
+                }
+
+                $parent = null;
+                $children = array();
+
+                foreach ($instanceversions as $mdk => $version) {
+                    $category = $this->get_category($mdk);
+                    if ($category !== 'uncategorised') {
+                        if (isset($parent)) {
+                            debugging("Multiple parents for {$id}.");
+                        }
+                        $parent = $this->_courses[$mdk];
+                    } else {
+                        $children[] = $this->_courses[$mdk];
+                    }
+                }
+
+                $versionspan[$parent] = $children;
+            }
+        }
+
+        return $versionspan;
+    }
+
+    /**
+     * Return the category for a given MDK.
+     */
+    private function get_category($mdk) {
+        $srch = $this->search($mdk);
+        if ($srch !== false) {
+            list($cat, $key) = $srch;
+            return $cat;
+        }
+
+        return false;
+    }
+
+    /**
+     * Find a given MDK.
+     */
+    private function search($mdk) {
+        foreach ($this->_categories as $cat => $array) {
+            $key = array_search($mdk, $array);
+            if ($key !== false) {
+                return array($cat, $key);
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Move all courses matching a shortcode to a list.
      */
     private function move($code, $list) {
@@ -179,11 +256,10 @@ class course_sorter
      * Unlist a given MDK.
      */
     private function unlist($mdk) {
-        foreach ($this->_categories as $k => $array) {
-            $key = array_search($mdk, $array);
-            if ($key !== false) {
-                unset($this->_categories[$k][$key]);
-            }
+        $srch = $this->search($mdk);
+        if ($srch !== false) {
+            list($cat, $key) = $srch;
+            unset($this->_categories[$cat][$key]);
         }
     }
 }
