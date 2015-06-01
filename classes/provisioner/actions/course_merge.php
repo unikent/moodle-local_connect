@@ -26,29 +26,29 @@ defined('MOODLE_INTERNAL') || die();
  */
 class course_merge extends base
 {
-	private $_data;
+    private $_data;
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct($data) {
-		parent::__construct();
+    /**
+     * Constructor.
+     */
+    public function __construct($data) {
+        parent::__construct();
 
-		$this->_data = $data;
-	}
+        $this->_data = $data;
+    }
 
-	/**
-	 * Execute this action.
-	 */
-	public function execute() {
-		// TODO.
-		parent::execute();
-	}
+    /**
+     * Execute this action.
+     */
+    public function execute() {
+        // TODO.
+        parent::execute();
+    }
 
-	/**
-	 * toString override.
-	 */
-	public function __toString() {
-		return "Merge course: " . $this->_data['shortname'] . ".\n" . parent::__toString();
-	}
+    /**
+     * toString override.
+     */
+    public function __toString() {
+        return "Merge course: " . $this->_data['shortname'] . ".\n" . parent::__toString();
+    }
 }
