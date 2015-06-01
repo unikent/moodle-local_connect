@@ -78,13 +78,9 @@ class base
 	}
 
 	/**
-	 * Build a shortnameext.
+	 * Get the term from dates.
 	 */
-	private function get_shortnameext($course) {
-        if (strpos($course->module_code, "WSHOP") === 0) {
-            return "(week " . $course->module_week_beginning . ")";
-        }
-
+	public static function get_term($course) {
         if ($course->module_week_beginning == 1) {
             return "AUT";
         }
@@ -95,6 +91,22 @@ class base
 
         if ($course->module_week_beginning >= 24) {
             return "SUM";
+        }
+
+        return "UNK";
+	}
+
+	/**
+	 * Build a shortnameext.
+	 */
+	private function get_shortnameext($course) {
+        if (strpos($course->module_code, "WSHOP") === 0) {
+            return "(week " . $course->module_week_beginning . ")";
+        }
+
+        $term = static::get_term($course);
+        if ($term != "UNK") {
+        	return $term;
         }
 
         $start = $course->module_week_beginning;
