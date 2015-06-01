@@ -41,7 +41,13 @@ class course_merge extends base
      * Execute this action.
      */
     public function execute() {
-        // TODO.
+        $parent = $this->_data['parent'];
+        $children = $this->_data['children'];
+
+        foreach ($children as $child) {
+            $parent->add_child($child);
+        }
+
         parent::execute();
     }
 
@@ -49,6 +55,6 @@ class course_merge extends base
      * toString override.
      */
     public function __toString() {
-        return "Merge course: " . $this->_data['shortname'] . ".\n" . parent::__toString();
+        return "Merge course: " . $this->_data['parent']['shortname'] . ".\n" . parent::__toString();
     }
 }
