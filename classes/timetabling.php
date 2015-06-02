@@ -46,6 +46,19 @@ class timetabling extends data
     }
 
     /**
+     * Returns an array of fields that link to other databasepods.
+     * fieldname -> classname
+     */
+    protected static function linked_fields() {
+        return array(
+            'typeid' => '\\local_connect\\type',
+            'userid' => '\\local_connect\\user',
+            'courseid' => '\\local_connect\\course',
+            'roomid' => '\\local_connect\\room'
+        );
+    }
+
+    /**
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {

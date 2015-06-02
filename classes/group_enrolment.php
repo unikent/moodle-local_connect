@@ -48,6 +48,17 @@ class group_enrolment extends data
     }
 
     /**
+     * Returns an array of fields that link to other databasepods.
+     * fieldname -> classname
+     */
+    protected static function linked_fields() {
+        return array(
+            'userid' => '\\local_connect\\user',
+            'groupid' => '\\local_connect\\group'
+        );
+    }
+
+    /**
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
