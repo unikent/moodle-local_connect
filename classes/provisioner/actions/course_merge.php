@@ -49,6 +49,15 @@ class course_merge extends base
         }
 
         foreach ($this->_children as $child) {
+            // Did we already create this?
+            if ($child->is_in_moodle() && $child->mid != $parent->mid) {
+                $child->unlink();
+                $course = $DB->get_record('course', array(
+                    'id' => $child->mid
+                ));
+                delete_course($course);
+            }
+
             $this->_parent->add_child($child);
         }
 

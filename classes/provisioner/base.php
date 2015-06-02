@@ -145,6 +145,7 @@ class base
             return "(week {$course->module_week_beginning})";
         }
 
+        // This is a bit.. special, just give the weeks.
         $start = $course->module_week_beginning;
         $end = (int)$start + (int)$course->module_length;
         return "(week {$start}-{$end})";
