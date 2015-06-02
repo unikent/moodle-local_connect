@@ -67,14 +67,14 @@ class course_merge extends base
         // Is the parent in a thing?
         $this->_course->refresh();
         if (!$this->_course->is_in_moodle()) {
-           debugging("Parent course has not been created {$this->_child->module_delivery_key}->{$this->_course->module_delivery_key}.");
+           debugging("Parent course has not been created {$this->_child->id}->{$this->_course->id}.");
            return;
         }
 
         // Did we already create this?
         $this->_child->refresh();
         if ($this->_child->is_in_moodle()) {
-           debugging("Child course has already been created {$this->_child->module_delivery_key}->{$this->_course->module_delivery_key}.");
+           debugging("Child course has already been created {$this->_child->id}->{$this->_course->id}.");
            return;
         }
 
@@ -87,6 +87,6 @@ class course_merge extends base
      * toString override.
      */
     public function __toString() {
-        return "merge course {$this->_child->module_delivery_key}->{$this->_course->module_delivery_key}" . parent::__toString();
+        return "merge course {$this->_child->id}->{$this->_course->id}" . parent::__toString();
     }
 }

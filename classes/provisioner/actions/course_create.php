@@ -55,7 +55,11 @@ class course_create extends base
      * Execute this action.
      */
     public function run() {
-        $this->_course->create_in_moodle(true);
+        if (!$this->_course->create_in_moodle(true)) {
+            debugging("Failed to create course {$this->_course->id}");
+            return;
+        }
+
         parent::run();
     }
 
@@ -63,6 +67,6 @@ class course_create extends base
      * toString override.
      */
     public function __toString() {
-        return "create course {$this->_course->module_delivery_key}" . parent::__toString();
+        return "create course {$this->_course->id}" . parent::__toString();
     }
 }

@@ -111,7 +111,7 @@ abstract class data {
     public function refresh() {
         global $DB;
 
-        $data = $DB->get_records(static::get_table(), array(
+        $data = $DB->get_record(static::get_table(), array(
             'id' => $this->id
         ));
 
