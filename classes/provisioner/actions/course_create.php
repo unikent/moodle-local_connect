@@ -54,9 +54,9 @@ class course_create extends base
     /**
      * Execute this action.
      */
-    public function execute() {
+    public function run() {
         $this->_course->create_in_moodle(true);
-        parent::execute();
+        parent::run();
     }
 
     /**

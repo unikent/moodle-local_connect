@@ -47,9 +47,9 @@ class course_notify extends base
     /**
      * Execute this action.
      */
-    public function execute() {
+    public function run() {
         // TODO.
-        parent::execute();
+        parent::run();
     }
 
     /**

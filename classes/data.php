@@ -105,6 +105,20 @@ abstract class data {
     }
 
     /**
+     * Refresh the object.
+     * @todo hack until the datapod is finished.
+     */
+    public function refresh() {
+        global $DB;
+
+        $data = $DB->get_records(static::get_table(), array(
+            'id' => $this->id
+        ));
+
+        $this->set_class_data($data);
+    }
+
+    /**
      * Magic method!
      */
     public function __get($name) {
@@ -173,7 +187,7 @@ abstract class data {
 
     /**
      * Is this in Moodle?
-     * 
+     *
      * @return boolean
      */
     public function is_in_moodle() {
@@ -182,7 +196,7 @@ abstract class data {
 
     /**
      * Save to Moodle
-     * 
+     *
      * @return boolean
      */
     public function create_in_moodle() {
@@ -191,7 +205,7 @@ abstract class data {
 
     /**
      * Save to the Connect database
-     * 
+     *
      * @return boolean
      */
     public function save() {
@@ -228,7 +242,7 @@ abstract class data {
 
     /**
      * Delete from Moodle
-     * 
+     *
      * @return boolean
      */
     public function delete() {
@@ -237,7 +251,7 @@ abstract class data {
 
     /**
      * Sync with Moodle
-     * 
+     *
      * @return boolean
      */
     public function sync($dry = false) {

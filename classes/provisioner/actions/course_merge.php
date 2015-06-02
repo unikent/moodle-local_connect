@@ -63,14 +63,16 @@ class course_merge extends base
     /**
      * Execute this action.
      */
-    public function execute() {
+    public function run() {
         // Is the parent in a thing?
+        $this->_course->refresh();
         if (!$this->_course->is_in_moodle()) {
            debugging("Parent course has not been created {$this->_child->module_delivery_key}->{$this->_course->module_delivery_key}.");
            return;
         }
 
         // Did we already create this?
+        $this->_child->refresh();
         if ($this->_child->is_in_moodle()) {
            debugging("Child course has already been created {$this->_child->module_delivery_key}->{$this->_course->module_delivery_key}.");
            return;
@@ -78,7 +80,7 @@ class course_merge extends base
 
         $this->_course->add_child($this->_child);
 
-        parent::execute();
+        parent::run();
     }
 
     /**
