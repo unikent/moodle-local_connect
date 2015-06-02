@@ -99,9 +99,10 @@ class base
      * Returns a count of all sub tasks.
      */
     public function count_children() {
-        $i = 1;
+        $i = 0;
 
         foreach ($this->_children as $child) {
+            $i += 1;
             $i += $child->count_children();
         }
 
