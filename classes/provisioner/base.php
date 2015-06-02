@@ -32,6 +32,12 @@ class base
     private $_tree;
 
     /**
+     * Internal tree spider.
+     * @internal
+     */
+    private $_spider;
+
+    /**
      * Are we prepared?.
      * @internal
      */
@@ -54,10 +60,10 @@ class base
         }
 
         $this->_tree = new actions\base();
-        $this->build_tree();
+        $this->_spider = new spider($this->_tree);
 
-        $spider = new spider($this->_tree);
-        $spider->tidy();
+        $this->build_tree();
+        $this->_spider->tidy();
 
         $this->_prepared = true;
 
@@ -108,7 +114,15 @@ class base
                 return \local_connect\course::from_sql_result($child);
             }, $merge['children']);
 
-            $this->_tree->add_child(new actions\course_merge($parent, $children));
+            // Find the parent create task.
+            $leaf = $this->_spider->get_create_task($parent->id);
+            if ($leaf) {
+                foreach ($children as $child) {
+                    $leaf->add_child(new actions\course_merge($parent, $child));
+                }
+            } else {
+                debugging("Couldn't find parent for merge task: {$parent->module_code}");
+            }
         }
     }
 

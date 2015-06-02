@@ -39,7 +39,7 @@ class spider
     /**
      * Search for all types of action.
      */
-    private function get_actions($type) {
+    public function get_actions($type) {
         foreach ($this->_tree->get_flat_tree() as $child) {
             if ($child->get_task_name() == $type) {
                 yield $child;
@@ -50,8 +50,8 @@ class spider
     /**
      * Returns the create task for a given course, if it exists.
      */
-    private function get_create_task($courseid) {
-        foreach ($this->get_actions(self::LEAF_COURSE_CREATE) as $action) {
+    public function get_create_task($courseid) {
+        foreach ($this->get_actions('course_create') as $action) {
             $course = $action->get_course();
             if ($course->id == $courseid) {
                 return $action;
@@ -68,9 +68,7 @@ class spider
 
         // Add all children of merge tasks to the list.
         foreach ($this->get_actions('course_merge') as $leaf) {
-            foreach ($leaf->get_course_children() as $child) {
-                $filterlist[] = $child;
-            }
+            $filterlist[] = $leaf->get_child();
         }
 
         // Crawl over the create tasks, remove any from the filter list.
