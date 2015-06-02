@@ -67,7 +67,7 @@ class base
     /**
      * Get a list of actions.
      */
-    public function get_actions() {
+    public function get_tree() {
         return $this->_tree;
     }
 

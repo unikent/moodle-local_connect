@@ -96,10 +96,23 @@ class base
     }
 
     /**
+     * Returns a count of all sub tasks.
+     */
+    public function count_children() {
+        $i = 1;
+
+        foreach ($this->_children as $child) {
+            $i += $child->count_children();
+        }
+
+        return $i;
+    }
+
+    /**
      * Execute this action.
      */
     public function execute() {
-        $total = count($this->_children);
+        $total = $this->count_children();
         $i = 0;
         $lastout = -1;
         foreach ($this->_children as $child) {

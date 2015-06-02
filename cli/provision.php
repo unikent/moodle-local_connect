@@ -54,6 +54,8 @@ if ($provisioner->prepare()) {
         echo "Done!\nExecuting... ";
         $provisioner->execute();
     } else {
-        echo $provisioner->get_actions();
+        $tree = $provisioner->get_tree();
+        echo "$tree\n";
+        echo "Total: " . $tree->count_children() . " actions.\n";
     }
 }
