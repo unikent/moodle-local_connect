@@ -26,73 +26,96 @@ defined('MOODLE_INTERNAL') || die();
  */
 class base
 {
-	/**
-	 * List of sub-actions.
-	 * 
-	 * @internal
-	 */
-	private $_children;
+    /**
+     * List of sub-actions.
+     *
+     * @internal
+     */
+    private $_children;
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->_children = array();
-	}
+    /**
+     * Constructor.
+     */
+    public function __construct() {
+        $this->_children = array();
+    }
 
-	/**
-	 * Add a child action.
-	 */
-	public function add_child($action) {
-		return $this->_children[] = $action;
-	}
+    /**
+     * Add a child action.
+     */
+    public function add_child($action) {
+        return $this->_children[] = $action;
+    }
 
-	/**
-	 * Return all children.
-	 */
-	public function get_children() {
-		return $this->_children;
-	}
+    /**
+     * Return all children.
+     */
+    public function get_children() {
+        return $this->_children;
+    }
 
-	/**
-	 * Returns the entire tree below this base node.
-	 */
-	public function get_flat_tree() {
-		$tree = array($this);
-		foreach ($this->_children as $child) {
-			$tree = array_merge($tree, $child->get_flat_tree());
-		}
-		return $tree;
-	}
+    /**
+     * Tree map.
+     */
+    public function map($func) {
+        $func($this);
+        foreach ($this->_children as $child) {
+            $child->map($func);
+        }
+    }
 
-	/**
-	 * Execute this action.
-	 */
-	public function execute() {
-		$total = count($this->_children);
-		$i = 0;
-		$lastout = -1;
-		foreach ($this->_children as $child) {
-			$child->execute();
+    /**
+     * Tree filter.
+     */
+    public function filter($func) {
+        foreach ($this->_children as $k => $child) {
+            if (!$func($child)) {
+                unset($this->_children[$k]);
+            } else {
+                $child->filter($func);
+            }
+        }
+    }
 
-			$percent = floor(($i / $total) * 100);
-			if ($percent % 10 === 0 && $percent != $lastout) {
-				echo "{$percent}%...";
-				$lastout = $percent;
-			}
+    /**
+     * Returns the entire tree below this base node.
+     */
+    public function get_flat_tree() {
+        $tree = array($this);
+        foreach ($this->_children as $child) {
+            $tree = array_merge($tree, $child->get_flat_tree());
+        }
+        return $tree;
+    }
 
-			$i++;
-		}
+    /**
+     * Execute this action.
+     */
+    public function execute() {
+        $total = count($this->_children);
+        $i = 0;
+        $lastout = -1;
+        foreach ($this->_children as $child) {
+            $child->execute();
 
-		if ($i > 0) {
-			echo "\n";
-		}
-	}
+            $percent = floor(($i / $total) * 100);
+            if ($percent % 10 === 0 && $percent != $lastout) {
+                echo "{$percent}%...";
+                $lastout = $percent;
+            }
 
-	/**
-	 * toString override.
-	 */
-	public function __toString() {
-		return implode(' then ', $this->get_children());
-	}
+            $i++;
+        }
+
+        if ($i > 0) {
+            echo "\n";
+        }
+    }
+
+    /**
+     * toString override.
+     */
+    public function __toString() {
+        return implode("\n", $this->get_children());
+    }
 }
