@@ -66,16 +66,14 @@ class course_merge extends base
     public function execute() {
         // Is the parent in a thing?
         if (!$this->_course->is_in_moodle()) {
-           $this->_course->create_in_moodle();
+           debugging("Parent course has not been created {$this->_child->module_delivery_key}->{$this->_course->module_delivery_key}.");
+           return;
         }
 
         // Did we already create this?
-        if ($this->_child->is_in_moodle() && $this->_child->mid != $parent->mid) {
-            $this->_child->unlink();
-            $course = $DB->get_record('course', array(
-                'id' => $this->_child->mid
-            ));
-            delete_course($course);
+        if ($this->_child->is_in_moodle()) {
+           debugging("Child course has already been created {$this->_child->module_delivery_key}->{$this->_course->module_delivery_key}.");
+           return;
         }
 
         $this->_course->add_child($this->_child);
