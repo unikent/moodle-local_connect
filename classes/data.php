@@ -39,6 +39,14 @@ abstract class data {
     const STATUS_ERROR = 4;
 
     /**
+     * Deprecated. Use set_data() instead.
+     */
+    public function set_class_data($data) {
+        debugging("Deprecated. Use set_data() instead.", DEBUG_DEVELOPER);
+        $this->set_data($data);
+    }
+
+    /**
      * Is this in Moodle?
      *
      * @return boolean
