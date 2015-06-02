@@ -38,6 +38,13 @@ class course_create extends base
     }
 
     /**
+     * Return the course.
+     */
+    public function get_course() {
+        return $this->_course;
+    }
+
+    /**
      * Execute this action.
      */
     public function execute() {
@@ -49,6 +56,6 @@ class course_create extends base
      * toString override.
      */
     public function __toString() {
-        return "create course '" . $this->_course->module_delivery_key . "'\n" . parent::__toString();
+        return "create course {$this->_course->module_delivery_key}" . parent::__toString();
     }
 }

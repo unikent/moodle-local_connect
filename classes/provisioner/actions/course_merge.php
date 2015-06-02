@@ -40,6 +40,20 @@ class course_merge extends base
     }
 
     /**
+     * Return the parent course.
+     */
+    public function get_parent() {
+        return $this->_parent;
+    }
+
+    /**
+     * Return the children.
+     */
+    public function get_children() {
+        return $this->_children;
+    }
+
+    /**
      * Execute this action.
      */
     public function execute() {
@@ -74,6 +88,6 @@ class course_merge extends base
 
         $children = implode(', ', $mdks);
 
-        return "merge course: {$this->_parent->module_delivery_key}->($children).\n" . parent::__toString();
+        return "merge course {$this->_parent->module_delivery_key}->($children)" . parent::__toString();
     }
 }

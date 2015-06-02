@@ -27,6 +27,13 @@ define('CLI_SCRIPT', true);
 require(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
+list($options, $unrecognized) = cli_get_params(
+    array(
+        // Dry run pls.
+        'dry' => false
+    )
+);
+
 raise_memory_limit(MEMORY_HUGE);
 
 $username = exec('logname');
@@ -43,7 +50,10 @@ if (!$user) {
 echo "Building task tree...";
 $provisioner = new \local_connect\provisioner\base();
 if ($provisioner->prepare()) {
-    echo "Done!\nExecuting... ";
-
-    $provisioner->execute();
+    if (!isset($options['dry']) || !$options['dry']) {
+        echo "Done!\nExecuting... ";
+        $provisioner->execute();
+    } else {
+        echo $provisioner->get_actions();
+    }
 }
