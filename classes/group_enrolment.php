@@ -99,8 +99,6 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_valid() {
-        $this->reset_object_cache();
-
         if (!$this->course || !$this->user || !$this->group) {
             return false;
         }
@@ -172,8 +170,6 @@ class group_enrolment extends data
      * @return boolean
      */
     public function delete() {
-        $this->reset_object_cache();
-
         if (!$this->group || !$this->group->is_in_moodle()) {
             return false;
         }

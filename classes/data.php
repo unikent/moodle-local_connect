@@ -39,27 +39,6 @@ abstract class data {
     const STATUS_ERROR = 4;
 
     /**
-     * Reset object cache.
-     */
-    protected function reset_object_cache() {
-        $this->_podcache = array();
-    }
-
-    /**
-     * Refresh the object.
-     * @todo hack until the datapod is finished.
-     */
-    public function refresh() {
-        global $DB;
-
-        $data = $DB->get_record(static::get_table(), array(
-            'id' => $this->id
-        ));
-
-        $this->set_class_data($data);
-    }
-
-    /**
      * Is this in Moodle?
      *
      * @return boolean

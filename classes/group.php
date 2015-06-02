@@ -74,8 +74,6 @@ class group extends data
     public function sync($dry = false) {
         global $DB;
 
-        $this->reset_object_cache();
-
         // Is our course in Moodle?
         if (!$this->course || !$this->course->is_in_moodle()) {
             if (!empty($this->mid)) {

@@ -82,8 +82,6 @@ class enrolment extends data
      * Returns true if this is a valid enrolment (i.e. we can create it in Moodle)
      */
     public function is_valid() {
-        $this->reset_object_cache();
-
         if (!$this->course) {
             return false;
         }
@@ -95,8 +93,6 @@ class enrolment extends data
      * Check to see if a user is enrolled on this module in Moodle
      */
     public function is_in_moodle() {
-        $this->reset_object_cache();
-
         if (!$this->course->is_in_moodle()) {
             return false;
         }
@@ -134,8 +130,6 @@ class enrolment extends data
      * Create this enrolment in Moodle
      */
     public function create_in_moodle() {
-        $this->reset_object_cache();
-
         // Create the user.
         if ($this->user && !$this->user->is_in_moodle()) {
             if (!$this->user->create_in_moodle()) {

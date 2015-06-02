@@ -87,8 +87,6 @@ class course extends data
     public function sync($dry = false) {
         global $DB;
 
-        $this->reset_object_cache();
-
         // If we are not in Moodle, we have nothing to do!
         if (!$this->is_in_moodle()) {
             return self::STATUS_NONE;
