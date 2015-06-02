@@ -36,7 +36,7 @@ class course_merge extends base
         parent::__construct();
 
         $this->_course = $parent;
-        $this->_child = $children;
+        $this->_child = $child;
     }
 
     /**

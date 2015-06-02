@@ -443,12 +443,16 @@ class course extends data
 
         // If in strict mode, we check against connect as well.
         if ($strict) {
-            $count = $DB->count_records('connect_course', array(
-                'module_code' => $shortname,
-                'deleted' => '0'
+            $records = $DB->get_records_sql('
+                SELECT id
+                FROM {connect_course}
+                WHERE module_code=:module_code AND deleted=0
+                GROUP BY campusid, module_week_beginning, module_length
+            ', array(
+                'module_code' => $shortname
             ));
 
-            if ($count > 1) {
+            if (count($records) > 1) {
                 return false;
             }
         }

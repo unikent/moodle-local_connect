@@ -45,6 +45,11 @@ class course_sorter
     private $_codes;
 
     /**
+     * List of version-spanned courses.
+     */
+    private $_version_spanned;
+
+    /**
      * Categorised list.
      */
     private $_categories = array(
@@ -114,6 +119,7 @@ class course_sorter
             }
         }
 
+        $this->sort_version_spans();
         $this->sort_unique();
         $this->sort_spans();
     }
@@ -162,15 +168,35 @@ class course_sorter
                 $this->move($key, 'term-span');
                 continue;
             }
+
+            if ($this->is_version_spanned($key)) {
+                $this->move($key, 'unique');
+                continue;
+            }
+
+            // Hm..
+            debugging("What do i do with {$key}?");
         }
     }
 
     /**
-     * List of MDKs that need to be merged with their parents.
-     * array(array(parent, child), ...)
+     * Is a given course part of a version-merge?
      */
-    public function get_version_merges() {
-        $versionspan = array();
+    private function is_version_spanned($key) {
+        foreach ($this->_version_spanned as $span) {
+            if ($span['parent']->module_code == $key) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Register all version-spanned courses.
+     */
+    private function sort_version_spans() {
+        $this->_version_spanned = array();
 
         foreach ($this->_codes as $key => $array) {
             if (count($array) <= 1) {
@@ -211,14 +237,20 @@ class course_sorter
                 // Remove parent from children.
                 unset($children[$parent->id]);
 
-                $versionspan[] = array(
+                $this->_version_spanned[] = array(
                     'parent' => $parent,
                     'children' => array_values($children)
                 );
             }
         }
+    }
 
-        return $versionspan;
+    /**
+     * List of MDKs that need to be merged with their parents.
+     * array(array(parent, child), ...)
+     */
+    public function get_version_merges() {
+        return $this->_version_spanned;
     }
 
     /**

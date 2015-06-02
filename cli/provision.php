@@ -50,8 +50,9 @@ if (!$user) {
 echo "Building task tree...";
 $provisioner = new \local_connect\provisioner\base();
 if ($provisioner->prepare()) {
+    echo "Done!\n";
     if (!isset($options['dry']) || !$options['dry']) {
-        echo "Done!\nExecuting... ";
+        echo "Executing... ";
         $provisioner->execute();
     } else {
         $tree = $provisioner->get_tree();
