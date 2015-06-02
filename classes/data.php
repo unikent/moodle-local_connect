@@ -30,78 +30,19 @@ defined('MOODLE_INTERNAL') || die();
  * Connect data container
  */
 abstract class data {
+    use \local_kent\traits\databasepod;
+
     const STATUS_NONE = 0;
     const STATUS_CREATE = 1;
     const STATUS_MODIFY = 2;
     const STATUS_DELETE = 3;
     const STATUS_ERROR = 4;
 
-    /** Stores all our data */
-    private $_data;
-
-    /** Stores all our objects */
-    private $_objects;
-
-    public function __construct() {
-        $this->_data = array();
-        $this->_objects = array();
-    }
-
-    /**
-     * The name of our connect table.
-     */
-    protected static function get_table() {
-        return null;
-    }
-
-    /**
-     * A list of valid fields for this data object.
-     */
-    protected static function valid_fields() {
-        return array();
-    }
-
-    /**
-     * A list of key fields for this data object.
-     */
-    protected static function key_fields() {
-        return array("id");
-    }
-
-    /**
-     * A list of immutable fields for this data object.
-     */
-    protected static function immutable_fields() {
-        return array();
-    }
-
-    /**
-     * Get all of our data as an object
-     */
-    public final function get_data() {
-        return (object)$this->_data;
-    }
-
-    /**
-     * Given an object containing data, set appropriate class vars.
-     */
-    protected function set_class_data($obj) {
-        if (!is_array($obj)) {
-            $obj = get_object_vars($obj);
-        }
-
-        foreach ($obj as $key => $value) {
-            if (in_array($key, $this->valid_fields())) {
-                $this->$key = $value;
-            }
-        }
-    }
-
     /**
      * Reset object cache.
      */
     protected function reset_object_cache() {
-        $this->_objects = array();
+        $this->_podcache = array();
     }
 
     /**
@@ -116,73 +57,6 @@ abstract class data {
         ));
 
         $this->set_class_data($data);
-    }
-
-    /**
-     * Magic method!
-     */
-    public function __get($name) {
-        $additional = "_get_" . $name;
-        if (method_exists($this, $additional)) {
-            return $this->$additional();
-        }
-
-        if (isset($this->_data[$name])) {
-            return $this->_data[$name];
-        }
-
-        // Are we trying to get the object for an id column?
-        if (isset($this->_data[$name . "id"])) {
-            $id = $this->_data[$name . "id"];
-            $class = "\\local_connect\\" . $name;
-            if (class_exists($class)) {
-                $key = $class . "\\" . $id;
-                if (!isset($this->_objects[$key])) {
-                    $this->_objects[$key] = $class::get($id);
-                }
-
-                return $this->_objects[$key];
-            }
-        }
-
-        if (!in_array($name, $this->valid_fields())) {
-            debugging("Invalid field: $name!");
-        }
-
-        return null;
-    }
-
-    /**
-     * Magic!
-     */
-    public function __isset($name) {
-        return isset($this->_data[$name]);
-    }
-
-    /**
-     * Magic!
-     */
-    public function __unset($name) {
-        unset($this->_data[$name]);
-    }
-
-    /**
-     * Magic!
-     */
-    public function __set($name, $value) {
-        if (!in_array($name, $this->valid_fields())) {
-            debugging("Invalid field: $name!");
-            return;
-        }
-
-        $validation = "_validate_" . $name;
-        if (method_exists($this, $validation)) {
-            if (!$this->$validation($value)) {
-                throw new \moodle_exception("Invalid value for field '$name': $value!");
-            }
-        }
-
-        $this->_data[$name] = $value;
     }
 
     /**
@@ -204,43 +78,6 @@ abstract class data {
     }
 
     /**
-     * Save to the Connect database
-     *
-     * @return boolean
-     */
-    public function save() {
-        global $DB;
-
-        $table = $this->get_table();
-        if ($table === null) {
-            return false;
-        }
-
-        $params = (array)$this->get_data();
-
-        $sets = array();
-        foreach ($params as $field => $value) {
-            if (!in_array($field, $this->immutable_fields())) {
-                $sets[] = "$field = :" . $field;
-            } else {
-                unset($params[$field]);
-            }
-        }
-
-        $ids = array();
-        foreach ($this->key_fields() as $key) {
-            $ids[] = $key . " = :" . $key;
-            $params[$key] = $this->_data[$key];
-        }
-
-        $idstr = implode(' AND ', $ids);
-        $sets = implode(', ', $sets);
-        $sql = "UPDATE {{$table}} SET {$sets} WHERE {$idstr}";
-
-        return $DB->execute($sql, $params);
-    }
-
-    /**
      * Delete from Moodle
      *
      * @return boolean
@@ -256,99 +93,5 @@ abstract class data {
      */
     public function sync($dry = false) {
         debugging("sync() has not been implemented for this!", DEBUG_DEVELOPER);
-    }
-
-    /**
-     * This is *basically* a public version of set_class_data
-     */
-    public static function from_sql_result($data) {
-        $obj = new static();
-        $obj->set_class_data($data);
-        return $obj;
-    }
-
-    /**
-     * Get an object by a specified field.
-     */
-    public static function get_by($field, $val, $forcearray = false) {
-        global $DB;
-
-        if (!in_array($field, static::valid_fields())) {
-            debugging("Invalid field: $field!");
-            return;
-        }
-
-        $data = $DB->get_records(static::get_table(), array(
-            $field => $val
-        ));
-
-        if (!$forcearray) {
-            if (!$data) {
-                return null;
-            }
-
-            if (count($data) === 1) {
-                return static::from_sql_result(array_pop($data));
-            }
-        }
-
-        $ret = array();
-        foreach ($data as $obj) {
-            $ret[] = static::from_sql_result($obj);
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Get an object by ID
-     */
-    public static function get($id) {
-        return static::get_by('id', $id);
-    }
-
-    /**
-     * Returns all known objects.
-     *
-     * @param bool raw Return raw (stdClass) objects?
-     */
-    public static function get_all($raw = false) {
-        global $DB;
-
-        $set = $DB->get_records(static::get_table());
-
-        if (!$raw) {
-            foreach ($set as &$o) {
-                $o = static::from_sql_result($o);
-            }
-        }
-
-        return $set;
-    }
-
-    /**
-     * Run a given method against all objects in a memory-efficient way.
-     * The method will be provided with a single argument (object).
-     */
-    public static function batch_all($func, $conditions = array()) {
-        global $DB;
-
-        $errors = array();
-
-        $rs = $DB->get_recordset(static::get_table(), $conditions);
-
-        // Go through each record, create an object and call the function.
-        foreach ($rs as $record) {
-            try {
-                $obj = static::from_sql_result($record);
-                $func($obj);
-            } catch (\moodle_exception $e) {
-                $errors[] = $e->getMessage();
-            }
-        }
-
-        $rs->close();
-
-        return $errors;
     }
 }
