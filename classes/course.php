@@ -136,7 +136,7 @@ class course extends data
         $courses = $this->get_siblings();
         if (is_array($courses)) {
             foreach ($courses as $course) {
-                if ($course->module_delivery_key !== $this->module_delivery_key) {
+                if ($course->module_code !== $this->module_code) {
                     return false;
                 }
             }
