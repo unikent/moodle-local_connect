@@ -93,7 +93,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $id2 = $this->generate_course();
         $DB->update_record('connect_course', array(
             'id' => $id2,
-            'module_delivery_key' => $course->module_delivery_key,
+            'module_code' => $course->module_code,
             'module_version' => 2
         ));
         $course2 = \local_connect\course::get($id2);
