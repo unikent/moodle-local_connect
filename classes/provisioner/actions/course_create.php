@@ -38,6 +38,13 @@ class course_create extends base
     }
 
     /**
+     * Get task name.
+     */
+    public function get_task_name() {
+        return 'course_create';
+    }
+
+    /**
      * Return the course.
      */
     public function get_course() {

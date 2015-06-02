@@ -56,6 +56,9 @@ class base
         $this->_tree = new actions\base();
         $this->build_tree();
 
+        $spider = new spider($this->_tree);
+        $spider->tidy();
+
         $this->_prepared = true;
 
         return $this->_prepared;

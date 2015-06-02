@@ -41,6 +41,13 @@ class base
     }
 
     /**
+     * Get task name.
+     */
+    public function get_task_name() {
+        return 'root';
+    }
+
+    /**
      * Add a child action.
      */
     public function add_child($action) {

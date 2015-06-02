@@ -26,8 +26,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class course_merge extends base
 {
-    private $_parent;
-    private $_children;
+    private $_course;
+    private $_course_children;
 
     /**
      * Constructor.
@@ -35,22 +35,29 @@ class course_merge extends base
     public function __construct($parent, $children) {
         parent::__construct();
 
-        $this->_parent = $parent;
-        $this->_children = $children;
+        $this->_course = $parent;
+        $this->_course_children = $children;
+    }
+
+    /**
+     * Get task name.
+     */
+    public function get_task_name() {
+        return 'course_merge';
     }
 
     /**
      * Return the parent course.
      */
-    public function get_parent() {
-        return $this->_parent;
+    public function get_course() {
+        return $this->_course;
     }
 
     /**
      * Return the children.
      */
-    public function get_children() {
-        return $this->_children;
+    public function get_course_children() {
+        return $this->_course_children;
     }
 
     /**
@@ -58,11 +65,11 @@ class course_merge extends base
      */
     public function execute() {
         // Is the parent in a thing?
-        if (!$this->_parent->is_in_moodle()) {
-           $this->_parent->create_in_moodle();
+        if (!$this->_course->is_in_moodle()) {
+           $this->_course->create_in_moodle();
         }
 
-        foreach ($this->_children as $child) {
+        foreach ($this->_course_children as $child) {
             // Did we already create this?
             if ($child->is_in_moodle() && $child->mid != $parent->mid) {
                 $child->unlink();
@@ -72,7 +79,7 @@ class course_merge extends base
                 delete_course($course);
             }
 
-            $this->_parent->add_child($child);
+            $this->_course->add_child($child);
         }
 
         parent::execute();
@@ -84,10 +91,10 @@ class course_merge extends base
     public function __toString() {
         $mdks = array_map(function($course) {
             return $course->module_delivery_key;
-        }, $this->_children);
+        }, $this->_course_children);
 
         $children = implode(', ', $mdks);
 
-        return "merge course {$this->_parent->module_delivery_key}->($children)" . parent::__toString();
+        return "merge course {$this->_course->module_delivery_key}->($children)" . parent::__toString();
     }
 }
