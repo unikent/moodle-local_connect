@@ -46,49 +46,51 @@ $PAGE->requires->css('/local/connect/styles/styles.min.css');
 echo $OUTPUT->header();
 echo $OUTPUT->heading('SDS Links');
 
-echo \html_writer::tag('p', "{$course->shortname} recieves data from the following SDS modules:");
-
-echo \html_writer::start_div('panel-group', array(
-    'id' => 'linksaccordion',
-    'role' => 'tablist',
-    'aria-multiselectable' => 'true'
-));
-
 $links = \local_connect\course::get_by('mid', $course->id, true);
-foreach ($links as $obj) {
-    echo \html_writer::start_div('panel panel-default');
-    echo \html_writer::start_div('panel-heading', array(
-        'id' => "heading{$obj->id}"
-    ));
-    echo \html_writer::link("#collapse{$obj->id}", "{$obj->module_code} - {$obj->module_title}&nbsp;", array(
-        'data-toggle' => 'collapse',
-        'data-parent' => '#linksaccordion',
-        'aria-expanded' => 'true',
-        'aria-controls' => "collapse{$obj->id}"
-    ));
-    echo \html_writer::tag('a', '<i class="fa fa-unlink"></i>', array(
-        'title' => 'Unlink',
-        'href' => new \moodle_url('/local/connect/manage/unlink.php', array(
-            'id' => $obj->id,
-            'sesskey' => sesskey()
-        )),
-        'style' => 'float: right;'
-    ));
-    echo \html_writer::end_div();
+if (!empty($links)) {
+    echo \html_writer::tag('p', "{$course->shortname} recieves data from the following SDS modules:");
 
-    echo \html_writer::start_div('panel-collapse collapse', array(
-        'id' => "collapse{$obj->id}",
-        'role' => 'tabpanel',
-        'aria-labelledby' => "heading{$obj->id}"
+    echo \html_writer::start_div('panel-group', array(
+        'id' => 'linksaccordion',
+        'role' => 'tablist',
+        'aria-multiselectable' => 'true'
     ));
-    $table = $obj->get_flexible_table($PAGE->url);
-    $table->print_html();
-    echo \html_writer::end_div();
+
+    foreach ($links as $obj) {
+        echo \html_writer::start_div('panel panel-default');
+        echo \html_writer::start_div('panel-heading', array(
+            'id' => "heading{$obj->id}"
+        ));
+        echo \html_writer::link("#collapse{$obj->id}", "{$obj->module_code} - {$obj->module_title}&nbsp;", array(
+            'data-toggle' => 'collapse',
+            'data-parent' => '#linksaccordion',
+            'aria-expanded' => 'true',
+            'aria-controls' => "collapse{$obj->id}"
+        ));
+        echo \html_writer::tag('a', '<i class="fa fa-unlink"></i>', array(
+            'title' => 'Unlink',
+            'href' => new \moodle_url('/local/connect/manage/unlink.php', array(
+                'id' => $obj->id,
+                'sesskey' => sesskey()
+            )),
+            'style' => 'float: right;'
+        ));
+        echo \html_writer::end_div();
+
+        echo \html_writer::start_div('panel-collapse collapse', array(
+            'id' => "collapse{$obj->id}",
+            'role' => 'tabpanel',
+            'aria-labelledby' => "heading{$obj->id}"
+        ));
+        $table = $obj->get_flexible_table($PAGE->url);
+        $table->print_html();
+        echo \html_writer::end_div();
+
+        echo \html_writer::end_div();
+    }
 
     echo \html_writer::end_div();
 }
-
-echo \html_writer::end_div();
 
 echo $OUTPUT->single_button(new \moodle_url('/local/connect/manage/addlink.php', array(
     'mid' => $mid
