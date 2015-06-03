@@ -30,7 +30,7 @@ if (!\local_connect\util\helpers::is_enabled()) {
     print_error('connect_disabled', 'local_connect');
 }
 
-if (!\local_connect\util\helpers::can_course_manage()) {
+if (!\local_connect\util\helpers::can_category_manage()) {
     print_error('accessdenied', 'local_connect');
 }
 

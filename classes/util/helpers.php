@@ -55,7 +55,15 @@ class helpers {
      * Returns a JSON list of categories we can manage
      */
     public static function get_connect_course_categories() {
-        global $DB;
+        global $DB, $USER;
+
+        $cachekey = "coursecat{$USER->id}";
+        $cache = \cache::make('local_connect', 'ctxperms');
+
+        $catpermissions = $cache->get($cachekey);
+        if ($catpermissions) {
+            return $catpermissions;
+        }
 
         $catpermissions = array();
 
@@ -75,6 +83,8 @@ class helpers {
             }
         }
 
+        $cache->set($cachekey, $catpermissions);
+
         return $catpermissions;
     }
 
@@ -82,7 +92,7 @@ class helpers {
      * Is this user allowed to manage courses?
      * @return boolean
      */
-    public static function can_course_manage() {
+    public static function can_category_manage() {
         global $DB;
 
         if (has_capability('moodle/site:config', \context_system::instance())) {
