@@ -26,29 +26,67 @@ defined('MOODLE_INTERNAL') || die();
  */
 class course_merge extends base
 {
-	private $_data;
+    private $_course;
+    private $_child;
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct($data) {
-		parent::__construct();
+    /**
+     * Constructor.
+     */
+    public function __construct($parent, $child) {
+        parent::__construct();
 
-		$this->_data = $data;
-	}
+        $this->_course = $parent;
+        $this->_child = $child;
+    }
 
-	/**
-	 * Execute this action.
-	 */
-	public function execute() {
-		// TODO.
-		parent::execute();
-	}
+    /**
+     * Get task name.
+     */
+    public function get_task_name() {
+        return 'course_merge';
+    }
 
-	/**
-	 * toString override.
-	 */
-	public function __toString() {
-		return "Merge course: " . $this->_data['shortname'] . ".\n" . parent::__toString();
-	}
+    /**
+     * Return the parent course.
+     */
+    public function get_parent_course() {
+        return $this->_course;
+    }
+
+    /**
+     * Return the child.
+     */
+    public function get_child() {
+        return $this->_child;
+    }
+
+    /**
+     * Execute this action.
+     */
+    public function run() {
+        // Is the parent in a thing?
+        $this->_course->refresh();
+        if (!$this->_course->is_in_moodle()) {
+           debugging("Parent course has not been created {$this->_child->id}->{$this->_course->id}.");
+           return;
+        }
+
+        // Did we already create this?
+        $this->_child->refresh();
+        if ($this->_child->is_in_moodle()) {
+           debugging("Child course has already been created {$this->_child->id}->{$this->_course->id}.");
+           return;
+        }
+
+        $this->_course->add_child($this->_child);
+
+        parent::run();
+    }
+
+    /**
+     * toString override.
+     */
+    public function __toString() {
+        return "merge course {$this->_child->id}->{$this->_course->id}" . parent::__toString();
+    }
 }

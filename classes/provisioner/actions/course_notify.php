@@ -26,29 +26,36 @@ defined('MOODLE_INTERNAL') || die();
  */
 class course_notify extends base
 {
-	private $_data;
+    private $_data;
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct($data) {
-		parent::__construct();
+    /**
+     * Constructor.
+     */
+    public function __construct($data) {
+        parent::__construct();
 
-		$this->_data = $data;
-	}
+        $this->_data = $data;
+    }
 
-	/**
-	 * Execute this action.
-	 */
-	public function execute() {
-		// TODO.
-		parent::execute();
-	}
+    /**
+     * Get task name.
+     */
+    public function get_task_name() {
+        return 'course_notify';
+    }
 
-	/**
-	 * toString override.
-	 */
-	public function __toString() {
-		return "Notified course " . $this->_data['id'] . ": " . $this->_data['message'] . ".\n" . parent::__toString();
-	}
+    /**
+     * Execute this action.
+     */
+    public function run() {
+        // TODO.
+        parent::run();
+    }
+
+    /**
+     * toString override.
+     */
+    public function __toString() {
+        return "Notified course " . $this->_data['id'] . ": " . $this->_data['message'] . parent::__toString();
+    }
 }

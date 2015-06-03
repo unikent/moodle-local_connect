@@ -47,6 +47,11 @@ $observers = array (
     array (
         'eventname' => '\core\event\group_deleted',
         'callback' => '\local_connect\observers::group_deleted',
+    ),
+
+    array (
+        'eventname' => '\local_catman\event\course_removed',
+        'callback' => '\local_connect\observers::catman_scheduled',
     )
 
 );

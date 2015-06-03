@@ -32,6 +32,29 @@ defined('MOODLE_INTERNAL') || die();
 class observers
 {
     /**
+     * Triggered when 'course_removed' event is triggered.
+     *
+     * @param \local_catman\event\course_removed $event
+     * @return unknown
+     */
+    public static function catman_scheduled(\local_catman\event\course_removed $event) {
+        global $DB;
+
+        // Check we were not moved to the removed category.
+        $category = \local_catman\core::get_category();
+        $course = $DB->get_record('course', array(
+            'id' => $event->objectid
+        ), 'id,category');
+
+        // If this is in the removed category, delete any reference to it.
+        if ($course->category == $category->id) {
+            $DB->set_field('connect_course', 'mid', 0, array(
+                'mid' => $course->id
+            ));
+        }
+    }
+
+    /**
      * Triggered when 'course_updated' event is triggered.
      *
      * @param \core\event\course_updated $event
@@ -39,24 +62,6 @@ class observers
      */
     public static function course_updated(\core\event\course_updated $event) {
         global $DB, $USER;
-
-        $enabled = get_config("local_catman", "enable");
-        if ($enabled) {
-            // Check we were not moved to the removed category.
-            $category = \local_catman\core::get_category();
-            $course = $DB->get_record('course', array(
-                'id' => $event->objectid
-            ), 'id,category');
-
-            // If this is in the removed category, delete any reference to it.
-            if ($course->category == $category->id) {
-                $DB->set_field('connect_course', 'mid', 0, array(
-                    'mid' => $course->id
-                ));
-
-                return true;
-            }
-        }
 
         if ($USER && $USER->id > 2) {
             // Check the shortname and summary, etc, dont match.

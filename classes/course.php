@@ -70,7 +70,7 @@ class course extends data
 
     /**
      * Save to the Connect database
-     * 
+     *
      * @return boolean
      */
     public function save() {
@@ -136,7 +136,7 @@ class course extends data
         $courses = $this->get_siblings();
         if (is_array($courses)) {
             foreach ($courses as $course) {
-                if ($course->module_delivery_key !== $this->module_delivery_key) {
+                if ($course->module_code !== $this->module_code) {
                     return false;
                 }
             }
@@ -443,12 +443,16 @@ class course extends data
 
         // If in strict mode, we check against connect as well.
         if ($strict) {
-            $count = $DB->count_records('connect_course', array(
-                'module_code' => $shortname,
-                'deleted' => '0'
+            $records = $DB->get_records_sql('
+                SELECT id
+                FROM {connect_course}
+                WHERE module_code=:module_code AND deleted=0
+                GROUP BY campusid, module_week_beginning, module_length
+            ', array(
+                'module_code' => $shortname
             ));
 
-            if ($count > 1) {
+            if (count($records) > 1) {
                 return false;
             }
         }
@@ -538,6 +542,12 @@ class course extends data
      */
     public function create_in_moodle($fast = false) {
         global $DB, $USER;
+
+        // Check we aren't already in Moodle.
+        if ($this->is_in_moodle()) {
+            debugging("Course already exists in Moodle!");
+            return false;
+        }
 
         // Check we have a category.
         if (empty($this->category)) {
@@ -693,7 +703,7 @@ class course extends data
 
     /**
      * Delete this course
-     * 
+     *
      * @return boolean
      */
     public function delete() {
@@ -897,7 +907,7 @@ class course extends data
     /**
      * Schedule a group of courses.
      * This is a hangover from the old UI.
-     * 
+     *
      * @param unknown $data
      * @return unknown
      */
@@ -978,7 +988,7 @@ class course extends data
     /**
      * Merge two courses.
      * Hangover from old UI.
-     * 
+     *
      * @param unknown $input
      * @return unknown
      */

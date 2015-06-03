@@ -20,7 +20,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Moodle provisioning toolkit.
- * 
+ *
  * This sorts out the courses into the following categories
  * so the provisioner can work out what to do with them:
  *  - Unique (Ain't nothing like me)
@@ -32,158 +32,272 @@ defined('MOODLE_INTERNAL') || die();
  */
 class course_sorter
 {
-	/**
-	 * Course list.
-	 * module_delivery_key => course
-	 */
-	private $_courses;
+    /**
+     * Course list.
+     * module_delivery_key => course
+     */
+    private $_courses;
 
-	/**
-	 * Course list.
-	 * module_code => (module_delivery_key,..)
-	 */
-	private $_codes;
+    /**
+     * Course list.
+     * module_code => (module_delivery_key,..)
+     */
+    private $_codes;
 
-	/**
-	 * Categorised list.
-	 */
-	private $_categories = array(
-		'unique' => array(),
-		'term-span' => array(),
-		'campus-span' => array(),
-		'full-span' => array(),
-		'uncategorised' => array()
-	);
+    /**
+     * List of version-spanned courses.
+     */
+    private $_version_spanned;
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->grab_courses();
-		$this->sort_lists();
-	}
+    /**
+     * Categorised list.
+     */
+    private $_categories = array(
+        'unique' => array(),
+        'term-span' => array(),
+        'campus-span' => array(),
+        'full-span' => array(),
+        'uncategorised' => array()
+    );
 
-	/**
-	 * Return the lists.
-	 */
-	public function get_lists() {
-		$array = array();
-		foreach ($this->_categories as $category => $list) {
-			$array[$category] = array();
-			foreach ($list as $mdk) {
-				$array[$category][] = $this->_courses[$mdk];
-			}
-		}
-		return $array;
-	}
+    /**
+     * Constructor.
+     */
+    public function __construct() {
+        $this->grab_courses();
+        $this->sort_lists();
+    }
 
-	/**
-	 * Grab courses.
-	 */
-	private function grab_courses() {
-		global $DB;
+    /**
+     * Return the lists.
+     */
+    public function get_lists() {
+        $array = array();
+        foreach ($this->_categories as $category => $list) {
+            $array[$category] = array();
+            foreach ($list as $mdk) {
+                $array[$category][] = $this->_courses[$mdk];
+            }
+        }
+        return $array;
+    }
 
-		$this->_courses = array();
-		$this->_codes = array();
+    /**
+     * Grab courses.
+     */
+    private function grab_courses() {
+        global $DB;
 
-		$rs = $DB->get_recordset('connect_course', array('mid' => 0, 'deleted' => 0));
-		foreach ($rs as $course) {
-			if (isset($this->_courses[$course->module_delivery_key])) {
-				debugging("Course is not unique: " . $this->_courses[$course->module_delivery_key]);
-			}
+        $this->_courses = array();
+        $this->_codes = array();
 
-			$this->_courses[$course->module_delivery_key] = $course;
+        $rs = $DB->get_recordset('connect_course', array('mid' => 0, 'deleted' => 0));
+        foreach ($rs as $course) {
+            if (isset($this->_courses[$course->module_delivery_key])) {
+                debugging("Course is not unique: " . $this->_courses[$course->module_delivery_key]);
+            }
 
-			// Add to keys list.
-			$k = $course->module_code;
-			if (!isset($this->_codes[$k])) {
-				$this->_codes[$k] = array();
-			}
-			$this->_codes[$k][] = $course->module_delivery_key;
-		}
-		$rs->close();
-	}
+            $this->_courses[$course->module_delivery_key] = $course;
 
-	/**
-	 * Sort the lists.
-	 */
-	private function sort_lists() {
-		foreach ($this->_codes as $key => $array) {
-			foreach ($array as $mdk) {
-				$this->_categories['uncategorised'][] = $mdk;
-			}
-		}
+            // Add to keys list.
+            $k = $course->module_code;
+            if (!isset($this->_codes[$k])) {
+                $this->_codes[$k] = array();
+            }
+            $this->_codes[$k][] = $course->module_delivery_key;
+        }
+        $rs->close();
+    }
 
-		$this->sort_unique();
-		$this->sort_spans();
-	}
+    /**
+     * Sort the lists.
+     */
+    private function sort_lists() {
+        foreach ($this->_codes as $key => $array) {
+            foreach ($array as $mdk) {
+                $this->_categories['uncategorised'][] = $mdk;
+            }
+        }
 
-	/**
-	 * Sort all unique courses.
-	 */
-	private function sort_unique() {
-		foreach ($this->_codes as $key => $array) {
-			if (count($array) <= 1) {
-				$this->move($key, 'unique');
-			}
-		}
-	}
+        $this->sort_version_spans();
+        $this->sort_unique();
+        $this->sort_spans();
+    }
 
-	/**
-	 * Sort all spanned courses.
-	 */
-	private function sort_spans() {
-		foreach ($this->_codes as $key => $array) {
-			if (count($array) <= 1) {
-				continue;
-			}
+    /**
+     * Sort all unique courses.
+     */
+    private function sort_unique() {
+        foreach ($this->_codes as $key => $array) {
+            if (count($array) <= 1) {
+                $this->move($key, 'unique');
+            }
+        }
+    }
 
-			$campuses = $terms = array();
-			foreach ($array as $mdk) {
-				$course = $this->_courses[$mdk];
-				$campuses[] = $course->campusid;
-				$terms[] = $course->module_week_beginning;
-			}
+    /**
+     * Sort all spanned courses.
+     */
+    private function sort_spans() {
+        foreach ($this->_codes as $key => $array) {
+            if (count($array) <= 1) {
+                continue;
+            }
 
-			$campuses = count(array_unique($campuses));
-			$terms = count(array_unique($terms));
+            $campuses = $terms = array();
+            foreach ($array as $mdk) {
+                $course = $this->_courses[$mdk];
+                $campuses[] = $course->campusid;
+                $terms[] = base::get_term($course);
+            }
 
-			if ($campuses > 1 && $terms > 1) {
-				$this->move($key, 'full-span');
-				continue;
-			}
+            $campuses = count(array_unique($campuses));
+            $terms = count(array_unique($terms));
 
-			if ($campuses > 1) {
-				$this->move($key, 'campus-span');
-				continue;
-			}
+            if ($campuses > 1 && $terms > 1) {
+                $this->move($key, 'full-span');
+                continue;
+            }
 
-			if ($terms > 1) {
-				$this->move($key, 'term-span');
-				continue;
-			}
-		}
-	}
+            if ($campuses > 1) {
+                $this->move($key, 'campus-span');
+                continue;
+            }
 
-	/**
-	 * Move all courses matching a shortcode to a list.
-	 */
-	private function move($code, $list) {
-		foreach ($this->_codes[$code] as $mdk) {
-			$this->unlist($mdk);
-			$this->_categories[$list][] = $mdk;
-		}
-	}
+            if ($terms > 1) {
+                $this->move($key, 'term-span');
+                continue;
+            }
 
-	/**
-	 * Unlist a given MDK.
-	 */
-	private function unlist($mdk) {
-		foreach ($this->_categories as $k => $array) {
-			$key = array_search($mdk, $array);
-			if ($key !== false) {
-			    unset($this->_categories[$k][$key]);
-			}
-		}
-	}
+            if ($this->is_version_spanned($key)) {
+                $this->move($key, 'unique');
+                continue;
+            }
+
+            // Hm..
+            debugging("What do i do with {$key}?");
+        }
+    }
+
+    /**
+     * Is a given course part of a version-merge?
+     */
+    private function is_version_spanned($key) {
+        foreach ($this->_version_spanned as $span) {
+            if ($span['parent']->module_code == $key) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Register all version-spanned courses.
+     */
+    private function sort_version_spans() {
+        $this->_version_spanned = array();
+
+        foreach ($this->_codes as $key => $array) {
+            if (count($array) <= 1) {
+                continue;
+            }
+
+            $versions = array();
+            foreach ($array as $mdk) {
+                $course = $this->_courses[$mdk];
+                $id = "{$course->module_code}_{$course->campusid}_{$course->module_week_beginning}_{$course->module_length}";
+                if (!isset($versions[$id])) {
+                    $versions[$id] = array();
+                }
+
+                $versions[$id][$mdk] = $course->module_version;
+            }
+
+            foreach ($versions as $id => $instanceversions) {
+                if (count($instanceversions) <= 1) {
+                    continue;
+                }
+
+                // Build children.
+                $children = array();
+                foreach ($instanceversions as $mdk => $version) {
+                    $course = $this->_courses[$mdk];
+                    $children[$course->id] = $course;
+                }
+
+                // Choose a parent.
+                $parent = null;
+                foreach ($children as $child) {
+                    if (!$parent || (int)$child->module_version > (int)$parent->module_version) {
+                        $parent = $child;
+                    }
+                }
+
+                // Remove parent from children.
+                unset($children[$parent->id]);
+
+                $this->_version_spanned[] = array(
+                    'parent' => $parent,
+                    'children' => array_values($children)
+                );
+            }
+        }
+    }
+
+    /**
+     * List of MDKs that need to be merged with their parents.
+     * array(array(parent, child), ...)
+     */
+    public function get_version_merges() {
+        return $this->_version_spanned;
+    }
+
+    /**
+     * Return the category for a given MDK.
+     */
+    private function get_category($mdk) {
+        $srch = $this->search($mdk);
+        if ($srch !== false) {
+            list($cat, $key) = $srch;
+            return $cat;
+        }
+
+        return false;
+    }
+
+    /**
+     * Find a given MDK.
+     */
+    private function search($mdk) {
+        foreach ($this->_categories as $cat => $array) {
+            $key = array_search($mdk, $array);
+            if ($key !== false) {
+                return array($cat, $key);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Move all courses matching a shortcode to a list.
+     */
+    private function move($code, $list) {
+        foreach ($this->_codes[$code] as $mdk) {
+            $this->unlist($mdk);
+            $this->_categories[$list][] = $mdk;
+        }
+    }
+
+    /**
+     * Unlist a given MDK.
+     */
+    private function unlist($mdk) {
+        $srch = $this->search($mdk);
+        if ($srch !== false) {
+            list($cat, $key) = $srch;
+            unset($this->_categories[$cat][$key]);
+        }
+    }
 }

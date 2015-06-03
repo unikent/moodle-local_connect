@@ -26,29 +26,47 @@ defined('MOODLE_INTERNAL') || die();
  */
 class course_create extends base
 {
-	private $_course;
+    private $_course;
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct($course) {
-		parent::__construct();
+    /**
+     * Constructor.
+     */
+    public function __construct($course) {
+        parent::__construct();
 
-		$this->_course = $course;
-	}
+        $this->_course = $course;
+    }
 
-	/**
-	 * Execute this action.
-	 */
-	public function execute() {
-		$this->_course->create_in_moodle(true);
-		parent::execute();
-	}
+    /**
+     * Get task name.
+     */
+    public function get_task_name() {
+        return 'course_create';
+    }
 
-	/**
-	 * toString override.
-	 */
-	public function __toString() {
-		return "create course '" . $this->_course->module_code . "'" . parent::__toString();
-	}
+    /**
+     * Return the course.
+     */
+    public function get_course() {
+        return $this->_course;
+    }
+
+    /**
+     * Execute this action.
+     */
+    public function run() {
+        if (!$this->_course->create_in_moodle(true)) {
+            debugging("Failed to create course {$this->_course->id}");
+            return;
+        }
+
+        parent::run();
+    }
+
+    /**
+     * toString override.
+     */
+    public function __toString() {
+        return "create course {$this->_course->id}" . parent::__toString();
+    }
 }
