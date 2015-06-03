@@ -695,6 +695,7 @@ class course extends data
 
         // Check this exists o.o I dont know why I'm expecting it not too...
         if (!$course) {
+            debugging("Can't find course to update {$course->id}");
             return false;
         }
 
