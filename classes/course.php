@@ -661,6 +661,30 @@ class course extends data
     }
 
     /**
+     * Link this to a course
+     *
+     * @param unknown $target
+     * @return unknown
+     */
+    public function link($courseid) {
+        // Add a link.
+        $this->mid = $courseid;
+        $this->save();
+
+        // Update in Moodle.
+        $this->update_moodle();
+
+        // Schedule an adhoc task to sync this course.
+        $task = new \local_connect\task\course_fast_sync();
+        $task->set_custom_data(array(
+            'courseid' => $this->id
+        ));
+        \core\task\manager::queue_adhoc_task($task);
+
+        return true;
+    }
+
+    /**
      * Link a course to this course
      * @param unknown $target
      * @return unknown
@@ -671,14 +695,7 @@ class course extends data
         $target->_siblings = null;
 
         // Add a link.
-        $target->mid = $this->mid;
-        $target->save();
-
-        // Update in Moodle.
-        $this->update_moodle();
-
-        // Sync enrolments.
-        $target->sync_enrolments();
+        $target->link($this->mid);
 
         return true;
     }

@@ -53,5 +53,5 @@ $PAGE->set_pagelayout('admin');
 $connect->unlink();
 
 redirect(new \moodle_url('/local/connect/manage/course.php', array(
-    'mid' => $course->mid
+    'mid' => $course->id
 )));

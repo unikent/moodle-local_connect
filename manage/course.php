@@ -72,7 +72,6 @@ foreach ($links as $obj) {
             'id' => $obj->id,
             'sesskey' => sesskey()
         )),
-        'target' => 'blank',
         'style' => 'float: right;'
     ));
     echo \html_writer::end_div();
