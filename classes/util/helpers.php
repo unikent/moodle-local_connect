@@ -50,37 +50,6 @@ class helpers {
         return isset($CFG->local_connect_enable) && $CFG->local_connect_enable;
     }
 
-    /**
-     * Is this user allowed to manage courses?
-     * @return boolean
-     */
-    public static function can_course_manage() {
-        global $DB;
-
-        if (has_capability('moodle/site:config', \context_system::instance())) {
-            return true;
-        }
-
-        $contextpreload = \context_helper::get_preload_record_columns_sql('x');
-        $cats = $DB->get_records_sql("
-            SELECT cc.id, cc.name, $contextpreload
-            FROM {course_categories} cc
-            INNER JOIN {context} x ON (cc.id=x.instanceid AND x.contextlevel=".CONTEXT_COURSECAT.")
-        ");
-
-        // Check permissions.
-        foreach ($cats as $cat) {
-            \context_helper::preload_from_record($cat);
-            $context = \context_coursecat::instance($cat->id);
-
-            if (has_capability('moodle/category:manage', $context)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 
     /**
      * Returns a JSON list of categories we can manage
@@ -107,5 +76,20 @@ class helpers {
         }
 
         return $catpermissions;
+    }
+
+    /**
+     * Is this user allowed to manage courses?
+     * @return boolean
+     */
+    public static function can_course_manage() {
+        global $DB;
+
+        if (has_capability('moodle/site:config', \context_system::instance())) {
+            return true;
+        }
+
+        $cats = static::get_connect_course_categories();
+        return count($cats) > 0;
     }
 }
