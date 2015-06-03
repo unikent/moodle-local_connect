@@ -23,7 +23,6 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once(dirname(__FILE__) . '/locallib.php');
 
 require_login();
 
@@ -37,7 +36,7 @@ if (!\local_connect\util\helpers::can_course_manage()) {
 
 // Initial setup.
 $sitecontext = context_system::instance();
-$catpermissions = kent_get_connect_course_categories();
+$catpermissions = \local_connect\util\helpers::get_connect_course_categories();
 
 // Page setup.
 $PAGE->set_context($sitecontext);
