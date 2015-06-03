@@ -90,9 +90,17 @@ class helpers {
 
         $catpermissions = array();
 
-        $cats = $DB->get_records('course_categories');
+        $contextpreload = \context_helper::get_preload_record_columns_sql('x');
+        $cats = $DB->get_records_sql("
+            SELECT cc.id, cc.name, $contextpreload
+            FROM {course_categories} cc
+            INNER JOIN {context} x ON (cc.id=x.instanceid AND x.contextlevel=".CONTEXT_COURSECAT.")
+        ");
+
         foreach ($cats as $cat) {
+            \context_helper::preload_from_record($cat);
             $context = \context_coursecat::instance($cat->id);
+
             if (has_capability('moodle/category:manage', $context)) {
                 $catpermissions[$cat->id] = $cat->name;
             }
