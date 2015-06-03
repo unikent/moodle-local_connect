@@ -38,7 +38,9 @@ require_capability('moodle/course:update', $ctx);
 
 $PAGE->set_context($ctx);
 $PAGE->set_title("SDS Links");
-$PAGE->set_url('/local/connect/manage/course.php');
+$PAGE->set_url(new \moodle_url('/local/connect/manage/course.php', array(
+    'mid' => $mid
+)));
 $PAGE->set_pagelayout('admin');
 
 echo $OUTPUT->header();
@@ -57,5 +59,9 @@ foreach ($links as $obj) {
     )));
 }
 echo \html_writer::end_tag('ul');
+
+echo $OUTPUT->single_button(new \moodle_url('/local/connect/manage/addlink.php', array(
+    'mid' => $mid
+)), 'Add a link');
 
 echo $OUTPUT->footer();
