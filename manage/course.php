@@ -34,16 +34,12 @@ $course = $DB->get_record('course', array('id' => $mid), '*', MUST_EXIST);
 $ctx = context_course::instance($course->id);
 
 require_login($course->id);
+require_capability('moodle/course:update', $ctx);
 
 $PAGE->set_context($ctx);
 $PAGE->set_title("SDS Links");
 $PAGE->set_url('/local/connect/manage/course.php');
 $PAGE->set_pagelayout('admin');
-
-// Check we have the capabilities.
-if (!has_capability('moodle/course:update', $ctx)) {
-    print_error("Access denied");
-}
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading("SDS Links");
@@ -53,7 +49,7 @@ echo \html_writer::tag('p', "{$course->shortname} recieves data from the followi
 echo \html_writer::start_tag('ul');
 $links = \local_connect\course::get_by('mid', $course->id, true);
 foreach ($links as $obj) {
-    echo \html_writer::tag('li', \html_writer::tag('a', $obj->fullname, array(
+    echo \html_writer::tag('li', \html_writer::tag('a', "$obj->module_code - $obj->module_title", array(
         'href' => $CFG->wwwroot . '/local/connect/browse/course.php?id=' . $obj->id,
         'target' => 'blank'
     )));
