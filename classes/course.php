@@ -62,6 +62,16 @@ class course extends data
     }
 
     /**
+     * Returns an array of fields that link to other databasepods.
+     * fieldname -> classname
+     */
+    protected static function linked_fields() {
+        return array(
+            'campusid' => '\\local_connect\\campus'
+        );
+    }
+
+    /**
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
@@ -86,8 +96,6 @@ class course extends data
      */
     public function sync($dry = false) {
         global $DB;
-
-        $this->reset_object_cache();
 
         // If we are not in Moodle, we have nothing to do!
         if (!$this->is_in_moodle()) {
@@ -687,6 +695,7 @@ class course extends data
 
         // Check this exists o.o I dont know why I'm expecting it not too...
         if (!$course) {
+            debugging("Can't find course to update {$course->id}");
             return false;
         }
 

@@ -65,14 +65,12 @@ class course_merge extends base
      */
     public function run() {
         // Is the parent in a thing?
-        $this->_course->refresh();
         if (!$this->_course->is_in_moodle()) {
            debugging("Parent course has not been created {$this->_child->id}->{$this->_course->id}.");
            return;
         }
 
         // Did we already create this?
-        $this->_child->refresh();
         if ($this->_child->is_in_moodle()) {
            debugging("Child course has already been created {$this->_child->id}->{$this->_course->id}.");
            return;

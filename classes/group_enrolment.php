@@ -48,6 +48,17 @@ class group_enrolment extends data
     }
 
     /**
+     * Returns an array of fields that link to other databasepods.
+     * fieldname -> classname
+     */
+    protected static function linked_fields() {
+        return array(
+            'userid' => '\\local_connect\\user',
+            'groupid' => '\\local_connect\\group'
+        );
+    }
+
+    /**
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
@@ -99,8 +110,6 @@ class group_enrolment extends data
      * @return unknown
      */
     public function is_valid() {
-        $this->reset_object_cache();
-
         if (!$this->course || !$this->user || !$this->group) {
             return false;
         }
@@ -172,8 +181,6 @@ class group_enrolment extends data
      * @return boolean
      */
     public function delete() {
-        $this->reset_object_cache();
-
         if (!$this->group || !$this->group->is_in_moodle()) {
             return false;
         }
