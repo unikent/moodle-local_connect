@@ -77,7 +77,7 @@ foreach ($links as $obj) {
     ));
     echo \html_writer::end_div();
 
-    echo \html_writer::start_div('panel-collapse collapse in', array(
+    echo \html_writer::start_div('panel-collapse collapse', array(
         'id' => "collapse{$obj->id}",
         'role' => 'tabpanel',
         'aria-labelledby' => "heading{$obj->id}"

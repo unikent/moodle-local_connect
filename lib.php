@@ -34,24 +34,31 @@ function local_connect_extend_settings_navigation(settings_navigation $nav, cont
 
     // Add an "SDS Links" nav item.
     if ($settingnode = $nav->find('courseadmin', navigation_node::TYPE_COURSE)) {
+
         $url = new moodle_url('/local/connect/manage/course.php', array(
             'mid' => $PAGE->course->id
         ));
 
+        $sdsnode = $settingnode->add('SDS Links', $url, navigation_node::TYPE_CONTAINER);
+
+        $url = new moodle_url('/local/connect/manage/addlink.php', array(
+            'mid' => $PAGE->course->id
+        ));
+
         $node = navigation_node::create(
-            'SDS Links',
+            'Add link',
             $url,
             navigation_node::NODETYPE_LEAF,
             'local_connect',
             'local_connect',
-            new pix_icon('e/insert_edit_link', 'SDS Links')
+            new pix_icon('e/insert_edit_link', 'Add link')
         );
 
         if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
             $node->make_active();
         }
 
-        $settingnode->add_node($node);
+        $sdsnode->add_node($node);
     }
 
     return $node;

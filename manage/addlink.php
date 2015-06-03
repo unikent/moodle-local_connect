@@ -28,30 +28,21 @@ if (!\local_connect\util\helpers::is_enabled()) {
     print_error('connect_disabled', 'local_connect');
 }
 
-$id = required_param('id', PARAM_INT);
-$connect = \local_connect\course::get($id);
-if (!$connect) {
-    print_error('Invalid Connect ID');
-}
-
-$course = $DB->get_record('course', array(
-    'id' => $connect->mid
-), '*', MUST_EXIST);
+$mid = required_param('mid', PARAM_INT);
+$course = $DB->get_record('course', array('id' => $mid), '*', MUST_EXIST);
 $ctx = context_course::instance($course->id);
 
 require_login($course->id);
 require_capability('moodle/course:update', $ctx);
-require_sesskey();
 
 $PAGE->set_context($ctx);
-$PAGE->set_title('Unlinking');
-$PAGE->set_url(new \moodle_url('/local/connect/manage/unlink.php', array(
-    'id' => $id
+$PAGE->set_title('Add an SDS link');
+$PAGE->set_url(new \moodle_url('/local/connect/manage/addlink.php', array(
+    'mid' => $mid
 )));
 $PAGE->set_pagelayout('admin');
 
-$connect->unlink();
+echo $OUTPUT->header();
+echo $OUTPUT->heading('Add an SDS link');
 
-redirect(new \moodle_url('/local/connect/manage/course.php', array(
-    'mid' => $course->mid
-)));
+echo $OUTPUT->footer();
