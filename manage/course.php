@@ -50,7 +50,9 @@ echo \html_writer::start_tag('ul');
 $links = \local_connect\course::get_by('mid', $course->id, true);
 foreach ($links as $obj) {
     echo \html_writer::tag('li', \html_writer::tag('a', "$obj->module_code - $obj->module_title", array(
-        'href' => $CFG->wwwroot . '/local/connect/browse/course.php?id=' . $obj->id,
+        'href' => new \moodle_url('/local/connect/browse/course.php', array(
+            'id' => $obj->id
+        )),
         'target' => 'blank'
     )));
 }
