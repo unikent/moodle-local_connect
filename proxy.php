@@ -31,7 +31,7 @@ if (!\local_connect\util\helpers::is_enabled()) {
     die(json_encode(array("error" => "Connect has been disabled")));
 }
 
-if (!\local_connect\util\helpers::can_course_manage()) {
+if (!\local_connect\util\helpers::can_category_manage()) {
     die(json_encode(array("error" => "You do not have access to view this")));
 }
 

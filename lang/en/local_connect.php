@@ -27,14 +27,14 @@ $string['pluginname'] = 'Kent Connect';
 $string['connect:helpdesk'] = 'Access to the Connect helpdesk portal';
 $string['connect:manage'] = 'Manage Moodle-Connect';
 
+$string['enable'] = 'Enable Connect';
 $string['connectreport'] = 'Departmental administration';
 $string['kentconnect:manage'] = 'Departmental administrator';
 $string['accessdenied'] = 'You are not permitted to view the Departmental administration page';
 $string['connect_error'] = 'Unable to display deliveries';
 $string['connect_disabled'] = 'Connect has been disabled on your system.';
 
-$string['cachedef_kent_connect'] = 'Connect Caching';
-$string['enable'] = 'Enable Connect';
+$string['cachedef_ctxperms'] = 'Context Permissions';
 
 $string['new_feature_toggle'] = 'Enable new Connect features';
 $string['new_feature_toggle_desc'] = 'Warning: These features are experimental and may not work!';

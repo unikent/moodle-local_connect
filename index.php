@@ -23,7 +23,6 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once(dirname(__FILE__) . '/locallib.php');
 
 require_login();
 
@@ -31,13 +30,13 @@ if (!\local_connect\util\helpers::is_enabled()) {
     print_error('connect_disabled', 'local_connect');
 }
 
-if (!\local_connect\util\helpers::can_course_manage()) {
+if (!\local_connect\util\helpers::can_category_manage()) {
     print_error('accessdenied', 'local_connect');
 }
 
 // Initial setup.
 $sitecontext = context_system::instance();
-$catpermissions = kent_get_connect_course_categories();
+$catpermissions = \local_connect\util\helpers::get_connect_course_categories();
 
 // Page setup.
 $PAGE->set_context($sitecontext);
