@@ -25,8 +25,6 @@
 require_once('../../../config.php');
 require_once($CFG->libdir . '/accesslib.php');
 
-require_login();
-
 if (!\local_connect\util\helpers::is_enabled()) {
     print_error('connect_disabled', 'local_connect');
 }
@@ -35,13 +33,12 @@ $mid = required_param('mid', PARAM_INT);
 $course = $DB->get_record('course', array('id' => $mid), '*', MUST_EXIST);
 $ctx = context_course::instance($course->id);
 
+require_login($course->id);
+
 $PAGE->set_context($ctx);
+$PAGE->set_title("SDS Links");
 $PAGE->set_url('/local/connect/manage/course.php');
 $PAGE->set_pagelayout('admin');
-$PAGE->navbar->add(\html_writer::tag('a', 'Connect Administration', array(
-    'href' => '/local/connect/manage/index.php'
-)));
-$PAGE->navbar->add($course->shortname);
 
 // Check we have the capabilities.
 if (!has_capability('moodle/course:update', $ctx)) {
@@ -49,18 +46,17 @@ if (!has_capability('moodle/course:update', $ctx)) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($course->shortname);
+echo $OUTPUT->heading("SDS Links");
 
-echo \html_writer::tag('p', 'This course recieves data from the following SDS modules:');
+echo \html_writer::tag('p', "{$course->shortname} recieves data from the following SDS modules:");
 
 echo \html_writer::start_tag('ul');
-$links = $DB->get_records('connect_course', array('mid' => $course->id));
+$links = \local_connect\course::get_by('mid', $course->id, true);
 foreach ($links as $obj) {
-    $a = \html_writer::tag('a', $obj->module_delivery_key, array(
+    echo \html_writer::tag('li', \html_writer::tag('a', $obj->fullname, array(
         'href' => $CFG->wwwroot . '/local/connect/browse/course.php?id=' . $obj->id,
         'target' => 'blank'
-    ));
-    echo \html_writer::tag('li', $a);
+    )));
 }
 echo \html_writer::end_tag('ul');
 
