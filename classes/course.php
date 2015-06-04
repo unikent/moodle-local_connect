@@ -766,8 +766,18 @@ class course extends data
     public function unlink() {
         $this->delete_enrolments();
 
+        $siblings = $this->get_siblings();
+
         $this->mid = 0;
         $this->save();
+
+        // We were not alone?
+        foreach ($siblings as $sibling) {
+            if ($sibling->id != $this->id) {
+                $sibling->update_moodle();
+                break;
+            }
+        }
 
         return true;
     }
