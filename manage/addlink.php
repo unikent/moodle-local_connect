@@ -41,6 +41,7 @@ $PAGE->set_url(new \moodle_url('/local/connect/manage/addlink.php', array(
     'mid' => $mid
 )));
 $PAGE->set_pagelayout('admin');
+$PAGE->requires->js_call_amd('local_connect/addlink', 'init', array());
 
 $form = new \local_connect\form\link_form();
 
@@ -56,5 +57,22 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading('Add an SDS link');
 
 $form->display();
+
+echo <<<HTML5
+<div id="searchmodal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            	<h4 class="modal-title">Search for module</h4>
+			</div>
+			<div class="modal-body">
+				<p>Type in a module code below</p>
+				<input class="form-control" name="module_code" id="searchmodalinput" placeholder="{$course->shortname}" />
+			</div>
+		</div>
+	</div>
+</div>
+HTML5;
 
 echo $OUTPUT->footer();

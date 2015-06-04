@@ -61,7 +61,7 @@ if (!empty($links)) {
         echo \html_writer::start_div('panel-heading', array(
             'id' => "heading{$obj->id}"
         ));
-        echo \html_writer::link("#collapse{$obj->id}", "{$obj->module_code} - {$obj->module_title}&nbsp;", array(
+        echo \html_writer::link("#collapse{$obj->id}", "{$obj->module_code} - {$obj->module_title}", array(
             'data-toggle' => 'collapse',
             'data-parent' => '#linksaccordion',
             'aria-expanded' => 'true',

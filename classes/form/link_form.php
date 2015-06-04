@@ -44,16 +44,8 @@ class link_form extends \moodleform
         $mform->addElement('text', 'module_delivery_key', 'Module Delivery Key');
         $mform->setType('module_delivery_key', PARAM_TEXT);
         $mform->addHelpButton('module_delivery_key', 'module_delivery_key', 'local_connect');
-        $mform->addRule('module_delivery_key', null, 'required', null, 'client');
+        $mform->addRule('module_delivery_key', null, 'required', null, 'server');
 
         $this->add_action_buttons(true);
-    }
-
-    /**
-     * Set default.
-     */
-    public function set_field_default($field, $val = 0) {
-        $mform =& $this->_form;
-        $mform->setDefault($field, $val);
     }
 }
