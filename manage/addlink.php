@@ -41,6 +41,7 @@ $PAGE->set_url(new \moodle_url('/local/connect/manage/addlink.php', array(
     'mid' => $mid
 )));
 $PAGE->set_pagelayout('admin');
+$PAGE->requires->css('/local/connect/less/build/build.css');
 $PAGE->requires->js_call_amd('local_connect/addlink', 'init', array());
 
 $form = new \local_connect\form\link_form();
@@ -69,7 +70,7 @@ echo <<<HTML5
 			<div class="modal-body">
 				<p>Type in a module code below</p>
 				<input class="form-control" name="module_code" id="searchmodalinput" placeholder="{$course->shortname}" />
-				<div id="searchresults" style="margin-top: 15px;"></div>
+				<div id="searchresults"></div>
 			</div>
 		</div>
 	</div>

@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require (dirname(__FILE__) . '/../../../config.php');
+require(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 /**
@@ -41,7 +41,7 @@ $PAGE->requires->jquery();
 $PAGE->requires->jquery_plugin('migrate');
 $PAGE->requires->js('/local/connect/scripts/jstree.min.js');
 $PAGE->requires->js('/local/connect/scripts/browse.js');
-$PAGE->requires->css('/local/connect/styles/jtree.css');
+$PAGE->requires->css('/local/connect/less/build/jtree.css');
 
 /**
  * And, the actual page.

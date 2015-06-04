@@ -41,7 +41,7 @@ $PAGE->set_url(new \moodle_url('/local/connect/manage/course.php', array(
     'mid' => $mid
 )));
 $PAGE->set_pagelayout('admin');
-$PAGE->requires->css('/local/connect/styles/styles.min.css');
+$PAGE->requires->css('/local/connect/less/build/build.css');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading('SDS Links');
