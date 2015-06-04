@@ -69,7 +69,7 @@ echo <<<HTML5
 			<div class="modal-body">
 				<p>Type in a module code below</p>
 				<input class="form-control" name="module_code" id="searchmodalinput" placeholder="{$course->shortname}" />
-				<div id="searchresults"></div>
+				<div id="searchresults" style="margin-top: 15px;"></div>
 			</div>
 		</div>
 	</div>

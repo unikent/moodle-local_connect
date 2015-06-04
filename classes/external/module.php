@@ -77,17 +77,10 @@ class module extends external_api
         $modulecode = $params['module_code'];
 
         $like = $DB->sql_like('module_code', ':modulecode');
-        $courses = $DB->get_records_select('connect_course', $like, array(
+
+        return $DB->get_records_select('connect_course', $like, array(
             'modulecode' => "%{$modulecode}%"
         ));
-
-        if (!empty($courses)) {
-            $courses = array_map(function($course) {
-                return json_encode($course);
-            }, $courses);
-        }
-
-        return $courses;
     }
 
     /**
@@ -96,6 +89,6 @@ class module extends external_api
      * @return external_description
      */
     public static function search_modules_returns() {
-        return new external_multiple_structure(new external_value(PARAM_RAW, 'The module information as JSON.'));
+        return new external_multiple_structure(new external_value(PARAM_RAW, 'The module information.'));
     }
 }

@@ -74,7 +74,7 @@ define([], function() {
         }
 
         // Show loading thing.
-        $("#searchresults").html('<div style="margin-top: 15px; text-align: center;"><i class="fa fa-spinner fa-spin"></i></div>');
+        $("#searchresults").html('<div style="text-align: center;"><i class="fa fa-spinner fa-spin"></i></div>');
 
         // AMD loader.
         require(['core/ajax', 'core/templates', 'core/notification'], function(ajax, templates, notification) {
@@ -87,8 +87,17 @@ define([], function() {
             }])
 
             promises[0].done(function(response) {
+                var courses = [];
+                $.each(response, function(course) {
+                    courses.push(response[course])
+                });
+
                 // Render a template.
-                console.log(response);
+                var promise = templates.render('local_connect/addlinktable', {'courses': courses});
+                promise.done(function(source, javascript) {
+                    $("#searchresults").html(source);
+                });
+                promise.fail(notification.exception);
             });
 
             promises[0].fail(notification.exception);
