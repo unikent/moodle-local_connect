@@ -55,7 +55,7 @@ define([], function() {
      * Setup listeners on the modal's form.
      */
     var setupListeners = function() {
-        $("#searchmodalinput").on('keyup', function() {
+        $('#searchmodalinput').on('keyup', function() {
             if (searchTimeout) {
                 clearTimeout(searchTimeout);
             }
@@ -68,13 +68,13 @@ define([], function() {
      * Called when it's time to search.
      */
     var doSearch = function() {
-        var val = $("#searchmodalinput").val();
+        var val = $('#searchmodalinput').val();
         if (val.length < 4) {
             return;
         }
 
         // Show loading thing.
-        $("#searchresults").html('<div style="text-align: center;"><i class="fa fa-spinner fa-spin"></i></div>');
+        $('#searchresults').html('<div style="text-align: center;"><i class="fa fa-spinner fa-spin"></i></div>');
 
         // AMD loader.
         require(['core/ajax', 'core/templates', 'core/notification'], function(ajax, templates, notification) {
@@ -82,7 +82,7 @@ define([], function() {
             var promises = ajax.call([{
                 methodname: 'local_connect_search_modules',
                 args: {
-                    module_code: $("#searchmodalinput").val()
+                    module_code: $('#searchmodalinput').val()
                 }
             }])
 
@@ -95,7 +95,13 @@ define([], function() {
                 // Render a template.
                 var promise = templates.render('local_connect/addlinktable', {'courses': courses});
                 promise.done(function(source, javascript) {
-                    $("#searchresults").html(source);
+                    $('#searchresults').html(source);
+
+                    $('#searchresults tr').on('click', function() {
+                        var mdk = $(this).find('.module_delivery_key').text();
+                        $('#id_module_delivery_key').val(mdk);
+                        $('#searchmodal').modal('hide')
+                    });
                 });
                 promise.fail(notification.exception);
             });
