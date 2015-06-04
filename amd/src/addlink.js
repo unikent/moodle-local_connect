@@ -1,4 +1,3 @@
-/*jslint devel: true */
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -74,7 +73,8 @@ define([], function() {
             return;
         }
 
-        // TODO: Show loading thing.
+        // Show loading thing.
+        $("#searchresults").html('<div style="margin-top: 15px; text-align: center;"><i class="fa fa-spinner fa-spin"></i></div>');
 
         // AMD loader.
         require(['core/ajax', 'core/templates', 'core/notification'], function(ajax, templates, notification) {
