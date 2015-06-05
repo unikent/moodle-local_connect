@@ -917,7 +917,7 @@ class course extends data
         }
 
         $course = new course();
-        $course->set_class_data($data);
+        $course->set_data($data);
         return $course;
     }
 
@@ -940,7 +940,7 @@ class course extends data
         if (!$raw) {
             foreach ($result as &$datum) {
                 $obj = new course();
-                $obj->set_class_data($datum);
+                $obj->set_data($datum);
                 $datum = $obj;
             }
         }

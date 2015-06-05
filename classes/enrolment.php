@@ -83,7 +83,7 @@ class enrolment extends data
 
     /**
      * Delete from Moodle
-     * 
+     *
      * @return boolean
      */
     public function delete() {
@@ -189,7 +189,7 @@ class enrolment extends data
 
     /**
      * Returns all enrolments for a given course MID.
-     * 
+     *
      * @return array(local_connect_enrolment) Enrolment objects
      */
     public static function get_by_course_mid($mid, $userid = null) {
@@ -216,7 +216,7 @@ SQL;
 
         foreach ($objs as &$obj) {
             $enrolment = new enrolment();
-            $enrolment->set_class_data($obj);
+            $enrolment->set_data($obj);
             $obj = $enrolment;
         }
 
@@ -225,7 +225,7 @@ SQL;
 
     /**
      * Returns all enrolments the current user should have
-     * 
+     *
      * @see get_all
      * @return array(local_connect_enrolment) Enrolment object
      */
@@ -238,7 +238,7 @@ SQL;
 
     /**
      * Returns all enrolments for a given category
-     * 
+     *
      * @param  local_connect_category $category A category
      * @return local_connect_enrolment Enrolment object
      */
@@ -257,7 +257,7 @@ SQL;
 
         foreach ($objs as &$obj) {
             $enrolment = new enrolment();
-            $enrolment->set_class_data($obj);
+            $enrolment->set_data($obj);
             $obj = $enrolment;
         }
 
@@ -280,7 +280,7 @@ SQL;
         }
 
         $enrolment = new enrolment();
-        $enrolment->set_class_data($obj);
+        $enrolment->set_data($obj);
 
         return $enrolment;
     }
@@ -300,7 +300,7 @@ SQL;
 
         foreach ($records as $record) {
             $enrolment = new enrolment();
-            $enrolment->set_class_data($record);
+            $enrolment->set_data($record);
 
             $enrolments[] = $enrolment;
         }
