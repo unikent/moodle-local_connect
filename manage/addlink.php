@@ -48,7 +48,7 @@ $form = new \local_connect\form\link_form();
 
 if ($data = $form->get_data()) {
     $connect = \local_connect\course::get_by('module_delivery_key', $data->module_delivery_key);
-    $connect->link($mid);
+    $connect->link($mid, true);
     redirect(new \moodle_url('/local/connect/manage/course.php', array(
         'mid' => $mid
     )));
