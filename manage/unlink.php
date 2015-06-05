@@ -22,13 +22,36 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+require_once('../../../config.php');
 
-$plugin->version   = 2015060500;
-$plugin->requires  = 2015051100;
+if (!\local_connect\util\helpers::is_enabled()) {
+    print_error('connect_disabled', 'local_connect');
+}
 
-$plugin->dependencies = array(
-    'local_kent' => 2015060500,
-    'local_catman' => 2015060500,
-    'local_hipchat' => 2015060500
-);
+$id = required_param('id', PARAM_INT);
+$connect = \local_connect\course::get($id);
+if (!$connect) {
+    print_error('Invalid Connect ID');
+}
+
+$course = $DB->get_record('course', array(
+    'id' => $connect->mid
+), '*', MUST_EXIST);
+$ctx = context_course::instance($course->id);
+
+require_login($course->id);
+require_capability('moodle/course:update', $ctx);
+require_sesskey();
+
+$PAGE->set_context($ctx);
+$PAGE->set_title('Unlinking');
+$PAGE->set_url(new \moodle_url('/local/connect/manage/unlink.php', array(
+    'id' => $id
+)));
+$PAGE->set_pagelayout('admin');
+
+$connect->unlink();
+
+redirect(new \moodle_url('/local/connect/manage/course.php', array(
+    'mid' => $course->id
+)));

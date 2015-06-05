@@ -18,14 +18,11 @@
  * Local stuff for Moodle Connect
  *
  * @package    local_connect
- * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2015 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../../config.php');
-require_once($CFG->libdir . '/accesslib.php');
-
-require_login();
 
 if (!\local_connect\util\helpers::is_enabled()) {
     print_error('connect_disabled', 'local_connect');
@@ -35,33 +32,68 @@ $mid = required_param('mid', PARAM_INT);
 $course = $DB->get_record('course', array('id' => $mid), '*', MUST_EXIST);
 $ctx = context_course::instance($course->id);
 
-$PAGE->set_context($ctx);
-$PAGE->set_url('/local/connect/manage/course.php');
-$PAGE->set_pagelayout('admin');
-$PAGE->navbar->add(\html_writer::tag('a', 'Connect Administration', array(
-    'href' => '/local/connect/manage/index.php'
-)));
-$PAGE->navbar->add($course->shortname);
+require_login($course->id);
+require_capability('moodle/course:update', $ctx);
 
-// Check we have the capabilities.
-if (!has_capability('moodle/course:update', $ctx)) {
-    print_error("Access denied");
-}
+$PAGE->set_context($ctx);
+$PAGE->set_title('SDS Links');
+$PAGE->set_url(new \moodle_url('/local/connect/manage/course.php', array(
+    'mid' => $mid
+)));
+$PAGE->set_pagelayout('admin');
+$PAGE->requires->css('/local/connect/less/build/build.css');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($course->shortname);
+echo $OUTPUT->heading('SDS Links');
 
-echo \html_writer::tag('p', 'This course recieves data from the following SDS modules:');
+$links = \local_connect\course::get_by('mid', $course->id, true);
+if (!empty($links)) {
+    echo \html_writer::tag('p', "{$course->shortname} recieves data from the following SDS modules:");
 
-echo \html_writer::start_tag('ul');
-$links = $DB->get_records('connect_course', array('mid' => $course->id));
-foreach ($links as $obj) {
-    $a = \html_writer::tag('a', $obj->module_delivery_key, array(
-        'href' => $CFG->wwwroot . '/local/connect/browse/course.php?id=' . $obj->id,
-        'target' => 'blank'
+    echo \html_writer::start_div('panel-group', array(
+        'id' => 'linksaccordion',
+        'role' => 'tablist',
+        'aria-multiselectable' => 'true'
     ));
-    echo \html_writer::tag('li', $a);
+
+    foreach ($links as $obj) {
+        echo \html_writer::start_div('panel panel-default');
+        echo \html_writer::start_div('panel-heading', array(
+            'id' => "heading{$obj->id}"
+        ));
+        echo \html_writer::link("#collapse{$obj->id}", "{$obj->module_code} - {$obj->module_title}", array(
+            'data-toggle' => 'collapse',
+            'data-parent' => '#linksaccordion',
+            'aria-expanded' => 'true',
+            'aria-controls' => "collapse{$obj->id}"
+        ));
+        echo \html_writer::tag('a', '<i class="fa fa-unlink"></i>', array(
+            'title' => 'Unlink',
+            'href' => new \moodle_url('/local/connect/manage/unlink.php', array(
+                'id' => $obj->id,
+                'sesskey' => sesskey()
+            )),
+            'style' => 'float: right;'
+        ));
+        echo \html_writer::end_div();
+
+        echo \html_writer::start_div('panel-collapse collapse', array(
+            'id' => "collapse{$obj->id}",
+            'role' => 'tabpanel',
+            'aria-labelledby' => "heading{$obj->id}"
+        ));
+        $table = $obj->get_flexible_table($PAGE->url);
+        $table->print_html();
+        echo \html_writer::end_div();
+
+        echo \html_writer::end_div();
+    }
+
+    echo \html_writer::end_div();
 }
-echo \html_writer::end_tag('ul');
+
+echo $OUTPUT->single_button(new \moodle_url('/local/connect/manage/addlink.php', array(
+    'mid' => $mid
+)), 'Add a link');
 
 echo $OUTPUT->footer();

@@ -48,6 +48,16 @@ class group extends data
     }
 
     /**
+     * Returns an array of fields that link to other databasepods.
+     * fieldname -> classname
+     */
+    protected static function linked_fields() {
+        return array(
+            'courseid' => '\\local_connect\\course'
+        );
+    }
+
+    /**
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
@@ -73,8 +83,6 @@ class group extends data
      */
     public function sync($dry = false) {
         global $DB;
-
-        $this->reset_object_cache();
 
         // Is our course in Moodle?
         if (!$this->course || !$this->course->is_in_moodle()) {

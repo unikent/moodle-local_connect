@@ -52,6 +52,16 @@ $observers = array (
     array (
         'eventname' => '\local_catman\event\course_removed',
         'callback' => '\local_connect\observers::catman_scheduled',
+    ),
+
+    array (
+        'eventname' => '\core\event\role_assigned',
+        'callback' => '\local_connect\observers::role_assigned',
+    ),
+
+    array (
+        'eventname' => '\core\event\role_unassigned',
+        'callback'  => '\local_connect\observers::role_unassigned',
     )
 
 );

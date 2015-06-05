@@ -47,14 +47,16 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $this->assertTrue($course->create_in_moodle());
         $this->assertTrue($course->is_in_moodle());
 
-        // Updates.
-        $course->module_title = "TESTING NAME CHANGE";
-
         $user1 = $this->getDataGenerator()->create_user();
         $this->setUser($user1);
 
+        // Test locking.
         $this->assertTrue($course->is_locked());
-        $this->assertEquals(\local_connect\data::STATUS_MODIFY, $course->sync());
+        $mc = $DB->get_record('course', array(
+            'id' => $course->mid
+        ));
+        $mc->fullname = 'TESTING NAME CHANGE';
+        update_course($mc);
         $this->assertFalse($course->is_locked());
 
         $this->setUser(null);
@@ -67,13 +69,12 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $course->save();
 
         $this->assertTrue($course->is_locked());
-        $this->assertEquals(\local_connect\data::STATUS_MODIFY, $course->sync());
+        $mc = $DB->get_record('course', array(
+            'id' => $course->mid
+        ));
+        $mc->fullname = 'TESTING NAME CHANGE 2';
+        update_course($mc);
         $this->assertTrue($course->is_locked());
-
-        $mcourse = $DB->get_record('course', array(
-            "id" => $course->mid
-        ), 'id,fullname');
-        $this->assertEquals($course->fullname, $mcourse->fullname);
     }
 
     /**

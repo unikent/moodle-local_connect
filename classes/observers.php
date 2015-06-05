@@ -175,4 +175,38 @@ class observers
         return true;
     }
 
+    /**
+     * Triggered via role_assigned event.
+     *
+     * @param \core\event\role_assigned $event
+     * @return bool true on success.
+     */
+    public static function role_assigned(\core\event\role_assigned $event) {
+        // Get the context.
+        $context = $event->get_context();
+
+        // Purge cache if we must.
+        if ($context->contextlevel == \CONTEXT_COURSECAT) {
+            $cache = \cache::make('local_connect', 'ctxperms');
+            $cache->delete("coursecat{$event->relateduserid}");
+        }
+
+        return true;
+    }
+
+    /**
+     * Triggered when user role is unassigned.
+     *
+     * @param \core\event\role_unassigned $event
+     */
+    public static function role_unassigned(\core\event\role_unassigned $event) {
+        // Get the context.
+        $context = $event->get_context();
+
+        // Purge cache if we must.
+        if ($context->contextlevel == \CONTEXT_COURSECAT) {
+            $cache = \cache::make('local_connect', 'ctxperms');
+            $cache->delete("coursecat{$event->relateduserid}");
+        }
+    }
 }

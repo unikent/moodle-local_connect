@@ -22,13 +22,30 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_connect\form;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015060500;
-$plugin->requires  = 2015051100;
+require_once($CFG->dirroot.'/lib/formslib.php');
 
-$plugin->dependencies = array(
-    'local_kent' => 2015060500,
-    'local_catman' => 2015060500,
-    'local_hipchat' => 2015060500
-);
+class link_form extends \moodleform
+{
+    /**
+     * Form definition
+     */
+    public function definition() {
+        global $PAGE;
+
+        $mform =& $this->_form;
+
+        $mform->addElement('hidden', 'mid', $PAGE->course->id);
+        $mform->setType('mid', PARAM_INT);
+
+        $mform->addElement('text', 'module_delivery_key', 'Module Delivery Key');
+        $mform->setType('module_delivery_key', PARAM_TEXT);
+        $mform->addHelpButton('module_delivery_key', 'module_delivery_key', 'local_connect');
+        $mform->addRule('module_delivery_key', null, 'required', null, 'server');
+
+        $this->add_action_buttons(true);
+    }
+}

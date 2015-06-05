@@ -22,13 +22,22 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+$services = array(
+    'Connect service' => array(
+        'functions' => array (
+            'local_connect_search_modules'
+        ),
+        'requiredcapability' => '',
+        'restrictedusers' => 0,
+        'enabled' => 1
+    )
+);
 
-$plugin->version   = 2015060500;
-$plugin->requires  = 2015051100;
-
-$plugin->dependencies = array(
-    'local_kent' => 2015060500,
-    'local_catman' => 2015060500,
-    'local_hipchat' => 2015060500
+$functions = array(
+    'local_connect_search_modules' => array(
+        'classname'   => 'local_connect\external\module',
+        'methodname'  => 'search_modules',
+        'description' => 'Search Modules.',
+        'type'        => 'read'
+    )
 );

@@ -1,0 +1,135 @@
+
+body {
+	#da_wrapper {
+		#dapage_app {
+			#options_bar {
+				height: 76px;
+
+				ul#status_toggle {
+					margin: 0;
+				}
+			}
+
+			.table-responsive {
+				border: none;
+				border-radius: 0;
+			}
+
+			#datable_wrapper {
+				#datable {
+					border-collapse: collapse !important;
+
+					thead {
+						tr {
+							background: none;
+							border: none !important;
+						}
+					}
+					
+					tbody {
+						tr.parent {
+							background: none;
+							border: none !important;
+
+							&.even {
+								background: #F7F7F7;
+							}
+
+							&.even:hover,
+							&:hover {
+								background: #F5F5F5;
+
+								td {
+									background: none;
+								}
+							}
+						}
+
+						td {
+							border: 1px solid @table-border-color !important;
+						}
+					}
+				}
+
+				.dataTables_paginate {
+					background: none;
+					border: none;
+					height: 44px;
+
+					span {
+						color: #05345c;
+					}
+
+					a {
+						background: @kent-corp-primary;
+						border: 1px solid @kent-corp-primary;
+						color: #FFF !important;
+						margin: 0 3px;
+
+						&:hover {
+							background: darken(@kent-corp-primary, 10%);
+							border: 1px solid darken(@kent-corp-primary, 10%);
+						}
+					}
+				}
+			}
+		}
+
+		#right_bar_wrap {
+			text-align: center;
+
+			.data_refresh {
+				margin-bottom: 10px;
+			}
+
+			#jobs_wrapper {
+				padding: 10px;
+
+				#select_buttons {
+					height: auto;
+					padding: 0;
+					border: none;
+					border-radius: 0;
+				}
+
+				#jobs {
+					margin: 10px -10px;
+					border: none;
+	  				border-top: 1px solid @border-color;
+	  				border-bottom: 1px solid @border-color;
+				}
+
+				#process_jobs {
+					padding: 0;
+				}
+
+				#dasearch {
+					&,
+					input {
+						margin: 0;
+					}
+				}
+
+				#options_bar {
+					text-align: left;
+				}
+			}
+		}
+	}
+
+	#key {
+		border: none;
+		border-radius: 0;
+
+		&.in,
+		&.collapsing {
+			display: block;
+		}
+	}
+}
+
+#page-local-connect-manage-course {
+	.singlebutton {
+		text-align: left;
+	}
+}

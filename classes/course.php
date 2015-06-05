@@ -62,6 +62,16 @@ class course extends data
     }
 
     /**
+     * Returns an array of fields that link to other databasepods.
+     * fieldname -> classname
+     */
+    protected static function linked_fields() {
+        return array(
+            'campusid' => '\\local_connect\\campus'
+        );
+    }
+
+    /**
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
@@ -86,8 +96,6 @@ class course extends data
      */
     public function sync($dry = false) {
         global $DB;
-
-        $this->reset_object_cache();
 
         // If we are not in Moodle, we have nothing to do!
         if (!$this->is_in_moodle()) {
@@ -653,6 +661,30 @@ class course extends data
     }
 
     /**
+     * Link this to a course
+     *
+     * @param unknown $target
+     * @return unknown
+     */
+    public function link($courseid) {
+        // Add a link.
+        $this->mid = $courseid;
+        $this->save();
+
+        // Update in Moodle.
+        $this->update_moodle();
+
+        // Schedule an adhoc task to sync this course.
+        $task = new \local_connect\task\course_fast_sync();
+        $task->set_custom_data(array(
+            'courseid' => $this->id
+        ));
+        \core\task\manager::queue_adhoc_task($task);
+
+        return true;
+    }
+
+    /**
      * Link a course to this course
      * @param unknown $target
      * @return unknown
@@ -663,14 +695,7 @@ class course extends data
         $target->_siblings = null;
 
         // Add a link.
-        $target->mid = $this->mid;
-        $target->save();
-
-        // Update in Moodle.
-        $this->update_moodle();
-
-        // Sync enrolments.
-        $target->sync_enrolments();
+        $target->link($this->mid);
 
         return true;
     }
@@ -687,6 +712,7 @@ class course extends data
 
         // Check this exists o.o I dont know why I'm expecting it not too...
         if (!$course) {
+            debugging("Can't find course to update {$course->id}");
             return false;
         }
 
@@ -740,8 +766,18 @@ class course extends data
     public function unlink() {
         $this->delete_enrolments();
 
+        $siblings = $this->get_siblings();
+
         $this->mid = 0;
         $this->save();
+
+        // We were not alone?
+        foreach ($siblings as $sibling) {
+            if ($sibling->id != $this->id) {
+                $sibling->update_moodle();
+                break;
+            }
+        }
 
         return true;
     }

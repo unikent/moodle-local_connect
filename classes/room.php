@@ -46,6 +46,16 @@ class room extends data
     }
 
     /**
+     * Returns an array of fields that link to other databasepods.
+     * fieldname -> classname
+     */
+    protected static function linked_fields() {
+        return array(
+            'campusid' => '\\local_connect\\campus'
+        );
+    }
+
+    /**
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {

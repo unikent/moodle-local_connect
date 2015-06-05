@@ -50,3 +50,6 @@ $string['connectbrowse_user'] = 'Connect Data Browser User - ';
 $string['connectbrowse_course'] = 'Connect Data Browser Course - ';
 $string['connectbrowse_group'] = 'Connect Data Browser Group - ';
 $string['connectbrowse_push'] = 'Pushing to Moodle';
+
+$string['module_delivery_key'] = 'Module Delivery Key';
+$string['module_delivery_key_help'] = 'You can get this from SDS';
