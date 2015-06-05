@@ -666,7 +666,7 @@ class course extends data
      * @param unknown $target
      * @return unknown
      */
-    public function link($courseid) {
+    public function link($courseid, $fast = false) {
         // Add a link.
         $this->mid = $courseid;
         $this->save();
@@ -674,12 +674,20 @@ class course extends data
         // Update in Moodle.
         $this->update_moodle();
 
-        // Schedule an adhoc task to sync this course.
-        $task = new \local_connect\task\course_fast_sync();
-        $task->set_custom_data(array(
-            'courseid' => $this->id
-        ));
-        \core\task\manager::queue_adhoc_task($task);
+        if ($fast) {
+            // Schedule an adhoc task to sync this course.
+            $task = new \local_connect\task\course_fast_sync();
+            $task->set_custom_data(array(
+                'courseid' => $this->id
+            ));
+            \core\task\manager::queue_adhoc_task($task);
+        } else {
+            // Sync our enrolments.
+            $this->sync_enrolments();
+
+            // Sync our groups.
+            $this->sync_groups();
+        }
 
         return true;
     }
@@ -689,13 +697,13 @@ class course extends data
      * @param unknown $target
      * @return unknown
      */
-    public function add_child($target) {
+    public function add_child($target, $fast = false) {
         // Reset required.
         $this->_siblings = null;
         $target->_siblings = null;
 
         // Add a link.
-        $target->link($this->mid);
+        $target->link($this->mid, $fast);
 
         return true;
     }
