@@ -32,9 +32,14 @@ function local_connect_extend_settings_navigation(settings_navigation $nav, cont
         return;
     }
 
+    // Check we can update the course.
+    $context = \context_course::instance($PAGE->course->id);
+    if (!has_capability('moodle/course:update', $context)) {
+        return;
+    }
+
     // Add an "SDS Links" nav item.
     if ($settingnode = $nav->find('courseadmin', navigation_node::TYPE_COURSE)) {
-
         $url = new moodle_url('/local/connect/manage/course.php', array(
             'mid' => $PAGE->course->id
         ));
@@ -59,7 +64,7 @@ function local_connect_extend_settings_navigation(settings_navigation $nav, cont
         }
 
         $sdsnode->add_node($node);
-    }
 
-    return $node;
+        return $node;
+    }
 }
