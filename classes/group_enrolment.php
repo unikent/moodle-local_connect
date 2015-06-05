@@ -177,7 +177,7 @@ class group_enrolment extends data
 
     /**
      * Delete from Moodle
-     * 
+     *
      * @return boolean
      */
     public function delete() {
@@ -194,7 +194,7 @@ class group_enrolment extends data
 
     /**
      * Returns all group enrolments for a given course
-     * 
+     *
      * @param  local_connect_course $course A course
      * @return local_connect_enrolment Enrolment object
      */
@@ -212,7 +212,7 @@ class group_enrolment extends data
 
         foreach ($set as &$o) {
             $obj = new group_enrolment();
-            $obj->set_class_data($o);
+            $obj->set_data($o);
             $o = $obj;
         }
 

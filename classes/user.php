@@ -219,7 +219,7 @@ class user extends data
             }
 
             $user = new static();
-            $user->set_class_data($obj);
+            $user->set_data($obj);
             $result[$obj->login] = $user;
         }
 
