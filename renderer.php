@@ -178,15 +178,15 @@ HTML5;
                 <input type="hidden" name="primary_child" id="primary_child" value="" />
                 <div class="form-group">
                     <label for="shortname">Shortname</label>
-                    <input type="text" class="form-control" id="shortname" name="shortname" placeholder="Shortname">
+                    <input type="text" class="form-control" id="shortname" name="shortname" placeholder="Shortname" disabled="disabled">
+                </div>
+                <div class="form-group">
+                    <label for="shortname_ext">Shortname extension</label>
+                    <input type="text" class="form-control" id="shortname_ext" name="shortname_ext" placeholder="AUT/SPR/SUM">
                 </div>
                 <div class="form-group">
                     <label for="fullname">Fullname</label>
-                    <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Fullname">
-                </div>
-                <div class="form-group">
-                    <label for="synopsis">Synopsis</label>
-                    <textarea maxlength="500" name="synopsis" id="synopsis" class="form-control" rows="3"></textarea>
+                    <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Fullname" disabled="disabled">
                 </div>
                 <div class="form-group">
                     <label for="category">Category</label>
