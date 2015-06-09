@@ -603,8 +603,8 @@ var Connect = (function() {
 
 			if(typeof prod != "undefined") {
 				_this.formEl.shrtNmExtTd.html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
-				_this.formEl.notes.removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
-				_this.formEl.shortNameExt.addClass('warn');
+				_this.formEl.notes.removeClass().addClass('alert alert-warning').text('Shortname already in use. Please provide a three letter identifier');
+				_this.formEl.shortNameExt.parent().addClass('has-warning');
 			}
 		} else {
 			var synopsis = row[0].synopsis;
@@ -642,8 +642,8 @@ var Connect = (function() {
 
           			if (!_.isEmpty($('#shortname_ext_td').children()) && $('#shortname_ext_td').children().length > 0) {
 						if(_.isEmpty($('#shortname_ext').val())) {
-							_this.formEl.notes.removeClass('warn').addClass('error').text('Please provide a three letter identifier');
-							_this.formEl.shortNameExt.addClass('error');
+							_this.formEl.notes.removeClass('alert alert-warning').addClass('error').text('Please provide a three letter identifier');
+							_this.formEl.shortNameExt.parent().addClass('has-error');
 							ui_sub.stop();
 							return;
 						}
@@ -678,11 +678,11 @@ var Connect = (function() {
 							case 'could_not_schedule':
 								if(_this.formEl.shortNameExt.get(0)) {
 									_this.formEl.notes.addClass('error').text('Please provide a three letter identifier');
-									_this.formEl.shortNameExt.addClass('error');
+									_this.formEl.shortNameExt.parent().addClass('has-error');
 								} else {
 									_this.formEl.shrtNmExtTd.html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
-									_this.formEl.notes.removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
-									_this.formEl.shortNameExt.addClass('warn');
+									_this.formEl.notes.removeClass().addClass('alert alert-warning').text('Shortname already in use. Please provide a three letter identifier');
+									_this.formEl.shortNameExt.parent().addClass('alert alert-warning');
 								}
 							break;
 						}
@@ -870,8 +870,8 @@ var Connect = (function() {
 
 					if(_this.formEl.shortNameExt.get(0)) {
 						if(_this.formEl.shortNameExt.val() === '') {
-							_this.formEl.notes.removeClass('warn').addClass('error').text('Please provide a three letter identifier');
-							_this.formEl.shortNameExt.addClass('error');
+							_this.formEl.notes.removeClass('alert alert-warning').addClass('error').text('Please provide a three letter identifier');
+							_this.formEl.shortNameExt.parent().addClass('has-error');
 							ui_sub.stop();
 							return;
 						}
@@ -933,17 +933,17 @@ var Connect = (function() {
 									case 'duplicate':
 									case 'could_not_schedule':
 										if($('#shortname_ext').get(0)) {
-											$('#edit_notifications').addClass('error').text('Please provide a three letter identifier');
+											$('#edit_notifications').addClass('alert alert-error').text('Please provide a three letter identifier');
 											$('#shortname_ext').addClass('error');
 										} else {
 											$('#shortname_ext_td').html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
-											$('#edit_notifications').removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
-											$('#shortname_ext').addClass('warn');
+											$('#edit_notifications').removeClass().addClass('alert alert-warning').text('Shortname already in use. Please provide a three letter identifier');
+											$('#shortname_ext').addClass('alert alert-warning');
 										}
 									break;
 								}
 							} else {
-								$('#edit_notifications').addClass('error').text('A server error occured :( ... please contact an administrator');
+								$('#edit_notifications').addClass('alert alert-error').text('A server error occured :( ... please contact an administrator');
 								$('#shortname_ext').addClass('error');
 							}
 
