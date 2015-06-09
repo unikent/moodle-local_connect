@@ -603,7 +603,7 @@ var Connect = (function() {
 
 			if(typeof prod != "undefined") {
 				_this.formEl.shrtNmExtTd.html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
-				_this.formEl.notes.removeClass().addClass('alert alert-warning').text('Shortname already in use. Please provide a three letter identifier');
+				_this.formEl.notes.removeClass().addClass('alert alert-warning').text('Shortname may be in use. Please provide a three letter identifier.');
 				_this.formEl.shortNameExt.parent().addClass('has-warning');
 			}
 		} else {
@@ -617,7 +617,7 @@ var Connect = (function() {
 		this.formEl.shortName.val(shortname);
 		this.formEl.fullName.val(fullname);
 		this.formEl.synopsis.val(synopsis);
-		this.formEl.cat.val(row[0].category_id);
+		this.formEl.cat.val(row[0].category);
 		$( "#dialog-form" ).dialog({ 
 			title: 'Choose details',
 			close: function(event, ui) {
@@ -839,7 +839,7 @@ var Connect = (function() {
 		this.formEl.shortName.val(short_name);
 		this.formEl.fullName.val(full_name);
 		this.formEl.synopsis.val(synopsis);
-		this.formEl.cat.val(mergers[0].category_id);
+		this.formEl.cat.val(mergers[0].category);
 		this.formEl.primary_child.val(primary_child);
 
 		this.formEl.shortName.change(function() { $('#primary_child').val(''); });
