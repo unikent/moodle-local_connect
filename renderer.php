@@ -123,27 +123,9 @@ class local_connect_renderer extends plugin_renderer_base
                                 </label>
                             </div>
                             <div class="checkbox">
-                                <label id="label-processing" for="processing">
-                                    <input type="checkbox" name="processing" value="processing" id="processing" class="status_checkbox">
-                                    processing
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label id="label-scheduled" for="scheduled">
-                                    <input type="checkbox" name="scheduled" value="scheduled" id="scheduled" class="status_checkbox">
-                                    scheduled
-                                </label>
-                            </div>
-                            <div class="checkbox">
                                 <label id="label-created_in_moodle" for="created_in_moodle">
                                     <input type="checkbox" name="created_in_moodle" value="created_in_moodle" id="created_in_moodle" class="status_checkbox">
                                     created in moodle
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label id="label-failed_in_moodle" for="failed_in_moodle">
-                                    <input type="checkbox" name="failed_in_moodle" value="failed_in_moodle" id="failed_in_moodle" class="status_checkbox">
-                                    failed in moodle
                                 </label>
                             </div>
                         </div>
