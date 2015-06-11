@@ -327,7 +327,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
      * If we move a course to the removed category,
      * kill its mid.
      */
-    public function test_course_removed_mid() {
+    public function test_course_scheduled_mid() {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . "/course/lib.php");
