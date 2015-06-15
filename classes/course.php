@@ -141,18 +141,23 @@ class course extends data
      * Are we only merged with different versions of the same course?
      */
     public function is_version_merged() {
-        $courses = $this->get_siblings();
-        if (is_array($courses)) {
-            foreach ($courses as $course) {
-                if ($course->module_code !== $this->module_code) {
-                    return false;
-                }
-            }
+        global $DB;
 
-            return true;
+        if (!$this->is_in_moodle()) {
+            return false;
         }
 
-        return false;
+        // Count the number of distinct module_versions.
+        $sql = <<<SQL
+        SELECT COUNT(DISTINCT c.module_version) as versions, COUNT(DISTINCT c.module_code) as codes
+        FROM {connect_course} c
+        WHERE c.mid = :mid
+SQL;
+        $counts = $DB->get_record_sql($sql, array(
+            'mid' => $this->mid
+        ));
+
+        return $counts->codes == 1 && $counts->versions > 1;
     }
 
     /**
