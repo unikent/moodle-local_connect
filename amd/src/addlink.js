@@ -84,7 +84,7 @@ define([], function() {
                 args: {
                     module_code: $('#searchmodalinput').val()
                 }
-            }])
+            }]);
 
             promises[0].done(function(response) {
                 var courses = [];

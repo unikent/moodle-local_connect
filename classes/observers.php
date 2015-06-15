@@ -32,12 +32,12 @@ defined('MOODLE_INTERNAL') || die();
 class observers
 {
     /**
-     * Triggered when 'course_removed' event is triggered.
+     * Triggered when 'course_scheduled' event is triggered.
      *
-     * @param \local_catman\event\course_removed $event
+     * @param \local_catman\event\course_scheduled $event
      * @return unknown
      */
-    public static function catman_scheduled(\local_catman\event\course_removed $event) {
+    public static function catman_scheduled(\local_catman\event\course_scheduled $event) {
         global $DB;
 
         // Check we were not moved to the removed category.

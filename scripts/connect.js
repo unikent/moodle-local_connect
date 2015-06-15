@@ -171,7 +171,7 @@ var Connect = (function() {
 		var _this = this;
 
 		//Setting the click event for table rows
-		this.buttons.rowsEl.live('click', function(e) {
+		this.buttons.rowsEl.on('click', function(e) {
 			clearTimeout(this.push_timeout);
 			clearTimeout(this.ui_timeout);
 			clearTimeout(this.merge_timeout);
@@ -208,13 +208,13 @@ var Connect = (function() {
 			$('#statusbox').fadeOut('fast');
 		});
 
-		this.buttons.edit.live('click', function() {
+		this.buttons.edit.on('click', function() {
 			var id = $(this).closest('tr').attr('ident');
 
 			_this.edit_row(id, _this.json, null);
 		});
 
-		this.buttons.child.live('click', function() {
+		this.buttons.child.on('click', function() {
 			var id = $(this).closest('tr').attr('ident');
 
 			var row = _.filter(_this.json, function (r) { 
@@ -233,11 +233,11 @@ var Connect = (function() {
 			}
 		});
 
-		this.buttons.unlinkRow.live('click', function() {
+		this.buttons.unlinkRow.on('click', function() {
 			_this.unlink_row(this);
 		});
 
-		this.buttons.unlinkChild.live('click', function() {
+		this.buttons.unlinkChild.on('click', function() {
 			_this.unlink_child(this);
 		});
 
@@ -603,8 +603,8 @@ var Connect = (function() {
 
 			if(typeof prod != "undefined") {
 				_this.formEl.shrtNmExtTd.html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
-				_this.formEl.notes.removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
-				_this.formEl.shortNameExt.addClass('warn');
+				_this.formEl.notes.removeClass().addClass('alert alert-warning').text('Shortname may be in use. Please provide a three letter identifier.');
+				_this.formEl.shortNameExt.parent().addClass('has-warning');
 			}
 		} else {
 			var synopsis = row[0].synopsis;
@@ -617,7 +617,7 @@ var Connect = (function() {
 		this.formEl.shortName.val(shortname);
 		this.formEl.fullName.val(fullname);
 		this.formEl.synopsis.val(synopsis);
-		this.formEl.cat.val(row[0].category_id);
+		this.formEl.cat.val(row[0].category);
 		$( "#dialog-form" ).dialog({ 
 			title: 'Choose details',
 			close: function(event, ui) {
@@ -642,8 +642,8 @@ var Connect = (function() {
 
           			if (!_.isEmpty($('#shortname_ext_td').children()) && $('#shortname_ext_td').children().length > 0) {
 						if(_.isEmpty($('#shortname_ext').val())) {
-							_this.formEl.notes.removeClass('warn').addClass('error').text('Please provide a three letter identifier');
-							_this.formEl.shortNameExt.addClass('error');
+							_this.formEl.notes.removeClass('alert alert-warning').addClass('error').text('Please provide a three letter identifier');
+							_this.formEl.shortNameExt.parent().addClass('has-error');
 							ui_sub.stop();
 							return;
 						}
@@ -678,11 +678,11 @@ var Connect = (function() {
 							case 'could_not_schedule':
 								if(_this.formEl.shortNameExt.get(0)) {
 									_this.formEl.notes.addClass('error').text('Please provide a three letter identifier');
-									_this.formEl.shortNameExt.addClass('error');
+									_this.formEl.shortNameExt.parent().addClass('has-error');
 								} else {
 									_this.formEl.shrtNmExtTd.html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
-									_this.formEl.notes.removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
-									_this.formEl.shortNameExt.addClass('warn');
+									_this.formEl.notes.removeClass().addClass('alert alert-warning').text('Shortname already in use. Please provide a three letter identifier');
+									_this.formEl.shortNameExt.parent().addClass('alert alert-warning');
 								}
 							break;
 						}
@@ -839,7 +839,7 @@ var Connect = (function() {
 		this.formEl.shortName.val(short_name);
 		this.formEl.fullName.val(full_name);
 		this.formEl.synopsis.val(synopsis);
-		this.formEl.cat.val(mergers[0].category_id);
+		this.formEl.cat.val(mergers[0].category);
 		this.formEl.primary_child.val(primary_child);
 
 		this.formEl.shortName.change(function() { $('#primary_child').val(''); });
@@ -870,8 +870,8 @@ var Connect = (function() {
 
 					if(_this.formEl.shortNameExt.get(0)) {
 						if(_this.formEl.shortNameExt.val() === '') {
-							_this.formEl.notes.removeClass('warn').addClass('error').text('Please provide a three letter identifier');
-							_this.formEl.shortNameExt.addClass('error');
+							_this.formEl.notes.removeClass('alert alert-warning').addClass('error').text('Please provide a three letter identifier');
+							_this.formEl.shortNameExt.parent().addClass('has-error');
 							ui_sub.stop();
 							return;
 						}
@@ -933,17 +933,17 @@ var Connect = (function() {
 									case 'duplicate':
 									case 'could_not_schedule':
 										if($('#shortname_ext').get(0)) {
-											$('#edit_notifications').addClass('error').text('Please provide a three letter identifier');
+											$('#edit_notifications').addClass('alert alert-error').text('Please provide a three letter identifier');
 											$('#shortname_ext').addClass('error');
 										} else {
 											$('#shortname_ext_td').html('<input type="text" name="shortname_ext" id="shortname_ext" class="text ui-widget-content ui-corner-all" size="3" maxlength="3"/>');
-											$('#edit_notifications').removeClass().addClass('warn').text('Shortname already in use. Please provide a three letter identifier');
-											$('#shortname_ext').addClass('warn');
+											$('#edit_notifications').removeClass().addClass('alert alert-warning').text('Shortname already in use. Please provide a three letter identifier');
+											$('#shortname_ext').addClass('alert alert-warning');
 										}
 									break;
 								}
 							} else {
-								$('#edit_notifications').addClass('error').text('A server error occured :( ... please contact an administrator');
+								$('#edit_notifications').addClass('alert alert-error').text('A server error occured :( ... please contact an administrator');
 								$('#shortname_ext').addClass('error');
 							}
 

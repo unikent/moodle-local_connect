@@ -25,7 +25,6 @@
 define('AJAX_SCRIPT', true);
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/locallib.php');
 
 if (!\local_connect\util\helpers::is_enabled()) {
     die(json_encode(array("error" => "Connect has been disabled")));

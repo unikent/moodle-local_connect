@@ -123,27 +123,9 @@ class local_connect_renderer extends plugin_renderer_base
                                 </label>
                             </div>
                             <div class="checkbox">
-                                <label id="label-processing" for="processing">
-                                    <input type="checkbox" name="processing" value="processing" id="processing" class="status_checkbox">
-                                    processing
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label id="label-scheduled" for="scheduled">
-                                    <input type="checkbox" name="scheduled" value="scheduled" id="scheduled" class="status_checkbox">
-                                    scheduled
-                                </label>
-                            </div>
-                            <div class="checkbox">
                                 <label id="label-created_in_moodle" for="created_in_moodle">
                                     <input type="checkbox" name="created_in_moodle" value="created_in_moodle" id="created_in_moodle" class="status_checkbox">
                                     created in moodle
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label id="label-failed_in_moodle" for="failed_in_moodle">
-                                    <input type="checkbox" name="failed_in_moodle" value="failed_in_moodle" id="failed_in_moodle" class="status_checkbox">
-                                    failed in moodle
                                 </label>
                             </div>
                         </div>
@@ -178,15 +160,15 @@ HTML5;
                 <input type="hidden" name="primary_child" id="primary_child" value="" />
                 <div class="form-group">
                     <label for="shortname">Shortname</label>
-                    <input type="text" class="form-control" id="shortname" name="shortname" placeholder="Shortname">
+                    <input type="text" class="form-control" id="shortname" name="shortname" placeholder="Shortname" disabled="disabled">
+                </div>
+                <div class="form-group">
+                    <label for="shortname_ext">Shortname extension</label>
+                    <input type="text" class="form-control" id="shortname_ext" name="shortname_ext" placeholder="AUT/SPR/SUM">
                 </div>
                 <div class="form-group">
                     <label for="fullname">Fullname</label>
-                    <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Fullname">
-                </div>
-                <div class="form-group">
-                    <label for="synopsis">Synopsis</label>
-                    <textarea maxlength="500" name="synopsis" id="synopsis" class="form-control" rows="3"></textarea>
+                    <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Fullname" disabled="disabled">
                 </div>
                 <div class="form-group">
                     <label for="category">Category</label>
