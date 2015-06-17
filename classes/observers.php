@@ -42,9 +42,7 @@ class observers
 
         // Check we were not moved to the removed category.
         $category = \local_catman\core::get_category();
-        $course = $DB->get_record('course', array(
-            'id' => $event->objectid
-        ), 'id,category');
+        $course = $event->get_record_snapshot('course', $event->objectid);
 
         // If this is in the removed category, delete any reference to it.
         if ($course->category == $category->id) {
