@@ -48,7 +48,7 @@ echo $OUTPUT->heading('SDS Links');
 
 $links = \local_connect\course::get_by('mid', $course->id, true);
 if (!empty($links)) {
-    echo \html_writer::tag('p', "{$course->shortname} recieves data from the following SDS modules:");
+    echo \html_writer::tag('p', "{$course->shortname} receives data from the following SDS modules:");
 
     echo \html_writer::start_div('panel-group', array(
         'id' => 'linksaccordion',
