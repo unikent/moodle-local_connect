@@ -171,7 +171,7 @@ var Connect = (function() {
 		var _this = this;
 
 		//Setting the click event for table rows
-		$(document).on('click', this.buttons.rowsEl, function(e) {
+		this.buttons.rowsEl.live('click', function(e) {
 			clearTimeout(this.push_timeout);
 			clearTimeout(this.ui_timeout);
 			clearTimeout(this.merge_timeout);
@@ -208,13 +208,13 @@ var Connect = (function() {
 			$('#statusbox').fadeOut('fast');
 		});
 
-		$(document).on('click', this.buttons.edit, function() {
+		this.buttons.edit.live('click', function() {
 			var id = $(this).closest('tr').attr('ident');
 
 			_this.edit_row(id, _this.json, null);
 		});
 
-		$(document).on('click', this.buttons.child, function() {
+		this.buttons.child.live('click', function() {
 			var id = $(this).closest('tr').attr('ident');
 
 			var row = _.filter(_this.json, function (r) { 
@@ -233,11 +233,11 @@ var Connect = (function() {
 			}
 		});
 
-		$(document).on('click', this.buttons.unlinkRow, function() {
+		this.buttons.unlinkRow.live('click', function() {
 			_this.unlink_row(this);
 		});
 
-		$(document).on('click', this.buttons.unlinkChild, function() {
+		this.buttons.unlinkChild.live('click', function() {
 			_this.unlink_child(this);
 		});
 
