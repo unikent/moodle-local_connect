@@ -111,6 +111,6 @@ class campus extends data
             return 'CCCU';
         }
 
-        return '';
+        return $this->name;
     }
 }

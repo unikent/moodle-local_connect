@@ -184,14 +184,14 @@ class base
      * Build a shortnameext.
      */
     private function get_shortnameext($course, $campus = '') {
-        $campus = empty($campus) ? '' : " {$campus}";
+        $campus = empty($campus) ? '' : "{$campus} ";
 
         if (strpos($course->module_code, "WSHOP") === 0) {
-            return "{$campus} (week {$course->module_week_beginning})";
+            return "{$campus}(week {$course->module_week_beginning})";
         }
 
         $term = static::get_term($course);
-        return "{$campus} {$term}";
+        return "{$campus}{$term}";
     }
 
     /**
