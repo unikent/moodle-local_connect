@@ -106,6 +106,18 @@ class base
             }
         }
 
+        // Create mostly-simple build actions for all courses that are campus-spanned.
+        foreach ($lists['campus-span'] as $course) {
+            $course = \local_connect\course::from_sql_result($course);
+            $campus = $course->campus->get_shortname();
+            $shortnameext = $this->get_shortnameext($course, $campus);
+            $course->set_shortname_ext($shortnameext);
+
+            if ($course->is_unique_shortname($course->shortname, true)) {
+                $this->_tree->add_child(new actions\course_create($course));
+            }
+        }
+
         // Merge version-spanned.
         $merges = $sorter->get_version_merges();
         foreach ($merges as $merge) {
@@ -171,13 +183,15 @@ class base
     /**
      * Build a shortnameext.
      */
-    private function get_shortnameext($course) {
+    private function get_shortnameext($course, $campus = '') {
+        $campus = empty($campus) ? '' : " {$campus}";
+
         if (strpos($course->module_code, "WSHOP") === 0) {
-            return "(week " . $course->module_week_beginning . ")";
+            return "{$campus} (week {$course->module_week_beginning})";
         }
 
         $term = static::get_term($course);
-        return $term;
+        return "{$campus} {$term}";
     }
 
     /**
