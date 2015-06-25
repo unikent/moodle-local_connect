@@ -89,4 +89,28 @@ class campus extends data
     public function delete() {
         return false;
     }
+
+    /**
+     * Get shortname.
+     */
+    public function get_shortname() {
+        switch ($this->name) {
+            case 'Canterbury':
+            return '';
+
+            case 'Medway':
+            return 'MED';
+
+            case 'Tonbridge Centre':
+            return 'TON';
+
+            case 'Glaxo Smith Kline':
+            return 'GSK';
+
+            case 'Canterbury Christ Church':
+            return 'CCCU';
+        }
+
+        return $this->name;
+    }
 }
