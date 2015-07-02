@@ -242,6 +242,11 @@ class category
                 'rule' => 'TH'
             ),
             array(
+                'department' => '4',
+                'idnumber' => '62',
+                'rule' => 'HM'
+            ),
+            array(
                 'department' => '5',
                 'idnumber' => '35'
             ),
