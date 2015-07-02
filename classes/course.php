@@ -648,7 +648,7 @@ SQL;
                 continue;
             }
 
-            if (isset($entry['rule']) && !strpos($this->module_code, $entry['rule']) !== 0) {
+            if (isset($entry['rule']) && strpos($this->module_code, $entry['rule']) !== 0) {
                 continue;
             }
 
