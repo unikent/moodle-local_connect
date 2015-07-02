@@ -110,6 +110,11 @@ class course extends data
             }
         }
 
+        // Do we need to re-map our category?
+        if (!$dry && $this->category < 1) {
+            $this->map_category();
+        }
+
         // Have we changed at all?
         if ($this->is_locked() && $this->has_changed()) {
             if (!$dry) {
@@ -501,9 +506,12 @@ SQL;
             'id' => $this->mid
         ), 'id, shortname, fullname, summary');
 
-        return  $course->shortname !== $this->shortname ||
-                $course->fullname !== $this->fullname ||
-                $course->summary !== $this->summary;
+        return  (
+            $course->shortname !== $this->shortname ||
+            $course->fullname !== $this->fullname ||
+            $course->category !== $this->category ||
+            $course->summary !== $this->summary
+        );
     }
 
     /**
@@ -744,6 +752,7 @@ SQL;
         // Updates!
         $course->shortname = $this->shortname;
         $course->fullname = $this->fullname;
+        $course->category = $this->category;
         $course->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
 
         // Update this course in Moodle.
