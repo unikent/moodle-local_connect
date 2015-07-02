@@ -300,6 +300,10 @@ class category
             ),
             array(
                 'department' => '12',
+                'idnumber' => '50'
+            ),
+            array(
+                'department' => '12',
                 'idnumber' => '53',
                 'rule' => 'CR'
             ),
@@ -312,6 +316,11 @@ class category
                 'department' => '12',
                 'idnumber' => '52',
                 'rule' => 'MU'
+            ),
+            array(
+                'department' => '12',
+                'idnumber' => '64',
+                'rule' => 'MFA'
             ),
             array(
                 'department' => '85',
