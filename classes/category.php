@@ -94,6 +94,10 @@ class category
                 'idnumber' => '27'
             ),
             array(
+                'department' => '78',
+                'idnumber' => '27'
+            ),
+            array(
                 'department' => '28',
                 'idnumber' => '9'
             ),
@@ -238,6 +242,11 @@ class category
                 'rule' => 'TH'
             ),
             array(
+                'department' => '4',
+                'idnumber' => '62',
+                'rule' => 'HM'
+            ),
+            array(
                 'department' => '5',
                 'idnumber' => '35'
             ),
@@ -296,6 +305,10 @@ class category
             ),
             array(
                 'department' => '12',
+                'idnumber' => '50'
+            ),
+            array(
+                'department' => '12',
                 'idnumber' => '53',
                 'rule' => 'CR'
             ),
@@ -308,6 +321,28 @@ class category
                 'department' => '12',
                 'idnumber' => '52',
                 'rule' => 'MU'
+            ),
+            array(
+                'department' => '12',
+                'idnumber' => '64',
+                'rule' => 'MFA'
+            ),
+            array(
+                'department' => '85',
+                'idnumber' => '50'
+            ),
+            array(
+                'department' => '85',
+                'idnumber' => '55',
+                'rule' => 'HA'
+            ),
+            array(
+                'department' => '69',
+                'idnumber' => '13'
+            ),
+            array(
+                'department' => '72',
+                'idnumber' => '10'
             )
         );
     }

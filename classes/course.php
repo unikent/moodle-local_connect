@@ -110,6 +110,11 @@ class course extends data
             }
         }
 
+        // Do we need to re-map our category?
+        if (!$dry && $this->category < 1) {
+            $this->map_category();
+        }
+
         // Have we changed at all?
         if ($this->is_locked() && $this->has_changed()) {
             if (!$dry) {
@@ -501,9 +506,12 @@ SQL;
             'id' => $this->mid
         ), 'id, shortname, fullname, summary');
 
-        return  $course->shortname !== $this->shortname ||
-                $course->fullname !== $this->fullname ||
-                $course->summary !== $this->summary;
+        return  (
+            $course->shortname !== $this->shortname ||
+            $course->fullname !== $this->fullname ||
+            $course->category !== $this->category ||
+            $course->summary !== $this->summary
+        );
     }
 
     /**
@@ -642,27 +650,39 @@ SQL;
     public function map_category() {
         global $DB;
 
+        $possibilities = array();
+
         $map = category::get_map_table();
         foreach ($map as $entry) {
             if ($entry['department'] != $this->department) {
                 continue;
             }
 
-            if (isset($entry['rule']) && !strpos($this->module_code, $entry['rule']) !== 0) {
-                continue;
+            $weight = 0;
+            if (isset($entry['rule'])) {
+                // Do we match the rule?
+                if (strpos($this->module_code, $entry['rule']) !== 0) {
+                    continue;
+                }
+
+                $weight = 1;
             }
 
-            // Yes please :)
-            $category = $DB->get_record('course_categories', array(
+            // Find the category.
+            $category = $DB->get_field('course_categories', 'id', array(
                 'idnumber' => $entry['idnumber']
             ));
             if ($category) {
-                $this->category = $category->id;
-                return;
+                $possibilities[$weight] = $category;
             }
         }
 
-        $this->category = 1;
+        if (empty($possibilities)) {
+            $this->category = 1;
+            return;
+        }
+
+        $this->category = isset($possibilities[1]) ? $possibilities[1] : $possibilities[0];
     }
 
     /**
@@ -732,6 +752,7 @@ SQL;
         // Updates!
         $course->shortname = $this->shortname;
         $course->fullname = $this->fullname;
+        $course->category = $this->category;
         $course->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
 
         // Update this course in Moodle.
