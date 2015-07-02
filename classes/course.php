@@ -642,27 +642,39 @@ SQL;
     public function map_category() {
         global $DB;
 
+        $possibilities = array();
+
         $map = category::get_map_table();
         foreach ($map as $entry) {
             if ($entry['department'] != $this->department) {
                 continue;
             }
 
-            if (isset($entry['rule']) && strpos($this->module_code, $entry['rule']) !== 0) {
-                continue;
+            $weight = 0;
+            if (isset($entry['rule'])) {
+                // Do we match the rule?
+                if (strpos($this->module_code, $entry['rule']) !== 0) {
+                    continue;
+                }
+
+                $weight = 1;
             }
 
-            // Yes please :)
-            $category = $DB->get_record('course_categories', array(
+            // Find the category.
+            $category = $DB->get_field('course_categories', 'id', array(
                 'idnumber' => $entry['idnumber']
             ));
             if ($category) {
-                $this->category = $category->id;
-                return;
+                $possibilities[$weight] = $category;
             }
         }
 
-        $this->category = 1;
+        if (empty($possibilities)) {
+            $this->category = 1;
+            return;
+        }
+
+        $this->category = isset($possibilities[1]) ? $possibilities[1] : $possibilities[0];
     }
 
     /**
