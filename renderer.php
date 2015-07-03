@@ -187,4 +187,11 @@ HTML5;
         <div id="dialog_error">$connecterror</div>
 HTML5;
     }
+
+    /**
+     * (BETA) Course list.
+     */
+    public function render_sds_list($courses) {
+
+    }
 }
