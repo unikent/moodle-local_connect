@@ -33,10 +33,10 @@ require_login();
 // Page setup.
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_url('/local/connect/beta.php');
-$PAGE->set_title('SDS link tool');
+$PAGE->set_title('SDS push tool (beta)');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading('SDS link tool (beta)');
+echo $OUTPUT->heading($PAGE->title);
 
 $connect = new \local_connect\core();
 $courses = $connect->get_my_courses();

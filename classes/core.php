@@ -81,15 +81,17 @@ SQL;
         // Add all courses I am enrolled in.
         $enrolments = enrolment::get_my_enrolments();
         foreach ($enrolments as $enrolment) {
-            $courses[$enrolment->courseid] = $enrolment->course;
+            if ($enrolment->role->name !== 'sds_student') {
+                $courses[$enrolment->courseid] = $enrolment->course;
+            }
         }
 
         // Add department maps.
         $departments = $this->get_my_departments();
         foreach ($departments as $department) {
             // Grab related courses.
-            $rs = course::get_by('department', $department);
-            foreach ($rs as $course) {
+            $records = course::get_by('department', $department);
+            foreach ($records as $course) {
                 $courses[$course->id] = $course;
             }
         }

@@ -192,6 +192,13 @@ HTML5;
      * (BETA) Course list.
      */
     public function render_sds_list($courses) {
+        $select = array();
+        foreach ($courses as $course) {
+            if (!$course->is_in_moodle()) {
+                $select[$course->id] = "{$course->module_code}: {$course->module_title}";
+            }
+        }
 
+        echo \html_writer::select($select, 'sdscourse', '', null, array('multiple' => true));
     }
 }
