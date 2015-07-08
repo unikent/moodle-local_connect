@@ -47,14 +47,14 @@ var Connect = (function() {
 				if ((typeof val.children != "undefined") && val.children.length > 0) {
 					sink_deleted = sink_deleted || _.any(val.children, function(i) {
 						return i.sink_deleted;
-					})
-					toolbar += '<div class="child_expand open toolbar_link"></div>'
+					});
+					toolbar += '<div class="child_expand open toolbar_link"></div>';
 					val.student_count = _.reduce(val.children, function(memo,child) {
 						return memo + child.student_count;
 					}, 0 );
 				}
 
-				toolbar += '<div class="unlink_row toolbar_link"></div>'
+				toolbar += '<div class="unlink_row toolbar_link"></div>';
 				//toolbar += '<div class="edit_row toolbar_link"></div>'
 				toolbar += '<a href=" '+ M.cfg.wwwroot + '/course/view.php?id='+ val.mid +'" target="_blank" class="created_link toolbar_link"></a>';
 				
@@ -297,7 +297,7 @@ var Connect = (function() {
 			sOut += '</table>';
 
 			return sOut;
-	}
+	};
 
 	Connect.prototype.statusbox = function(el, message) {
 		var position = $(el).position();
@@ -478,7 +478,7 @@ var Connect = (function() {
 
 					var obj = {
 						id: pushees[i].id,
-					}
+					};
 
 					data.push(obj);
 				});
@@ -560,7 +560,7 @@ var Connect = (function() {
 						_this.processRowSelect();
 					}, 2000);
 				});
-			}
+			};
 
 			// show confirmation
 			$('#dialog-confirm').dialog({
@@ -696,7 +696,7 @@ var Connect = (function() {
 																
 				},
 				Cancel: function() {
-					_this.clear_ui_form()
+					_this.clear_ui_form();
 					$(this).dialog( "close" );
 				}
 			}
@@ -724,7 +724,7 @@ var Connect = (function() {
 					var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[index]+']');
 					var aPos = _this.oTable.fnGetPosition(row[0]);
 					_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-				})
+				});
 
 				_this.oTable.fnDraw();
 
@@ -908,7 +908,7 @@ var Connect = (function() {
 									var aPos = _this.oTable.fnGetPosition(row[0]);
 									_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
 								}
-							})
+							});
 
 							_this.oTable.fnDraw();
 
@@ -922,7 +922,7 @@ var Connect = (function() {
 
 							_this.buttons.pageRefresh.addClass('highlight');
 
-							_this.clear_ui_form()
+							_this.clear_ui_form();
 							$("#dialog-form").dialog("close");
 						},
 						error: function(xhr, request, settings) {
@@ -952,7 +952,7 @@ var Connect = (function() {
 					});								 										 	
 				},
 				Cancel: function() {
-					_this.clear_ui_form()
+					_this.clear_ui_form();
 					$(this).dialog( "close" );
 				}
 			}
@@ -983,8 +983,8 @@ var Connect = (function() {
 
 				row.removeClass('row_selected');
 				var aPos = _this.oTable.fnGetPosition(row[0]);
-				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-				_this.oTable.fnUpdate('', row[0], 6, false)
+				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
+				_this.oTable.fnUpdate('', row[0], 6, false);
 
 				_this.oTable.fnDraw();
 
@@ -1019,7 +1019,7 @@ var Connect = (function() {
 				row_data[0].children.splice(i,1);
 				return false;
 			}
-		})
+		});
 
 		var row = $(el).closest('tr');
 		var children =$(row).closest('.merged tbody');

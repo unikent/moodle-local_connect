@@ -107,6 +107,8 @@ class user extends data
                 $enrolment->create_in_moodle();
             }
         }
+
+        return true;
     }
 
     /**

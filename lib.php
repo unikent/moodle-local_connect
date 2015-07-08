@@ -29,13 +29,13 @@ function local_connect_extend_settings_navigation(settings_navigation $nav, cont
 
     // Only add this settings item on non-site course pages.
     if (!$PAGE->course || $PAGE->course->id == 1 || !\local_connect\util\helpers::is_enabled()) {
-        return;
+        return null;
     }
 
     // Check we can update the course.
     $context = \context_course::instance($PAGE->course->id);
     if (!has_capability('moodle/course:update', $context)) {
-        return;
+        return null;
     }
 
     // Add an "SDS Links" nav item.
