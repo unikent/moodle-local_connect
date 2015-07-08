@@ -85,6 +85,8 @@ class group_enrolment extends data
 
     /**
      * Sync method
+     * @param bool $dry
+     * @return bool|int
      */
     public function sync($dry = false) {
         // If our group doesn't exist, or is not in Moodle,
@@ -195,8 +197,8 @@ class group_enrolment extends data
     /**
      * Returns all group enrolments for a given course
      *
-     * @param  local_connect_course $course A course
-     * @return local_connect_enrolment Enrolment object
+     * @param  local_connect\course $course A course
+     * @return local_connect\enrolment Enrolment object
      */
     public static function get_for_course($course) {
         global $DB;

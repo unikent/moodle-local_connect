@@ -74,6 +74,8 @@ class timetabling extends data
 
     /**
      * Returns the date of a given occurrence.
+     * @param $occurrence
+     * @return int
      */
     public function occurrence_date($occurrence) {
         $week = week::get_by('week_beginning', $occurrence);
@@ -106,6 +108,8 @@ class timetabling extends data
 
     /**
      * Return start time for a given occurrence.
+     * @param $occurrence
+     * @return int
      */
     public function get_start_time($occurrence) {
         $date = $this->occurrence_date($occurrence);
@@ -114,6 +118,8 @@ class timetabling extends data
 
     /**
      * Return start time for a given occurrence.
+     * @param $occurrence
+     * @return int
      */
     public function get_end_time($occurrence) {
         $date = $this->occurrence_date($occurrence);

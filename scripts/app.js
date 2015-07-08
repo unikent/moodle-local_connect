@@ -27,7 +27,7 @@ $( "#dialog-form" ).dialog({
 		},
 		Cancel: function() {
 			$( this ).dialog( "close" );
-		},
+		}
 	},
 	close: function() {
 		//allFields.val( "" ).removeClass( "ui-state-error" );
@@ -53,7 +53,7 @@ function connect_load(yui, cats) {
 					tabledata: json,
 					tableEl: $('#datable'),
 					statusEl: $('.status_checkbox'),
-					searchEl: $('#dasearch input'),
+					searchEl: $('#dasearch').find('input'),
 					buttons: {
 						rowsSel: '.parent',
 						childSel: '.child_expand',
@@ -97,10 +97,6 @@ $('#key_button').click(function() {
 			$('#key_button').removeClass().addClass('show_key');
 		});
 	}
-});
-
-$('.data_refresh').click(function() {
-	location.reload(true);
 });
 
 $('.data_refresh').click(function() {

@@ -90,6 +90,9 @@ abstract class connect_testcase extends \advanced_testcase
 
     /**
      * Returns a valid enrolment for testing.
+     * @param $id
+     * @param int $role
+     * @return bool|int
      */
     protected function generate_enrolment($id, $role = 1) {
         global $DB;
@@ -108,6 +111,9 @@ abstract class connect_testcase extends \advanced_testcase
 
     /**
      * Creates a bunch of enrolments.
+     * @param $count
+     * @param $id
+     * @param int $role
      */
     protected function generate_enrolments($count, $id, $role = 1) {
         global $DB;
@@ -123,6 +129,8 @@ abstract class connect_testcase extends \advanced_testcase
 
     /**
      * Returns a valid group for testing.
+     * @param $courseid
+     * @return bool|int
      */
     protected function generate_group($courseid) {
         global $DB;
@@ -136,6 +144,8 @@ abstract class connect_testcase extends \advanced_testcase
 
     /**
      * Creates a bunch of enrolments.
+     * @param $count
+     * @param $courseid
      */
     protected function generate_groups($count, $courseid) {
         for ($i = 0; $i < $count; $i++) {
@@ -145,6 +155,9 @@ abstract class connect_testcase extends \advanced_testcase
 
     /**
      * Returns a valid group enrolment for testing.
+     * @param $groupid
+     * @param string $role
+     * @return bool|int
      */
     protected function generate_group_enrolment($groupid, $role = 'sds_student') {
         global $DB;
@@ -168,6 +181,9 @@ abstract class connect_testcase extends \advanced_testcase
 
     /**
      * Creates a bunch of group enrolments.
+     * @param $count
+     * @param $group
+     * @param string $role
      */
     protected function generate_group_enrolments($count, $group, $role = 'sds_student') {
         global $DB;
@@ -234,6 +250,7 @@ abstract class connect_testcase extends \advanced_testcase
 
     /**
      * Returns a valid course module key for testing against.
+     * @param $count
      */
     protected function generate_courses($count) {
         for ($i = 0; $i < $count; $i++) {

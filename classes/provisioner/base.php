@@ -140,6 +140,8 @@ class base
 
     /**
      * Get the term from dates.
+     * @param $course
+     * @return string
      */
     public static function get_term($course) {
         if ($course->module_length == 12) {
@@ -182,6 +184,9 @@ class base
 
     /**
      * Build a shortnameext.
+     * @param $course
+     * @param string $campus
+     * @return string
      */
     private function get_shortnameext($course, $campus = '') {
         $campus = empty($campus) ? '' : "{$campus} ";

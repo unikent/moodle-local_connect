@@ -33,6 +33,10 @@ class helpers {
 
     /**
      * Decide what to do with an error.
+     * @param $message
+     * @throws \Exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public static function error($message) {
         if (get_config("local_connect", "enable_hipchat")) {

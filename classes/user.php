@@ -159,6 +159,10 @@ class user extends data
 
     /**
      * Given a (username, firstname and lastname) create a user object.
+     * @param $username
+     * @param $firstname
+     * @param $lastname
+     * @return \stdClass
      */
     public static function get_user_object($username, $firstname, $lastname) {
         global $CFG;
@@ -191,6 +195,8 @@ class user extends data
 
     /**
      * Returns a list of all known users in a given role.
+     * @param $role
+     * @return array
      */
     public static function get_by_role($role) {
         global $DB;

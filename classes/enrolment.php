@@ -76,6 +76,8 @@ class enrolment extends data
 
     /**
      * Here is the big sync method.
+     * @param bool $dry
+     * @return bool|void
      */
     public function sync($dry = false) {
         debugging("You should not be using this! The enrol sync does this now.");
@@ -190,7 +192,9 @@ class enrolment extends data
     /**
      * Returns all enrolments for a given course MID.
      *
-     * @return array(local_connect_enrolment) Enrolment objects
+     * @param $mid
+     * @param null $userid
+     * @return array Enrolment objects
      */
     public static function get_by_course_mid($mid, $userid = null) {
         global $DB;
@@ -243,8 +247,8 @@ SQL;
     /**
      * Returns all enrolments for a given category
      *
-     * @param  local_connect_category $category A category
-     * @return local_connect_enrolment Enrolment object
+     * @param  local_connect\category $category A category
+     * @return local_connect\enrolment Enrolment object
      */
     public static function get_for_category($category) {
         global $DB;
@@ -270,6 +274,9 @@ SQL;
 
     /**
      * Returns an enrolment, given a user and a course
+     * @param $user
+     * @param $course
+     * @return enrolment|null
      */
     public static function get_for_user_and_course($user, $course) {
         global $DB;
@@ -291,6 +298,9 @@ SQL;
 
     /**
      * Returns an enrolment, given a course and a role
+     * @param $course
+     * @param $role
+     * @return array
      */
     public static function get_for_course_and_role($course, $role) {
         global $DB;

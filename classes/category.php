@@ -37,6 +37,8 @@ class category
     /**
      * Returns an object of type category in the same
      * manner the rest of connect creates objects.
+     * @param $id
+     * @return static
      */
     public static function get($id) {
         $obj = new static();

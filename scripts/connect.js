@@ -147,11 +147,9 @@ var Connect = (function() {
 		statusel.change(function() {
 			$('#statusbox').hide();
 			if($(this).is(':checked')) {
-				var val = $(this).val();
-				$('#status_' + val).prop("checked", true).trigger('change');
+				$('#status_' + $(this).val()).prop("checked", true).trigger('change');
 			} else {
-				var val = $(this).val();
-				$('#status_' + val).prop("checked", false).trigger('change');
+				$('#status_' + $(this).val()).prop("checked", false).trigger('change');
 			}
 		});
 
@@ -308,7 +306,7 @@ var Connect = (function() {
 		if (this.statusHide) clearTimeout(this.statusHide);
 
 		$('#statusbox').stop(true, true).html(message).css({
-			'top' : position.top,
+			'top' : position.top
 		}).click(function() {
 			$(this).hide();
 			clearTimeout(statusHide);
@@ -477,7 +475,7 @@ var Connect = (function() {
 					var synopsis = $.trim(pushees[i].synopsis);
 
 					var obj = {
-						id: pushees[i].id,
+						id: pushees[i].id
 					};
 
 					data.push(obj);
@@ -655,7 +653,7 @@ var Connect = (function() {
 						shortname: $('#shortname').val(),
 						shortnameext: $('#shortname_ext').val(),
 						synopsis: $('#synopsis').val(),
-						category: $('#category').val(),
+						category: $('#category').val()
 					}];
 
 					_this.push_selected(data, ui_sub, true, function() {
@@ -1032,7 +1030,7 @@ var Connect = (function() {
 			dataType: 'json',
 			data: {
 				action: 'unlink',
-				course: id,
+				course: id
 			},
 			success: function () {
 

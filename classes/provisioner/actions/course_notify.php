@@ -30,6 +30,7 @@ class course_notify extends base
 
     /**
      * Constructor.
+     * @param $data
      */
     public function __construct($data) {
         parent::__construct();

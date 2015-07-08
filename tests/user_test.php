@@ -97,7 +97,7 @@ class kent_user_tests extends \local_connect\tests\connect_testcase
 		$user = \local_connect\user::get($user->id);
 		$this->assertFalse($user->is_in_moodle());
 
-		user_create_user(array(
+		user_create_user((object)array(
 			'username' => $user->login,
 			'password' => 'Moodle2012!',
 			'idnumber' => 'idnumbertest1',

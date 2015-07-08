@@ -49,6 +49,8 @@ class base
 
     /**
      * Add a child action.
+     * @param $action
+     * @return
      */
     public function add_child($action) {
         return $this->_children[] = $action;
@@ -63,6 +65,7 @@ class base
 
     /**
      * Tree map.
+     * @param $func
      */
     public function map($func) {
         $func($this);
@@ -73,6 +76,7 @@ class base
 
     /**
      * Tree filter.
+     * @param $func
      */
     public function filter($func) {
         foreach ($this->_children as $k => $child) {
