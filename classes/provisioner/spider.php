@@ -31,6 +31,7 @@ class spider
 
     /**
      * Setup.
+     * @param actions\base $tree
      */
     public function __construct(actions\base $tree) {
         $this->_tree = $tree;
@@ -38,6 +39,8 @@ class spider
 
     /**
      * Search for all types of action.
+     * @param $type
+     * @return \Generator
      */
     public function get_actions($type) {
         foreach ($this->_tree->get_flat_tree() as $child) {
@@ -49,6 +52,8 @@ class spider
 
     /**
      * Returns the create task for a given course, if it exists.
+     * @param $courseid
+     * @return mixed
      */
     public function get_create_task($courseid) {
         foreach ($this->get_actions('course_create') as $action) {

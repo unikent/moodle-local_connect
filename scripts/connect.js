@@ -47,14 +47,14 @@ var Connect = (function() {
 				if ((typeof val.children != "undefined") && val.children.length > 0) {
 					sink_deleted = sink_deleted || _.any(val.children, function(i) {
 						return i.sink_deleted;
-					})
-					toolbar += '<div class="child_expand open toolbar_link"></div>'
+					});
+					toolbar += '<div class="child_expand open toolbar_link"></div>';
 					val.student_count = _.reduce(val.children, function(memo,child) {
 						return memo + child.student_count;
 					}, 0 );
 				}
 
-				toolbar += '<div class="unlink_row toolbar_link"></div>'
+				toolbar += '<div class="unlink_row toolbar_link"></div>';
 				//toolbar += '<div class="edit_row toolbar_link"></div>'
 				toolbar += '<a href=" '+ M.cfg.wwwroot + '/course/view.php?id='+ val.mid +'" target="_blank" class="created_link toolbar_link"></a>';
 				
@@ -147,11 +147,9 @@ var Connect = (function() {
 		statusel.change(function() {
 			$('#statusbox').hide();
 			if($(this).is(':checked')) {
-				var val = $(this).val();
-				$('#status_' + val).prop("checked", true).trigger('change');
+				$('#status_' + $(this).val()).prop("checked", true).trigger('change');
 			} else {
-				var val = $(this).val();
-				$('#status_' + val).prop("checked", false).trigger('change');
+				$('#status_' + $(this).val()).prop("checked", false).trigger('change');
 			}
 		});
 
@@ -297,7 +295,7 @@ var Connect = (function() {
 			sOut += '</table>';
 
 			return sOut;
-	}
+	};
 
 	Connect.prototype.statusbox = function(el, message) {
 		var position = $(el).position();
@@ -308,7 +306,7 @@ var Connect = (function() {
 		if (this.statusHide) clearTimeout(this.statusHide);
 
 		$('#statusbox').stop(true, true).html(message).css({
-			'top' : position.top,
+			'top' : position.top
 		}).click(function() {
 			$(this).hide();
 			clearTimeout(statusHide);
@@ -477,8 +475,8 @@ var Connect = (function() {
 					var synopsis = $.trim(pushees[i].synopsis);
 
 					var obj = {
-						id: pushees[i].id,
-					}
+						id: pushees[i].id
+					};
 
 					data.push(obj);
 				});
@@ -560,7 +558,7 @@ var Connect = (function() {
 						_this.processRowSelect();
 					}, 2000);
 				});
-			}
+			};
 
 			// show confirmation
 			$('#dialog-confirm').dialog({
@@ -655,7 +653,7 @@ var Connect = (function() {
 						shortname: $('#shortname').val(),
 						shortnameext: $('#shortname_ext').val(),
 						synopsis: $('#synopsis').val(),
-						category: $('#category').val(),
+						category: $('#category').val()
 					}];
 
 					_this.push_selected(data, ui_sub, true, function() {
@@ -696,7 +694,7 @@ var Connect = (function() {
 																
 				},
 				Cancel: function() {
-					_this.clear_ui_form()
+					_this.clear_ui_form();
 					$(this).dialog( "close" );
 				}
 			}
@@ -724,7 +722,7 @@ var Connect = (function() {
 					var row = $('#datable tbody tr[ident='+_this.selectedDeliveries[index]+']');
 					var aPos = _this.oTable.fnGetPosition(row[0]);
 					_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-				})
+				});
 
 				_this.oTable.fnDraw();
 
@@ -908,7 +906,7 @@ var Connect = (function() {
 									var aPos = _this.oTable.fnGetPosition(row[0]);
 									_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
 								}
-							})
+							});
 
 							_this.oTable.fnDraw();
 
@@ -922,7 +920,7 @@ var Connect = (function() {
 
 							_this.buttons.pageRefresh.addClass('highlight');
 
-							_this.clear_ui_form()
+							_this.clear_ui_form();
 							$("#dialog-form").dialog("close");
 						},
 						error: function(xhr, request, settings) {
@@ -952,7 +950,7 @@ var Connect = (function() {
 					});								 										 	
 				},
 				Cancel: function() {
-					_this.clear_ui_form()
+					_this.clear_ui_form();
 					$(this).dialog( "close" );
 				}
 			}
@@ -983,8 +981,8 @@ var Connect = (function() {
 
 				row.removeClass('row_selected');
 				var aPos = _this.oTable.fnGetPosition(row[0]);
-				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false)
-				_this.oTable.fnUpdate('', row[0], 6, false)
+				_this.oTable.fnUpdate('<div class="status_scheduled">scheduled</div>', row[0], 1, false);
+				_this.oTable.fnUpdate('', row[0], 6, false);
 
 				_this.oTable.fnDraw();
 
@@ -1019,7 +1017,7 @@ var Connect = (function() {
 				row_data[0].children.splice(i,1);
 				return false;
 			}
-		})
+		});
 
 		var row = $(el).closest('tr');
 		var children =$(row).closest('.merged tbody');
@@ -1032,7 +1030,7 @@ var Connect = (function() {
 			dataType: 'json',
 			data: {
 				action: 'unlink',
-				course: id,
+				course: id
 			},
 			success: function () {
 

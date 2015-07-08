@@ -80,6 +80,8 @@ class group extends data
 
     /**
      * The big sync method.
+     * @param bool $dry
+     * @return bool|int
      */
     public function sync($dry = false) {
         global $DB;
@@ -145,6 +147,7 @@ class group extends data
 
     /**
      * Take full ownership of the group, trash any extra enrolments.
+     * @param $dry
      */
     private function sync_enrolments($dry) {
         global $DB;
@@ -184,7 +187,9 @@ class group extends data
 
     /**
      * Grab (or create) our grouping ID
+     * @param string $name
      * @return unknown
+     * @throws \moodle_exception
      */
     public function get_or_create_grouping($name = 'Seminar groups') {
         global $DB;
@@ -229,7 +234,10 @@ class group extends data
 
     /**
      * Create this group in Moodle
+     * @param string $name
      * @return unknown
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     public function create_in_moodle($name = 'Seminar groups') {
         global $DB;

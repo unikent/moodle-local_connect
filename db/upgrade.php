@@ -33,12 +33,12 @@ function xmldb_local_connect_upgrade($oldversion) {
         $table = new xmldb_table('connect_course_dets');
 
         $field = new xmldb_field('id');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null,
                                 XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
         $table->addField($field);
 
         $field = new xmldb_field('course');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null,
                                 XMLDB_NOTNULL, null, null, null);
         $table->addField($field);
 
@@ -48,17 +48,17 @@ function xmldb_local_connect_upgrade($oldversion) {
         $table->addField($field);
 
         $field = new xmldb_field('startdate');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null,
                                 null, null, '0', null);
         $table->addField($field);
 
         $field = new xmldb_field('enddate');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null,
                                 null, null, '0', null);
         $table->addField($field);
 
         $field = new xmldb_field('weeks');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED,
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', null,
                                 null, null, '0', null);
         $table->addField($field);
 
@@ -77,15 +77,15 @@ function xmldb_local_connect_upgrade($oldversion) {
 
     if ($oldversion < 2012052913) {
         $table = new xmldb_table('connect_course_dets');
-        $field = new xmldb_field('unlocked', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'weeks');
+        $field = new xmldb_field('unlocked', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'weeks');
         $dbman->add_field($table, $field);
 
         $table = new xmldb_table('connect_course_dets');
-        $field = new xmldb_field('locked_change_at', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, '0', 'unlocked');
+        $field = new xmldb_field('locked_change_at', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'unlocked');
         $dbman->add_field($table, $field);
 
         $table = new xmldb_table('connect_course_dets');
-        $field = new xmldb_field('locked_change_by', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+        $field = new xmldb_field('locked_change_by', XMLDB_TYPE_INTEGER, '10', null,
             null, null, null, 'locked_change_at');
         $dbman->add_field($table, $field);
 

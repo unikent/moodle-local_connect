@@ -67,6 +67,8 @@ if ($node == 'users') {
 
 /**
  * Filter out an ID
+ * @param $id
+ * @return mixed
  */
 function filter_course_id($id) {
 	$parts = explode(' ', $id);
@@ -75,6 +77,15 @@ function filter_course_id($id) {
 
 /**
  * Returns a set of data for tree view display
+ * @param $file
+ * @param $node
+ * @param $raw_node_data
+ * @param $table
+ * @param $column
+ * @param $prefix
+ * @param int $left
+ * @param null $data
+ * @return array
  */
 function grab_set($file, $node, $raw_node_data, $table, $column, $prefix, $left = 1, $data = null) {
 	global $DB;
@@ -109,6 +120,14 @@ function grab_set($file, $node, $raw_node_data, $table, $column, $prefix, $left 
 
 /**
  * Returns a set of LEFTed data for tree view display
+ * @param $node
+ * @param $table
+ * @param $column
+ * @param $prefix
+ * @param int $left
+ * @param string $where
+ * @param array $params
+ * @return array
  */
 function grab_left_set($node, $table, $column, $prefix, $left = 1, $where = '', $params = array()) {
 	global $DB;

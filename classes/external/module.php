@@ -64,9 +64,11 @@ class module extends external_api
     /**
      * Search a list of modules.
      *
-     * @param string $component Limit the search to a component.
-     * @param string $search The search string.
-     * @return array[string]
+     * @param $modulecode
+     * @return array [string]
+     * @throws \invalid_parameter_exception
+     * @internal param string $component Limit the search to a component.
+     * @internal param string $search The search string.
      */
     public static function search_modules($modulecode) {
         global $DB;

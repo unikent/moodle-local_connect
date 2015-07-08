@@ -181,6 +181,8 @@ class course_sorter
 
     /**
      * Is a given course part of a version-merge?
+     * @param $key
+     * @return bool
      */
     private function is_version_spanned($key) {
         foreach ($this->_version_spanned as $span) {
@@ -255,6 +257,8 @@ class course_sorter
 
     /**
      * Return the category for a given MDK.
+     * @param $mdk
+     * @return bool
      */
     private function get_category($mdk) {
         $srch = $this->search($mdk);
@@ -268,6 +272,8 @@ class course_sorter
 
     /**
      * Find a given MDK.
+     * @param $mdk
+     * @return array|bool
      */
     private function search($mdk) {
         foreach ($this->_categories as $cat => $array) {
@@ -282,6 +288,8 @@ class course_sorter
 
     /**
      * Move all courses matching a shortcode to a list.
+     * @param $code
+     * @param $list
      */
     private function move($code, $list) {
         foreach ($this->_codes[$code] as $mdk) {
@@ -292,6 +300,7 @@ class course_sorter
 
     /**
      * Unlist a given MDK.
+     * @param $mdk
      */
     private function unlist($mdk) {
         $srch = $this->search($mdk);

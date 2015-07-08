@@ -52,6 +52,7 @@ class user_enrolments extends \core\task\adhoc_task
     /**
      * Setter for $customdata.
      * @param mixed $customdata (anything that can be handled by json_encode)
+     * @throws \moodle_exception
      */
     public function set_custom_data($customdata) {
         if (empty($customdata['userid'])) {

@@ -31,6 +31,8 @@ abstract class task_base extends \core\task\scheduled_task
 {
     /**
      * Map status to actions.
+     * @param $status
+     * @param $obj
      */
     public function map_status($status, $obj) {
         switch ($status) {

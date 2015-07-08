@@ -56,6 +56,8 @@ class course_ext extends data
 
     /**
      * Set the extension of a course.
+     * @param $mid
+     * @param $ext
      */
     public static function set($mid, $ext) {
         global $DB;

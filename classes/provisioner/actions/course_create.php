@@ -30,6 +30,7 @@ class course_create extends base
 
     /**
      * Constructor.
+     * @param $course
      */
     public function __construct($course) {
         parent::__construct();

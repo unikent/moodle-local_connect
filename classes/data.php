@@ -68,7 +68,8 @@ abstract class data {
     /**
      * Sync with Moodle
      *
-     * @return boolean
+     * @param bool $dry
+     * @return bool
      */
     public function sync($dry = false) {
         debugging("sync() has not been implemented for this!", DEBUG_DEVELOPER);

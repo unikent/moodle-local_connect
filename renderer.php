@@ -141,6 +141,8 @@ HTML5;
 
     /**
      * Render the index page JS helpers.
+     * @param $categories
+     * @throws coding_exception
      */
     public function render_index_js($categories) {
         global $CFG;
@@ -190,6 +192,7 @@ HTML5;
 
     /**
      * (BETA) Course list.
+     * @param $courses
      */
     public function render_sds_list($courses) {
         $select = array();

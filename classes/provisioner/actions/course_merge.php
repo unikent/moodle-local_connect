@@ -31,6 +31,8 @@ class course_merge extends base
 
     /**
      * Constructor.
+     * @param $parent
+     * @param $child
      */
     public function __construct($parent, $child) {
         parent::__construct();

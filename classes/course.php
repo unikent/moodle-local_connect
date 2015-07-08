@@ -93,6 +93,9 @@ class course extends data
 
     /**
      * Here is the big sync method.
+     * @param bool $dry
+     * @return bool|int
+     * @throws \moodle_exception
      */
     public function sync($dry = false) {
         global $DB;
@@ -187,6 +190,8 @@ SQL;
 
     /**
      * Adds the shortname date if required.
+     * @param $val
+     * @return string
      */
     private function append_date($val) {
         if (preg_match('/\(\d+\/\d+\)/is', $val) === 0) {
@@ -454,7 +459,9 @@ SQL;
 
     /**
      * Does this course have a unique shortname?
-     * @return boolean
+     * @param $shortname
+     * @param bool $strict
+     * @return bool
      */
     public function is_unique_shortname($shortname, $strict = false) {
         global $DB;
@@ -483,7 +490,8 @@ SQL;
 
     /**
      * Does this course have a unique shortname?
-     * @return boolean
+     * @param bool $strict
+     * @return bool
      */
     public function has_unique_shortname($strict = false) {
         return $this->is_unique_shortname($this->shortname, $strict);
@@ -558,8 +566,11 @@ SQL;
 
     /**
      * Create this course in Moodle
-     * @param string $shortnameext (optional)
-     * @return boolean
+     * @param bool $fast
+     * @return bool
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     * @internal param string $shortnameext (optional)
      */
     public function create_in_moodle($fast = false) {
         global $DB, $USER;
@@ -688,8 +699,11 @@ SQL;
     /**
      * Link this to a course
      *
-     * @param unknown $target
+     * @param $courseid
+     * @param bool $fast
      * @return unknown
+     * @throws \moodle_exception
+     * @internal param unknown $target
      */
     public function link($courseid, $fast = false) {
         // Add a link.
@@ -720,6 +734,7 @@ SQL;
     /**
      * Link a course to this course
      * @param unknown $target
+     * @param bool $fast
      * @return unknown
      */
     public function add_child($target, $fast = false) {
@@ -927,8 +942,9 @@ SQL;
     /**
      * Get a Connect Course by Devliery Key and Session Code
      * @param unknown $moduledeliverykey
-     * @param unknown $session_code
+     * @param $sessioncode
      * @return unknown
+     * @internal param unknown $session_code
      */
     public static function get_by_uid($moduledeliverykey, $sessioncode) {
         global $DB;
@@ -952,7 +968,7 @@ SQL;
      * This is a little complicated and is due to be simplified using magic methods and
      * other such things.
      *
-     * @param array category_restrictions A list of categories we dont want
+     * @param array categories A list of categories we dont want
      * @param boolean raw Should all objects be stdClass?
      * @return array
      */
@@ -978,8 +994,10 @@ SQL;
      * Schedule a group of courses.
      * This is a hangover from the old UI.
      *
-     * @param unknown $data
+     * @param $courses
      * @return unknown
+     * @throws \moodle_exception
+     * @internal param unknown $data
      */
     public static function schedule_all($courses) {
         global $DB;
@@ -1059,8 +1077,9 @@ SQL;
      * Merge two courses.
      * Hangover from old UI.
      *
-     * @param unknown $input
+     * @param $courses
      * @return unknown
+     * @internal param unknown $input
      */
     public static function process_merge($courses) {
         $courses = array_map(function($course) {
