@@ -504,7 +504,7 @@ SQL;
         // Basically we just need to check: shortname, fullname and summary.
         $course = $DB->get_record('course', array(
             'id' => $this->mid
-        ), 'id, shortname, fullname, summary');
+        ), 'id, shortname, fullname, category, summary');
 
         return  (
             $course->shortname !== $this->shortname ||
