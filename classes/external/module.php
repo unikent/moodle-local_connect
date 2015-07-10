@@ -116,75 +116,8 @@ class module extends external_api
      * @throws \invalid_parameter_exception
      */
     public static function get_my() {
-        global $DB;
-
-        $courses = array();
-        if (!has_capability("local/connect:helpdesk", \context_system::instance())) {
-            $cats = \local_connect\util\helpers::get_connect_course_categories();
-            $courses = \local_connect\course::get_by_category($cats);
-        } else {
-            $courses = \local_connect\course::get_all();
-        }
-
-        // Grab a list of campus IDs.
-        $campusids = array();
-        $campuses = $DB->get_recordset('connect_campus');
-        foreach ($campuses as $campus) {
-            $campusids[$campus->id] = $campus->name;
-        }
-        $campuses->close();
-
-        // Find all merged modules.
-        $merged = array();
-        foreach ($courses as $course) {
-            if (empty($course->mid)) {
-                continue;
-            }
-
-            if (!isset($merged[$course->mid])) {
-                $merged[$course->mid] = array();
-            }
-
-            $merged[$course->mid][] = $course;
-        }
-
-        $merged = array_filter($merged, function($a) {
-            return count($a) > 1;
-        });
-
-        // Process everything.
-        $mergerefs = array();
-        $out = array();
-        foreach ($courses as $course) {
-            $coursedata = $course->get_data();
-
-            if (isset($campusids[$coursedata->campusid])) {
-                $coursedata->campus = $campusids[$coursedata->campusid];
-            }
-
-            if (!isset($merged[$course->mid])) {
-                $out[] = $coursedata;
-                continue;
-            }
-
-            if (isset($mergerefs[$course->mid])) {
-                $obj = $mergerefs[$course->mid];
-                $obj->children[] = $coursedata;
-                continue;
-            }
-
-            // This is a merged module, create a skeleton.
-            $merge = clone($coursedata);
-            $merge->module_title = $course->shortname;
-            $merge->campus_desc = $course->campus_name;
-            $merge->children = array($coursedata);
-
-            $mergerefs[$course->mid] = $merge;
-
-            $out[] = $merge;
-        }
-
-        return $out;
+        $connect = new \local_connect\core();
+        return $connect->get_my_courses();
     }
 
     /**
