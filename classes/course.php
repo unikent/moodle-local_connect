@@ -587,13 +587,12 @@ SQL;
         }
 
         // Grab shortname.
+        $this->generate_shortname_ext();
         $shortname = $this->shortname;
 
         // Ensure the shortname is unique.
         if (!$this->is_unique_shortname($shortname)) {
-            $err = "'{$USER->username}' just tried to push course '{$this->id}' to Moodle but the shortname was not unique.";
-            \local_connect\util\helpers::error($err);
-            return false;
+            throw new \moodle_exception("'{$USER->username}' just tried to push course '{$this->id}' to Moodle but the shortname was not unique.");
         }
 
         // Create the course.
@@ -994,6 +993,7 @@ SQL;
      * Schedule a group of courses.
      * This is a hangover from the old UI.
      *
+     * @deprecated - Use webservice methods instead.
      * @param $courses
      * @return unknown
      * @throws \moodle_exception
@@ -1077,6 +1077,7 @@ SQL;
      * Merge two courses.
      * Hangover from old UI.
      *
+     * @deprecated - Use webservice methods instead.
      * @param $courses
      * @return unknown
      * @internal param unknown $input
@@ -1110,5 +1111,67 @@ SQL;
         }
 
         return array();
+    }
+
+    /**
+     * Get the term from dates.
+     * 
+     * @return string
+     */
+    public function get_term() {
+        if ($this->module_length == 12) {
+            if ($this->module_week_beginning >= 24) {
+                return "SUM";
+            }
+
+            if ($this->module_week_beginning >= 12) {
+                return "SPR";
+            }
+
+            if ($this->module_week_beginning >= 1) {
+                return "AUT";
+            }
+        }
+
+        if ($this->module_length == 24) {
+            if ($this->module_week_beginning >= 24) {
+                return "SUM/AUT";
+            }
+
+            if ($this->module_week_beginning >= 12) {
+                return "SPR/SUM";
+            }
+
+            if ($this->module_week_beginning >= 1) {
+                return "AUT/SPR";
+            }
+        }
+
+        if ($this->module_length == 1) {
+            return "(week {$this->module_week_beginning})";
+        }
+
+        // This is a bit.. special, just give the weeks.
+        $start = $this->module_week_beginning;
+        $end = (int)$start + (int)$this->module_length;
+        return "(week {$start}-{$end})";
+    }
+
+    /**
+     * Build a shortnameext.
+     *
+     * @todo Make this private. Move shortname generation local.
+     * @param string $campus
+     * @return string
+     */
+    public function generate_shortname_ext() {
+        $campus = $this->campus->get_shortname();
+
+        // Are we a WSHOP?
+        if (strpos($this->module_code, "WSHOP") === 0) {
+            return "{$campus}(week {$this->module_week_beginning})";
+        }
+
+        $this->set_shortname_ext($campus .  $this->get_term());
     }
 }

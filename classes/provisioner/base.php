@@ -98,7 +98,7 @@ class base
         // Create mostly-simple build actions for all courses that are term-spanned.
         foreach ($lists['term-span'] as $course) {
             $course = \local_connect\course::from_sql_result($course);
-            $shortnameext = $this->get_shortnameext($course);
+            $shortnameext = $course->generate_shortname_ext();
             $course->set_shortname_ext($shortnameext);
 
             if ($course->is_unique_shortname($course->shortname, true)) {
@@ -109,8 +109,7 @@ class base
         // Create mostly-simple build actions for all courses that are campus-spanned.
         foreach ($lists['campus-span'] as $course) {
             $course = \local_connect\course::from_sql_result($course);
-            $campus = $course->campus->get_shortname();
-            $shortnameext = $this->get_shortnameext($course, $campus);
+            $shortnameext = $course->generate_shortname_ext();
             $course->set_shortname_ext($shortnameext);
 
             if ($course->is_unique_shortname($course->shortname, true)) {
@@ -140,63 +139,18 @@ class base
 
     /**
      * Get the term from dates.
+     *
+     * @deprecated Use the method in the course itself.
      * @param $course
      * @return string
      */
     public static function get_term($course) {
-        if ($course->module_length == 12) {
-            if ($course->module_week_beginning >= 24) {
-                return "SUM";
-            }
-
-            if ($course->module_week_beginning >= 12) {
-                return "SPR";
-            }
-
-            if ($course->module_week_beginning >= 1) {
-                return "AUT";
-            }
+        debugging("Deprecated method used: base::get_term");
+        if (!is_object($course)) {
+            $course = \local_connect\course::from_sql_result($course);
         }
 
-        if ($course->module_length == 24) {
-            if ($course->module_week_beginning >= 24) {
-                return "SUM/AUT";
-            }
-
-            if ($course->module_week_beginning >= 12) {
-                return "SPR/SUM";
-            }
-
-            if ($course->module_week_beginning >= 1) {
-                return "AUT/SPR";
-            }
-        }
-
-        if ($course->module_length == 1) {
-            return "(week {$course->module_week_beginning})";
-        }
-
-        // This is a bit.. special, just give the weeks.
-        $start = $course->module_week_beginning;
-        $end = (int)$start + (int)$course->module_length;
-        return "(week {$start}-{$end})";
-    }
-
-    /**
-     * Build a shortnameext.
-     * @param $course
-     * @param string $campus
-     * @return string
-     */
-    private function get_shortnameext($course, $campus = '') {
-        $campus = empty($campus) ? '' : "{$campus} ";
-
-        if (strpos($course->module_code, "WSHOP") === 0) {
-            return "{$campus}(week {$course->module_week_beginning})";
-        }
-
-        $term = static::get_term($course);
-        return "{$campus}{$term}";
+        return $course->get_term();
     }
 
     /**
