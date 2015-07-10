@@ -30,6 +30,7 @@ require_once("$CFG->libdir/externallib.php");
 
 use external_api;
 use external_value;
+use external_single_structure;
 use external_multiple_structure;
 use external_function_parameters;
 
@@ -67,14 +68,12 @@ class module extends external_api
      * @param $modulecode
      * @return array [string]
      * @throws \invalid_parameter_exception
-     * @internal param string $component Limit the search to a component.
-     * @internal param string $search The search string.
      */
     public static function search($modulecode) {
         global $DB;
 
         $params = self::validate_parameters(self::search_parameters(), array(
-            'module_code' => $modulecode,
+            'module_code' => $modulecode
         ));
         $modulecode = $params['module_code'];
 
@@ -115,8 +114,6 @@ class module extends external_api
      *
      * @return array [string]
      * @throws \invalid_parameter_exception
-     * @internal param string $component Limit the search to a component.
-     * @internal param string $search The search string.
      */
     public static function get_my() {
         global $DB;
@@ -196,6 +193,158 @@ class module extends external_api
      * @return external_description
      */
     public static function get_my_returns() {
-        return new external_multiple_structure(new external_value(PARAM_RAW, 'DA Page List.'));
+        return new external_multiple_structure(new external_value(PARAM_RAW, 'DA Page List.')); // TODO?
+    }
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function push_parameters() {
+        return new external_function_parameters(array(
+            'id' => new external_value(
+                PARAM_INT,
+                'The module to push',
+                VALUE_DEFAULT,
+                ''
+            )
+        ));
+    }
+
+    /**
+     * Expose to AJAX
+     * @return boolean
+     */
+    public static function push_is_allowed_from_ajax() {
+        return true;
+    }
+
+    /**
+     * Push a module 
+     *
+     * @param $id
+     * @return bool
+     * @throws \invalid_parameter_exception
+     */
+    public static function push($id) {
+        $params = self::validate_parameters(self::push_parameters(), array(
+            'id' => $id
+        ));
+
+        $course = \local_connect\course::get($params['id']);
+        return $course->create_in_moodle();
+    }
+
+    /**
+     * Returns description of push() result value.
+     *
+     * @return external_description
+     */
+    public static function push_returns() {
+        return new external_single_structure(new external_value(PARAM_BOOL, 'Success or failue (true/false).'));
+    }
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function unlink_parameters() {
+        return new external_function_parameters(array(
+            'id' => new external_value(
+                PARAM_INT,
+                'The module to unlink',
+                VALUE_DEFAULT,
+                ''
+            )
+        ));
+    }
+
+    /**
+     * Expose to AJAX
+     * @return boolean
+     */
+    public static function unlink_is_allowed_from_ajax() {
+        return true;
+    }
+
+    /**
+     * Unlink a module 
+     *
+     * @param $id
+     * @return bool
+     * @throws \invalid_parameter_exception
+     */
+    public static function unlink($id) {
+        $params = self::validate_parameters(self::unlink_parameters(), array(
+            'id' => $id
+        ));
+
+        $course = \local_connect\course::get($params['id']);
+        return $course->unlink();
+    }
+
+    /**
+     * Returns description of unlink() result value.
+     *
+     * @return external_description
+     */
+    public static function unlink_returns() {
+        return new external_single_structure(new external_value(PARAM_BOOL, 'Success or failue (true/false).'));
+    }
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function merge_parameters() {
+        return new external_function_parameters(array(
+            'id' => new external_value(
+                PARAM_INT,
+                'The module to merge',
+                VALUE_DEFAULT,
+                ''
+            ),
+            'moodleid' => new external_value(
+                PARAM_INT,
+                'The Moodle ID to assign this to.',
+                VALUE_DEFAULT,
+                ''
+            )
+        ));
+    }
+
+    /**
+     * Expose to AJAX
+     * @return boolean
+     */
+    public static function merge_is_allowed_from_ajax() {
+        return true;
+    }
+
+    /**
+     * Merge a module 
+     *
+     * @param $id
+     * @param $moodleid
+     * @return bool
+     * @throws \invalid_parameter_exception
+     */
+    public static function merge($id, $moodleid) {
+        $params = self::validate_parameters(self::merge_parameters(), array(
+            'id' => $id,
+            'moodleid' => $moodleid
+        ));
+
+        $course = \local_connect\course::get($params['id']);
+        return $course->link($params['moodleid']);
+    }
+
+    /**
+     * Returns description of merge() result value.
+     *
+     * @return external_description
+     */
+    public static function merge_returns() {
+        return new external_single_structure(new external_value(PARAM_BOOL, 'Success or failue (true/false).'));
     }
 }

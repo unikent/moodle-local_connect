@@ -732,6 +732,7 @@ SQL;
 
     /**
      * Link a course to this course
+     * 
      * @param unknown $target
      * @param bool $fast
      * @return unknown
