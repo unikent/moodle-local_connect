@@ -296,11 +296,11 @@ class module extends external_api
      * Returns description of method parameters
      * @return external_function_parameters
      */
-    public static function merge_parameters() {
+    public static function link_parameters() {
         return new external_function_parameters(array(
             'id' => new external_value(
                 PARAM_INT,
-                'The module to merge',
+                'The module to link',
                 VALUE_DEFAULT,
                 ''
             ),
@@ -317,20 +317,20 @@ class module extends external_api
      * Expose to AJAX
      * @return boolean
      */
-    public static function merge_is_allowed_from_ajax() {
+    public static function link_is_allowed_from_ajax() {
         return true;
     }
 
     /**
-     * Merge a module 
+     * link a module 
      *
      * @param $id
      * @param $moodleid
      * @return bool
      * @throws \invalid_parameter_exception
      */
-    public static function merge($id, $moodleid) {
-        $params = self::validate_parameters(self::merge_parameters(), array(
+    public static function link($id, $moodleid) {
+        $params = self::validate_parameters(self::link_parameters(), array(
             'id' => $id,
             'moodleid' => $moodleid
         ));
@@ -340,11 +340,11 @@ class module extends external_api
     }
 
     /**
-     * Returns description of merge() result value.
+     * Returns description of link() result value.
      *
      * @return external_description
      */
-    public static function merge_returns() {
+    public static function link_returns() {
         return new external_single_structure(new external_value(PARAM_BOOL, 'Success or failue (true/false).'));
     }
 }

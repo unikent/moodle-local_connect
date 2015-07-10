@@ -53,10 +53,10 @@ $functions = array(
         'description' => 'Push a module.',
         'type'        => 'write'
     ),
-    'local_connect_merge_module' => array(
+    'local_connect_link_module' => array(
         'classname'   => 'local_connect\external\module',
-        'methodname'  => 'merge',
-        'description' => 'Merge a module.',
+        'methodname'  => 'link',
+        'description' => 'Link a module.',
         'type'        => 'write'
     ),
     'local_connect_unlink_module' => array(
