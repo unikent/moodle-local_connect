@@ -160,6 +160,10 @@ class module extends external_api
      * @throws \invalid_parameter_exception
      */
     public static function push($id) {
+        if (!\local_connect\util\helpers::can_category_manage()) {
+            throw new \moodle_exception('You do not have access to that.');
+        }
+
         $params = self::validate_parameters(self::push_parameters(), array(
             'id' => $id
         ));
@@ -208,6 +212,10 @@ class module extends external_api
      * @throws \invalid_parameter_exception
      */
     public static function unlink($id) {
+        if (!\local_connect\util\helpers::can_category_manage()) {
+            throw new \moodle_exception('You do not have access to that.');
+        }
+
         $params = self::validate_parameters(self::unlink_parameters(), array(
             'id' => $id
         ));
@@ -263,6 +271,10 @@ class module extends external_api
      * @throws \invalid_parameter_exception
      */
     public static function link($id, $moodleid) {
+        if (!\local_connect\util\helpers::can_category_manage()) {
+            throw new \moodle_exception('You do not have access to that.');
+        }
+
         $params = self::validate_parameters(self::link_parameters(), array(
             'id' => $id,
             'moodleid' => $moodleid
