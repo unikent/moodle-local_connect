@@ -894,6 +894,7 @@ var Connect = (function() {
 						dataType: 'json',
 						data: {
 							action: 'merge',
+							shortnameext: $('#shortname_ext').val(),
 							courses: JSON.stringify(_this.selectedDeliveries)
 						},
 						success: function () {
