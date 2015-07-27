@@ -34,14 +34,18 @@ require_login();
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_url('/local/connect/beta.php');
 $PAGE->set_title('SDS push tool (beta)');
+$PAGE->set_pagelayout('fullwidth');
+$PAGE->requires->css('/local/connect/less/build/build.css');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($PAGE->title);
+echo \html_writer::start_div('beta');
 
 $connect = new \local_connect\core();
 $courses = $connect->get_my_courses();
 
 $renderer = $PAGE->get_renderer('local_connect');
-$renderer->render_sds_list($courses);
+$renderer->render_beta($courses);
 
+echo \html_writer::end_div('beta');
 echo $OUTPUT->footer();

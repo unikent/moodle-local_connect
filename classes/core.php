@@ -76,6 +76,10 @@ SQL;
      * Return all my SDS courses.
      */
     public function get_my_courses() {
+        if (has_capability("local/connect:helpdesk", \context_system::instance())) {
+            return \local_connect\course::get_all();
+        }
+
         $courses = array();
 
         // Add all courses I am enrolled in.

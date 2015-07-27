@@ -191,17 +191,93 @@ HTML5;
     }
 
     /**
-     * (BETA) Course list.
-     * @param $courses
+     * (BETA) Index.
      */
-    public function render_sds_list($courses) {
-        $select = array();
+    public function render_beta($courses) {
+        $table = new \html_table();
+        $table->head = array(
+            'Delivery key',
+            'Module code',
+            'Module name',
+            'Campus',
+            'Duration',
+            'Version'
+        );
+        $table->data = array();
+
         foreach ($courses as $course) {
             if (!$course->is_in_moodle()) {
-                $select[$course->id] = "{$course->module_code}: {$course->module_title}";
+                $table->data[] = array(
+                    $course->module_delivery_key,
+                    $course->module_code,
+                    $course->module_title,
+                    $course->campus->name,
+                    $course->module_length,
+                    $course->module_version
+                );
             }
         }
 
-        echo \html_writer::select($select, 'sdscourse', '', null, array('multiple' => true));
+        $table = html_writer::table($table);
+
+
+        echo <<<HTML5
+        <div id="da_wrapper" class="row">
+            <div id="dapage_app" class="col-xs-12 col-sm-10">
+                <div class="table-responsive">
+                    $table
+                </div>
+            </div>
+
+            <div id="right_bar_wrap" class="col-xs-12 col-sm-2">
+                <div class="data_refresh btn btn-info">Refresh deliveries</div>
+
+                <div id="jobs_wrapper">
+                    <div id="select_buttons" class="btn-group" role="group" aria-label="Selections">
+                        <button id="select_all" type="button" class="btn btn-success">Select all</button>
+                        <button id="deselect_all" type="button" class="btn btn-danger">Deselect all</button>
+                    </div>
+
+                    <div id="jobs">
+                        <div class="job_number_text">you currently have</div>
+                        <div id="job_number">0</div>
+                        <div class="job_number_text">deliveries selected</div>
+                        <div id="display_list_toggle">
+                            <button>show deliveries</button>
+                            <div class="arrow_border"></div>
+                            <div class="arrow_light"></div>
+                        </div>
+                        <ul>
+                        </ul>
+                    </div>
+
+                    <div id="process_jobs">
+                        <button id="push_deliveries" disabled="disabled">No selection</button>
+                        <button id="merge_deliveries" disabled="disabled">No selection</button>
+                    </div>
+
+                    <div id="options_bar">
+                        <div id="status_toggle">
+                            <div class="checkbox">
+                                <label id="label-unprocessed" for="unprocessed">
+                                    <input type="checkbox" name="unprocessed" value="unprocessed" id="unprocessed" class="status_checkbox" checked="checked">
+                                    unprocessed
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label id="label-created_in_moodle" for="created_in_moodle">
+                                    <input type="checkbox" name="created_in_moodle" value="created_in_moodle" id="created_in_moodle" class="status_checkbox">
+                                    created in moodle
+                                </label>
+                            </div>
+                        </div>
+                        <div id="dasearch" class="form-group">
+                            <input type="search" class="form-control" id="dasearch-box" name="dasearch-box" placeholder="Search" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+HTML5;
     }
 }

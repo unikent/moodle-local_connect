@@ -97,7 +97,7 @@ class course_sorter
                 debugging("Course is not unique: " . $this->_courses[$course->module_delivery_key]);
             }
 
-            $this->_courses[$course->module_delivery_key] = $course;
+            $this->_courses[$course->module_delivery_key] = \local_connect\course::from_sql_result($course);
 
             // Add to keys list.
             $k = $course->module_code;
@@ -148,7 +148,7 @@ class course_sorter
             foreach ($array as $mdk) {
                 $course = $this->_courses[$mdk];
                 $campuses[] = $course->campusid;
-                $terms[] = base::get_term($course);
+                $terms[] = $course->get_term();
             }
 
             $campuses = count(array_unique($campuses));
