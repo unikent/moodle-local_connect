@@ -1081,7 +1081,7 @@ SQL;
      * @return unknown
      * @internal param unknown $input
      */
-    public static function process_merge($courses) {
+    public static function process_merge($courses, $shortnameext = '') {
         $courses = array_map(function($course) {
             return self::get($course);
         }, $courses);
@@ -1095,6 +1095,10 @@ SQL;
 
         // Create the linked course if it doesnt exist.
         if (!$primary->is_in_moodle()) {
+            if (!empty($shortnameext)) {
+                $primary->set_shortname_ext($shortnameext);
+            }
+
             if (!$primary->create_in_moodle()) {
                 \local_connect\util\helpers::error("Could not create linked course: $primary");
             }

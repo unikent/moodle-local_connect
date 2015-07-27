@@ -61,7 +61,9 @@ switch ($action) {
         $courses = required_param('courses', PARAM_RAW);
         $courses = json_decode($courses);
 
-        $result = \local_connect\course::process_merge($courses);
+        $shortnameext = optional_param('shortnameext', '', PARAM_ALPHA);
+
+        $result = \local_connect\course::process_merge($courses, $shortnameext);
         if (is_array($result) && isset($result['error_code'])) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 422');
         } else {
