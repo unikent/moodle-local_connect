@@ -48,8 +48,7 @@ class module extends external_api
             'module_code' => new external_value(
                 PARAM_RAW,
                 'The search string',
-                VALUE_DEFAULT,
-                ''
+                VALUE_REQUIRED
             )
         ));
     }
@@ -138,8 +137,7 @@ class module extends external_api
             'id' => new external_value(
                 PARAM_INT,
                 'The module to push',
-                VALUE_DEFAULT,
-                ''
+                VALUE_REQUIRED
             )
         ));
     }
@@ -192,8 +190,7 @@ class module extends external_api
             'id' => new external_value(
                 PARAM_INT,
                 'The module to unlink',
-                VALUE_DEFAULT,
-                ''
+                VALUE_REQUIRED
             )
         ));
     }
@@ -246,14 +243,12 @@ class module extends external_api
             'id' => new external_value(
                 PARAM_INT,
                 'The module to link',
-                VALUE_DEFAULT,
-                ''
+                VALUE_REQUIRED
             ),
             'moodleid' => new external_value(
                 PARAM_INT,
                 'The Moodle ID to assign this to.',
-                VALUE_DEFAULT,
-                ''
+                VALUE_REQUIRED
             )
         ));
     }
