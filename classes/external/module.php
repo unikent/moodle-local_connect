@@ -153,7 +153,7 @@ class module extends external_api
     }
 
     /**
-     * Push a module 
+     * Push a module.
      *
      * @param $id
      * @return bool
@@ -178,7 +178,9 @@ class module extends external_api
      * @return external_description
      */
     public static function push_returns() {
-        return new external_single_structure(new external_value(PARAM_BOOL, 'Success or failue (true/false).'));
+        return new external_single_structure(array(
+            new external_value(PARAM_BOOL, 'Success or failue (true/false).')
+        ));
     }
 
     /**
@@ -205,7 +207,7 @@ class module extends external_api
     }
 
     /**
-     * Unlink a module 
+     * Unlink a module.
      *
      * @param $id
      * @return bool
@@ -230,7 +232,9 @@ class module extends external_api
      * @return external_description
      */
     public static function unlink_returns() {
-        return new external_single_structure(new external_value(PARAM_BOOL, 'Success or failue (true/false).'));
+        return new external_single_structure(array(
+            new external_value(PARAM_BOOL, 'Success or failue (true/false).')
+        ));
     }
 
     /**
@@ -263,7 +267,7 @@ class module extends external_api
     }
 
     /**
-     * link a module 
+     * Link a module.
      *
      * @param $id
      * @param $moodleid
@@ -290,6 +294,8 @@ class module extends external_api
      * @return external_description
      */
     public static function link_returns() {
-        return new external_single_structure(new external_value(PARAM_BOOL, 'Success or failue (true/false).'));
+        return new external_single_structure(array(
+            new external_value(PARAM_BOOL, 'Success or failue (true/false).')
+        ));
     }
 }
