@@ -175,10 +175,12 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
 
         $courseid = $this->generate_course();
         $course = \local_connect\course::get($courseid);
+        $course->set_shortname_ext("TEST");
         $this->assertTrue($course->create_in_moodle());
 
         $courseid = $this->generate_course();
         $course2 = \local_connect\course::get($courseid);
+        $course2->set_shortname_ext("TEST");
 
         $this->assertTrue($course2->is_unique_shortname($course2->shortname));
         $course2->module_code = $course->module_code;
@@ -312,9 +314,10 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
 
         $courseid = $this->generate_course();
         $course = \local_connect\course::get($courseid);
-        $this->assertTrue($course->create_in_moodle());
-
         $this->assertEquals('', $course->shortname_ext);
+        $this->assertTrue($course->create_in_moodle());
+        $this->assertNotEquals('', $course->shortname_ext);
+
         $course->set_shortname_ext('TEST');
         $course->save();
         $this->assertEquals('TEST', $course->shortname_ext);

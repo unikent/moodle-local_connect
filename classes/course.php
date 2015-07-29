@@ -587,7 +587,7 @@ SQL;
         }
 
         // Grab shortname.
-        if (empty($this->shortname_ext)) {
+        if (empty($this->_get_shortname_ext())) {
             $this->generate_shortname_ext();
         }
 
