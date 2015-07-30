@@ -735,7 +735,7 @@ SQL;
 
     /**
      * Link a course to this course
-     * 
+     *
      * @param unknown $target
      * @param bool $fast
      * @return unknown
@@ -1123,7 +1123,7 @@ SQL;
 
     /**
      * Get the term from dates.
-     * 
+     *
      * @return string
      */
     public function get_term() {
@@ -1173,7 +1173,7 @@ SQL;
      * @return string
      */
     public function generate_shortname_ext() {
-        $campus = $this->campus->get_shortname();
+        $campus = $this->campus->get_shortname() . " ";
 
         // Are we a WSHOP?
         if (strpos($this->module_code, "WSHOP") === 0) {
