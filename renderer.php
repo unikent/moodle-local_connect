@@ -236,7 +236,7 @@ HTML5;
                 $course->module_length,
                 $course->module_version,
                 '<input name="id" value="' . $course->id . '" type="checkbox" />'
-            ), $course->is_in_moodle() ? 'inmoodle' : '');
+            ), 'row-' . $course->id);
         }
 
         $table->finish_output();
@@ -274,20 +274,6 @@ HTML5;
                     </div>
 
                     <div id="options_bar">
-                        <div id="status_toggle">
-                            <div class="checkbox">
-                                <label id="label-unprocessed" for="unprocessed">
-                                    <input type="checkbox" name="unprocessed" value="unprocessed" id="unprocessed" class="status_checkbox" checked="checked">
-                                    unprocessed
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label id="label-created_in_moodle" for="created_in_moodle">
-                                    <input type="checkbox" name="created_in_moodle" value="created_in_moodle" id="created_in_moodle" class="status_checkbox">
-                                    created in moodle
-                                </label>
-                            </div>
-                        </div>
                         <div id="dasearch" class="form-group">
                             <input type="search" class="form-control" id="dasearch-box" name="dasearch-box" placeholder="Search" />
                         </div>

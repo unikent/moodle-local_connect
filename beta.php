@@ -35,6 +35,7 @@ $PAGE->set_context(\context_system::instance());
 $PAGE->set_url('/local/connect/beta.php');
 $PAGE->set_title('SDS push tool (beta)');
 $PAGE->set_pagelayout('fullwidth');
+$PAGE->requires->js_call_amd('local_connect/beta', 'init', array());
 $PAGE->requires->css('/local/connect/less/build/build.css');
 
 echo $OUTPUT->header();
@@ -47,7 +48,9 @@ echo \html_writer::start_div('beta');
 
 $connect = new \local_connect\core();
 $courses = $connect->get_my_courses();
-
+$courses = array_filter($courses, function($course) {
+    return !$course->is_in_moodle();
+});
 $renderer = $PAGE->get_renderer('local_connect');
 $renderer->render_beta($courses);
 
