@@ -236,7 +236,7 @@ HTML5;
                 $course->module_length,
                 $course->module_version,
                 '<input name="id" value="' . $course->id . '" type="checkbox" />'
-            ));
+            ), $course->is_in_moodle() ? 'inmoodle' : '');
         }
 
         $table->finish_output();
