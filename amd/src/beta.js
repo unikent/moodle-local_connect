@@ -66,6 +66,14 @@ define([], function() {
         		setCount();
         		rebuildDeliverylist();
         	});
+
+			$("#select_all").on('click', function() {
+				$("input[name=id]:not(:checked)").trigger('click');
+			});
+
+			$("#deselect_all").on('click', function() {
+				$("input[name=id]:checked").trigger('click');
+			});
         }
     };
 });

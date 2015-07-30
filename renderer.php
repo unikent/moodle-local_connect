@@ -247,8 +247,6 @@ HTML5;
             </div>
 
             <div id="right_bar_wrap" class="col-xs-12 col-sm-2">
-                <div class="data_refresh btn btn-info">Refresh deliveries</div>
-
                 <div id="jobs_wrapper">
                     <div id="select_buttons" class="btn-group" role="group" aria-label="Selections">
                         <button id="select_all" type="button" class="btn btn-success">Select all</button>
