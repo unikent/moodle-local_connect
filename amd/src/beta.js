@@ -75,6 +75,12 @@ define([], function() {
 		$("#merge_deliveries").removeAttr("disabled");
 	};
 
+	var onListChange = function() {
+		setCount();
+		rebuildDeliverylist();
+		rebuildButtons();
+	};
+
     return {
         init: function() {
         	$("#display_list_toggle").hide();
@@ -82,11 +88,7 @@ define([], function() {
 				$("#jobs > ul").toggle()
 			});
 
-        	$("input[name=id]").on('change', function() {
-        		setCount();
-        		rebuildDeliverylist();
-        		rebuildButtons();
-        	});
+        	$("input[name=id]").on('change', onListChange);
 
 			$("#select_all").on('click', function() {
 				$("input[name=id]:not(:checked)").trigger('click');
@@ -110,13 +112,14 @@ define([], function() {
 			                    id: id
 			                }
 						})
-					})
+					});
 
 		            // Call web service once per delivery.
 		            var promises = ajax.call(calls);
 		            $.each(promises, function(i, o) {
 			            promises[i].done(function(response) {
-			            	$("tr.row-" + calls[i].args.id).hide();
+			            	$("tr.row-" + calls[i].args.id).remove();
+			            	onListChange();
 			            });
 
 			            promises[i].fail(notification.exception);
@@ -124,7 +127,48 @@ define([], function() {
 				});
 
 				$("#merge_deliveries").on('click', function() {
-					var checked = getSelected();
+					var checked = getSelected().toArray();
+					var primaryid = $(checked.shift()).val()
+
+					var promises = ajax.call([{
+		                methodname: 'local_connect_push_module',
+		                args: {
+		                    id: primaryid
+		                }
+					}]);
+
+					promises[0].done(function(response) {
+						// Remove from the list.
+		            	$("tr.row-" + primaryid).remove();
+		            	onListChange();
+
+						// Great! Lets merge the rest.
+						var calls = [];
+						$.each(checked, function(i, o) {
+							var id = $(o).val();
+
+							calls.push({
+				                methodname: 'local_connect_link_module',
+				                args: {
+				                    id: id,
+				                    moodleid: response
+				                }
+							});
+						});
+
+			            // Call web service once per delivery.
+			            var promises = ajax.call(calls);
+			            $.each(promises, function(i, o) {
+				            promises[i].done(function(response) {
+				            	$("tr.row-" + calls[i].args.id).remove();
+				            	onListChange();
+				            });
+
+				            promises[i].fail(notification.exception);
+			            });
+					});
+
+					promises[0].fail(notification.exception);
 				});
 			});
         }

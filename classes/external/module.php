@@ -167,7 +167,11 @@ class module extends external_api
         ));
 
         $course = \local_connect\course::get($params['id']);
-        return $course->create_in_moodle();
+        if (!$course->create_in_moodle()) {
+            throw new \moodle_exception("Could not push course.");
+        }
+
+        return $course->mid;
     }
 
     /**
@@ -177,7 +181,7 @@ class module extends external_api
      */
     public static function push_returns() {
         return new external_single_structure(array(
-            new external_value(PARAM_BOOL, 'Success or failue (true/false).')
+            new external_value(PARAM_INT, 'Moodle id of the course.')
         ));
     }
 
