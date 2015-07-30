@@ -95,6 +95,38 @@ define([], function() {
 			$("#deselect_all").on('click', function() {
 				$("input[name=id]:checked").trigger('click');
 			});
+
+			require(['core/ajax', 'core/notification'], function(ajax, notification) {
+				$("#push_deliveries").on('click', function() {
+					var checked = getSelected();
+
+					var calls = [];
+					$.each(checked, function(i, o) {
+						var id = $(o).val();
+
+						calls.push({
+			                methodname: 'local_connect_push_module',
+			                args: {
+			                    id: id
+			                }
+						})
+					})
+
+		            // Call web service once per delivery.
+		            var promises = ajax.call(calls);
+		            $.each(promises, function(i, o) {
+			            promises[i].done(function(response) {
+			            	$("tr.row-" + calls[i].args.id).hide();
+			            });
+
+			            promises[i].fail(notification.exception);
+		            });
+				});
+
+				$("#merge_deliveries").on('click', function() {
+					var checked = getSelected();
+				});
+			});
         }
     };
 });

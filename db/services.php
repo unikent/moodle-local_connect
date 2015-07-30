@@ -26,7 +26,10 @@ $services = array(
     'Connect service' => array(
         'functions' => array (
             'local_connect_search_modules',
-            'local_connect_get_my_modules'
+            'local_connect_get_my_modules',
+            'local_connect_push_module',
+            'local_connect_link_module',
+            'local_connect_unlink_module'
         ),
         'requiredcapability' => '',
         'restrictedusers' => 0,
