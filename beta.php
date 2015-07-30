@@ -39,6 +39,10 @@ $PAGE->requires->css('/local/connect/less/build/build.css');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($PAGE->title);
+
+$link = \html_writer::link(new \moodle_url('/local/connect/index.php', array('nobeta' => true)), 'Go back', array('class' => 'alert-link'));
+echo \html_writer::div('<i class="fa fa-info-circle"></i> You have been enrolled on the beta program. ' . $link . '.', 'alert alert-info');
+
 echo \html_writer::start_div('beta');
 
 $connect = new \local_connect\core();
