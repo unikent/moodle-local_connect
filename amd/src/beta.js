@@ -52,8 +52,28 @@ define([], function() {
 		$.each(checked, function(i, o) {
 			$("#jobs > ul").append('<li>' + getName($(o).val()) + '</li>');
 		});
+	};
 
-	}
+	var rebuildButtons = function() {
+		var checked = getSelected();
+
+		if (checked.length == 0) {
+			$("#push_deliveries").attr("disabled", "disabled");
+			$("#merge_deliveries").attr("disabled", "disabled");
+
+			return;
+		}
+
+		if (checked.length == 1) {
+			$("#push_deliveries").removeAttr("disabled");
+			$("#merge_deliveries").attr("disabled", "disabled");
+
+			return;
+		}
+
+		$("#push_deliveries").removeAttr("disabled");
+		$("#merge_deliveries").removeAttr("disabled");
+	};
 
     return {
         init: function() {
@@ -65,6 +85,7 @@ define([], function() {
         	$("input[name=id]").on('change', function() {
         		setCount();
         		rebuildDeliverylist();
+        		rebuildButtons();
         	});
 
 			$("#select_all").on('click', function() {

@@ -267,8 +267,8 @@ HTML5;
                     </div>
 
                     <div id="process_jobs">
-                        <button id="push_deliveries" disabled="disabled">No selection</button>
-                        <button id="merge_deliveries" disabled="disabled">No selection</button>
+                        <button id="push_deliveries" disabled="disabled">Push selected</button>
+                        <button id="merge_deliveries" disabled="disabled">Merge selected</button>
                     </div>
 
                     <div id="options_bar">
