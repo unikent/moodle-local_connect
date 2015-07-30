@@ -194,38 +194,55 @@ HTML5;
      * (BETA) Index.
      */
     public function render_beta($courses) {
-        $table = new \html_table();
-        $table->head = array(
+        echo <<<HTML5
+        <div id="da_wrapper" class="row">
+            <div id="dapage_app" class="col-xs-12 col-sm-10">
+                <div class="table-responsive">
+HTML5;
+
+        $table = new \flexible_table('da-courses');
+        $table->define_columns(array(
+            'delivery_key',
+            'module_code',
+            'module_name',
+            'campus',
+            'duration',
+            'version',
+            'actions'
+        ));
+        $table->define_headers(array(
             'Delivery key',
             'Module code',
             'Module name',
             'Campus',
             'Duration',
-            'Version'
-        );
-        $table->data = array();
+            'Version',
+            ''
+        ));
+        $table->define_baseurl(new \moodle_url('/local/connect/beta.php'));
+        $table->pagesize(15, count($courses));
+        $table->setup();
 
+        $chunkstart = $table->get_page_start();
+        $chunksize = $table->get_page_size();
+
+        $courses = array_slice($courses, $chunkstart, $chunksize);
         foreach ($courses as $course) {
-            if (!$course->is_in_moodle()) {
-                $table->data[] = array(
-                    $course->module_delivery_key,
-                    $course->module_code,
-                    $course->module_title,
-                    $course->campus->name,
-                    $course->module_length,
-                    $course->module_version
-                );
-            }
+            $table->add_data(array(
+                $course->module_delivery_key,
+                $course->module_code,
+                $course->module_title,
+                $course->campus->name,
+                $course->module_length,
+                $course->module_version,
+                '<input name="id" value="' . $course->id . '" type="checkbox" />'
+            ));
         }
 
-        $table = html_writer::table($table);
+        $table->finish_output();
 
 
         echo <<<HTML5
-        <div id="da_wrapper" class="row">
-            <div id="dapage_app" class="col-xs-12 col-sm-10">
-                <div class="table-responsive">
-                    $table
                 </div>
             </div>
 
