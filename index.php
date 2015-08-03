@@ -44,6 +44,12 @@ $PAGE->set_url('/local/connect/index.php');
 $PAGE->set_pagelayout('datool');
 $PAGE->set_title("Departmental administration");
 
+// Beta pages?
+$noredirect = optional_param('nobeta', false, PARAM_BOOL);
+if (!$noredirect && \local_kent\User::get_preference("beta_connect", false)) {
+    redirect(new \moodle_url('/local/connect/beta.php'));
+}
+
 // JQuery.
 $PAGE->requires->jquery();
 $PAGE->requires->jquery_plugin('migrate');

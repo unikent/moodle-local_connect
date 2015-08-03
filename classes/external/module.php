@@ -30,6 +30,7 @@ require_once("$CFG->libdir/externallib.php");
 
 use external_api;
 use external_value;
+use external_single_structure;
 use external_multiple_structure;
 use external_function_parameters;
 
@@ -42,13 +43,12 @@ class module extends external_api
      * Returns description of method parameters
      * @return external_function_parameters
      */
-    public static function search_modules_parameters() {
+    public static function search_parameters() {
         return new external_function_parameters(array(
             'module_code' => new external_value(
                 PARAM_RAW,
                 'The search string',
-                VALUE_DEFAULT,
-                ''
+                VALUE_REQUIRED
             )
         ));
     }
@@ -57,7 +57,7 @@ class module extends external_api
      * Expose to AJAX
      * @return boolean
      */
-    public static function search_modules_is_allowed_from_ajax() {
+    public static function search_is_allowed_from_ajax() {
         return true;
     }
 
@@ -67,14 +67,12 @@ class module extends external_api
      * @param $modulecode
      * @return array [string]
      * @throws \invalid_parameter_exception
-     * @internal param string $component Limit the search to a component.
-     * @internal param string $search The search string.
      */
-    public static function search_modules($modulecode) {
+    public static function search($modulecode) {
         global $DB;
 
-        $params = self::validate_parameters(self::search_modules_parameters(), array(
-            'module_code' => $modulecode,
+        $params = self::validate_parameters(self::search_parameters(), array(
+            'module_code' => $modulecode
         ));
         $modulecode = $params['module_code'];
 
@@ -86,11 +84,217 @@ class module extends external_api
     }
 
     /**
-     * Returns description of search_modules() result value.
+     * Returns description of search() result value.
      *
      * @return external_description
      */
-    public static function search_modules_returns() {
+    public static function search_returns() {
         return new external_multiple_structure(new external_value(PARAM_RAW, 'The module information.'));
+    }
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function get_my_parameters() {
+        return new external_function_parameters(array());
+    }
+
+    /**
+     * Expose to AJAX
+     * @return boolean
+     */
+    public static function get_my_is_allowed_from_ajax() {
+        return true;
+    }
+
+    /**
+     * Search a list of modules.
+     *
+     * @return array [string]
+     * @throws \invalid_parameter_exception
+     */
+    public static function get_my() {
+        $connect = new \local_connect\core();
+        return $connect->get_my_courses();
+    }
+
+    /**
+     * Returns description of get_my() result value.
+     *
+     * @return external_description
+     */
+    public static function get_my_returns() {
+        return new external_multiple_structure(new external_value(PARAM_RAW, 'DA Page List.')); // TODO?
+    }
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function push_parameters() {
+        return new external_function_parameters(array(
+            'id' => new external_value(
+                PARAM_INT,
+                'The module to push',
+                VALUE_REQUIRED
+            )
+        ));
+    }
+
+    /**
+     * Expose to AJAX
+     * @return boolean
+     */
+    public static function push_is_allowed_from_ajax() {
+        return true;
+    }
+
+    /**
+     * Push a module.
+     *
+     * @param $id
+     * @return bool
+     * @throws \invalid_parameter_exception
+     */
+    public static function push($id) {
+        if (!\local_connect\util\helpers::can_category_manage()) {
+            throw new \moodle_exception('You do not have access to that.');
+        }
+
+        $params = self::validate_parameters(self::push_parameters(), array(
+            'id' => $id
+        ));
+
+        $course = \local_connect\course::get($params['id']);
+        if (!$course->create_in_moodle()) {
+            throw new \moodle_exception("Could not push course.");
+        }
+
+        return $course->mid;
+    }
+
+    /**
+     * Returns description of push() result value.
+     *
+     * @return external_description
+     */
+    public static function push_returns() {
+        return new external_single_structure(array(
+            new external_value(PARAM_INT, 'Moodle id of the course.')
+        ));
+    }
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function unlink_parameters() {
+        return new external_function_parameters(array(
+            'id' => new external_value(
+                PARAM_INT,
+                'The module to unlink',
+                VALUE_REQUIRED
+            )
+        ));
+    }
+
+    /**
+     * Expose to AJAX
+     * @return boolean
+     */
+    public static function unlink_is_allowed_from_ajax() {
+        return true;
+    }
+
+    /**
+     * Unlink a module.
+     *
+     * @param $id
+     * @return bool
+     * @throws \invalid_parameter_exception
+     */
+    public static function unlink($id) {
+        if (!\local_connect\util\helpers::can_category_manage()) {
+            throw new \moodle_exception('You do not have access to that.');
+        }
+
+        $params = self::validate_parameters(self::unlink_parameters(), array(
+            'id' => $id
+        ));
+
+        $course = \local_connect\course::get($params['id']);
+        return $course->unlink();
+    }
+
+    /**
+     * Returns description of unlink() result value.
+     *
+     * @return external_description
+     */
+    public static function unlink_returns() {
+        return new external_single_structure(array(
+            new external_value(PARAM_BOOL, 'Success or failue (true/false).')
+        ));
+    }
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function link_parameters() {
+        return new external_function_parameters(array(
+            'id' => new external_value(
+                PARAM_INT,
+                'The module to link',
+                VALUE_REQUIRED
+            ),
+            'moodleid' => new external_value(
+                PARAM_INT,
+                'The Moodle ID to assign this to.',
+                VALUE_REQUIRED
+            )
+        ));
+    }
+
+    /**
+     * Expose to AJAX
+     * @return boolean
+     */
+    public static function link_is_allowed_from_ajax() {
+        return true;
+    }
+
+    /**
+     * Link a module.
+     *
+     * @param $id
+     * @param $moodleid
+     * @return bool
+     * @throws \invalid_parameter_exception
+     */
+    public static function link($id, $moodleid) {
+        if (!\local_connect\util\helpers::can_category_manage()) {
+            throw new \moodle_exception('You do not have access to that.');
+        }
+
+        $params = self::validate_parameters(self::link_parameters(), array(
+            'id' => $id,
+            'moodleid' => $moodleid
+        ));
+
+        $course = \local_connect\course::get($params['id']);
+        return $course->link($params['moodleid']);
+    }
+
+    /**
+     * Returns description of link() result value.
+     *
+     * @return external_description
+     */
+    public static function link_returns() {
+        return new external_single_structure(array(
+            new external_value(PARAM_BOOL, 'Success or failue (true/false).')
+        ));
     }
 }

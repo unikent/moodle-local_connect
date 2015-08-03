@@ -191,17 +191,94 @@ HTML5;
     }
 
     /**
-     * (BETA) Course list.
-     * @param $courses
+     * (BETA) Index.
      */
-    public function render_sds_list($courses) {
-        $select = array();
+    public function render_beta($courses) {
+        echo <<<HTML5
+        <div id="da_wrapper" class="row">
+            <div id="dapage_app" class="col-xs-12 col-sm-10">
+                <div class="table-responsive">
+HTML5;
+
+        $table = new \flexible_table('da-courses');
+        $table->define_columns(array(
+            'delivery_key',
+            'module_code',
+            'module_name',
+            'campus',
+            'duration',
+            'version',
+            'actions'
+        ));
+        $table->define_headers(array(
+            'Delivery key',
+            'Module code',
+            'Module name',
+            'Campus',
+            'Duration',
+            'Version',
+            ''
+        ));
+        $table->define_baseurl(new \moodle_url('/local/connect/beta.php'));
+        $table->pagesize(15, count($courses));
+        $table->setup();
+
+        $chunkstart = $table->get_page_start();
+        $chunksize = $table->get_page_size();
+
+        $courses = array_slice($courses, $chunkstart, $chunksize);
         foreach ($courses as $course) {
-            if (!$course->is_in_moodle()) {
-                $select[$course->id] = "{$course->module_code}: {$course->module_title}";
-            }
+            $table->add_data(array(
+                $course->module_delivery_key,
+                $course->module_code,
+                $course->module_title,
+                $course->campus->name,
+                $course->module_length,
+                $course->module_version,
+                '<input name="id" value="' . $course->id . '" type="checkbox" />'
+            ), 'row-' . $course->id);
         }
 
-        echo \html_writer::select($select, 'sdscourse', '', null, array('multiple' => true));
+        $table->finish_output();
+
+
+        echo <<<HTML5
+                </div>
+            </div>
+
+            <div id="right_bar_wrap" class="col-xs-12 col-sm-2">
+                <div id="jobs_wrapper">
+                    <div id="select_buttons" class="btn-group" role="group" aria-label="Selections">
+                        <button id="select_all" type="button" class="btn btn-success">Select all</button>
+                        <button id="deselect_all" type="button" class="btn btn-danger">Deselect all</button>
+                    </div>
+
+                    <div id="jobs">
+                        <div class="job_number_text">you currently have</div>
+                        <div id="job_number">0</div>
+                        <div class="job_number_text">deliveries selected</div>
+                        <div id="display_list_toggle">
+                            <button>show deliveries</button>
+                            <div class="arrow_border"></div>
+                            <div class="arrow_light"></div>
+                        </div>
+                        <ul>
+                        </ul>
+                    </div>
+
+                    <div id="process_jobs">
+                        <button id="push_deliveries" disabled="disabled">Push selected</button>
+                        <button id="merge_deliveries" disabled="disabled">Merge selected</button>
+                    </div>
+
+                    <div id="options_bar">
+                        <div id="dasearch" class="form-group">
+                            <input type="search" class="form-control" id="dasearch-box" name="dasearch-box" placeholder="Search" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+HTML5;
     }
 }

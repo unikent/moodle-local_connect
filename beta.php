@@ -34,14 +34,25 @@ require_login();
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_url('/local/connect/beta.php');
 $PAGE->set_title('SDS push tool (beta)');
+$PAGE->set_pagelayout('fullwidth');
+$PAGE->requires->js_call_amd('local_connect/beta', 'init', array());
+$PAGE->requires->css('/local/connect/less/build/build.css');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($PAGE->title);
 
+$link = \html_writer::link(new \moodle_url('/local/connect/index.php', array('nobeta' => true)), 'Go back', array('class' => 'alert-link'));
+echo \html_writer::div('<i class="fa fa-info-circle"></i> You have been enrolled on the beta program. ' . $link . '.', 'alert alert-info');
+
+echo \html_writer::start_div('beta');
+
 $connect = new \local_connect\core();
 $courses = $connect->get_my_courses();
-
+$courses = array_filter($courses, function($course) {
+    return !$course->is_in_moodle();
+});
 $renderer = $PAGE->get_renderer('local_connect');
-$renderer->render_sds_list($courses);
+$renderer->render_beta($courses);
 
+echo \html_writer::end_div('beta');
 echo $OUTPUT->footer();
