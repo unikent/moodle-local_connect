@@ -130,31 +130,17 @@ class user extends data
         // Try to link up if there is already a matching user.
         if ($obj = $DB->get_record('user', array('username' => $this->login))) {
             $this->mid = $obj->id;
-            if ($this->save()) {
-                $this->sync_enrolments();
-            }
-
-            return true;
+            return $this->save();
         }
 
         if (empty($this->initials) || empty($this->family_name)) {
+            debugging("Invalid user {$this->id} - must have initials and family name.");
             return false;
         }
 
         $user = self::get_user_object($this->login, $this->initials, $this->family_name);
-
-        try {
-            $this->mid = user_create_user($user, false);
-        } catch (\moodle_exception $e) {
-            // TODO - error.
-            return false;
-        }
-
-        if ($this->save()) {
-            $this->sync_enrolments();
-        }
-
-        return true;
+        $this->mid = user_create_user($user, false);
+        return $this->save();
     }
 
     /**
