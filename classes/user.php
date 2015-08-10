@@ -134,7 +134,6 @@ class user extends data
         }
 
         if (empty($this->initials) || empty($this->family_name)) {
-            debugging("Invalid user {$this->id} - must have initials and family name.");
             return false;
         }
 
