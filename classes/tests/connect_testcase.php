@@ -277,4 +277,15 @@ abstract class connect_testcase extends \advanced_testcase
         $enabled = array_keys($enabled);
         set_config('enrol_plugins_enabled', implode(',', $enabled));
     }
+
+    /**
+     * Push roles through to Moodle (required for some tests).
+     */
+    public function push_roles() {
+        // Push roles through.
+        $roles = \local_connect\role::get_all();
+        foreach ($roles as $role) {
+            $role->create_in_moodle();
+        }
+    }
 }
