@@ -757,6 +757,10 @@ SQL;
     public function update_moodle() {
         global $DB;
 
+        if (!$this->is_locked()) {
+            return false;
+        }
+
         $course = $DB->get_record('course', array(
             'id' => $this->mid
         ));
@@ -765,6 +769,15 @@ SQL;
         if (!$course) {
             debugging("Can't find course to update {$course->id}");
             return false;
+        }
+
+        // Ensure the shortname is unique.
+        if (!$this->is_unique_shortname($this->shortname)) {
+            if (empty($this->_get_shortname_ext())) {
+                $this->generate_shortname_ext();
+            } else {
+                throw new \moodle_exception("Could not update_moodle as new shortname is not unique.");
+            }
         }
 
         // Updates!
