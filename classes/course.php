@@ -391,7 +391,7 @@ SQL;
     public function _get_course() {
         global $DB;
 
-        if (!$this->is_on_moodle()) {
+        if (!$this->is_in_moodle()) {
             return null;
         }
 
