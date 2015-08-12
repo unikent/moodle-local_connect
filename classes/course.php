@@ -386,6 +386,26 @@ SQL;
     }
 
     /**
+     * Returns a cached course object.
+     */
+    public function _get_course($refreshcache = false) {
+        global $DB;
+
+        if (!$this->is_in_moodle()) {
+            return null;
+        }
+
+        static $result = null;
+        if (!$result || $refreshcache) {
+            $result = $DB->get_record('course', array(
+                'id' => $this->mid
+            ), '*', \MUST_EXIST);
+        }
+
+        return $result;
+    }
+
+    /**
      * Is this course (probably) postgraduate?
      * @return boolean
      */
@@ -483,7 +503,7 @@ SQL;
         }
 
         $expected = $this->is_in_moodle() ? 1 : 0;
-        return $expected === $DB->count_records('course', array(
+        return $expected >= $DB->count_records('course', array(
             'shortname' => $shortname
         ));
     }
@@ -529,10 +549,7 @@ SQL;
         global $DB;
 
         // We need a course object for all this.
-        $course = $DB->get_record('course', array(
-            'id' => $this->mid
-        ));
-
+        $course = $this->course;
         if (!$course) {
             return null;
         }
@@ -658,6 +675,39 @@ SQL;
     }
 
     /**
+     * Update this course in Moodle
+     */
+    public function update_moodle() {
+        global $DB;
+
+        if (!$this->is_locked()) {
+            return false;
+        }
+
+        // Ensure the shortname is unique.
+        if (!$this->has_unique_shortname()) {
+            if (empty($this->_get_shortname_ext())) {
+                $this->generate_shortname_ext();
+            } else {
+                throw new \moodle_exception("Could not update_moodle as new shortname is not unique.");
+            }
+        }
+
+        // Updates!
+        $course = $this->course;
+        $course->shortname = $this->shortname;
+        $course->fullname = $this->fullname;
+        $course->category = $this->category;
+        $course->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
+
+        // Update this course in Moodle.
+        update_course($course);
+        $this->_get_course(true);
+
+        return true;
+    }
+
+    /**
      * Map this course to a category.
      */
     public function map_category() {
@@ -752,34 +802,6 @@ SQL;
     }
 
     /**
-     * Update this course in Moodle
-     */
-    public function update_moodle() {
-        global $DB;
-
-        $course = $DB->get_record('course', array(
-            'id' => $this->mid
-        ));
-
-        // Check this exists o.o I dont know why I'm expecting it not too...
-        if (!$course) {
-            debugging("Can't find course to update {$course->id}");
-            return false;
-        }
-
-        // Updates!
-        $course->shortname = $this->shortname;
-        $course->fullname = $this->fullname;
-        $course->category = $this->category;
-        $course->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
-
-        // Update this course in Moodle.
-        update_course($course);
-
-        return true;
-    }
-
-    /**
      * Delete this course
      *
      * @return boolean
@@ -787,9 +809,7 @@ SQL;
     public function delete() {
         global $DB;
 
-        $course = $DB->get_record('course', array(
-            'id' => $this->mid
-        ));
+        $course = $this->course;
 
         // Step 1 - Move to the 'removed category'.
         $category = \local_catman\core::get_category();
@@ -854,20 +874,13 @@ SQL;
             return;
         }
 
-        $instances = array();
-
         $courses = self::get_by('mid', $this->mid, true);
         foreach ($courses as $course) {
-            $instance = $course->get_enrol_instance();
-            if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
-                $instances[] = $instance;
-            }
+            $course->get_enrol_instance();
         }
 
-        if (!empty($instances)) {
-            $enrol = enrol_get_plugin('connect');
-            $enrol->sync($this->mid, $instances);
-        }
+        $enrol = enrol_get_plugin('connect');
+        $enrol->sync($this->mid);
     }
 
     /**
