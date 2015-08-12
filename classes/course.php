@@ -388,7 +388,7 @@ SQL;
     /**
      * Returns a cached course object.
      */
-    public function _get_course() {
+    public function _get_course($refreshcache = false) {
         global $DB;
 
         if (!$this->is_in_moodle()) {
@@ -396,7 +396,7 @@ SQL;
         }
 
         static $result = null;
-        if (!$result) {
+        if (!$result || $refreshcache) {
             $result = $DB->get_record('course', array(
                 'id' => $this->mid
             ), '*', \MUST_EXIST);
@@ -503,7 +503,7 @@ SQL;
         }
 
         $expected = $this->is_in_moodle() ? 1 : 0;
-        return $expected === $DB->count_records('course', array(
+        return $expected >= $DB->count_records('course', array(
             'shortname' => $shortname
         ));
     }
@@ -675,6 +675,39 @@ SQL;
     }
 
     /**
+     * Update this course in Moodle
+     */
+    public function update_moodle() {
+        global $DB;
+
+        if (!$this->is_locked()) {
+            return false;
+        }
+
+        // Ensure the shortname is unique.
+        if (!$this->has_unique_shortname()) {
+            if (empty($this->_get_shortname_ext())) {
+                $this->generate_shortname_ext();
+            } else {
+                throw new \moodle_exception("Could not update_moodle as new shortname is not unique.");
+            }
+        }
+
+        // Updates!
+        $course = $this->course;
+        $course->shortname = $this->shortname;
+        $course->fullname = $this->fullname;
+        $course->category = $this->category;
+        $course->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
+
+        // Update this course in Moodle.
+        update_course($course);
+        $this->_get_course(true);
+
+        return true;
+    }
+
+    /**
      * Map this course to a category.
      */
     public function map_category() {
@@ -764,38 +797,6 @@ SQL;
 
         // Add a link.
         $target->link($this->mid, $fast);
-
-        return true;
-    }
-
-    /**
-     * Update this course in Moodle
-     */
-    public function update_moodle() {
-        global $DB;
-
-        if (!$this->is_locked()) {
-            return false;
-        }
-
-        // Ensure the shortname is unique.
-        if (!$this->is_unique_shortname($this->shortname)) {
-            if (empty($this->_get_shortname_ext())) {
-                $this->generate_shortname_ext();
-            } else {
-                throw new \moodle_exception("Could not update_moodle as new shortname is not unique.");
-            }
-        }
-
-        // Updates!
-        $course = $this->course;
-        $course->shortname = $this->shortname;
-        $course->fullname = $this->fullname;
-        $course->category = $this->category;
-        $course->summary = \core_text::convert($this->summary, 'utf-8', 'utf-8');
-
-        // Update this course in Moodle.
-        update_course($course);
 
         return true;
     }
