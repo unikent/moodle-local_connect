@@ -131,15 +131,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
 
         $this->resetAfterTest();
         $this->enable_enrol_plugin();
-
-        $role = \local_connect\role::get_by('name', 'sds_student');
-        $role->create_in_moodle();
-
-        $role = \local_connect\role::get_by('name', 'sds_convenor');
-        $role->create_in_moodle();
-
-        $role = \local_connect\role::get_by('name', 'sds_teacher');
-        $role->create_in_moodle();
+        $this->push_roles();
 
         $course = $this->generate_course();
         $this->generate_enrolments(30, $course, 'sds_student');
