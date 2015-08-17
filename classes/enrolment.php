@@ -160,13 +160,17 @@ class enrolment extends data
             return false;
         }
 
-        // Do the enrolment.
+        // Get the enrol instance.
         $instance = $this->course->get_enrol_instance();
-        if ($instance && $instance->status == ENROL_INSTANCE_ENABLED) {
-            $enrol = enrol_get_plugin('connect');
-            $enrol->enrol_user($instance, $this->user->mid, $this->role->mid);
+        if (!$instance || $instance->status != ENROL_INSTANCE_ENABLED) {
+            return false;
         }
 
+        // Do the enrolment.
+        $enrol = enrol_get_plugin('connect');
+        $enrol->enrol_user($instance, $this->user->mid, $this->role->mid);
+
+        // Check!
         if (!$this->is_in_moodle()) {
             $msg = "Enrol '{$this->user->mid}' on '{$this->course->mid}' as a '{$this->role->name}' failed.";
             \local_connect\util\helpers::error($msg);
