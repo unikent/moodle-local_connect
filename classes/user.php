@@ -153,7 +153,7 @@ class user extends data
         global $CFG;
 
         $user = new \stdClass();
-        $user->username = \core_text::convert($username, 'utf-8', 'utf-8');
+        $user->username = \core_text::strtolower(\core_text::convert($username, 'utf-8', 'utf-8'));
         $user->email = $user->username . "@kent.ac.uk";
         $user->auth = "kentsaml";
         $user->password = "not cached";
