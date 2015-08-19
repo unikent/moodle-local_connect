@@ -34,14 +34,14 @@ class observers
     /**
      * Triggered when 'course_scheduled' event is triggered.
      *
-     * @param \local_catman\event\course_scheduled $event
+     * @param \tool_cat\event\course_scheduled $event
      * @return unknown
      */
-    public static function catman_scheduled(\local_catman\event\course_scheduled $event) {
+    public static function catman_scheduled(\tool_cat\event\recyclebin_scheduled $event) {
         global $DB;
 
         // Check we were not moved to the removed category.
-        $category = \local_catman\core::get_category();
+        $category = \tool_cat\recyclebin::get_category();
         $course = $event->get_record_snapshot('course', $event->objectid);
 
         // If this is in the removed category, delete any reference to it.

@@ -330,7 +330,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $this->resetAfterTest();
 
         // Enable the plugin for testing.
-        set_config("enable", true, "local_catman");
+        set_config("enablerecyclebin", true, "tool_cat");
 
         $id = $this->generate_course();
         $course = \local_connect\course::get($id);
@@ -341,7 +341,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $this->assertTrue($course->is_in_moodle());
 
         // Move to removed category.
-        $category = \local_catman\core::get_category();
+        $category = \tool_cat\recyclebin::get_category();
         move_courses(array($course->mid), $category->id);
 
         $course = \local_connect\course::get($id);
