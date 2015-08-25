@@ -50,7 +50,7 @@ $observers = array (
     ),
 
     array (
-        'eventname' => '\local_catman\event\course_scheduled',
+        'eventname' => '\tool_cat\event\recyclebin_scheduled',
         'callback' => '\local_connect\observers::catman_scheduled',
     ),
 

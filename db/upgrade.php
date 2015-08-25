@@ -673,7 +673,7 @@ function xmldb_local_connect_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014062700) {
-        $category = \local_catman\core::get_category();
+        $category = \tool_cat\recyclebin::get_category();
 
         $courses = $DB->get_records('course', array(
             'category' => $category->id

@@ -24,11 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015081000;
+$plugin->version   = 2015081900;
 $plugin->requires  = 2015051100;
 
 $plugin->dependencies = array(
     'local_kent' => 2015081000,
-    'local_catman' => 2015061100,
+    'tool_cat' => 2015081800,
     'local_hipchat' => 2015060500
 );

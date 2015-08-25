@@ -812,7 +812,7 @@ SQL;
         $course = $this->course;
 
         // Step 1 - Move to the 'removed category'.
-        $category = \local_catman\core::get_category();
+        $category = \tool_cat\recyclebin::get_category();
         $course->category = $category->id;
 
         // Step 2 - Also update shortname/id.
