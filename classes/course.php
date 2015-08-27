@@ -802,32 +802,15 @@ SQL;
     }
 
     /**
-     * Delete this course
+     * Delete this course.
      *
+     * @deprecated 2015082600 Just delete the course instead.
      * @return boolean
      */
     public function delete() {
-        global $DB;
+        debugging("local_connect\\course->delete() is deprecated. Use delete_course instead!");
 
-        $course = $this->course;
-
-        // Step 1 - Move to the 'removed category'.
-        $category = \tool_cat\recyclebin::get_category();
-        $course->category = $category->id;
-
-        // Step 2 - Also update shortname/id.
-        $course->shortname = date("dmY-His") . "-" . $course->shortname;
-        $course->idnumber = date("dmY-His") . "-" . $course->idnumber;
-
-        // Step 3 - Commit to DB.
-        update_course($course);
-
-        // Step 4 - Delete enrolments.
-        $this->delete_enrolments();
-
-        // Step 5 - Update this entry.
-        $this->mid = 0;
-        $this->save();
+        delete_course($this->mid);
 
         return true;
     }

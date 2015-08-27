@@ -154,7 +154,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $course2->unlink();
         $this->assertEquals(33, $DB->count_records('user_enrolments'));
 
-        $course->delete();
+        delete_course($course->mid);
 
         $this->assertEquals(0, $DB->count_records('user_enrolments'));
     }
@@ -329,9 +329,6 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
 
         $this->resetAfterTest();
 
-        // Enable the plugin for testing.
-        set_config("enablerecyclebin", true, "tool_cat");
-
         $id = $this->generate_course();
         $course = \local_connect\course::get($id);
 
@@ -340,9 +337,8 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $this->assertTrue($course->create_in_moodle());
         $this->assertTrue($course->is_in_moodle());
 
-        // Move to removed category.
-        $category = \tool_cat\recyclebin::get_category();
-        move_courses(array($course->mid), $category->id);
+        // Delete the course.
+        delete_course($course->mid);
 
         $course = \local_connect\course::get($id);
         $this->assertFalse($course->is_in_moodle());
