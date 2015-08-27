@@ -50,11 +50,6 @@ $observers = array (
     ),
 
     array (
-        'eventname' => '\tool_cat\event\recyclebin_scheduled',
-        'callback' => '\local_connect\observers::catman_scheduled',
-    ),
-
-    array (
         'eventname' => '\core\event\role_assigned',
         'callback' => '\local_connect\observers::role_assigned',
     ),

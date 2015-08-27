@@ -32,27 +32,6 @@ defined('MOODLE_INTERNAL') || die();
 class observers
 {
     /**
-     * Triggered when 'course_scheduled' event is triggered.
-     *
-     * @param \tool_cat\event\course_scheduled $event
-     * @return unknown
-     */
-    public static function catman_scheduled(\tool_cat\event\recyclebin_scheduled $event) {
-        global $DB;
-
-        // Check we were not moved to the removed category.
-        $category = \tool_cat\recyclebin::get_category();
-        $course = $event->get_record_snapshot('course', $event->objectid);
-
-        // If this is in the removed category, delete any reference to it.
-        if ($course->category == $category->id) {
-            $DB->set_field('connect_course', 'mid', 0, array(
-                'mid' => $course->id
-            ));
-        }
-    }
-
-    /**
      * Triggered when 'course_updated' event is triggered.
      *
      * @param \core\event\course_updated $event
