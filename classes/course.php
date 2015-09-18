@@ -386,23 +386,18 @@ SQL;
     }
 
     /**
-     * Returns a cached course object.
+     * Returns a Moodle course object.
      */
-    public function _get_course($refreshcache = false) {
+    public function _get_course() {
         global $DB;
 
         if (!$this->is_in_moodle()) {
             return null;
         }
 
-        static $result = null;
-        if (!$result || $refreshcache) {
-            $result = $DB->get_record('course', array(
-                'id' => $this->mid
-            ), '*', \MUST_EXIST);
-        }
-
-        return $result;
+        return $DB->get_record('course', array(
+            'id' => $this->mid
+        ), '*', \MUST_EXIST);
     }
 
     /**
