@@ -846,5 +846,18 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015041700, 'local', 'connect');
     }
 
+    if ($oldversion < 2015091800) {
+        // Support new School of Economics categories.
+        $courses = \local_connect\course::get_by('category', 12, true);
+        foreach ($courses as $course) {
+            $course->map_category();
+            $course->save();
+            $course->sync();
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2015091800, 'local', 'connect');
+    }
+
     return true;
 }
