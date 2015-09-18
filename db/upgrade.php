@@ -846,7 +846,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015041700, 'local', 'connect');
     }
 
-    if ($oldversion < 2015091800) {
+    if ($oldversion < 2015091801) {
         // Support new School of Economics categories.
         $courses = \local_connect\course::get_by('category', 12, true);
         foreach ($courses as $course) {
@@ -855,7 +855,7 @@ function xmldb_local_connect_upgrade($oldversion) {
         }
 
         // Connect savepoint reached.
-        upgrade_plugin_savepoint(true, 2015091800, 'local', 'connect');
+        upgrade_plugin_savepoint(true, 2015091801, 'local', 'connect');
     }
 
     return true;
