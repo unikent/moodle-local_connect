@@ -28,7 +28,7 @@ $plugin->version   = 2015091800;
 $plugin->requires  = 2015051100;
 $plugin->component = 'local_connect';
 $plugin->dependencies = array(
-    'local_kent' => 2015081000,
+    'local_kent' => 2015091800,
     'tool_cat' => 2015081800,
     'local_hipchat' => 2015060500
 );
