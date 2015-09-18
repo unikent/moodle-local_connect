@@ -852,7 +852,6 @@ function xmldb_local_connect_upgrade($oldversion) {
         foreach ($courses as $course) {
             $course->map_category();
             $course->save();
-            $course->sync();
         }
 
         // Connect savepoint reached.
