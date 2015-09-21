@@ -456,7 +456,7 @@ SQL;
      * Returns the Moodle URL for this object.
      */
     public function get_moodle_url() {
-        if (empty($this->mid)) {
+        if (!$this->is_in_moodle()) {
             return "";
         }
 
