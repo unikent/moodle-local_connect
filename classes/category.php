@@ -174,7 +174,17 @@ class category
             ),
             array(
                 'department' => '36',
-                'idnumber' => '12'
+                'idnumber' => '67'
+            ),
+            array(
+                'department' => '36',
+                'idnumber' => '68',
+                'rule' => 'EC8'
+            ),
+            array(
+                'department' => '36',
+                'idnumber' => '68',
+                'rule' => 'EC9'
             ),
             array(
                 'department' => '16',
