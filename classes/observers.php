@@ -91,11 +91,11 @@ class observers
 
         // Grab user info.
         $username = $DB->get_field('user', 'username', array(
-            "id" => $event->objectid
+            'id' => $event->objectid
         ));
 
         $user = $DB->get_record('connect_user', array(
-            "login" => $username
+            'login' => $username
         ));
 
         // If there is no valid connect user, bail out.
