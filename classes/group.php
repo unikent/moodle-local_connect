@@ -149,7 +149,7 @@ class group extends data
      * Take full ownership of the group, trash any extra enrolments.
      * @param $dry
      */
-    private function sync_enrolments($dry) {
+    public function sync_enrolments($dry = false) {
         global $DB;
 
         // Grab a list of Moodle enrolments.
@@ -157,21 +157,27 @@ class group extends data
             'groupid' => $this->mid
         ));
 
-        // Grab a list of Connect enrolments.
-        $enrolments = $this->enrolments;
+        // Grab a list of expected users to cross-reference.
+        $expected = $DB->get_records_sql('
+            SELECT DISTINCT cu.mid, cu.id
+            FROM {connect_group_enrolments} cge
+            INNER JOIN {connect_group} cg
+                ON cg.id = cge.groupid
+            INNER JOIN {connect_user} cu
+                ON cu.id = cge.userid
+            INNER JOIN {connect_enrolments} ce
+                ON ce.courseid = cg.courseid AND ce.userid = cu.id
+            WHERE cg.mid = :mid AND cu.mid > 0
+        ', array(
+            'mid' => $this->mid
+        ));
 
-        // Deletions.
+        $userids = array();
         foreach ($members as $member) {
-            $found = false;
+            $userids[$member->userid] = $member;
 
-            // Is there a matching enrolment?
-            foreach ($enrolments as $enrolment) {
-                if ($enrolment->user->mid == $member->userid) {
-                    $found = true;
-                }
-            }
-
-            if (!$found) {
+            // Deletions.
+            if (!isset($expected[$member->userid])) {
                 echo "   Removing {$member->userid} from group {$this->mid}.\n";
                 if (!$dry) {
                     groups_remove_member($this->mid, $member->userid);
@@ -180,8 +186,13 @@ class group extends data
         }
 
         // Creations.
-        foreach ($enrolments as $enrolment) {
-            $enrolment->sync($dry);
+        foreach ($this->enrolments as $enrolment) {
+            foreach ($expected as $valid) {
+                if ($enrolment->userid == $valid->id && !isset($userids[$valid->mid])) {
+                    $enrolment->sync($dry);
+                    break;
+                }
+            }
         }
     }
 
