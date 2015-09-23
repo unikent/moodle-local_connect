@@ -85,7 +85,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 	$table->add_data(array("staff_enrolled", $course->count_staff()));
 	$table->add_data(array("students_enrolled", $course->count_students()));
 
-	$table->print_html();
+	$table->finish_output();
 }
 
 // The Enrolments Table
@@ -113,7 +113,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 	$push_link = \html_writer::link($push_url->out(false), "Push All");
 	$table->add_data(array("", "", "", $push_link));
 
-	$table->print_html();
+	$table->finish_output();
 }
 
 // The Groups Table
@@ -133,7 +133,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 		$table->add_data(array($name, $group->count_all(), $group->is_in_moodle() ? "Yes" : "No"));
 	}
 
-	$table->print_html();
+	$table->finish_output();
 }
 
 echo $OUTPUT->footer();

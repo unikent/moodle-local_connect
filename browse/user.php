@@ -74,7 +74,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_user', 'local_connect') . $user-
 	$table->add_data(array("initials", $user->initials));
 	$table->add_data(array("family_name", $user->family_name));
 
-	$table->print_html();
+	$table->finish_output();
 }
 
 // The Enrolments Table
@@ -102,7 +102,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_user', 'local_connect') . $user-
 	$push_link = \html_writer::link($push_url->out(false), "Push All");
 	$table->add_data(array('', '', '', $push_link));
 
-	$table->print_html();
+	$table->finish_output();
 }
 
 echo $OUTPUT->footer();
