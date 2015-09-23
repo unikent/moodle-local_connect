@@ -217,8 +217,6 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
      * Test we can create a linked course.
      */
     public function test_linked_courses() {
-        global $DB;
-
         $this->resetAfterTest();
 
         // Create two courses.
@@ -226,9 +224,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $course2 = \local_connect\course::get($this->generate_course());
         $this->assertEquals(2, count(\local_connect\course::get_all()));
 
-        $result = \local_connect\course::process_merge(array($course1->id, $course2->id));
-
-        $this->assertEquals(array(), $result);
+        $this->assertTrue($course1->add_child($course2));
 
         // Unlink!
         $this->assertTrue($course1->unlink());
@@ -238,8 +234,6 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
      * Test course counting methods.
      */
     public function test_course_counts() {
-        global $DB;
-
         $this->resetAfterTest();
 
         $course1 = \local_connect\course::get($this->generate_course());
@@ -323,7 +317,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
      * kill its mid.
      */
     public function test_course_scheduled_mid() {
-        global $CFG, $DB;
+        global $CFG;
 
         require_once($CFG->dirroot . "/course/lib.php");
 
@@ -348,7 +342,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
      * Make sure we lock courses properly.
      */
     public function test_course_lock() {
-        global $CFG, $DB, $USER;
+        global $CFG, $DB;
 
         require_once($CFG->dirroot . "/course/lib.php");
 
