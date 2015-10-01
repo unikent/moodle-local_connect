@@ -92,6 +92,15 @@ class course extends data
     }
 
     /**
+     * Get our URL.
+     */
+    public function get_url() {
+        return new \moodle_url('/local/connect/browse/course.php', array(
+            'id' => $this->id
+        ));
+    }
+
+    /**
      * Here is the big sync method.
      * @param bool $dry
      * @return bool|int
