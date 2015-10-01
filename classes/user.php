@@ -60,6 +60,15 @@ class user extends data
     }
 
     /**
+     * Get our URL.
+     */
+    public function get_url() {
+        return new \moodle_url('/local/connect/browse/user.php', array(
+            'id' => $this->id
+        ));
+    }
+
+    /**
      * Returns all enrolments for this user.
      */
     public function _get_enrolments() {
