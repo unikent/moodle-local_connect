@@ -27,6 +27,9 @@ define('AJAX_SCRIPT', true);
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
+require_login();
+$PAGE->set_context(\context_system::instance());
+
 if (!\local_connect\util\helpers::is_enabled()) {
     die(json_encode(array("error" => "Connect has been disabled")));
 }
@@ -51,7 +54,7 @@ switch ($action) {
         $course = required_param('course', PARAM_INT);
         $obj = \local_connect\course::get($course);
         if ($obj) {
-            $obj->delete();
+            delete_course($obj->mid, false);
         }
 
         echo $OUTPUT->header();
