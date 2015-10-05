@@ -814,7 +814,7 @@ SQL;
     public function delete() {
         debugging("local_connect\\course->delete() is deprecated. Use delete_course instead!");
 
-        delete_course($this->mid);
+        delete_course($this->mid, false);
 
         return true;
     }
