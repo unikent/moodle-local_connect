@@ -59,7 +59,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 	$table = new flexible_table('course-info');
 	$table->define_columns(array('variable', 'value'));
 	$table->define_headers(array("Variable", "Value"));
-	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/course.php');
+	$table->define_baseurl('/local/connect/browse/course.php');
 	$table->setup();
 
 	$mid = "-";
@@ -93,9 +93,9 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 	echo $OUTPUT->heading("Enrolments", 2);
 
 	$table = new flexible_table('course-enrolments');
-	$table->define_columns(array('username', 'role', 'in_moodle', 'action'));
-	$table->define_headers(array("Username", "Role", "In Moodle?", "Action"));
-	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/course.php');
+	$table->define_columns(array('username', 'role', 'status', 'in_moodle', 'action'));
+	$table->define_headers(array("Username", "Role", "Status", "In Moodle?", "Action"));
+	$table->define_baseurl('/local/connect/browse/course.php');
 	$table->setup();
 
 	foreach ($course->enrolments as $enrolment) {
@@ -106,7 +106,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 		$push_link = \html_writer::link($push_url->out(false), "Push");
 
 		$in_moodle = $enrolment->is_in_moodle();
-		$table->add_data(array($userlink, $enrolment->role->name, $in_moodle ? "Yes" : "No", $in_moodle ? "" : $push_link));
+		$table->add_data(array($userlink, $enrolment->role->name, $enrolment->status, $in_moodle ? "Yes" : "No", $in_moodle ? "" : $push_link));
 	}
 
 	$push_url = new \moodle_url("/local/connect/browse/sync/course.php", array("id" => $course->id));
@@ -123,7 +123,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 	$table = new flexible_table('course-groups');
 	$table->define_columns(array('name', 'members', 'in_moodle'));
 	$table->define_headers(array("Name", "Number of users", "In Moodle?"));
-	$table->define_baseurl($CFG->wwwroot.'/local/connect/browse/course.php');
+	$table->define_baseurl('/local/connect/browse/course.php');
 	$table->setup();
 
 	foreach ($course->groups as $group) {
