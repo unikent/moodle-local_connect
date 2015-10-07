@@ -111,7 +111,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 
 	$push_url = new \moodle_url("/local/connect/browse/sync/course.php", array("id" => $course->id));
 	$push_link = \html_writer::link($push_url->out(false), "Push All");
-	$table->add_data(array("", "", "", $push_link));
+	$table->add_data(array("", "", "", "", $push_link));
 
 	$table->finish_output();
 }
