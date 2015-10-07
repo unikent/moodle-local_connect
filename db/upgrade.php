@@ -858,5 +858,19 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015091801, 'local', 'connect');
     }
 
+    if ($oldversion < 2015100700) {
+        // Define field department to be added to connect_enrolments.
+        $table = new xmldb_table('connect_enrolments');
+        $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '3', null, null, null, '?', 'roleid');
+
+        // Conditionally launch add field department.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2015100700, 'local', 'connect');
+    }
+
     return true;
 }
