@@ -154,7 +154,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $course2->unlink();
         $this->assertEquals(33, $DB->count_records('user_enrolments'));
 
-        delete_course($course->mid);
+        delete_course($course->mid, false);
 
         $this->assertEquals(0, $DB->count_records('user_enrolments'));
     }
@@ -223,6 +223,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $course1 = \local_connect\course::get($this->generate_course());
         $course2 = \local_connect\course::get($this->generate_course());
         $this->assertEquals(2, count(\local_connect\course::get_all()));
+        $course1->create_in_moodle();
 
         $this->assertTrue($course1->add_child($course2));
 
@@ -332,7 +333,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
         $this->assertTrue($course->is_in_moodle());
 
         // Delete the course.
-        delete_course($course->mid);
+        delete_course($course->mid, false);
 
         $course = \local_connect\course::get($id);
         $this->assertFalse($course->is_in_moodle());
