@@ -125,10 +125,10 @@ class group extends data
             // We are currently in Moodle!
             $group = $DB->get_record('groups', array(
                 'id' => $this->mid
-            ), 'id,courseid,name');
+            ), 'id,name');
 
             // Does our data match up?
-            if ($group->name !== $this->name) {
+            if (strtolower($group->name) !== strtolower($this->name)) {
                 if (!$dry) {
                     $this->update_in_moodle();
                 }
@@ -326,7 +326,7 @@ class group extends data
         ), 'id,courseid,name');
 
         // Does our data match up?
-        if ($group->name !== $this->name) {
+        if (strtolower($group->name) !== strtolower($this->name)) {
             $group->name = $this->name;
             return groups_update_group($group);
         }
