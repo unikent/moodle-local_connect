@@ -159,17 +159,22 @@ class group extends data
 
         // Grab a list of expected users to cross-reference.
         $expected = $DB->get_records_sql('
-            SELECT DISTINCT cu.mid, cu.id
+            SELECT DISTINCT cu.mid, cu.id, cu.login
             FROM {connect_group_enrolments} cge
             INNER JOIN {connect_group} cg
                 ON cg.id = cge.groupid
+            INNER JOIN {connect_course} cc
+                ON cc.id = cg.courseid
             INNER JOIN {connect_user} cu
                 ON cu.id = cge.userid
-            INNER JOIN {connect_enrolments} ce
-                ON ce.courseid = cg.courseid AND ce.userid = cu.id
-            WHERE cg.mid = :mid AND cu.mid > 0
+            INNER JOIN {enrol} e
+                ON e.enrol=:enrol AND e.courseid=cc.mid
+            INNER JOIN {user_enrolments} ue
+                ON ue.userid=cu.mid AND ue.enrolid=e.id
+            WHERE cg.mid = :mid
         ', array(
-            'mid' => $this->mid
+            'mid' => $this->mid,
+            'enrol' => 'connect'
         ));
 
         $userids = array();
