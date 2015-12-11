@@ -42,30 +42,35 @@ $functions = array(
         'classname'   => 'local_connect\external\module',
         'methodname'  => 'search',
         'description' => 'Search modules.',
-        'type'        => 'read'
+        'type'        => 'read',
+        'ajax'        => true
     ),
     'local_connect_get_my_modules' => array(
         'classname'   => 'local_connect\external\module',
         'methodname'  => 'get_my',
         'description' => 'Get a user\'s modules.',
-        'type'        => 'read'
+        'type'        => 'read',
+        'ajax'        => true
     ),
     'local_connect_push_module' => array(
         'classname'   => 'local_connect\external\module',
         'methodname'  => 'push',
         'description' => 'Push a module.',
-        'type'        => 'write'
+        'type'        => 'write',
+        'ajax'        => true
     ),
     'local_connect_link_module' => array(
         'classname'   => 'local_connect\external\module',
         'methodname'  => 'link',
         'description' => 'Link a module.',
-        'type'        => 'write'
+        'type'        => 'write',
+        'ajax'        => true
     ),
     'local_connect_unlink_module' => array(
         'classname'   => 'local_connect\external\module',
         'methodname'  => 'unlink',
         'description' => 'Unlink a module.',
-        'type'        => 'write'
+        'type'        => 'write',
+        'ajax'        => true
     )
 );

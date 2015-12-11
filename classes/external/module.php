@@ -54,14 +54,6 @@ class module extends external_api
     }
 
     /**
-     * Expose to AJAX
-     * @return boolean
-     */
-    public static function search_is_allowed_from_ajax() {
-        return true;
-    }
-
-    /**
      * Search a list of modules.
      *
      * @param $modulecode
@@ -101,14 +93,6 @@ class module extends external_api
     }
 
     /**
-     * Expose to AJAX
-     * @return boolean
-     */
-    public static function get_my_is_allowed_from_ajax() {
-        return true;
-    }
-
-    /**
      * Search a list of modules.
      *
      * @return array [string]
@@ -140,14 +124,6 @@ class module extends external_api
                 VALUE_REQUIRED
             )
         ));
-    }
-
-    /**
-     * Expose to AJAX
-     * @return boolean
-     */
-    public static function push_is_allowed_from_ajax() {
-        return true;
     }
 
     /**
@@ -200,14 +176,6 @@ class module extends external_api
     }
 
     /**
-     * Expose to AJAX
-     * @return boolean
-     */
-    public static function unlink_is_allowed_from_ajax() {
-        return true;
-    }
-
-    /**
      * Unlink a module.
      *
      * @param $id
@@ -255,14 +223,6 @@ class module extends external_api
                 VALUE_REQUIRED
             )
         ));
-    }
-
-    /**
-     * Expose to AJAX
-     * @return boolean
-     */
-    public static function link_is_allowed_from_ajax() {
-        return true;
     }
 
     /**
