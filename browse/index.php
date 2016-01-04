@@ -37,10 +37,7 @@ admin_externalpage_setup('connectdatabrowse', '', null, '', array('pagelayout' =
 /**
  * Script setup.
  */
-$PAGE->requires->jquery();
-$PAGE->requires->jquery_plugin('migrate');
-$PAGE->requires->js('/local/connect/scripts/jstree.min.js');
-$PAGE->requires->js('/local/connect/scripts/browse.js');
+$PAGE->requires->js_call_amd('local_connect/browse', 'init', array());
 $PAGE->requires->css('/local/connect/less/build/jtree.css');
 
 /**
