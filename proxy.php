@@ -19,7 +19,7 @@
  *
  * @deprecated See web service methods: local_connect_push_module, local_connect_merge_module, local_connect_unlink_module
  * @package    local_connect
- * @copyright  2015 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
