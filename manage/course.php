@@ -83,7 +83,7 @@ if (!empty($links)) {
             'aria-labelledby' => "heading{$obj->id}"
         ));
         $table = $obj->get_flexible_table($PAGE->url);
-        $table->print_html();
+        $table->finish_output();
         echo \html_writer::end_div();
 
         echo \html_writer::end_div();
