@@ -27,7 +27,7 @@ namespace local_connect\task;
 /**
  * SDS Sync
  */
-class sds_sync extends task_base
+class sds_sync extends \core\task\scheduled_task
 {
     public function get_name() {
         return "SDS Sync";
