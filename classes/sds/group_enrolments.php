@@ -73,7 +73,7 @@ SQL;
               `id` int(11) NOT NULL,
               `group_id` varchar(255) DEFAULT NULL,
               `login` varchar(255) DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation};
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation}
 SQL;
     }
 
@@ -86,7 +86,7 @@ SQL;
                 ADD PRIMARY KEY (`id`),
                 ADD KEY index_{$tablename}_on_group_id (`group_id`),
                 ADD KEY index_{$tablename}_on_login (`login`),
-                MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+                MODIFY `id` int(11) NOT NULL AUTO_INCREMENT
 SQL;
     }
 

@@ -74,7 +74,7 @@ SQL;
               `group_id` int(11) NOT NULL,
               `group_desc` varchar(255) DEFAULT NULL,
               `module_delivery_key` varchar(36) DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation};
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation}
 SQL;
     }
 
@@ -86,7 +86,7 @@ SQL;
             ALTER TABLE {{$tablename}}
                 ADD PRIMARY KEY (`group_id`),
                 ADD KEY index_{$tablename}_on_group_desc (`group_desc`),
-                ADD KEY index_{$tablename}_on_module_delivery_key (`module_delivery_key`);
+                ADD KEY index_{$tablename}_on_module_delivery_key (`module_delivery_key`)
 SQL;
     }
 

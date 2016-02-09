@@ -141,7 +141,7 @@ SQL;
               `status_code` varchar(1) DEFAULT '?',
               `module_delivery_key` varchar(36) DEFAULT NULL,
               `role` varchar(255) DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation};
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation}
 SQL;
     }
 
@@ -157,7 +157,7 @@ SQL;
                 ADD KEY index_{$tablename}_on_module_delivery_key (`module_delivery_key`),
                 ADD KEY index_{$tablename}_on_session_code (`session_code`),
                 ADD KEY index_{$tablename}_on_login (`login`),
-                MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+                MODIFY `id` int(11) NOT NULL AUTO_INCREMENT
 SQL;
     }
 

@@ -141,7 +141,7 @@ SQL;
               `primary_child` varchar(36) DEFAULT NULL,
               `id_chksum` varchar(36) DEFAULT NULL,
               `last_checked` datetime DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation};
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation}
 SQL;
     }
 
@@ -160,7 +160,7 @@ SQL;
                 ADD KEY index_{$tablename}_on_session_delivery (`session_code`,`module_delivery_key`),
                 ADD KEY index_{$tablename}_on_id_chksum (`id_chksum`),
                 ADD KEY index_{$tablename}_on_primary_child (`primary_child`),
-                MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+                MODIFY `id` int(11) NOT NULL AUTO_INCREMENT
 SQL;
     }
 
