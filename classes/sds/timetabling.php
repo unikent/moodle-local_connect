@@ -52,7 +52,7 @@ class timetabling extends \core\task\adhoc_task
               ltrim(rtrim(cast(cswb.week_beginning_date as varchar))) as week_beginning_date,
               ltrim(rtrim(cast(cswb.week_number as varchar))) as week_number
             FROM c_session_week_beginning cswb
-            WHERE cswb.session_code = {$CFG->session_code}
+            WHERE cswb.session_code = {$CFG->connect->session_code}
 SQL;
 
         $this->get_all_sql($sql, $rowcallback);

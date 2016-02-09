@@ -55,7 +55,7 @@ class groups extends \core\task\adhoc_task
               INNER JOIN c_groups AS cg ON cg.parent_group = dgm.group_id
               LEFT JOIN l_ukc_group AS lug on lug.group_id = cg.group_id
               LEFT JOIN b_details AS bd on bd.ukc = lug.ukc
-            WHERE (dgm.session_code = {$CFG->session_code})
+            WHERE (dgm.session_code = {$CFG->connect->session_code})
               AND (cg.group_type = 'S')
               AND bd.email_address != ''
 SQL;

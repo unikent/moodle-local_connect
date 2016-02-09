@@ -56,7 +56,7 @@ class enrolments extends \core\task\adhoc_task
               , ltrim(rtrim(session_code)) as session_code
               , 'sds_teacher' as role
             FROM v_moodle_data_export
-            WHERE (session_code = {$CFG->session_code}) and lecturerid is not null and lecturerid != ''
+            WHERE (session_code = {$CFG->connect->session_code}) and lecturerid is not null and lecturerid != ''
 SQL;
 
         $this->get_all_sql($sql, $rowcallback);
@@ -68,7 +68,7 @@ SQL;
     public function get_all_convenors($rowcallback) {
         global $CFG;
 
-        $codeplus = ((int)$CFG->session_code) + 1;
+        $codeplus = ((int)$CFG->connect->session_code) + 1;
 
         $sql = <<<SQL
             SELECT DISTINCT
@@ -78,7 +78,7 @@ SQL;
               , ltrim(rtrim(cs.family_name)) as family_name
               , '' as ukc
               , ltrim(rtrim(dmc.module_delivery_key)) as module_delivery_key
-              , '{$CFG->session_code}' as session_code
+              , '{$CFG->connect->session_code}' as session_code
               , 'sds_convenor' as role
             FROM d_module_convener AS dmc
               INNER JOIN c_staff AS cs ON dmc.staff = cs.staff
@@ -87,7 +87,7 @@ SQL;
             WHERE (
                 dmc.staff_function_end_date IS NULL
                 OR dmc.staff_function_end_date > CURRENT_TIMESTAMP
-                OR (mcv.session_code > {$CFG->session_code}
+                OR (mcv.session_code > {$CFG->connect->session_code}
                 AND dmc.staff_function_end_date >= mcv.rollover_date
                 AND CURRENT_TIMESTAMP < csd.session_start)
             ) AND cs.login != ''
@@ -116,7 +116,7 @@ SQL;
             FROM b_details AS bd
               INNER JOIN b_module AS bm ON bd.ukc = bm.ukc
                 AND bd.email_address <> ''
-                AND (bm.session_taught = '{$CFG->session_code}') AND (bm.module_registration_status IN ('R','U'))
+                AND (bm.session_taught = '{$CFG->connect->session_code}') AND (bm.module_registration_status IN ('R','U'))
                 AND bd.email_address != ''
 SQL;
 
