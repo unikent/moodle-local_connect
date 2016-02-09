@@ -29,9 +29,16 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Grabs all timetabling information out of SDS.
  */
-class timetabling
+class timetabling extends \core\task\adhoc_task
 {
     use sql_helper;
+
+    /**
+     * Returns the component name.
+     */
+    public function get_component() {
+        return 'local_connect';
+    }
 
     /**
      * Grab out of SDS.
@@ -146,8 +153,8 @@ SQL;
     /**
      * Sync weeks with Moodle.
      */
-    public function sync() {
-        global $CFG, $DB;
+    public function execute() {
+        global $DB;
 
         echo "Synching Timetabling...\n";
 

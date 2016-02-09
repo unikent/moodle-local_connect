@@ -18,26 +18,40 @@
  * Local stuff for Moodle Connect
  *
  * @package    local_connect
- * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_connect\task;
 
 /**
- * Group Sync
+ * SDS Sync
  */
-class group_sync extends task_base
+class sds_sync extends task_base
 {
     public function get_name() {
-        return "Group Sync";
+        return "SDS Sync";
     }
 
     public function execute() {
-        $self = $this;
-        \local_connect\group::batch_all(function ($obj) use($self) {
-            $result = $obj->sync();
-            $self->map_status($result, $obj);
-        });
+        $enabled = get_config('local_connect', 'enable_sds_sync');
+        if (!$enabled) {
+            return;
+        }
+
+        $task = new \local_connect\sds\courses();
+        $task->execute();
+
+        $task = new \local_connect\sds\enrolments();
+        $task->execute();
+
+        $task = new \local_connect\sds\groups();
+        $task->execute();
+
+        $task = new \local_connect\sds\group_enrolments();
+        $task->execute();
+
+        $task = new \local_connect\sds\timetabling();
+        $task->execute();
     }
 }

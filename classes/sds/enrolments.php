@@ -29,9 +29,16 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Grabs all enrolments out of SDS.
  */
-class enrolments
+class enrolments extends \core\task\adhoc_task
 {
     use sql_helper;
+
+    /**
+     * Returns the component name.
+     */
+    public function get_component() {
+        return 'local_connect';
+    }
 
     /**
      * Grab teachers out of SDS.
@@ -377,7 +384,7 @@ SQL;
     /**
      * Sync enrolments with Moodle.
      */
-    public function sync() {
+    public function execute() {
         global $CFG, $DB;
 
         echo "Synching Enrolments...\n";

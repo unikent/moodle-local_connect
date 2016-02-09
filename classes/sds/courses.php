@@ -29,9 +29,16 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Grabs all courses out of SDS.
  */
-class courses
+class courses extends \core\task\adhoc_task
 {
     use sql_helper;
+
+    /**
+     * Returns the component name.
+     */
+    public function get_component() {
+        return 'local_connect';
+    }
 
     /**
      * Grab out of SDS.
@@ -327,7 +334,7 @@ SQL;
     /**
      * Sync courses with Moodle.
      */
-    public function sync() {
+    public function execute() {
         global $CFG, $DB;
 
         echo "Synching Courses...\n";

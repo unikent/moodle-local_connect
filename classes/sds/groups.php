@@ -29,9 +29,16 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Grabs all groups out of SDS.
  */
-class groups
+class groups extends \core\task\adhoc_task
 {
     use sql_helper;
+
+    /**
+     * Returns the component name.
+     */
+    public function get_component() {
+        return 'local_connect';
+    }
 
     /**
      * Grab out of SDS.
@@ -180,8 +187,8 @@ SQL;
     /**
      * Sync groups with Moodle.
      */
-    public function sync() {
-        global $CFG, $DB;
+    public function execute() {
+        global $DB;
 
         echo "Synching Groups...\n";
 
