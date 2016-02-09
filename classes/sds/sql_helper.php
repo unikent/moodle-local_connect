@@ -38,8 +38,8 @@ trait sql_helper
         global $SDSDB;
 
         $rows = array();
-        $query = mssql_query($sql, $SDSDB);
-        while ($row = mssql_fetch_assoc($query)) {
+        $rs = $SDSDB->get_recordset_sql($sql);
+        foreach ($rs as $row) {
             $rows[] = $row;
 
             if (count($rows) > $batchsize) {
@@ -52,6 +52,6 @@ trait sql_helper
             $rowcallback($rows);
         }
 
-        mssql_free_result($query);
+        $rs->close();
     }
 }
