@@ -74,7 +74,7 @@ SQL;
               `group_id` int(11) NOT NULL,
               `group_desc` varchar(255) DEFAULT NULL,
               `module_delivery_key` varchar(36) DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation}
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->dbcollation}
 SQL;
     }
 
@@ -109,7 +109,7 @@ SQL;
     private function destroy_temp_table() {
         global $DB;
 
-        $DB->execute('DROP TEMPORARY TABLE {tmp_connect_groups};');
+        $DB->execute('DROP TEMPORARY TABLE {tmp_connect_groups}');
     }
 
     /**

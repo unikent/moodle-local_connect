@@ -138,10 +138,10 @@ SQL;
               `initials` varchar(255) DEFAULT NULL,
               `family_name` varchar(255) DEFAULT NULL,
               `session_code` varchar(4) DEFAULT NULL,
-              `status_code` varchar(1) DEFAULT '?',
+              `status_code` varchar(1) DEFAULT ?,
               `module_delivery_key` varchar(36) DEFAULT NULL,
               `role` varchar(255) DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation}
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->dbcollation}
 SQL;
     }
 
@@ -168,7 +168,7 @@ SQL;
         global $DB;
 
         $create = static::get_create_table_sql('tmp_connect_enrolments', 'CREATE TEMPORARY TABLE');
-        $DB->execute($create);
+        $DB->execute($create, array('?'));
 
         $alter = static::get_alter_table_sql('tmp_connect_enrolments');
         $DB->execute($alter);
@@ -180,7 +180,7 @@ SQL;
     private function destroy_temp_table() {
         global $DB;
 
-        $DB->execute('DROP TEMPORARY TABLE {tmp_connect_enrolments};');
+        $DB->execute('DROP TEMPORARY TABLE {tmp_connect_enrolments}');
     }
 
     /**

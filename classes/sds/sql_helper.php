@@ -40,7 +40,7 @@ trait sql_helper
         $rows = array();
         $rs = $SDSDB->get_recordset_sql($sql);
         foreach ($rs as $row) {
-            $rows[] = $row;
+            $rows[] = fix_utf8($row);
 
             if (count($rows) > $batchsize) {
                 $rowcallback($rows);

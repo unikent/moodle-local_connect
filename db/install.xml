@@ -75,7 +75,7 @@
         <FIELD NAME="credit_level" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="synopsis" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="category" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="department" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="department" TYPE="char" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>

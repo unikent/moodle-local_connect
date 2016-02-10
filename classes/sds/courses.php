@@ -141,7 +141,7 @@ SQL;
               `primary_child` varchar(36) DEFAULT NULL,
               `id_chksum` varchar(36) DEFAULT NULL,
               `last_checked` datetime DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->collation}
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->dbcollation}
 SQL;
     }
 
@@ -183,7 +183,7 @@ SQL;
     private function destroy_temp_table() {
         global $DB;
 
-        $DB->execute('DROP TEMPORARY TABLE {tmp_connect_courses};');
+        $DB->execute('DROP TEMPORARY TABLE {tmp_connect_courses}');
     }
 
     /**
@@ -297,7 +297,7 @@ SQL;
 
         echo "  - Mapping new courses\n";
 
-        $sql = '
+        $sql = <<<SQL
             SELECT c.id, cc.id AS primaryid, cc.mid
             FROM {connect_course} c
             INNER JOIN {connect_course} cc
@@ -307,8 +307,8 @@ SQL;
                 AND cc.campusid = c.campusid
                 AND cc.module_version < c.module_version
             WHERE cc.mid > 0 AND (c.mid = 0 OR c.mid IS NULL)
-            GROUP BY c.id, cc.mid
-        ';
+            GROUP BY c.id
+SQL;
 
         $results = $DB->get_records_sql($sql);
         foreach ($results as $result) {

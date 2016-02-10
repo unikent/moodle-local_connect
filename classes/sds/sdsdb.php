@@ -47,6 +47,8 @@ class sdsdb {
             return true;
         }
 
+        require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sds.php');
+
         if (!$SDSDB = \moodle_database::get_driver_instance($CFG->kent->sdsdb['type'],
                                                             $CFG->kent->sdsdb['library'],
                                                             true)) {
@@ -92,6 +94,7 @@ class sdsdb {
     public static function available() {
         global $CFG;
 
+        require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sds.php');
         return !empty($CFG->kent->sdsdb['user']);
     }
 
