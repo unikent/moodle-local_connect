@@ -30,7 +30,7 @@ namespace local_connect\task;
 class course_sync extends task_base
 {
     public function get_name() {
-        return "SDS Course Sync";
+        return "Course Sync";
     }
 
     public function execute() {
@@ -50,4 +50,4 @@ class course_sync extends task_base
             }
         });
     }
-} 
+}

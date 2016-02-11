@@ -18,26 +18,40 @@
  * Local stuff for Moodle Connect
  *
  * @package    local_connect
- * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect\task;
+namespace local_connect\sds;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
- * Group Sync
+ * Sync base.
  */
-class group_sync extends task_base
+trait sql_helper
 {
-    public function get_name() {
-        return "Group Sync";
-    }
+    /**
+     * Grab records out of SDS.
+     */
+    public function get_all_sql($sql, $rowcallback, $batchsize = 1000) {
+        global $SDSDB;
 
-    public function execute() {
-        $self = $this;
-        \local_connect\group::batch_all(function ($obj) use($self) {
-            $result = $obj->sync();
-            $self->map_status($result, $obj);
-        });
+        $rows = array();
+        $rs = $SDSDB->get_recordset_sql($sql);
+        foreach ($rs as $row) {
+            $rows[] = fix_utf8($row);
+
+            if (count($rows) > $batchsize) {
+                $rowcallback($rows);
+                $rows = array();
+            }
+        }
+
+        if (!empty($rows)) {
+            $rowcallback($rows);
+        }
+
+        $rs->close();
     }
 }

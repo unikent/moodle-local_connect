@@ -774,7 +774,7 @@ function xmldb_local_connect_upgrade($oldversion) {
                         'newid' => $oldrole->id,
                         'oldid' => $role->id
                     ));
-                    
+
                     // Delete the "new" one.
                     $DB->delete_records('connect_role', array(
                         'id' => $role->id
@@ -870,6 +870,18 @@ function xmldb_local_connect_upgrade($oldversion) {
 
         // Connect savepoint reached.
         upgrade_plugin_savepoint(true, 2015100700, 'local', 'connect');
+    }
+
+    if ($oldversion < 2016021000) {
+        // Changing type of field department on table connect_course to char.
+        $table = new xmldb_table('connect_course');
+        $field = new xmldb_field('department', XMLDB_TYPE_CHAR, '11', null, null, null, null, 'category');
+
+        // Launch change of type for field department.
+        $dbman->change_field_type($table, $field);
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2016021000, 'local', 'connect');
     }
 
     return true;

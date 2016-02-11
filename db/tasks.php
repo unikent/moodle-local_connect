@@ -49,5 +49,14 @@ $tasks = array(
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'
+    ),
+    array(
+        'classname' => 'local_connect\task\sds_sync',
+        'blocking' => 0,
+        'minute' => '30',
+        'hour' => '*/4',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
     )
 );
