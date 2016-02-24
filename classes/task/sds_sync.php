@@ -34,6 +34,8 @@ class sds_sync extends \core\task\scheduled_task
     }
 
     public function execute() {
+        global $DB;
+
         $enabled = get_config('local_connect', 'enable_sds_sync');
         if (!$enabled) {
             return;
@@ -53,5 +55,10 @@ class sds_sync extends \core\task\scheduled_task
 
         $task = new \local_connect\sds\timetabling();
         $task->execute();
+
+        $DB->set_field('config_plugins', 'value', time(), array(
+            'plugin' => 'local_connect',
+            'name' => 'lastsync'
+        ));
     }
 }
