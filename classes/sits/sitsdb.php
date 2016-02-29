@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect\sds;
+namespace local_kent\util;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -30,38 +30,38 @@ defined('MOODLE_INTERNAL') || die();
  * Shared Connect Provider for Moodle - Provides
  * a simple interface to the Shared Connect DB
  */
-class sdsdb {
+class sitsdb {
     private static $setup = false;
 
     /**
-     * Sets up global $SDSDB moodle_database instance
-     * @return bool|void Returns true when finished setting up $SDSDB. Returns void when $SDSDB has already been set.
+     * Sets up global $SITSDB moodle_database instance
+     * @return bool|void Returns true when finished setting up $SITSDB. Returns void when $SITSDB has already been set.
      * @throws \dml_exception
      * @global stdClass $CFG The global configuration instance.
-     * @global stdClass $SDSDB The global moodle_database instance for Connect.
+     * @global stdClass $SITSDB The global moodle_database instance for Connect.
      */
     private static function setup_database() {
-        global $CFG, $SDSDB;
+        global $CFG, $SITSDB;
 
         if (static::$setup) {
             return true;
         }
 
-        require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sds.php');
+        require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sits.php');
 
-        if (!$SDSDB = \moodle_database::get_driver_instance($CFG->kent->sdsdb['type'],
-                                                            $CFG->kent->sdsdb['library'],
+        if (!$SITSDB = \moodle_database::get_driver_instance($CFG->kent->sitsdb['type'],
+                                                            $CFG->kent->sitsdb['library'],
                                                             true)) {
             throw new \dml_exception('dbdriverproblem', "Unknown driver for kent");
         }
 
-        $SDSDB->connect(
-            $CFG->kent->sdsdb['host'],
-            $CFG->kent->sdsdb['user'],
-            $CFG->kent->sdsdb['pass'],
-            $CFG->kent->sdsdb['name'],
-            $CFG->kent->sdsdb['prefix'],
-            $CFG->kent->sdsdb['options']
+        $SITSDB->connect(
+            $CFG->kent->sitsdb['host'],
+            $CFG->kent->sitsdb['user'],
+            $CFG->kent->sitsdb['pass'],
+            $CFG->kent->sitsdb['name'],
+            $CFG->kent->sitsdb['prefix'],
+            $CFG->kent->sitsdb['options']
         );
 
         static::$setup = true;
@@ -78,14 +78,14 @@ class sdsdb {
      * @throws \dml_exception
      */
     public function __call($name, $arguments) {
-        global $SDSDB;
+        global $SITSDB;
 
         // Ensure we are connected.
         self::setup_database();
 
         // Reflect in this instance, subsequent calls should be routed straight to the DML provider.
-        $method = new \ReflectionMethod($SDSDB, $name);
-        return $method->invokeArgs($SDSDB, $arguments);
+        $method = new \ReflectionMethod($SITSDB, $name);
+        return $method->invokeArgs($SITSDB, $arguments);
     }
 
     /**
@@ -94,17 +94,17 @@ class sdsdb {
     public static function available() {
         global $CFG;
 
-        require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sds.php');
-        return !empty($CFG->kent->sdsdb['user']);
+        require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sits.php');
+        return !empty($CFG->kent->sitsdb['user']);
     }
 
     /**
      * Dispose SHAREDB.
      */
     public static function dispose() {
-        global $SDSDB;
+        global $SITSDB;
 
-        $SDSDB->dispose();
+        $SITSDB->dispose();
         static::$setup = false;
     }
 }
