@@ -17,12 +17,12 @@
 /**
  * Local stuff for Moodle Kent
  *
- * @package    local_kent
+ * @package    local_connect
  * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_kent\util;
+namespace local_connect\sits;
 
 defined('MOODLE_INTERNAL') || die();
 
