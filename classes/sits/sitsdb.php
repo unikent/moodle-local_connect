@@ -47,6 +47,9 @@ class sitsdb {
             return true;
         }
 
+        // Force this here.
+        ini_set('mssql.charset', "UTF-8");
+
         require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sits.php');
 
         if (!$SITSDB = \moodle_database::get_driver_instance($CFG->kent->sitsdb['type'],

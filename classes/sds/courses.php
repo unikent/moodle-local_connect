@@ -317,6 +317,17 @@ SQL;
     }
 
     /**
+     * Cleanup a course.
+     */
+    protected function clean_row($row) {
+        $row = (object)$row;
+        $row->week_beginning_date = strtotime($row->week_beginning_date);
+        $row->week_beginning_date = strftime("%Y-%m-%d %H:%M:%S", $row->week_beginning_date);
+
+        return $row;
+    }
+
+    /**
      * Sync courses with Moodle.
      */
     public function execute() {
@@ -334,14 +345,11 @@ SQL;
             // Munge the dates.
             $tmp = array();
             foreach ($rows as $row) {
-                $row = (object)$row;
-
-                $row->week_beginning_date = strtotime($row->week_beginning_date);
-                $row->week_beginning_date = strftime("%Y-%m-%d %H:%M:%S", $row->week_beginning_date);
-                $tmp[] = $row;
+                $row = $this->clean_row($row);
+                if ($row) {
+                    $tmp[] = $row;
+                }
             }
-
-            unset($rows);
 
             $DB->insert_records('tmp_connect_courses', $tmp);
         });
