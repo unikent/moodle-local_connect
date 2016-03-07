@@ -53,10 +53,12 @@ SQL;
      */
     protected function clean_row($row) {
         $row = (object)$row;
-        if (empty($row->campus)) {
+
+        if (empty($row->campus) || empty($row->module_week_beginning) || empty($row->module_length)) {
             return null;
         }
 
+        $row->session_code = $row->academic_year;
         $row->week_beginning_date = strtotime($row->week_beginning_date);
         $row->week_beginning_date = strftime("%Y-%m-%d", $row->week_beginning_date);
 
@@ -83,6 +85,11 @@ SQL;
             )
         ';
 
-        return $DB->execute($sql);
+        $DB->execute($sql);
+
+        // Update campus IDS in temptable.
+        $DB->execute('UPDATE {tmp_connect_courses} c
+            INNER JOIN {connect_campus} cc ON c.campus=cc.shortname
+            SET c.campus = cc.id');
     }
 }
