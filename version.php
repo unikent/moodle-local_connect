@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016021000;
+$plugin->version   = 2016030700;
 $plugin->requires  = 2015111600;
 $plugin->component = 'local_connect';
 $plugin->dependencies = array(

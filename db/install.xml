@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/connect/db" VERSION="20150417" COMMENT="XMLDB file for Connect module"
+<XMLDB PATH="local/connect/db" VERSION="20160307" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -7,11 +7,12 @@
     <TABLE NAME="connect_campus" COMMENT="Connect Campuses">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="shortname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="unique_name" TYPE="unique" FIELDS="name"/>
+        <KEY NAME="unique_name" TYPE="unique" FIELDS="shortname, name"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="connect_enrolments" COMMENT="Connect Enrolments">

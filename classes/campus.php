@@ -44,7 +44,7 @@ class campus extends data
      * A list of valid fields for this data object.
      */
     protected final static function valid_fields() {
-        return array("id", "name");
+        return array("id", "shortname", "name");
     }
 
     /**
@@ -65,6 +65,10 @@ class campus extends data
      * To string.
      */
     public function __toString() {
+        if ($this->shortname != $this->name) {
+            return "{$this->shortname}: {$this->name}";
+        }
+
         return $this->name;
     }
 
@@ -94,6 +98,10 @@ class campus extends data
      * Get shortname.
      */
     public function get_shortname() {
+        if (!empty($this->shortname) && $this->shortname != $this->name) {
+            return $this->shortname;
+        }
+
         switch ($this->name) {
             case 'Canterbury':
             return '';

@@ -62,4 +62,27 @@ SQL;
 
         return $row;
     }
+
+    /**
+     * New Campuses
+     */
+    protected function sync_new_campus() {
+        global $DB;
+
+        echo "  - Migrating new campus\n";
+
+        $sql = '
+            INSERT INTO {connect_campus} (shortname, name)
+            (
+                SELECT c.campus, c.campus_desc
+                FROM {tmp_connect_courses} c
+                LEFT OUTER JOIN {connect_campus} cc
+                    ON cc.shortname = c.campus
+                WHERE cc.shortname IS NULL
+                GROUP BY c.campus
+            )
+        ';
+
+        return $DB->execute($sql);
+    }
 }

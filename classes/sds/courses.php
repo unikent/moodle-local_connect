@@ -174,15 +174,15 @@ SQL;
     /**
      * New Campuses
      */
-    private function sync_new_campus() {
+    protected function sync_new_campus() {
         global $DB;
 
         echo "  - Migrating new campus\n";
 
         $sql = '
-            INSERT INTO {connect_campus} (id, name)
+            INSERT INTO {connect_campus} (id, shortname, name)
             (
-                SELECT c.campus, c.campus_desc
+                SELECT c.campus, c.campus_desc, c.campus_desc
                 FROM {tmp_connect_courses} c
                 LEFT OUTER JOIN {connect_campus} cc
                     ON cc.id = c.campus

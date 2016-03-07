@@ -884,5 +884,34 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016021000, 'local', 'connect');
     }
 
+    // Update connect_campus for SITS compatibility.
+    if ($oldversion < 2016030700) {
+        $table = new xmldb_table('connect_campus');
+
+        // Define key unique_name (unique) to be dropped form connect_campus.
+        $key = new xmldb_key('unique_name', XMLDB_KEY_UNIQUE, array('name'));
+        $dbman->drop_key($table, $key);
+
+        // Define field shortname to be added to connect_campus.
+        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'id');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Copy over names.
+        $DB->execute("UPDATE {connect_campus} SET shortname=name WHERE shortname IS NULL");
+
+        // Changing nullability of field shortname on table connect_campus to not null.
+        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+        $dbman->change_field_notnull($table, $field);
+
+        // Define key unique_name (unique) to be added to connect_campus.
+        $key = new xmldb_key('unique_name', XMLDB_KEY_UNIQUE, array('shortname', 'name'));
+        $dbman->add_key($table, $key);
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2016030700, 'local', 'connect');
+    }
+
     return true;
 }
