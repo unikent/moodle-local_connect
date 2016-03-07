@@ -48,17 +48,6 @@ class courses extends \core\task\adhoc_task
 
         $sql = <<<SQL
             SELECT DISTINCT
-              lower(CAST(master.dbo.fn_varbintohexsubstring( 0,
-                 hashbytes('md5',
-                  ltrim(rtrim(dmds.session_code)) + '|' + ltrim(rtrim(cast(dmd.module_delivery_key as varchar)))
-                ), 1, 0) as char(32))) as id_chksum,
-              lower(CAST(master.dbo.fn_varbintohexsubstring( 0,
-                hashbytes('md5',
-                  dmds.session_code + dmd.delivery_department
-                  + cast(dmd.module_delivery_key as varchar) + cast(cmd.module_version as varchar)
-                  + cc.campus + cc.campus_desc + dmd.module_week_beginning + cmd.module_length
-                  + cmd.module_title + cmd.module_code + isnull(cast(syn.data as varchar(500)),0)
-                ), 1, 0) as char(32))) as chksum,
               ltrim(rtrim(dmd.module_delivery_key)) as module_delivery_key,
               ltrim(rtrim(dmds.session_code)) as session_code,
               ltrim(rtrim(dmd.delivery_department)) as delivery_department,
@@ -123,7 +112,6 @@ SQL;
               `module_title` varchar(255) DEFAULT NULL,
               `module_code` varchar(255) DEFAULT NULL,
               `credit_level` varchar(255) DEFAULT NULL,
-              `chksum` varchar(36) DEFAULT NULL,
               `moodle_id` int(11) DEFAULT NULL,
               `sink_deleted` tinyint(1) DEFAULT '0',
               `state` int(11) DEFAULT '0',
@@ -139,7 +127,6 @@ SQL;
               `link` tinyint(1) DEFAULT '0',
               `json_cache` text,
               `primary_child` varchar(36) DEFAULT NULL,
-              `id_chksum` varchar(36) DEFAULT NULL,
               `last_checked` datetime DEFAULT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->dbcollation}
 SQL;
@@ -152,13 +139,11 @@ SQL;
         return <<<SQL
             ALTER TABLE {{$tablename}}
                 ADD PRIMARY KEY (`id`),
-                ADD UNIQUE KEY index_{$tablename}_on_chksum (`chksum`),
                 ADD KEY index_{$tablename}_on_module_delivery_key (`module_delivery_key`),
                 ADD KEY index_{$tablename}_on_session_code (`session_code`),
                 ADD KEY index_{$tablename}_on_state (`state`),
                 ADD KEY index_{$tablename}_on_parent_id (`parent_id`),
                 ADD KEY index_{$tablename}_on_session_delivery (`session_code`,`module_delivery_key`),
-                ADD KEY index_{$tablename}_on_id_chksum (`id_chksum`),
                 ADD KEY index_{$tablename}_on_primary_child (`primary_child`),
                 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT
 SQL;
