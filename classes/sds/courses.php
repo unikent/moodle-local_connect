@@ -229,22 +229,10 @@ SQL;
                 SELECT cc.id, c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.credit_level,
                        c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,
                        c.module_title,c.module_code,c.module_code_sds,COALESCE(c.synopsis, \'\'),cc.category,
-                       c.delivery_department,COALESCE(cc.mid,0),0
+                       COALESCE(c.delivery_department,0),COALESCE(cc.mid,0),0
                 FROM {tmp_connect_courses} c
                 INNER JOIN {connect_course} cc
                     ON cc.module_delivery_key = c.module_delivery_key AND cc.module_version = c.module_version
-                WHERE (
-                    c.module_title <> cc.module_title
-                    OR c.module_code <> cc.module_code
-                    OR c.module_code_sds <> cc.module_code_sds
-                    OR c.credit_level <> cc.credit_level
-                    OR c.campus <> cc.campusid
-                    OR c.module_week_beginning <> cc.module_week_beginning
-                    OR c.module_length <> cc.module_length
-                    OR c.week_beginning_date <> cc.week_beginning_date
-                    OR c.synopsis <> cc.synopsis
-                    OR c.delivery_department <> IFNULL(cc.department, 0)
-                )
                 GROUP BY c.module_delivery_key, c.module_version
             )
         ');
