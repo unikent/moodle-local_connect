@@ -111,6 +111,7 @@ SQL;
               `module_length` varchar(4) DEFAULT NULL,
               `module_title` varchar(255) DEFAULT NULL,
               `module_code` varchar(255) DEFAULT NULL,
+              `module_code_sds` varchar(255) DEFAULT NULL,
               `credit_level` varchar(255) DEFAULT NULL,
               `moodle_id` int(11) DEFAULT NULL,
               `sink_deleted` tinyint(1) DEFAULT '0',
@@ -223,11 +224,11 @@ SQL;
         return $DB->execute('
             REPLACE INTO {connect_course} (
                 id,module_delivery_key,session_code,module_version,credit_level,campusid,module_week_beginning,
-                module_length,week_beginning_date,module_title,module_code,synopsis,category,department,mid,deleted)
+                module_length,week_beginning_date,module_title,module_code,module_code_sds,synopsis,category,department,mid,deleted)
             (
                 SELECT cc.id, c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.credit_level,
                        c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,
-                       c.module_title,c.module_code,COALESCE(c.synopsis, \'\'),cc.category,
+                       c.module_title,c.module_code,c.module_code_sds,COALESCE(c.synopsis, \'\'),cc.category,
                        c.delivery_department,COALESCE(cc.mid,0),0
                 FROM {tmp_connect_courses} c
                 INNER JOIN {connect_course} cc
@@ -235,6 +236,7 @@ SQL;
                 WHERE (
                     c.module_title <> cc.module_title
                     OR c.module_code <> cc.module_code
+                    OR c.module_code_sds <> cc.module_code_sds
                     OR c.credit_level <> cc.credit_level
                     OR c.campus <> cc.campusid
                     OR c.module_week_beginning <> cc.module_week_beginning
@@ -258,12 +260,12 @@ SQL;
 
         return $DB->execute('
             INSERT INTO {connect_course} (
-                module_delivery_key,session_code,module_version,credit_level,campusid,module_week_beginning,
-                module_length,week_beginning_date,module_title,module_code,synopsis,category,department,mid,deleted)
+                module_delivery_key,session_code,module_version,credit_level,campusid,module_week_beginning,module_length,
+                week_beginning_date,module_title,module_code,module_code_sds,synopsis,category,department,mid,deleted)
             (
                 SELECT c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.credit_level,
                        c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,
-                       c.module_title,c.module_code,COALESCE(c.synopsis, \'\'),0,c.delivery_department,0,0
+                       c.module_title,c.module_code,c.module_code_sds,COALESCE(c.synopsis, \'\'),0,c.delivery_department,0,0
                 FROM {tmp_connect_courses} c
                 LEFT OUTER JOIN {connect_course} cc
                     ON cc.module_delivery_key = c.module_delivery_key AND cc.module_version = c.module_version
@@ -321,6 +323,8 @@ SQL;
      */
     protected function clean_row($row) {
         $row = (object)$row;
+
+        $row->module_code_sds = '';
         $row->week_beginning_date = strtotime($row->week_beginning_date);
         $row->week_beginning_date = strftime("%Y-%m-%d %H:%M:%S", $row->week_beginning_date);
 
