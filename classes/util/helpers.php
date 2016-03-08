@@ -39,10 +39,7 @@ class helpers {
      * @throws \moodle_exception
      */
     public static function error($message) {
-        if (get_config("local_connect", "enable_hipchat")) {
-            \local_hipchat\Message::send($message, "red", "text");
-        }
-
+        // TODO 3.1 - Session flashes?
         debugging($message, DEBUG_DEVELOPER);
     }
 

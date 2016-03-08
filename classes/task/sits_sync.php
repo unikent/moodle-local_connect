@@ -22,24 +22,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_connect\nagios;
+namespace local_connect\task;
 
 /**
- * Checks cache.
+ * SITS Sync
  */
-class lastsync_check extends \local_nagios\base_check
+class sits_sync extends \core\task\scheduled_task
 {
+    public function get_name() {
+        return "SITS Sync";
+    }
+
     public function execute() {
-        $lastrun = get_config('local_connect', 'lastsync');
-        if (!$lastrun) {
-            return $this->warning("Connect has not yet run.");
+        $enabled = get_config('local_connect', 'enable_sits_sync');
+        if (!$enabled) {
+            return;
         }
 
-        $delta = time() - $lastrun;
-        if ($delta > 90000) {
-            $this->warning("Connect has not run for more than 25 hours.");
-        } else if ($delta > 172800) {
-            $this->error("Connect has not run for more than 48 hours.");
-        }
+        $task = new \local_connect\sits\courses();
+        $task->execute();
+
+        set_config('lastsync', time(), 'local_connect');
     }
 }

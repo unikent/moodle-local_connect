@@ -44,29 +44,29 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configcheckbox(
         'local_connect/enable_sds_sync',
-        'Enable SDS syncing',
-        'Enable the SDS sync.',
+        'Enable SDS sync',
+        '',
+        0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_connect/enable_sits_sync',
+        'Enable SITS sync',
+        '',
         0
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_connect/enable_course_sync',
         'Enable course syncing',
-        'Allows modules to update their description from SDS (you do not want to enable this for anything prior to 2014).',
+        'Allows modules to update their description from their data source.',
         0
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_connect/strict_sync',
-        'Enable stricter SDS sync',
-        'Forces modules to update to SDS data, rather than letting convenors modify them Moodle-side.',
-        0
-    ));
-
-    $settings->add(new admin_setting_configcheckbox(
-        'local_connect/enable_hipchat',
-        'Enable hipchat notifications',
-        'Note: Spams the developers when things go wrong.',
+        'Force strict sync',
+        'Forces modules to update their data, rather than letting convenors modify them Moodle-side.',
         0
     ));
 }
