@@ -76,6 +76,11 @@ class observers
             'coursemid' => $event->objectid
         ));
 
+        // Clear out locks.
+        $DB->delete_records('connect_course_locks', array(
+            'mid' => $event->objectid
+        ));
+
         return true;
     }
 
