@@ -56,8 +56,8 @@ class course extends data
     protected final static function valid_fields() {
         return array(
             "id", "mid", "module_delivery_key", "session_code", "module_version", "credit_level",
-            "campusid", "module_week_beginning", "module_length", "week_beginning_date",
-            "module_title", "module_code", "synopsis", "category", "department", "deleted"
+            "campusid", "module_week_beginning", "module_length", "week_beginning_date", "module_title",
+            "module_code", "module_code_sds", "synopsis", "category", "department", "deleted"
         );
     }
 
@@ -407,6 +407,14 @@ SQL;
         return $DB->get_record('course', array(
             'id' => $this->mid
         ), '*', \MUST_EXIST);
+    }
+
+    /**
+     * Returns the SDS module code, even if this is a SITS module.
+     * @return boolean
+     */
+    public function _get_sds_module_code() {
+        return !empty($this->module_code_sds) ? $this->module_code_sds : $this->module_code;
     }
 
     /**

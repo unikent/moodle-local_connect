@@ -913,5 +913,19 @@ function xmldb_local_connect_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016030700, 'local', 'connect');
     }
 
+    if ($oldversion < 2016030800) {
+        // Define field module_code_sds to be added to connect_course.
+        $table = new xmldb_table('connect_course');
+        $field = new xmldb_field('module_code_sds', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'module_code');
+
+        // Conditionally launch add field module_code_sds.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Connect savepoint reached.
+        upgrade_plugin_savepoint(true, 2016030800, 'local', 'connect');
+    }
+
     return true;
 }

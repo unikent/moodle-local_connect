@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/connect/db" VERSION="20160307" COMMENT="XMLDB file for Connect module"
+<XMLDB PATH="local/connect/db" VERSION="20160308" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -73,6 +73,7 @@
         <FIELD NAME="week_beginning_date" TYPE="datetime" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="module_title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="module_code" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="module_code_sds" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="SDS module code (if available)"/>
         <FIELD NAME="credit_level" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="synopsis" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="category" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
@@ -90,19 +91,27 @@
         <INDEX NAME="index_module_code" UNIQUE="false" FIELDS="module_code"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="connect_role" COMMENT="A list of roles known to connect">
+    <TABLE NAME="connect_course_locks" COMMENT="Course lock status for Connect">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="locked" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="unique_name" TYPE="unique" FIELDS="name"/>
+        <KEY NAME="i_mid" TYPE="unique" FIELDS="mid"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
-      </INDEXES>
+    </TABLE>
+    <TABLE NAME="connect_course_exts" COMMENT="Shortname extensions for courses">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="coursemid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="extension" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="k_coursemid" TYPE="unique" FIELDS="coursemid"/>
+      </KEYS>
     </TABLE>
     <TABLE NAME="connect_user" COMMENT="Connect Users">
       <FIELDS>
@@ -122,16 +131,19 @@
         <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="connect_course_locks" COMMENT="Course lock status for Connect">
+    <TABLE NAME="connect_role" COMMENT="A list of roles known to connect">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="locked" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="i_mid" TYPE="unique" FIELDS="mid"/>
+        <KEY NAME="unique_name" TYPE="unique" FIELDS="name"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="index_mid" UNIQUE="false" FIELDS="mid"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="connect_timetabling" COMMENT="Timetabling Information">
       <FIELDS>
@@ -196,17 +208,6 @@
         <INDEX NAME="i_week_beginning_date" UNIQUE="false" FIELDS="week_beginning_date"/>
         <INDEX NAME="i_week_number" UNIQUE="false" FIELDS="week_number"/>
       </INDEXES>
-    </TABLE>
-    <TABLE NAME="connect_course_exts" COMMENT="Shortname extensions for courses">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="coursemid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="extension" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="k_coursemid" TYPE="unique" FIELDS="coursemid"/>
-      </KEYS>
     </TABLE>
   </TABLES>
 </XMLDB>

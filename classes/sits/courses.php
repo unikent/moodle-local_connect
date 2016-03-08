@@ -61,6 +61,7 @@ SQL;
         $row->session_code = $row->academic_year;
         $row->week_beginning_date = strtotime($row->week_beginning_date);
         $row->week_beginning_date = strftime("%Y-%m-%d", $row->week_beginning_date);
+        $row->module_code_sds = $row->sds_module_code;
 
         return $row;
     }
