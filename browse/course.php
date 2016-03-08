@@ -69,6 +69,7 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
 
 	$table->add_data(array("id", $course->id));
 	$table->add_data(array("mid", $mid));
+	$table->add_data(array("interface", $course->get_interface()));
 	$table->add_data(array("module_delivery_key", $course->module_delivery_key));
 	$table->add_data(array("session_code", $course->session_code));
 	$table->add_data(array("module_version", $course->module_version));
