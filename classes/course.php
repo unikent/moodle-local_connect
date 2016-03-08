@@ -57,7 +57,7 @@ class course extends data
         return array(
             "id", "mid", "module_delivery_key", "session_code", "module_version", "credit_level",
             "campusid", "module_week_beginning", "module_length", "week_beginning_date", "module_title",
-            "module_code", "module_code_sds", "synopsis", "category", "department", "deleted"
+            "module_code", "module_code_sds", "synopsis", "category", "department", "interface", "deleted"
         );
     }
 
@@ -75,7 +75,7 @@ class course extends data
      * A list of immutable fields for this data object.
      */
     protected static function immutable_fields() {
-        return array("id", "module_delivery_key", "session_code", "credit_level", "department", "deleted");
+        return array("id", "module_delivery_key", "session_code", "credit_level", "department", "interface", "deleted");
     }
 
     /**
@@ -175,6 +175,14 @@ SQL;
         ));
 
         return $counts->codes == 1 && $counts->versions > 1;
+    }
+
+    /**
+     * Which interface are we from?
+     * This will currently be 'SDS' or 'SITS'
+     */
+    public function get_interface() {
+        return $this->interface == \local_connect\core::INTERFACE_SITS ? 'sits' : 'sds';
     }
 
     /**

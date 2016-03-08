@@ -62,6 +62,7 @@ SQL;
         $row->week_beginning_date = strtotime($row->week_beginning_date);
         $row->week_beginning_date = strftime("%Y-%m-%d", $row->week_beginning_date);
         $row->module_code_sds = $row->sds_module_code;
+        $row->interface = \local_connect\core::INTERFACE_SITS;
 
         return $row;
     }

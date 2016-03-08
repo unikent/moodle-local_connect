@@ -31,6 +31,9 @@ defined('MOODLE_INTERNAL') || die();
  * a single, central API for Connect.
  */
 class core {
+    const INTERFACE_SDS = 1;
+    const INTERFACE_SITS = 2;
+
     /**
      * Return all my SDS departments.
      */

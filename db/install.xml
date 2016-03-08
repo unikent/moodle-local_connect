@@ -78,6 +78,7 @@
         <FIELD NAME="synopsis" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="category" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="department" TYPE="char" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="interface" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="SITS or SDS?"/>
         <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
