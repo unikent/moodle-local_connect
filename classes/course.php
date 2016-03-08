@@ -181,8 +181,8 @@ SQL;
      * Which interface are we from?
      * This will currently be 'SDS' or 'SITS'
      */
-    public function get_interface() {
-        return $this->interface == \local_connect\core::INTERFACE_SITS ? 'sits' : 'sds';
+    protected function _pretty_interface() {
+        return $this->interface == \local_connect\core::INTERFACE_SITS ? 'SITS' : 'SDS';
     }
 
     /**
