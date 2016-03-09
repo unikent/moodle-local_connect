@@ -242,6 +242,10 @@ SQL;
      * Returns the shortname
      */
     public function _get_shortname() {
+        if ($this->interface == \local_connect\core::INTERFACE_SITS) {
+            return $this->module_delivery_key;
+        }
+
         // Are we a version-only course?
         if ($this->is_version_merged()) {
             $primary = $this->get_primary_version();
