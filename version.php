@@ -29,6 +29,5 @@ $plugin->requires  = 2015111600;
 $plugin->component = 'local_connect';
 $plugin->dependencies = array(
     'local_kent' => 2015091800,
-    'tool_cat' => 2015081800,
-    'local_hipchat' => 2015060500
+    'tool_cat' => 2015081800
 );
