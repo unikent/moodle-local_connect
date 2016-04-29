@@ -42,6 +42,9 @@ class sits_sync extends \core\task\scheduled_task
         $task = new \local_connect\sits\courses();
         $task->execute();
 
+        $task = new \local_connect\sits\course_handbook();
+        $task->execute();
+
         set_config('lastsync', time(), 'local_connect');
     }
 }
