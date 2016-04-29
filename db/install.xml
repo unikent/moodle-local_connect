@@ -1,5 +1,6 @@
+
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/connect/db" VERSION="20160308" COMMENT="XMLDB file for Connect module"
+<XMLDB PATH="local/connect/db" VERSION="20160428" COMMENT="XMLDB file for Connect module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -75,7 +76,6 @@
         <FIELD NAME="module_code" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="module_code_sds" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="SDS module code (if available)"/>
         <FIELD NAME="credit_level" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="synopsis" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="category" TYPE="int" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="department" TYPE="char" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="interface" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="SITS or SDS?"/>
@@ -209,6 +209,28 @@
         <INDEX NAME="i_week_beginning_date" UNIQUE="false" FIELDS="week_beginning_date"/>
         <INDEX NAME="i_week_number" UNIQUE="false" FIELDS="week_number"/>
       </INDEXES>
+    </TABLE>
+    <TABLE NAME="connect_course_handbook" COMMENT="Handbook data for courses">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="module_code" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="synopsis" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="publicationssynopsis" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="contacthours" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="learningoutcome" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="methodofassessment" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="preliminaryreading" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="updateddate" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="availability" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="cost" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="prerequisites" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="progression" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="restrictions" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="k_module_code" TYPE="unique" FIELDS="module_code"/>
+      </KEYS>
     </TABLE>
   </TABLES>
 </XMLDB>
