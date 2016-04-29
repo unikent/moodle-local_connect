@@ -18,17 +18,15 @@
  * Browse data for a course.
  *
  * @package    local_connect
- * @copyright  2014 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require (dirname(__FILE__) . '/../../../config.php');
+require(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/tablelib.php');
 
-/**
- * Page setup.
- */
+// Page setup.
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/connect/browse/course.php');
 $PAGE->set_title(get_string('connectbrowse', 'local_connect'));
@@ -37,104 +35,100 @@ admin_externalpage_setup('connectdatabrowse', '', null, '', array('pagelayout' =
 
 $PAGE->navbar->add("Course View");
 
-/**
- * Check course.
- */
+// Check course.
 $id = required_param("id", PARAM_INT);
 $course = \local_connect\course::get($id);
 if ($course === null) {
-	print_error('Invalid Course!');
+    print_error('Invalid Course!');
 }
 
-/**
- * And, the actual page.
- */
+// And, the actual page.
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $course->module_code);
 
-// The Course Information Table
+// The Course Information Table.
 {
-	echo $OUTPUT->heading("Course Information", 2);
+    echo $OUTPUT->heading("Course Information", 2);
 
-	$table = new flexible_table('course-info');
-	$table->define_columns(array('variable', 'value'));
-	$table->define_headers(array("Variable", "Value"));
-	$table->define_baseurl('/local/connect/browse/course.php');
-	$table->setup();
+    $table = new flexible_table('course-info');
+    $table->define_columns(array('variable', 'value'));
+    $table->define_headers(array("Variable", "Value"));
+    $table->define_baseurl('/local/connect/browse/course.php');
+    $table->setup();
 
-	$mid = "-";
-	if (!empty($course->mid)) {
-		$mid = \html_writer::link($course->get_moodle_url(), $course->mid);
-	}
+    $mid = "-";
+    if (!empty($course->mid)) {
+        $mid = \html_writer::link($course->get_moodle_url(), $course->mid);
+    }
 
-	$table->add_data(array("id", $course->id));
-	$table->add_data(array("mid", $mid));
-	$table->add_data(array("interface", $course->interface == \local_connect\core::INTERFACE_SITS ? 'SITS' : 'SDS'));
-	$table->add_data(array("module_delivery_key", $course->module_delivery_key));
-	$table->add_data(array("session_code", $course->session_code));
-	$table->add_data(array("module_version", $course->module_version));
-	$table->add_data(array("campus", $course->campus));
-	$table->add_data(array("module_week_beginning", $course->module_week_beginning));
-	$table->add_data(array("module_length", $course->module_length));
-	$table->add_data(array("week_beginning_date", $course->week_beginning_date));
-	$table->add_data(array("module_title", $course->module_title));
-	$table->add_data(array("module_code", $course->module_code));
-	$table->add_data(array("synopsis", $course->synopsis));
-	$table->add_data(array("category", $course->category));
+    $table->add_data(array("id", $course->id));
+    $table->add_data(array("mid", $mid));
+    $table->add_data(array("interface", $course->interface == \local_connect\core::INTERFACE_SITS ? 'SITS' : 'SDS'));
+    $table->add_data(array("module_delivery_key", $course->module_delivery_key));
+    $table->add_data(array("session_code", $course->session_code));
+    $table->add_data(array("module_version", $course->module_version));
+    $table->add_data(array("campus", $course->campus));
+    $table->add_data(array("module_week_beginning", $course->module_week_beginning));
+    $table->add_data(array("module_length", $course->module_length));
+    $table->add_data(array("week_beginning_date", $course->week_beginning_date));
+    $table->add_data(array("module_title", $course->module_title));
+    $table->add_data(array("module_code", $course->module_code));
+    $table->add_data(array("synopsis", $course->synopsis));
+    $table->add_data(array("category", $course->category));
 
-	// Enrolment counts.
-	$table->add_data(array("staff_enrolled", $course->count_staff()));
-	$table->add_data(array("students_enrolled", $course->count_students()));
+    // Enrolment counts.
+    $table->add_data(array("staff_enrolled", $course->count_staff()));
+    $table->add_data(array("students_enrolled", $course->count_students()));
 
-	$table->finish_output();
+    $table->finish_output();
 }
 
-// The Enrolments Table
+// The Enrolments Table.
 {
-	echo $OUTPUT->heading("Enrolments", 2);
+    echo $OUTPUT->heading("Enrolments", 2);
 
-	$table = new flexible_table('course-enrolments');
-	$table->define_columns(array('username', 'role', 'status', 'in_moodle', 'action'));
-	$table->define_headers(array("Username", "Role", "Status", "In Moodle?", "Action"));
-	$table->define_baseurl('/local/connect/browse/course.php');
-	$table->setup();
+    $table = new flexible_table('course-enrolments');
+    $table->define_columns(array('username', 'role', 'status', 'in_moodle', 'action'));
+    $table->define_headers(array("Username", "Role", "Status", "In Moodle?", "Action"));
+    $table->define_baseurl('/local/connect/browse/course.php');
+    $table->setup();
 
-	foreach ($course->enrolments as $enrolment) {
-		$userurl = new \moodle_url("/local/connect/browse/user.php", array("id" => $enrolment->userid));
-		$userlink = \html_writer::link($userurl->out(false), $enrolment->user->login);
+    foreach ($course->enrolments as $enrolment) {
+        $userurl = new \moodle_url("/local/connect/browse/user.php", array("id" => $enrolment->userid));
+        $userlink = \html_writer::link($userurl->out(false), $enrolment->user->login);
 
-		$push_url = new \moodle_url("/local/connect/browse/sync/enrolment.php", array("id" => $enrolment->id));
-		$push_link = \html_writer::link($push_url->out(false), "Push");
+        $push_url = new \moodle_url("/local/connect/browse/sync/enrolment.php", array("id" => $enrolment->id));
+        $push_link = \html_writer::link($push_url->out(false), "Push");
 
-		$in_moodle = $enrolment->is_in_moodle();
-		$table->add_data(array($userlink, $enrolment->role->name, $enrolment->status, $in_moodle ? "Yes" : "No", $in_moodle ? "" : $push_link));
-	}
+        $in_moodle = $enrolment->is_in_moodle();
+        $table->add_data(array($userlink, $enrolment->role->name, $enrolment->status, $in_moodle ? "Yes" : "No", $in_moodle ? "" : $push_link));
+    }
 
-	$push_url = new \moodle_url("/local/connect/browse/sync/course.php", array("id" => $course->id));
-	$push_link = \html_writer::link($push_url->out(false), "Push All");
-	$table->add_data(array("", "", "", "", $push_link));
+    $push_url = new \moodle_url("/local/connect/browse/sync/course.php", array("id" => $course->id));
+    $push_link = \html_writer::link($push_url->out(false), "Push All");
+    $table->add_data(array("", "", "", "", $push_link));
 
-	$table->finish_output();
+    $table->finish_output();
 }
 
-// The Groups Table
+// The Groups Table.
 {
-	echo $OUTPUT->heading("Groups", 2);
+    echo $OUTPUT->heading("Groups", 2);
 
-	$table = new flexible_table('course-groups');
-	$table->define_columns(array('name', 'members', 'in_moodle'));
-	$table->define_headers(array("Name", "Number of users", "In Moodle?"));
-	$table->define_baseurl('/local/connect/browse/course.php');
-	$table->setup();
+    $table = new flexible_table('course-groups');
+    $table->define_columns(array('name', 'members', 'in_moodle'));
+    $table->define_headers(array("Name", "Number of users", "In Moodle?"));
+    $table->define_baseurl('/local/connect/browse/course.php');
+    $table->setup();
 
-	foreach ($course->groups as $group) {
-		$url = new \moodle_url("/local/connect/browse/group.php", array("id" => $group->id));
-		$name = \html_writer::link($url->out(true), $group->name);
+    foreach ($course->groups as $group) {
+        $url = new \moodle_url("/local/connect/browse/group.php", array("id" => $group->id));
+        $name = \html_writer::link($url->out(true), $group->name);
 
-		$table->add_data(array($name, $group->count_all(), $group->is_in_moodle() ? "Yes" : "No"));
-	}
+        $table->add_data(array($name, $group->count_all(), $group->is_in_moodle() ? "Yes" : "No"));
+    }
 
-	$table->finish_output();
+    $table->finish_output();
 }
 
 echo $OUTPUT->footer();
