@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Grabs all course handbook data out of SITS.
  */
-class handbook extends \core\task\adhoc_task
+class course_handbook extends \core\task\adhoc_task
 {
     use sql_helper;
 
