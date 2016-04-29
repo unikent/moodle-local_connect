@@ -441,7 +441,10 @@ SQL;
      * Returns the handbook.
      */
     public function get_handbook() {
-        return course_handbook::get_by('module_code', $this->module_code);
+        if (!isset(static::$internalcache["handbook_{$this->module_code}"])) {
+            static::$internalcache["handbook_{$this->module_code}"] = course_handbook::get_by('module_code', $this->module_code);
+        }
+        return static::$internalcache["handbook_{$this->module_code}"];
     }
 
     /**
