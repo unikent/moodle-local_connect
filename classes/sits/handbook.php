@@ -58,12 +58,12 @@ SQL;
     /**
      * Create Table SQL.
      */
-    public static function get_create_table_sql($tablename = 'course_handbooks', $create = 'CREATE TABLE IF NOT EXISTS') {
+    public static function get_create_table_sql($tablename = 'connect_course_handbooks', $create = 'CREATE TABLE IF NOT EXISTS') {
         global $CFG;
 
         return <<<SQL
             {$create} {{$tablename}} (
-                module_code CHAR(255) NOT NULL,
+                module_code VARCHAR(255) NOT NULL,
                 synopsis LONGTEXT,
                 publicationssynopsis LONGTEXT,
                 contacthours LONGTEXT,
@@ -75,7 +75,7 @@ SQL;
                 cost LONGTEXT,
                 prerequisites LONGTEXT,
                 progression LONGTEXT,
-                restrictions LONGTEXT,
+                restrictions LONGTEXT
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->dbcollation}
 SQL;
     }
@@ -96,10 +96,10 @@ SQL;
     private function create_temp_table() {
         global $DB;
 
-        $create = static::get_create_table_sql('tmp_connect_course_handbooks', 'CREATE TEMPORARY TABLE');
+        $create = static::get_create_table_sql('tmp_connect_course_handbook', 'CREATE TEMPORARY TABLE');
         $DB->execute($create);
 
-        $alter = static::get_alter_table_sql('tmp_connect_course_handbooks');
+        $alter = static::get_alter_table_sql('tmp_connect_course_handbook');
         $DB->execute($alter);
     }
 
@@ -109,7 +109,7 @@ SQL;
     private function destroy_temp_table() {
         global $DB;
 
-        $DB->execute('DROP TEMPORARY TABLE {tmp_connect_course_handbooks}');
+        $DB->execute('DROP TEMPORARY TABLE {tmp_connect_course_handbook}');
     }
 
     /**
@@ -122,8 +122,8 @@ SQL;
 
         return $DB->execute('
             DELETE cch.* FROM {connect_course_handbook} cch
-            LEFT OUTER JOIN {tmp_connect_course_handbooks} tmp
-                ON tmp.module_code = c.module_code
+            LEFT OUTER JOIN {tmp_connect_course_handbook} tmp
+                ON tmp.module_code = cch.module_code
             WHERE tmp.module_code IS NULL
         ');
     }
@@ -142,7 +142,7 @@ SQL;
                                                     availability,cost,prerequisites,progression,restrictions)
             (
                 SELECT cch.id, ccht.*
-                FROM {tmp_connect_course_handbooks} ccht
+                FROM {tmp_connect_course_handbook} ccht
                 INNER JOIN {connect_course_handbook} cch
                     ON cch.module_code=ccht.module_code
             )
@@ -163,7 +163,7 @@ SQL;
                                                     availability,cost,prerequisites,progression,restrictions)
             (
                 SELECT ccht.*
-                FROM {tmp_connect_course_handbooks} ccht
+                FROM {tmp_connect_course_handbook} ccht
                 LEFT OUTER JOIN {connect_course_handbook} cch
                     ON cch.module_code=ccht.module_code
                 WHERE cch.id IS NULL
@@ -194,13 +194,17 @@ SQL;
         $this->create_temp_table();
 
         // Load data into the temp table.
-        $this->get_all(function($row) {
+        $this->get_all(function($rows) {
             global $DB;
 
-            $row->updateddate = strtotime($row->updateddate);
-            $row->module_code = $row->sds_module_code;
+            $tmp = array();
+            foreach ($rows as $row) {
+                $row->updateddate = strtotime($row->updateddate);
+                $row->module_code = $row->sds_module_code;
+                $tmp[] = $row;
+            }
 
-            $DB->insert_records('tmp_connect_course_handbook', $row);
+            $DB->insert_records('tmp_connect_course_handbook', $tmp);
         });
         $stats = $this->get_stats();
 
