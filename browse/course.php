@@ -73,7 +73,6 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
     $table->add_data(array("week_beginning_date", $course->week_beginning_date));
     $table->add_data(array("module_title", $course->module_title));
     $table->add_data(array("module_code", $course->module_code));
-    $table->add_data(array("synopsis", $course->synopsis));
     $table->add_data(array("category", $course->category));
 
     // Enrolment counts.

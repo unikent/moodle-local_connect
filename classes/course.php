@@ -57,7 +57,7 @@ class course extends data
         return array(
             "id", "mid", "module_delivery_key", "session_code", "module_version", "credit_level",
             "campusid", "module_week_beginning", "module_length", "week_beginning_date", "module_title",
-            "module_code", "module_code_sds", "synopsis", "category", "department", "interface", "deleted"
+            "module_code", "module_code_sds", "category", "department", "interface", "deleted"
         );
     }
 
@@ -419,6 +419,14 @@ SQL;
         return $DB->get_record('course', array(
             'id' => $this->mid
         ), '*', \MUST_EXIST);
+    }
+
+    /**
+     * Returns a basic synopsis.
+     */
+    public function _get_synopsis() {
+        $handbook = $this->get_handbook();
+        return $handbook->synopsis;
     }
 
     /**

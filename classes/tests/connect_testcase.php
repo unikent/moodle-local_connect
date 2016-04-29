@@ -232,6 +232,13 @@ abstract class connect_testcase extends \advanced_testcase
 
         static $key = 10000;
 
+        $mcode = $this->generate_module_code();
+
+        $DB->insert_record('connect_course_handbook', array(
+            'module_code' => $mcode,
+            'synopsis' => 'A test course'
+        ));
+
         return $DB->insert_record('connect_course', array(
             "mid" => 0,
             "module_delivery_key" => $key++,
@@ -242,8 +249,7 @@ abstract class connect_testcase extends \advanced_testcase
             "module_length" => 12,
             "week_beginning_date" => strftime('%Y-%m-%d %H:%M:%S'),
             "module_title" => $this->generate_module_name(),
-            "module_code" => $this->generate_module_code(),
-            "synopsis" => 'A test course',
+            "module_code" => $mcode,
             "category" => 1
         ));
     }

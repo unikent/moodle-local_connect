@@ -208,7 +208,7 @@ class kent_course_tests extends \local_connect\tests\connect_testcase
             $synopsis .= ":";
         }
 
-        $course->synopsis = $synopsis;
+        $course->get_handbook()->synopsis = $synopsis;
 
         $this->assertEquals($expected, $course->summary);
     }
