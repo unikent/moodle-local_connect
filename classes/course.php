@@ -430,6 +430,13 @@ SQL;
     }
 
     /**
+     * Returns the handbook.
+     */
+    public function get_handbook() {
+        return course_handbook::get_by('module_code', $this->module_code);
+    }
+
+    /**
      * Is this course (probably) postgraduate?
      * @return boolean
      */

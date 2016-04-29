@@ -83,6 +83,14 @@ echo $OUTPUT->heading(get_string('connectbrowse_course', 'local_connect') . $cou
     $table->finish_output();
 }
 
+// The module handbook.
+{
+    echo $OUTPUT->heading("Handbook", 2);
+    $handbook = $course->get_handbook();
+    $table = $handbook->get_flexible_table($PAGE->url);
+    $table->finish_output();
+}
+
 // The Enrolments Table.
 {
     echo $OUTPUT->heading("Enrolments", 2);
