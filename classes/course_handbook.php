@@ -68,4 +68,11 @@ class course_handbook extends data
     protected static function key_fields() {
         return array('id');
     }
+
+    /**
+     * Pretty print the date.
+     */
+    public function _pretty_updateddate() {
+        return strftime(get_string('strftimedatetime', 'langconfig'), $this->updateddate);
+    }
 }
