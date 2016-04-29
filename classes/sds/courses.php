@@ -59,8 +59,7 @@ class courses extends \core\task\adhoc_task
               ltrim(rtrim(cmd.module_length)) as module_length,
               ltrim(rtrim(cmd.module_title)) as module_title,
               ltrim(rtrim(cmd.module_code)) as module_code,
-              ltrim(rtrim(cmd.credit_level)) as credit_level,
-              syn.data as synopsis
+              ltrim(rtrim(cmd.credit_level)) as credit_level
             FROM d_module_delivery dmd
               INNER JOIN d_module_delivery_session AS dmds
                 ON dmds.module_delivery_key = dmd.module_delivery_key
@@ -69,20 +68,6 @@ class courses extends \core\task\adhoc_task
               INNER JOIN c_campus AS cc ON dmd.delivery_campus = cc.campus
               INNER JOIN c_module_details AS cmd
                   ON cmd.module_code = dmd.module_code AND cmd.module_version = dmd.module_version
-              LEFT JOIN (
-                SELECT DISTINCT
-                  he_1.module_code, he_1.module_version, cast(he_1.data as varchar(500)) as data
-                FROM CLIO.UKC_Reference.dbo.hdb_handbook_entry AS he_1
-                WHERE he_1.id IN (
-                  SELECT TOP 1 id
-                  FROM CLIO.UKC_Reference.dbo.hdb_handbook_entry AS hee_1
-                  WHERE hee_1.isactive = 1
-                      AND hee_1.display_order = 1
-                      AND entry_type = 'S'
-                      AND session_code = {$CFG->connect->session_code}
-                      AND hee_1.module_code = he_1.module_code
-                )
-              ) AS syn ON syn.module_code=cmd.module_code AND syn.module_version=cmd.module_version
               INNER JOIN c_session_week_beginning AS swb
                   ON swb.week_beginning = dmd.module_week_beginning
                   AND swb.session_code = {$CFG->connect->session_code}
@@ -118,7 +103,6 @@ SQL;
               `state` int(11) DEFAULT '0',
               `created_at` datetime DEFAULT NULL,
               `updated_at` datetime DEFAULT NULL,
-              `synopsis` text,
               `week_beginning_date` datetime DEFAULT NULL,
               `category_id` int(11) DEFAULT NULL,
               `parent_id` varchar(36) DEFAULT NULL,
@@ -225,11 +209,11 @@ SQL;
         return $DB->execute('
             REPLACE INTO {connect_course} (
                 id,module_delivery_key,session_code,module_version,credit_level,campusid,module_week_beginning,module_length,
-                week_beginning_date,module_title,module_code,module_code_sds,synopsis,category,department,mid,interface,deleted)
+                week_beginning_date,module_title,module_code,module_code_sds,category,department,mid,interface,deleted)
             (
                 SELECT cc.id, c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.credit_level,
                        c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,
-                       c.module_title,c.module_code,c.module_code_sds,COALESCE(c.synopsis, \'\'),cc.category,
+                       c.module_title,c.module_code,c.module_code_sds,cc.category,
                        COALESCE(c.delivery_department,0),COALESCE(cc.mid,0),c.interface,0
                 FROM {tmp_connect_courses} c
                 INNER JOIN {connect_course} cc
@@ -250,12 +234,11 @@ SQL;
         return $DB->execute('
             INSERT INTO {connect_course} (
                 module_delivery_key,session_code,module_version,credit_level,campusid,module_week_beginning,module_length,
-                week_beginning_date,module_title,module_code,module_code_sds,synopsis,category,department,mid,interface,deleted)
+                week_beginning_date,module_title,module_code,module_code_sds,category,department,mid,interface,deleted)
             (
                 SELECT c.module_delivery_key,c.session_code,COALESCE(c.module_version,1),c.credit_level,
                        c.campus as campusid,c.module_week_beginning,c.module_length,c.week_beginning_date,
-                       c.module_title,c.module_code,c.module_code_sds,COALESCE(c.synopsis, \'\'),0,
-                       c.delivery_department,0,c.interface,0
+                       c.module_title,c.module_code,c.module_code_sds,0,c.delivery_department,0,c.interface,0
                 FROM {tmp_connect_courses} c
                 LEFT OUTER JOIN {connect_course} cc
                     ON cc.module_delivery_key = c.module_delivery_key AND cc.module_version = c.module_version
