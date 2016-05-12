@@ -38,7 +38,7 @@ class base
     private $_spider;
 
     /**
-     * Are we prepared?.
+     * Are we prepared?
      * @internal
      */
     private $_prepared;
@@ -87,7 +87,6 @@ class base
 
         // Create simple build actions for all courses that are unique.
         foreach ($lists['unique'] as $course) {
-            $course = \local_connect\course::from_sql_result($course);
             if ($course->is_unique_shortname($course->shortname, true)) {
                 $this->_tree->add_child(new actions\course_create($course));
             } else {
@@ -97,7 +96,6 @@ class base
 
         // Create mostly-simple build actions for all courses that are term-spanned.
         foreach ($lists['term-span'] as $course) {
-            $course = \local_connect\course::from_sql_result($course);
             $shortnameext = $course->generate_shortname_ext();
             $course->set_shortname_ext($shortnameext);
 
@@ -108,7 +106,6 @@ class base
 
         // Create mostly-simple build actions for all courses that are campus-spanned.
         foreach ($lists['campus-span'] as $course) {
-            $course = \local_connect\course::from_sql_result($course);
             $shortnameext = $course->generate_shortname_ext();
             $course->set_shortname_ext($shortnameext);
 
@@ -120,10 +117,8 @@ class base
         // Merge version-spanned.
         $merges = $sorter->get_version_merges();
         foreach ($merges as $merge) {
-            $parent = \local_connect\course::from_sql_result($merge['parent']);
-            $children = array_map(function($child) {
-                return \local_connect\course::from_sql_result($child);
-            }, $merge['children']);
+            $parent = $merge['parent'];
+            $children = $merge['children'];
 
             // Find the parent create task.
             $leaf = $this->_spider->get_create_task($parent->id);
