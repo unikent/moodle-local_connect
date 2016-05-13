@@ -278,7 +278,7 @@ SQL;
             return trim($modulecode) . " " . $ext;
         }
 
-        return $modulecode;
+        return trim($modulecode);
     }
 
     /**
