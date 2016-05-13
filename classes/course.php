@@ -1211,13 +1211,16 @@ SQL;
      * @return string
      */
     public function generate_shortname_ext() {
-        $campus = $this->campus->get_shortname() . " ";
+        $campus = trim($this->campus->get_shortname());
+        if (!empty($campus)) {
+            $campus .= ' ';
+        }
 
         // Are we a WSHOP?
         if (strpos($this->module_code, "WSHOP") === 0) {
             return "{$campus}(week {$this->module_week_beginning})";
         }
 
-        $this->set_shortname_ext(trim($campus .  $this->get_term()));
+        $this->set_shortname_ext($campus .  $this->get_term());
     }
 }
