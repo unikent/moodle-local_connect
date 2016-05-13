@@ -273,9 +273,9 @@ SQL;
             }
         }
 
-        $ext = $this->shortname_ext;
+        $ext = trim($this->shortname_ext);
         if (!empty($ext)) {
-            return $modulecode . " " . $ext;
+            return trim($modulecode) . " " . $ext;
         }
 
         return $modulecode;
@@ -1218,6 +1218,6 @@ SQL;
             return "{$campus}(week {$this->module_week_beginning})";
         }
 
-        $this->set_shortname_ext($campus .  $this->get_term());
+        $this->set_shortname_ext(trim($campus .  $this->get_term()));
     }
 }
