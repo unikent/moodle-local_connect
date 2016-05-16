@@ -61,6 +61,7 @@ SQL;
     public static function get_create_table_sql($tablename = 'connect_course_handbooks', $create = 'CREATE TABLE IF NOT EXISTS') {
         global $CFG;
 
+        $collation = $CFG->dboptions['dbcollation'];
         return <<<SQL
             {$create} {{$tablename}} (
                 module_code VARCHAR(255) NOT NULL,
@@ -76,7 +77,7 @@ SQL;
                 prerequisites LONGTEXT,
                 progression LONGTEXT,
                 restrictions LONGTEXT
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->dbcollation}
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$collation}
 SQL;
     }
 

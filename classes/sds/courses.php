@@ -83,6 +83,7 @@ SQL;
     public static function get_create_table_sql($tablename = 'courses', $create = 'CREATE TABLE IF NOT EXISTS') {
         global $CFG;
 
+        $collation = $CFG->dboptions['dbcollation'];
         return <<<SQL
             {$create} {{$tablename}} (
               `id` int(11) NOT NULL,
@@ -114,7 +115,7 @@ SQL;
               `json_cache` text,
               `primary_child` varchar(36) DEFAULT NULL,
               `last_checked` datetime DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->dbcollation}
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$collation}
 SQL;
     }
 

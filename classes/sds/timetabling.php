@@ -64,13 +64,14 @@ SQL;
     public static function get_create_table_sql($tablename = 'weeks', $create = 'CREATE TABLE IF NOT EXISTS') {
         global $CFG;
 
+        $collation = $CFG->dboptions['dbcollation'];
         return <<<SQL
             {$create} {{$tablename}} (
               `id` int(11) NOT NULL,
               `week_beginning` varchar(255) DEFAULT NULL,
               `week_beginning_date` varchar(255) DEFAULT NULL,
               `week_number` varchar(255) DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->dbcollation}
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$collation}
 SQL;
     }
 

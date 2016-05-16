@@ -69,12 +69,13 @@ SQL;
     public static function get_create_table_sql($tablename = 'groups', $create = 'CREATE TABLE IF NOT EXISTS') {
         global $CFG;
 
+        $collation = $CFG->dboptions['dbcollation'];
         return <<<SQL
             {$create} {{$tablename}} (
               `group_id` int(11) NOT NULL,
               `group_desc` varchar(255) DEFAULT NULL,
               `module_delivery_key` varchar(36) DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$CFG->dbcollation}
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE={$collation}
 SQL;
     }
 
