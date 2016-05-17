@@ -47,21 +47,19 @@ class sdsdb {
             return true;
         }
 
-        require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sds.php');
-
-        if (!$SDSDB = \moodle_database::get_driver_instance($CFG->kent->sdsdb['type'],
-                                                            $CFG->kent->sdsdb['library'],
-                                                            true)) {
+        if (!$SDSDB = \moodle_database::get_driver_instance($CFG->dbcfg[KENT_ENV]['sds']['dbtype'],
+                                                              $CFG->dbcfg[KENT_ENV]['sds']['dblibrary'],
+                                                              true)) {
             throw new \dml_exception('dbdriverproblem', "Unknown driver for kent");
         }
 
         $SDSDB->connect(
-            $CFG->kent->sdsdb['host'],
-            $CFG->kent->sdsdb['user'],
-            $CFG->kent->sdsdb['pass'],
-            $CFG->kent->sdsdb['name'],
-            $CFG->kent->sdsdb['prefix'],
-            $CFG->kent->sdsdb['options']
+            $CFG->dbcfg[KENT_ENV]['sds']['dbhost'],
+            $CFG->dbcfg[KENT_ENV]['sds']['dbuser'],
+            $CFG->dbcfg[KENT_ENV]['sds']['dbpass'],
+            $CFG->dbcfg[KENT_ENV]['sds']['dbname'],
+            $CFG->dbcfg[KENT_ENV]['sds']['prefix'],
+            $CFG->dbcfg[KENT_ENV]['sds']['dboptions']
         );
 
         static::$setup = true;
@@ -94,8 +92,7 @@ class sdsdb {
     public static function available() {
         global $CFG;
 
-        require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sds.php');
-        return !empty($CFG->kent->sdsdb['user']);
+        return isset($CFG->dbcfg[KENT_ENV]['sds']);
     }
 
     /**

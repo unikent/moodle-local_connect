@@ -50,21 +50,19 @@ class sitsdb {
         // Force this here.
         ini_set('mssql.charset', "UTF-8");
 
-        require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sits.php');
-
-        if (!$SITSDB = \moodle_database::get_driver_instance($CFG->kent->sitsdb['type'],
-                                                            $CFG->kent->sitsdb['library'],
-                                                            true)) {
+        if (!$SITSDB = \moodle_database::get_driver_instance($CFG->dbcfg[KENT_ENV]['sits']['dbtype'],
+                                                              $CFG->dbcfg[KENT_ENV]['sits']['dblibrary'],
+                                                              true)) {
             throw new \dml_exception('dbdriverproblem', "Unknown driver for kent");
         }
 
         $SITSDB->connect(
-            $CFG->kent->sitsdb['host'],
-            $CFG->kent->sitsdb['user'],
-            $CFG->kent->sitsdb['pass'],
-            $CFG->kent->sitsdb['name'],
-            $CFG->kent->sitsdb['prefix'],
-            $CFG->kent->sitsdb['options']
+            $CFG->dbcfg[KENT_ENV]['sits']['dbhost'],
+            $CFG->dbcfg[KENT_ENV]['sits']['dbuser'],
+            $CFG->dbcfg[KENT_ENV]['sits']['dbpass'],
+            $CFG->dbcfg[KENT_ENV]['sits']['dbname'],
+            $CFG->dbcfg[KENT_ENV]['sits']['prefix'],
+            $CFG->dbcfg[KENT_ENV]['sits']['dboptions']
         );
 
         static::$setup = true;
@@ -97,8 +95,7 @@ class sitsdb {
     public static function available() {
         global $CFG;
 
-        require_once('/var/www/vhosts/' . KENT_VHOST . '/app/config/sits.php');
-        return !empty($CFG->kent->sitsdb['user']);
+        return isset($CFG->dbcfg[KENT_ENV]['sits']);
     }
 
     /**
