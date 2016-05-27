@@ -53,7 +53,7 @@ SQL;
         global $CFG;
 
         $sql = <<<SQL
-            SELECT * FROM vw_moodle_students WHERE academic_year = {$CFG->connect->session_code}
+            SELECT * FROM vw_moodle_conveners WHERE academic_year = {$CFG->connect->session_code}
 SQL;
 
         $this->get_all_sql($sql, $rowcallback);
@@ -66,7 +66,7 @@ SQL;
         global $CFG;
 
         $sql = <<<SQL
-            SELECT * FROM vw_moodle_conveners WHERE academic_year = {$CFG->connect->session_code}
+            SELECT * FROM vw_moodle_students WHERE academic_year = {$CFG->connect->session_code}
 SQL;
 
         $this->get_all_sql($sql, $rowcallback);
