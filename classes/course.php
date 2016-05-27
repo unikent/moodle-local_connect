@@ -109,6 +109,14 @@ class course extends data
     public function sync($dry = false) {
         global $DB;
 
+        // Do we need to re-map our category?
+        if (!$dry && $this->category < 1) {
+            $this->map_category();
+            if (!$dry && $this->category > 0) {
+                $this->save();
+            }
+        }
+
         // If we are not in Moodle, we have nothing to do!
         if (!$this->is_in_moodle()) {
             return self::STATUS_NONE;
@@ -120,11 +128,6 @@ class course extends data
             if ($primary->id !== $this->id) {
                 return self::STATUS_NONE;
             }
-        }
-
-        // Do we need to re-map our category?
-        if (!$dry && $this->category < 1) {
-            $this->map_category();
         }
 
         // Have we changed at all?
