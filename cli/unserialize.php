@@ -27,6 +27,8 @@ define('CLI_SCRIPT', true);
 require(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
+raise_memory_limit(MEMORY_UNLIMITED);
+
 if ($CFG->kent->environment !== 'dev') {
     cli_error("You cannot run this script here.");
     die("You shouldn't see this.");
