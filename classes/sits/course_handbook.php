@@ -49,7 +49,7 @@ class course_handbook extends \core\task\adhoc_task
         global $CFG;
 
         $sql = <<<SQL
-            SELECT * FROM vw_Module_Handbook_Details WHERE academic_year = {$CFG->connect->session_code}
+            SELECT * FROM vw_Module_Handbook_Details WHERE Academic_Year = {$CFG->connect->session_code}
 SQL;
 
         $this->get_all_sql($sql, $rowcallback);
