@@ -391,11 +391,8 @@ SQL;
             $code = substr($code, 0, strpos($code, " "));
         }
 
-        $text = strip_tags($this->synopsis);
-        if (strlen($text) > 250) {
-            $more = "<a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/{$code}'>more</a>";
-            $text = substr($text, 0, 247) . "... " . $more;
-        }
+        $more = "<a href='http://www.kent.ac.uk/courses/modulecatalogue/modules/{$code}'>more</a>";
+        $text = shorten_text(strip_tags($this->synopsis), 250 + strlen($more), true, '...' . $more);
 
         // If we are a merged course, we may have more than one campus.
         $campus = $this->campus_name;
