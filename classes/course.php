@@ -1223,4 +1223,11 @@ SQL;
 
         $this->set_shortname_ext($campus .  $this->get_term());
     }
+
+    /**
+     * Can we auto-provision?
+     */
+    public function can_auto_provision() {
+        return !$this->is_in_moodle() && $this->campus_name != 'Kent, Sussex and Surrey Deanery' && $this->campus_name != 'Canterbury College';
+    }
 }

@@ -97,7 +97,11 @@ class course_sorter
                 debugging("Course is not unique: " . $this->_courses[$course->module_delivery_key]);
             }
 
-            $this->_courses[$course->module_delivery_key] = \local_connect\course::from_sql_result($course);
+            $courseobj = \local_connect\course::from_sql_result($course);
+            if (!$courseobj->can_auto_provision()) {
+                continue;
+            }
+            $this->_courses[$course->module_delivery_key] = $courseobj;
 
             // Add to keys list.
             $k = $course->module_code;
