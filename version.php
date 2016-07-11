@@ -28,6 +28,6 @@ $plugin->version   = 2016042900;
 $plugin->requires  = 2015111600;
 $plugin->component = 'local_connect';
 $plugin->dependencies = array(
-    'local_kent' => 2015091800,
+    'local_kent' => 2016071100,
     'tool_cat' => 2015081800
 );

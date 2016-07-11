@@ -72,6 +72,11 @@ class category
                 'idnumber' => '33'
             ),
             array(
+                'department' => '11',
+                'idnumber' => '69',
+                'rule' => 'KE'
+            ),
+            array(
                 'department' => '48',
                 'idnumber' => '22'
             ),
